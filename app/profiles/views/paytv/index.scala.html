@@ -1,4 +1,5 @@
-@(response: model.user.DashboardResponse,email: String)
+@import profile.utils.CommonUtil
+@(rs: profile.model.PayTVResponse,response: model.paytv.PaytvResponse,email: String)
 
 @import services.domain.CommonService.formatNumber
 @import services.domain.CommonService.percent
@@ -42,164 +43,122 @@
         </div>
     </div>
         <!-- /top navigation -->
-                    <!-- page content -->
-                <div class="right_col" role="main">
-                    <div class="row"><h2 class="noData-title">Sorry, This page is under construction, please come back later...</h2></div>
-                    @*<div class="row">
-                        <div class="col-md-12 col-sm-12 col-xs-9">
-                            <div class="dashboard_graph">
-                                <div class="col-md-9 col-sm-9 col-xs-12">
-                                    <div class="x_title">
-                                        <h2><i class="fa fa-user"></i> PAYTV APP CUSTOMER</h2>
-                                        <ul class="nav navbar-right panel_toolbox">
-                                            <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                            </li>
-                                            <li class="dropdown">
-                                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                                <ul class="dropdown-menu" role="menu">
-                                                    <li><a href="#">Settings 1</a>
-                                                    </li>
-                                                    <li><a href="#">Settings 2</a>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                            <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                            </li>
-                                        </ul>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    <div id="pie-customer" style=" height: 300px"></div>
-                                </div>
-
-                                <div class="col-md-3 col-sm-3 col-xs-3 bg-white">
-                                    <div class="col-md-12">
-                                        <div class="panel hvr-wobble-bottom" style="display: inherit;padding:20px 20px;border: 1px solid #9CC2CB ">
-                                            <div class="panel-heading bg-facebook text-center"  style="background-color: #1ABB9C;padding: 7px!important;">
-                                                <a href="#">
-                                                    <i class="fa fa-user fa-3x"></i>
-                                                </a>
-                                            </div>
-                                            <div class="padder-v text-center clearfix">
-                                                <div class="col-xs-12">
-                                                    <div class="h3 font-bold ">@formatNumber(response.uniqueCustomer)</div>
-                                                    <span class="text-muted">Unique count of customer</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="panel hvr-wobble-bottom" style="display: inherit;padding:20px 20px;border: 1px solid #9CC2CB">
-                                            <div class="panel-heading bg-facebook text-center" style="background-color: #1ABB9C;padding: 7px!important;">
-                                                <a href="#">
-                                                    <i class="fa fa-book fa-3x"></i>
-                                                </a>
-                                            </div>
-                                            <div class="padder-v text-center clearfix">
-                                                <div class="col-xs-12">
-                                                    <div class="h3 font-bold ">@formatNumber(response.uniqueContract)</div>
-                                                    <span class="text-muted">Unique count of contract</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
+        <!-- page content -->
+        <div class="right_col" role="main">
+            @if(response != null) {
+                <div class="row top_tiles">
+                    <div class="col-lg-6 col-md-6 col-sm-6">
+                        <div class="x_panel tile" style="padding: 0px">
+                            <div class="title disInline">
+                                <span style="width: 80%">Paytv Contract By Status</span>
+                                <select class="form-control" id="slStatus" onclick="drillDownJson(this)">
+                                    <option value="*" selected>--- Choose status ---</option>
+                                @for( (k,v) <- CommonUtil.STATUS_MAP){
+                                    <option value="@v">@k</option>
+                                }
+                                </select>
                                 <div class="clearfix"></div>
                             </div>
-                        </div>
-
-                    </div>
-
-                    <br/>
-                    <div class="row" style="display: none">
-                        <div class="col-md-12 col-sm-12 col-xs-12">
-                            <div class="x_panel">
-                                <div class="x_title">
-                                    <h2><i class="fa fa-television"></i> PAYTV CATE IPTV COUNT DURATION</h2>
-                                    <ul class="nav navbar-right panel_toolbox">
-                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                        </li>
-                                        <li class="dropdown">
-                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                            <ul class="dropdown-menu" role="menu">
-                                                <li><a href="#">Settings 1</a>
-                                                </li>
-                                                <li><a href="#">Settings 2</a>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                        <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                        </li>
-                                    </ul>
-                                    <div class="clearfix"></div>
-                                </div>
-                                <div class="x_content">
-                                    <div id="col-iptv" style=" height: 300px"></div>
-                                </div>
+                            <div class="x_content">
+                                <div id="line-status" style="height: 300px;"></div>
                             </div>
                         </div>
                     </div>
-                    <br/>
+                    <div class="col-lg-6 col-md-6 col-sm-6">
+                        <div class="x_panel tile" style="padding: 0px">
+                            <div class="title disInline">
+                                <span style="width: 80%">Paytv Contract By Province</span>
+                                <select class="form-control" id="slProvince" onclick="drillDownJson(this)">
 
-                    <div class="row">
-                        <div class="col-md-12 col-sm-12 col-xs-12">
-                            <div class="x_panel">
-                                <div class="x_title">
-                                    <h2><i class="fa fa-bar-chart"></i> PAYTV DURATION</h2>
-                                    <ul class="nav navbar-right panel_toolbox">
-                                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                                        </li>
-                                        <li class="dropdown">
-                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
-                                            <ul class="dropdown-menu" role="menu">
-                                                <li><a href="#">Settings 1</a>
-                                                </li>
-                                                <li><a href="#">Settings 2</a>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                        <li><a class="close-link"><i class="fa fa-close"></i></a>
-                                        </li>
-                                    </ul>
-                                    <div class="clearfix"></div>
-                                </div>
-                                <div class="x_content">
-
-
-                                    <div class="" role="tabpanel" data-example-id="togglable-tabs">
-                                        <ul id="myTab" class="nav nav-tabs bar_tabs" role="tablist">
-                                            <li role="presentation" class="active"><a href="#tab_day" id="day-tab" role="tab" data-toggle="tab" aria-expanded="true">Day of week</a>
-                                            </li>
-                                            <li role="presentation" class=""><a href="#tab_hourly" role="tab" id="hourly-tab" data-toggle="tab" aria-expanded="false">Hourly</a>
-                                            </li>
-                                        </ul>
-                                        <div id="myTabContent" class="tab-content">
-                                            <div role="tabpanel" class="tab-pane fade active in animated slideInUp" id="tab_day" aria-labelledby="day-tab">
-                                                <div id="col-day" style="min-width: 300px; height: 400px; margin-top: 50px"></div>
-                                            </div>
-
-                                            <div role="tabpanel" class="tab-pane fade animated slideInUp" id="tab_hourly" aria-labelledby="hourly-tab">
-                                                <div id="col-hourly" style="min-width: 300px; height: 400px; margin-top: 50px"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                </div>
+                                </select>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="x_content">
+                                <div id="line-province" style="height: 300px;"></div>
                             </div>
                         </div>
-                    </div>*@
-
+                    </div>
                 </div>
-                    <!-- /page content -->
-
-                    <!-- footer content -->
-                <footer>
-                    <div class="pull-right">
-                        Dashboard Admin 21/09/2017
+                <div class="row top_tiles">
+                    <div class="col-lg-12">
+                        <div class="x_panel tile" style="padding: 0px">
+                            <div class="title disInline">
+                                <span style="width: 90%">Paytv Contract By Name</span>
+                                <select class="form-control" id="slName" onclick="drillDownJson(this)">
+                                    <option value="*" selected>--- Choose name ---</option>
+                                @for(i <- 0 until rs.tengoi.map(x=>x._2).distinct.length){
+                                    <option value="@rs.tengoi.map(x=>x._2).distinct(i)">@rs.tengoi.map(x=>x._2).distinct(i)</option>
+                                }
+                                </select>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="x_content">
+                                <div id="line-name" style="height: 300px;"></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="clearfix"></div>
-                </footer>
-                    <!-- /footer content -->
-            </div>
+                </div>
+                <div class="row top_tiles">
+                    <div class="col-lg-12">
+                        <div class="x_panel tile" style="padding: 0px">
+                            <div class="title disInline">
+                                <span style="width: 90%">Paytv Usage</span>
+                                <select class="form-control" id="slUsage" onclick="drillDownJson(this)">
+                                    <option value="*" selected>--- Choose usage ---</option>
+                                    <option value=">0">Usage</option>
+                                    <option value="<1">No Usage</option>
+                                </select>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="x_content">
+                                <div id="usage-bar" style="height: 300px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row top_tiles">
+                    <div class="col-sm-6">
+                        <div class="x_panel tile" style="padding: 0px">
+                            <div class="title disInline">
+                                <span>Quantile For Usage</span>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="x_content">
+                                <div id="sumusage-quantile" style="height: 300px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="x_panel tile" style="padding: 0px">
+                            <div class="title disInline">
+                                <span>Quantile For Life</span>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="x_content">
+                                <div id="lte-quantile" style="height: 300px;"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            } else{
+                <div class="row"><h2 class="noData-title">
+                    Sorry, This page is under construction, please come back later...</h2></div>
+            }
+
         </div>
+            <!-- /page content -->
+
+            <!-- footer content -->
+        <footer>
+            <div class="pull-right">
+                Dashboard Admin 21/09/2017
+            </div>
+            <div class="clearfix"></div>
+        </footer>
+        <!-- /footer content -->
+      </div>
+    </div>
 
             <!-- jQuery -->
         <script src="../assets/vendors/jquery/dist/jquery.min.js"></script>
@@ -210,9 +169,12 @@
             <!-- Hight chart -->
         <script src="../assets/javascripts/highcharts.js"></script>
         <script src="../assets/javascripts/exporting.js"></script>
+        <script src="../assets/javascripts/highcharts-more.js"></script>
             <!-- Counter number -->
         <script src="http://cdnjs.cloudflare.com/ajax/libs/waypoints/2.0.3/waypoints.min.js"></script>
         <script src="../assets/javascripts/jquery.counterup.min.js"></script>
-        @scripts(response)
+        @if(response != null) {
+            @scripts(rs,response)
+        }
     </body>
 </html>

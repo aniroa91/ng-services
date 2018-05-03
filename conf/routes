@@ -48,6 +48,7 @@ GET      /report                       controllers.ReportController.index(day: S
 #######################################################################
 ### PROFILE
 GET     /paytv                         controllers.PaytvClientController.index
+GET     /paytv/drilldownJson           controllers.PaytvClientController.drilldownJson(code: String ?= "")
 GET     /profile                       controllers.ProfileContractController.index(day: String ?= "")
 
 ### PROFILE INTERNET

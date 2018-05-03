@@ -168,6 +168,26 @@ object CommonService extends AbstractService {
       .toArray
   }
 
+  def getSecondSumAggregations(aggr: Option[AnyRef],secondField: String):  Array[(String, Array[(String, Long)])] = {
+    aggr.getOrElse("buckets", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+      .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+      .map(x => x.asInstanceOf[Map[String, AnyRef]])
+      .map(x => {
+        val key = x.getOrElse("key", "0L").toString
+        val map = x.getOrElse(s"$secondField",Map[String,AnyRef]()).asInstanceOf[Map[String,AnyRef]]
+          .getOrElse("buckets",List).asInstanceOf[List[AnyRef]]
+          .map(x => x.asInstanceOf[Map[String,AnyRef]])
+          .map(x => {
+            val keyCard = x.getOrElse("key","0L").toString
+            val sum = x.getOrElse("sum",Map[String,AnyRef]()).asInstanceOf[Map[String,AnyRef]]
+              .map(x=> x._2.toString.toDouble).toList(0).toLong
+            (keyCard,sum)
+          }).toArray
+        (key, map)
+      })
+      .toArray
+  }
+
   def getPreviousDay(day: String, num: Int): String = {
     val prev = DateTimeUtil.create(day, DateTimeUtil.YMD)
     prev.minusDays(num).toString(DateTimeUtil.YMD)

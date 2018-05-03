@@ -1,199 +1,643 @@
-@(response: model.user.DashboardResponse)
+@(rs: profile.model.PayTVResponse,response: model.paytv.PaytvResponse)
 @import play.api.libs.json.Json
 @import services.domain.CommonService.getOthers
 
 <script type="text/javascript">
         $(document).ready(function () {
-            // auto count number
-            $('.counter').counterUp({
-                delay: 10,
-                time: 1000
+            // dropdownlist country
+            var csv_path = "/assets/province.csv";
+            var renderCSVDropdown = function(csv) {
+                var dropdown = $('select#slProvince');
+                dropdown.html('')
+                dropdown.append($('<option>').attr('value', "*").text("--- Choose Province ---"));
+                for(var i = 1; i < csv.length; i++) {
+                    var record = csv[i];
+                    var entry = $('<option>').attr('value', i).text(record[0]);
+                    dropdown.append(entry);
+                }
+            };
+
+            $.get(csv_path, function(data) {
+                var csv = CSVToArray(data);
+                renderCSVDropdown(csv);
             });
 
-            // Build the chart pie customer
-            Highcharts.chart('pie-customer', {
-                chart: {
-                    type: 'pie'
-                },
-                title: {
-                    text: ''
-                },
-                tooltip: {
-                    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-                },
-                plotOptions: {
-                    pie: {
-                        colors: [
-                            '#3498DB',
-                            '#1ABB9C',
-                            '#9B59B6',
-                            '#9CC2CB',
-                            '#E74C3C',
-                            '#73879C'
-                        ],
-                        allowPointSelect: true,
-                        cursor: 'pointer',
-                        dataLabels: {
-                            enabled: true
-                        },
-                        showInLegend: true
-                    }
-                },
-                series: [{
-                    name: 'Percent',
-                    innerSize:'40%',
-                    colorByPoint: true,
-                    data: [ {
-                        name: 'IPTV',
-                        y: 40,
-                        sliced: true,
-                        selected: true
-                    }, {
-                        name: 'Service',
-                        y: 11
-                    },{
-                        name: 'Child',
-                        y: 32
-                    }]
-                }]
-            });
+            var categories = @Html(Json.stringify(Json.toJson( rs.status.map(x => x._1).distinct.sorted )));
 
-            // draw chart column iptv
-            Highcharts.chart('col-iptv', {
-                chart: {
-                    type: 'column'
-                },
-                title: {
-                    text: ''
-                },
-                xAxis: {
-                    categories: ['VTV1', 'THVL', 'VTV3', 'K+', 'ANND']
-                },
-                yAxis: {
-                    min: 0,
+            @if(rs.status != null){
+                Highcharts.chart('line-status', {
+
                     title: {
                         text: ''
-                    }
-                },
-                legend: {
-                    align: 'right',
-                    x: -30,
-                    verticalAlign: 'top',
-                    y: 25,
-                    floating: true,
-                    backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
-                    borderColor: '#CCC',
-                    borderWidth: 1,
-                    shadow: false
-                },
-                tooltip: {
-                    headerFormat: '<b>{point.x}</b><br/>',
-                    pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
-                },
-                plotOptions: {
-                    column: {
-                        stacking: 'normal',
-                        pointPadding: 0.2,
-                        borderWidth: 0,
-                    }
-                },
-                colors: [
-                   '#73879C', '#1ABB9C'
-                ],
-                series: [{
-                    name: 'Sum of value',
-                    data: [5, 3, 4, 7, 2]
-                }, {
-                    name: 'Sum of count',
-                    data: [2, 2, 3, 2, 1]
-                }]
-            });
+                    },
 
-            // draw chart column hourly, day of week
-            var daily = @Html(Json.stringify(Json.toJson(response.dayOfWeek.map(x => x.key))));
-            var values = @Html(Json.stringify(Json.toJson(response.dayOfWeek.map(x => x.value))));
-            Highcharts.chart('col-day', {
-                chart: {
-                    type: 'column'
-                },
-                title: {
-                    text: ''
-                },
-                xAxis: {
-                    categories: daily,
-                    crosshair: true
-                },
-                yAxis: {
-                    min: 0,
+                    colors : ['#dc5a78', '#3498DB', '#9B59B6', '#f1b53d', '#73879C', '#1ABB9C', '#832d1d', '#0000cc',  '#E74C3C', '#09006d', '#cccccc', '#669999', '#f2ccff', '#e6e600', '#132639', '#99cc00', '#466d6d', '#ffc6b3', '#666633', '#ffff00'],
+                    yAxis: {
+                        title: {
+                            text: 'Number of Status'
+                        }
+                    },
+                    xAxis: {
+                        categories: @Html(Json.stringify(Json.toJson(rs.status.map(x=> x._1).distinct.sorted)))
+                    },
+
+                    series: getJsonMultiLines(@Html(Json.stringify(Json.toJson(rs.status))), @Html(Json.stringify(Json.toJson(rs.status.map(x=> x._1).distinct.sorted))), @Html(Json.stringify(Json.toJson(rs.status.map(x=> x._2).distinct))))
+
+                });
+            }
+            @if(rs.tengoi != null){
+                Highcharts.chart('line-name', {
                     title: {
-                        text: 'Average'
-                    }
-                },
-                tooltip: {
-                    headerFormat: '<span style="font-size:10px">Day of week: {point.key}</span><table>',
-                    pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-                    '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
-                    footerFormat: '</table>',
-                    shared: true,
-                    useHTML: true
-                },
-                plotOptions: {
-                    column: {
-                        pointPadding: 0.2,
-                        borderWidth: 0,
-                    }
-                },
-                colors: [
-                    '#1ABB9C'
-                ],
-                series: [{
-                    name: 'Duration day of week',
-                    data: values
+                        text: ''
+                    },
 
-                }]
-            });
-            var hourly = @Html(Json.stringify(Json.toJson(response.hourly.map(x => x.key))));
-                values = @Html(Json.stringify(Json.toJson(response.hourly.map(x => x.value))));
-            Highcharts.chart('col-hourly', {
-                chart: {
-                    type: 'column'
-                },
-                title: {
-                    text: ''
-                },
-                xAxis: {
-                    categories: hourly,
-                    crosshair: true
-                },
-                colors: [
-                    '#1ABB9C'
-                ],
-                yAxis: {
-                    min: 0,
+                    colors : ['#99cc00','#dc5a78', '#3498DB', '#f2ccff','#09006d', '#9B59B6', '#f1b53d','#cccccc', '#669999', '#e6e600', '#132639',  '#73879C', '#1ABB9C', '#832d1d', '#0000cc', '#E74C3C', '#466d6d', '#ffc6b3', '#666633', '#ffff00'],
+
+                    yAxis: {
+                        title: {
+                            text: 'Number of Name'
+                        }
+                    },
+                    xAxis: {
+                        categories: @Html(Json.stringify(Json.toJson(rs.tengoi.map(x=> x._1).distinct.sorted)))
+                    },
+
+                    series: getJsonMultiLines(@Html(Json.stringify(Json.toJson(rs.tengoi))), @Html(Json.stringify(Json.toJson(rs.tengoi.map(x=> x._1).distinct.sorted))), @Html(Json.stringify(Json.toJson(rs.tengoi.map(x=> x._2).distinct))))
+                    /*[{
+                        name: 'Installation',
+                        data: [43934, 52503, 57177, 69658, 97031, 119931, 137133, 154175]
+                    }, {
+                        name: 'Manufacturing',
+                        data: [24916, 24064, 29742, 29851, 32490, 30282, 38121, 40434]
+                    }]*/
+
+                });
+            }
+            @if(rs.province != null){
+                Highcharts.chart('line-province', {
+                    chart: {
+                        type: 'column'
+                    },
                     title: {
-                        text: 'Average'
-                    }
-                },
-                tooltip: {
-                    headerFormat: '<span style="font-size:10px">Day of week: {point.key}</span><table>',
-                    pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-                    '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
-                    footerFormat: '</table>',
-                    shared: true,
-                    useHTML: true
-                },
-                plotOptions: {
-                    column: {
-                        pointPadding: 0,
-                        borderWidth: 0
-                    }
-                },
-                series: [{
-                    name: 'Duration hourly',
-                    data: values
+                        text: ''
+                    },
 
-                }]
-            });
+                    colors : ['#9B59B6', '#1ABB9C', '#832d1d', '#0000cc',  '#73879C ','#E74C3C','#dc5a78', '#3498DB', '#f1b53d','#09006d', '#cccccc', '#669999', '#f2ccff', '#e6e600', '#132639', '#99cc00', '#466d6d', '#ffc6b3', '#666633', '#ffff00'],
 
+                    yAxis: {
+                        title: {
+                            text: 'Number of Province'
+                        }
+                    },
+                    xAxis: {
+                        categories: @Html(Json.stringify(Json.toJson(rs.province.map(x=> x._1).distinct.sorted)))
+                    },
+
+                    series: getJsonMultiLines(@Html(Json.stringify(Json.toJson(rs.province))), @Html(Json.stringify(Json.toJson(rs.province.map(x=> x._1).distinct.sorted))), @Html(Json.stringify(Json.toJson(rs.province.map(x=> x._2).distinct))))
+
+                });
+            }
+            @if(rs.usage != null){
+                var no_usage = @Html(Json.stringify(Json.toJson(rs.usage.filter(x => x._2 == "no_usage").map(x => -x._3))))
+                var usage = @Html(Json.stringify(Json.toJson(rs.usage.filter(x => x._2 == "usage").map(x => x._3))))
+                var max = @Html(Json.stringify(Json.toJson(rs.usage.filter(x => x._2 == "usage").map(x => x._3).max)))
+                Highcharts.chart('usage-bar', {
+                    chart: {
+                        type: 'bar'
+                    },
+                    title: {
+                        text: ''
+                    },
+                    xAxis: [{
+                        categories: @Html(Json.stringify(Json.toJson(rs.usage.map(x => x._1).distinct))),
+                        reversed: false,
+                        labels: {
+                            step: 1
+                        },
+                    }, { // mirror axis on right side
+                        opposite: true,
+                        reversed: false,
+                        categories: @Html(Json.stringify(Json.toJson(rs.usage.map(x => x._1).distinct))),
+                        linkedTo: 0,
+                        labels: {
+                            step: 1
+                        }
+                    }],
+                    yAxis: {
+                        title: {
+                            text: null
+                        },
+                        labels: {
+                            formatter: function () {
+                                return Math.abs(this.value);
+                            }
+                        },
+                        max: max,
+                        min: -max
+                    },
+
+                    plotOptions: {
+                        series: {
+                            stacking: 'normal'
+                        }
+                    },
+
+                    tooltip: {
+                        formatter: function () {
+                            return '<b>' + this.series.name + ', month ' + this.point.category + '</b><br/>' +
+                                    'Number Of Contract: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0);
+                        }
+                    },
+
+                    series: [{
+                        name: 'No_Usage',
+                        data: no_usage,
+                        color:'#73879C'
+                    }, {
+                        name: 'Usage',
+                        data: usage,
+                        color:'#832d1d'
+                    }]
+                });
+            }
+            @if(rs.usageQuantile != null){
+                var dtaUsageQuantile = @Html(Json.stringify(Json.toJson(rs.usageQuantile.map(x => x._2))))
+                var usage_quantile = Highcharts.chart('sumusage-quantile', {
+
+                    chart: {
+                        type: 'boxplot'
+                    },
+
+                    title: {
+                        text: ''
+                    },
+
+                    legend: {
+                        enabled: false
+                    },
+
+                    xAxis: {
+                        categories: categories
+                    },
+
+                    yAxis: {
+                        title: {
+                            text: 'Observations'
+                        }
+                    },
+
+                    series: [{
+                        name: 'Observations',
+                        color: '#f60',
+                        data: dtaUsageQuantile,
+                        // [
+                        //   [760, 801, 848, 895, 965],
+                        //   [733, 853, 939, 980, 1080],
+                        //   [714, 762, 817, 870, 918],
+                        //   [724, 802, 806, 871, 950],
+                        //   [834, 836, 864, 882, 910]],
+                        tooltip: {
+                            headerFormat: '<em>{point.key}</em><br/>'
+                        }
+                    }]
+
+                });
+            }
+            @if(rs.lteQuantile != null){
+                var dtaLteQuantile = @Html(Json.stringify(Json.toJson(rs.lteQuantile.map(x => x._2))))
+                var lte_quantile = Highcharts.chart('lte-quantile', {
+
+                    chart: {
+                        type: 'boxplot'
+                    },
+
+                    title: {
+                        text: ''
+                    },
+
+                    legend: {
+                        enabled: false
+                    },
+
+                    xAxis: {
+                        categories: categories
+                    },
+
+                    yAxis: {
+                        title: {
+                            text: 'Observations'
+                        }
+                    },
+
+                    series: [{
+                        name: 'Observations',
+                        color:'#09006d',
+                        data: dtaLteQuantile,
+                        // [
+                        //   [760, 801, 848, 895, 965],
+                        //   [733, 853, 939, 980, 1080],
+                        //   [714, 762, 817, 870, 918],
+                        //   [724, 802, 806, 871, 950],
+                        //   [834, 836, 864, 882, 910]],
+                        tooltip: {
+                            headerFormat: '<em>{point.key}</em><br/>'
+                        }
+                    }]
+
+                });
+            }
         });
+
+        function getJsonMultiLines(dta, arrMonth, arrKey){
+            var jsArray = []
+            var sizeKey = arrKey.length
+            if(arrKey.length >5) sizeKey =5
+            for(var key=0;key< sizeKey;key++ ){
+                var arrData = []
+                for(var month=0;month<arrMonth.length;month++ ) {
+                    for (var i = 0; i < dta.length; i++) {
+                        if (arrKey[key] == dta[i][1] && arrMonth[month] == dta[i][0]){
+                            arrData.push(dta[i][2])
+                        }
+                    }
+                }
+                jsArray.push({
+                    name: arrKey[key],
+                    data: arrData
+                })
+
+            }
+            return jsArray
+        }
+
+/*        function json(dta, arrKey,arrMonth){
+            var jsArray = []
+            var sumOthers = []
+            for(var month=0;month<arrMonth.length;month++ ) {
+                sumOthers.push(0)
+            }
+            for(var key=0;key<arrKey.length;key++ ){
+                var arrData = []
+                var arrOthers = []
+                for(var month=0;month<arrMonth.length;month++ ) {
+                    var isMonth = 0
+                    for (var i = 0; i < dta.length; i++) {
+                        if (arrKey[key] == dta[i][0][2] && arrMonth[month] == dta[i][0][0]){
+                            arrData.push(dta[i][1])
+                            isMonth = 1
+                            if(key >= 5)
+                                arrOthers.push(dta[i][1])
+                        }
+                    }
+                    if(isMonth == 0){
+                       arrData.push(0)
+                        if(key >= 5)
+                            arrOthers.push(0)
+                    }
+                }
+                if(key<5){
+                    jsArray.push({
+                        name: arrKey[key],
+                        data: arrData
+                    })
+                }
+                else{
+                    sumOthers = sumOthers.map(function (num, idx) {
+                        return num + arrOthers[idx];
+                    });
+                }
+
+            }
+            if(arrKey.length >= 5) {
+                jsArray.push({
+                    name: 'Others',
+                    data: sumOthers
+                })
+            }
+            return jsArray
+        }*/
+
+        function drillDownJson(element){
+            var nameCT = "*"
+            if($('#slName').val() != "*")
+                nameCT = "\""+$('#slName').val()+"\""
+//          var fields = 'StatusCode:'+$('#slStatus').val()+',ProvinceCode:'+$('#slProvince').val()+',TenGoi:'+$('#slName').val()+',Usage:'+$('#slUsage').val()
+            var fields = 'StatusCode:'+$('#slStatus').val()+' AND ProvinceCode:'+$('#slProvince').val()+' AND TenGoi:'+nameCT+' AND SumUsage:'+$('#slUsage').val()
+            $.ajax({
+                url: "/paytv/drilldownJson?code="+fields,
+                cache: false,
+                success: function (dta) {
+                    if(dta != "Error"){
+                        console.log(dta.maxRange)
+                        // set data line status contract
+                        Highcharts.chart('line-status', {
+
+                            title: {
+                                text: ''
+                            },
+
+                            colors : ['#dc5a78', '#3498DB', '#9B59B6', '#f1b53d', '#73879C', '#1ABB9C', '#832d1d', '#0000cc',  '#E74C3C', '#09006d', '#cccccc', '#669999', '#f2ccff', '#e6e600', '#132639', '#99cc00', '#466d6d', '#ffc6b3', '#666633', '#ffff00'],
+
+                            yAxis: {
+                                title: {
+                                    text: 'Number of Status'
+                                }
+                            },
+                            xAxis: {
+                                categories: dta.monthStatus
+                            },
+
+                            series: getJsonMultiLines(dta.statusContract,dta.monthStatus,dta.keyCodeStatus)
+
+                        });
+                        /*var chartStatus = $('#line-status').highcharts();
+                        var arrDtaStt = getJsonMultiLines(dta.statusContract,dta.keyStatus,dta.monthStatus)
+                        for(var i=0;i<arrDtaStt.length;i++) {
+                            chartStatus.series[i].update(arrDtaStt[i]);
+                        }
+                        chartStatus.redraw();*/
+                        // set data line name contract
+                        /*var chartName = $('#line-name').highcharts();
+                        var arrDtaName = getJsonMultiLines(dta.nameContract,dta.keyName,dta.monthName)
+                        for(var i=0;i<arrDtaName.length;i++) {
+                            chartName.series[i].update(arrDtaName[i]);
+                        }
+                        chartName.redraw();*/
+                        Highcharts.chart('line-name', {
+                            title: {
+                                text: ''
+                            },
+
+                            colors : ['#99cc00','#dc5a78', '#3498DB', '#f2ccff','#09006d', '#9B59B6', '#f1b53d','#cccccc', '#669999', '#e6e600', '#132639',  '#73879C', '#1ABB9C', '#832d1d', '#0000cc', '#E74C3C', '#466d6d', '#ffc6b3', '#666633', '#ffff00'],
+
+                            yAxis: {
+                                title: {
+                                    text: 'Number of Name'
+                                }
+                            },
+                            xAxis: {
+                                categories: dta.monthStatus
+                            },
+
+                            series: getJsonMultiLines(dta.nameContract,dta.monthStatus,dta.keyName)
+
+                        });
+                        // set data line province contract
+                        /*var chartProvince = $('#line-province').highcharts();
+                        var arrDtaProvince = getJsonMultiLines(dta.provinceContract,dta.keyProvince,dta.monthProvince)
+                        for(var i=0;i<arrDtaProvince.length;i++) {
+                            chartProvince.series[i].update(arrDtaProvince[i]);
+                        }
+                        chartProvince.redraw();*/
+                        Highcharts.chart('line-province', {
+                            chart: {
+                                type: 'column'
+                            },
+                            title: {
+                                text: ''
+                            },
+
+                            colors : ['#9B59B6', '#1ABB9C', '#832d1d', '#0000cc',  '#73879C','#E74C3C','#dc5a78', '#3498DB', '#f1b53d','#09006d', '#cccccc', '#669999', '#f2ccff', '#e6e600', '#132639', '#99cc00', '#466d6d', '#ffc6b3', '#666633', '#ffff00'],
+
+
+                            yAxis: {
+                                title: {
+                                    text: 'Number of Province'
+                                }
+                            },
+                            xAxis: {
+                                categories: dta.monthStatus
+                            },
+
+                            series: getJsonMultiLines(dta.provinceContract,dta.monthStatus,dta.keyProvince)
+
+                        });
+                        Highcharts.chart('sumusage-quantile', {
+
+                            chart: {
+                                type: 'boxplot'
+                            },
+
+                            title: {
+                                text: ''
+                            },
+
+                            legend: {
+                                enabled: false
+                            },
+
+                            xAxis: {
+                                categories: dta.monthStatus
+                            },
+
+                            yAxis: {
+                                title: {
+                                    text: 'Observations'
+                                }
+                            },
+
+                            series: [{
+                                name: 'Observations',
+                                color: '#f60',
+                                data: dta.dtaUsageQuantile,
+                                // [
+                                //   [760, 801, 848, 895, 965],
+                                //   [733, 853, 939, 980, 1080],
+                                //   [714, 762, 817, 870, 918],
+                                //   [724, 802, 806, 871, 950],
+                                //   [834, 836, 864, 882, 910]],
+                                tooltip: {
+                                    headerFormat: '<em>{point.key}</em><br/>'
+                                }
+                            }]
+
+                        });
+                        Highcharts.chart('lte-quantile', {
+
+                            chart: {
+                                type: 'boxplot'
+                            },
+
+                            title: {
+                                text: ''
+                            },
+
+                            legend: {
+                                enabled: false
+                            },
+
+                            xAxis: {
+                                categories: dta.monthStatus
+                            },
+
+                            yAxis: {
+                                title: {
+                                    text: 'Observations'
+                                }
+                            },
+
+                            series: [{
+                                name: 'Observations',
+                                color:'#09006d',
+                                data: dta.dtaLteQuantile,
+                                // [
+                                //   [760, 801, 848, 895, 965],
+                                //   [733, 853, 939, 980, 1080],
+                                //   [714, 762, 817, 870, 918],
+                                //   [724, 802, 806, 871, 950],
+                                //   [834, 836, 864, 882, 910]],
+                                tooltip: {
+                                    headerFormat: '<em>{point.key}</em><br/>'
+                                }
+                            }]
+
+                        });
+                        Highcharts.chart('usage-bar', {
+                            chart: {
+                                type: 'bar'
+                            },
+                            title: {
+                                text: ''
+                            },
+                            xAxis: [{
+                                categories: dta.monthStatus,
+                                reversed: false,
+                                labels: {
+                                    step: 1
+                                },
+                            }, { // mirror axis on right side
+                                opposite: true,
+                                reversed: false,
+                                categories: dta.monthStatus,
+                                linkedTo: 0,
+                                labels: {
+                                    step: 1
+                                }
+                            }],
+                            yAxis: {
+                                title: {
+                                    text: null
+                                },
+                                labels: {
+                                    formatter: function () {
+                                        return Math.abs(this.value);
+                                    }
+                                },
+                                max: dta.maxRange,
+                                min: -dta.maxRange
+                            },
+
+                            plotOptions: {
+                                series: {
+                                    stacking: 'normal'
+                                }
+                            },
+
+                            tooltip: {
+                                formatter: function () {
+                                    return '<b>' + this.series.name + ', month ' + this.point.category + '</b><br/>' +
+                                            'Number Of Contract: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0);
+                                }
+                            },
+
+                            series: [{
+                                name: 'No_Usage',
+                                data: dta.no_usage,
+                                color:'#73879C'
+                            }, {
+                                name: 'Usage',
+                                data: dta.usage,
+                                color:'#832d1d'
+                            }]
+                        });
+                    }
+                    else{
+                        location.href = "/paytv";
+                    }
+                }
+            });
+        }
+
+        function CSVToArray( strData, strDelimiter ){
+            // Check to see if the delimiter is defined. If not,
+            // then default to comma.
+            strDelimiter = (strDelimiter || ",");
+
+            // Create a regular expression to parse the CSV values.
+            var objPattern = new RegExp(
+                    (
+                            // Delimiters.
+                            "(\\" + strDelimiter + "|\\r?\\n|\\r|^)" +
+
+                            // Quoted fields.
+                            "(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|" +
+
+                            // Standard fields.
+                            "([^\"\\" + strDelimiter + "\\r\\n]*))"
+                    ),
+                    "gi"
+            );
+
+
+            // Create an array to hold our data. Give the array
+            // a default empty first row.
+            var arrData = [[]];
+
+            // Create an array to hold our individual pattern
+            // matching groups.
+            var arrMatches = null;
+
+
+            // Keep looping over the regular expression matches
+            // until we can no longer find a match.
+            while (arrMatches = objPattern.exec( strData )){
+
+                // Get the delimiter that was found.
+                var strMatchedDelimiter = arrMatches[ 1 ];
+
+                // Check to see if the given delimiter has a length
+                // (is not the start of string) and if it matches
+                // field delimiter. If id does not, then we know
+                // that this delimiter is a row delimiter.
+                if (
+                        strMatchedDelimiter.length &&
+                        strMatchedDelimiter !== strDelimiter
+                ){
+
+                    // Since we have reached a new row of data,
+                    // add an empty row to our data array.
+                    arrData.push( [] );
+
+                }
+
+                var strMatchedValue;
+
+                // Now that we have our delimiter out of the way,
+                // let's check to see which kind of value we
+                // captured (quoted or unquoted).
+                if (arrMatches[ 2 ]){
+
+                    // We found a quoted value. When we capture
+                    // this value, unescape any double quotes.
+                    strMatchedValue = arrMatches[ 2 ].replace(
+                            new RegExp( "\"\"", "g" ),
+                            "\""
+                    );
+
+                } else {
+
+                    // We found a non-quoted value.
+                    strMatchedValue = arrMatches[ 3 ];
+
+                }
+
+
+                // Now that we have our value string, let's add
+                // it to the data array.
+                arrData[ arrData.length - 1 ].push( strMatchedValue );
+            }
+
+            // Return the parsed data.
+            return( arrData );
+        }
 </script>
