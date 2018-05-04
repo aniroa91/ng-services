@@ -90,6 +90,11 @@ object CommonService extends AbstractService {
     date.toString(DateTimeFormat.forPattern("yyyy-MM-dd"))
   }
 
+  def getCurrentMonth(): String = {
+    val date = new DateTime()
+    date.toString(DateTimeFormat.forPattern("yyyy-MM"))
+  }
+
   def getpreviousMinutes(times: Int): String = {
     val date = new DateTime()
     date.minusMinutes(times).toString()

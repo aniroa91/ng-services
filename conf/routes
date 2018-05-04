@@ -52,6 +52,8 @@ GET     /paytv/drilldownJson           controllers.PaytvClientController.drilldo
 GET     /profile                       controllers.ProfileContractController.index(day: String ?= "")
 
 ### PROFILE INTERNET
+GET     /internet/getMonthJson         profile.controllers.internet.ChurnController.getMonthJson(month: String ?= "")
+GET     /internet/churn                profile.controllers.internet.ChurnController.index
 GET     /internet/history              profile.controllers.internet.HistoryController.index(date: String ?= "")
 GET     /internet/realtime             profile.controllers.internet.HistoryController.realtime
 GET     /internet/realtime-json        profile.controllers.internet.HistoryController.realtimeJson

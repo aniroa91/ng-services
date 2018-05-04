@@ -1,5 +1,5 @@
 @import profile.utils.CommonUtil
-@(rs: profile.model.PayTVResponse,response: model.paytv.PaytvResponse,email: String)
+@(rs: profile.model.PayTVResponse,email: String)
 
 @import services.domain.CommonService.formatNumber
 @import services.domain.CommonService.percent
@@ -45,13 +45,13 @@
         <!-- /top navigation -->
         <!-- page content -->
         <div class="right_col" role="main">
-            @if(response != null) {
+            @if(rs != null) {
                 <div class="row top_tiles">
                     <div class="col-lg-6 col-md-6 col-sm-6">
                         <div class="x_panel tile" style="padding: 0px">
                             <div class="title disInline">
                                 <span style="width: 80%">Paytv Contract By Status</span>
-                                <select class="form-control" id="slStatus" onclick="drillDownJson(this)">
+                                <select class="form-control" id="slStatus" onchange="drillDownJson(this)">
                                     <option value="*" selected>--- Choose status ---</option>
                                 @for( (k,v) <- CommonUtil.STATUS_MAP){
                                     <option value="@v">@k</option>
@@ -68,7 +68,7 @@
                         <div class="x_panel tile" style="padding: 0px">
                             <div class="title disInline">
                                 <span style="width: 80%">Paytv Contract By Province</span>
-                                <select class="form-control" id="slProvince" onclick="drillDownJson(this)">
+                                <select class="form-control" id="slProvince" onchange="drillDownJson(this)">
 
                                 </select>
                                 <div class="clearfix"></div>
@@ -84,7 +84,7 @@
                         <div class="x_panel tile" style="padding: 0px">
                             <div class="title disInline">
                                 <span style="width: 90%">Paytv Contract By Name</span>
-                                <select class="form-control" id="slName" onclick="drillDownJson(this)">
+                                <select class="form-control" id="slName" onchange="drillDownJson(this)">
                                     <option value="*" selected>--- Choose name ---</option>
                                 @for(i <- 0 until rs.tengoi.map(x=>x._2).distinct.length){
                                     <option value="@rs.tengoi.map(x=>x._2).distinct(i)">@rs.tengoi.map(x=>x._2).distinct(i)</option>
@@ -103,7 +103,7 @@
                         <div class="x_panel tile" style="padding: 0px">
                             <div class="title disInline">
                                 <span style="width: 90%">Paytv Usage</span>
-                                <select class="form-control" id="slUsage" onclick="drillDownJson(this)">
+                                <select class="form-control" id="slUsage" onchange="drillDownJson(this)">
                                     <option value="*" selected>--- Choose usage ---</option>
                                     <option value=">0">Usage</option>
                                     <option value="<1">No Usage</option>
@@ -170,11 +170,9 @@
         <script src="../assets/javascripts/highcharts.js"></script>
         <script src="../assets/javascripts/exporting.js"></script>
         <script src="../assets/javascripts/highcharts-more.js"></script>
-            <!-- Counter number -->
-        <script src="http://cdnjs.cloudflare.com/ajax/libs/waypoints/2.0.3/waypoints.min.js"></script>
         <script src="../assets/javascripts/jquery.counterup.min.js"></script>
-        @if(response != null) {
-            @scripts(rs,response)
+        @if(rs != null) {
+            @scripts(rs)
         }
     </body>
 </html>

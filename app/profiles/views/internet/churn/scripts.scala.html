@@ -1,0 +1,258 @@
+@(rs: (Array[(Int, Int, Double, Double)], Array[(Int, Int, Double, Double)]) )
+@import play.api.libs.json.Json
+@import services.domain.CommonService.getOthers
+@import _root_.service.DevService.bubbleHeatChart
+
+<script type="text/javascript">
+        $(document).ready(function () {
+                var internetChurnColor = @Html(Json.stringify(bubbleHeatChart(rs._1)._1))
+                var internetChurnSeries = @Html(Json.stringify(bubbleHeatChart(rs._1)._2))
+
+                        Highcharts.chart('container', {
+
+                                chart: {
+                                        type: 'bubble',
+                                        plotBorderWidth: 1,
+                                        zoomType: 'xy'
+                                },
+
+                                legend: {
+                                        enabled: false
+                                },
+                                title: {
+                                        text: ''
+                                },
+                                xAxis: {
+                                        gridLineWidth: 1,
+                                        title: {
+                                                text: 'Region'
+                                        },
+                                        categories: ["0", "1","2","3","4","5","6","7"]
+
+                                },
+
+                                yAxis: {
+                                        gridLineWidth: 1,
+                                        title: {
+                                                text: 'Age'
+                                        },
+                                        tickInterval: 6,
+                                        categories:[]
+                                },
+
+                                colors: internetChurnColor,
+                                tooltip: {
+                                        useHTML: true,
+                                        headerFormat: '<table>',
+                                        pointFormat: '' +
+                                        '<tr><th>Resiong:</th><td>{point.x}g</td></tr>' +
+                                        '<tr><th>Age:</th><td>{point.y}g</td></tr>' +
+                                        '<tr><th>Rate:</th><td>{point.z}%</td></tr>' +
+                                        '<tr><th>Percent:</th><td>{point.c}%</td></tr>',
+                                        footerFormat: '</table>',
+                                        followPointer: true
+                                },
+
+                                plotOptions: {
+                                        series: {
+                                                dataLabels: {
+                                                        enabled: true,
+                                                        format: '{point.name}'
+                                                }
+                                        }
+                                },
+
+                                series: internetChurnSeries
+                        });
+
+                var internetChurnColor2 = @Html(Json.stringify(bubbleHeatChart(rs._2)._1))
+                var internetChurnSeries2 = @Html(Json.stringify(bubbleHeatChart(rs._2)._2))
+
+                        Highcharts.chart('container2', {
+
+                                chart: {
+                                        type: 'bubble',
+                                        plotBorderWidth: 1,
+                                        zoomType: 'xy'
+                                },
+
+                                legend: {
+                                        enabled: false
+                                },
+                                title: {
+                                        text: ''
+                                },
+                                xAxis: {
+                                        gridLineWidth: 1,
+                                        title: {
+                                                text: 'Region'
+                                        },
+                                        categories: ["0", "1","2","3","4","5","6","7"]
+
+                                },
+
+                                yAxis: {
+                                        gridLineWidth: 1,
+                                        title: {
+                                                text: 'Age'
+                                        },
+                                        tickInterval: 6,
+                                        categories:[]
+                                },
+
+                                colors: internetChurnColor2,
+                                tooltip: {
+                                        useHTML: true,
+                                        headerFormat: '<table>',
+                                        pointFormat: '' +
+                                        '<tr><th>Resiong:</th><td>{point.x}g</td></tr>' +
+                                        '<tr><th>Age:</th><td>{point.y}g</td></tr>' +
+                                        '<tr><th>Rate:</th><td>{point.z}%</td></tr>' +
+                                        '<tr><th>Percent:</th><td>{point.c}%</td></tr>',
+                                        footerFormat: '</table>',
+                                        followPointer: true
+                                },
+
+                                plotOptions: {
+                                        series: {
+                                                dataLabels: {
+                                                        enabled: true,
+                                                        format: '{point.name}'
+                                                }
+                                        }
+                                },
+
+                                series: internetChurnSeries2
+                        });
+        });
+
+        function getDataByMonth(el){
+                var month = $(el).val();
+                $.ajax({
+                        url: "/internet/getMonthJson?month="+month,
+                        cache: false,
+                        success: function (dta) {
+                                if(dta != "Error"){
+
+                                        Highcharts.chart('container', {
+
+                                                chart: {
+                                                        type: 'bubble',
+                                                        plotBorderWidth: 1,
+                                                        zoomType: 'xy'
+                                                },
+
+                                                legend: {
+                                                        enabled: false
+                                                },
+                                                title: {
+                                                        text: ''
+                                                },
+                                                xAxis: {
+                                                        gridLineWidth: 1,
+                                                        title: {
+                                                                text: 'Region'
+                                                        },
+                                                        categories: ["0", "1","2","3","4","5","6","7"]
+
+                                                },
+
+                                                yAxis: {
+                                                        gridLineWidth: 1,
+                                                        title: {
+                                                                text: 'Age'
+                                                        },
+                                                        tickInterval: 6,
+                                                        categories:[]
+                                                },
+
+                                                colors: dta.internetChurnColor,
+                                                tooltip: {
+                                                        useHTML: true,
+                                                        headerFormat: '<table>',
+                                                        pointFormat: '' +
+                                                        '<tr><th>Resiong:</th><td>{point.x}g</td></tr>' +
+                                                        '<tr><th>Age:</th><td>{point.y}g</td></tr>' +
+                                                        '<tr><th>Rate:</th><td>{point.z}%</td></tr>' +
+                                                        '<tr><th>Percent:</th><td>{point.c}%</td></tr>',
+                                                        footerFormat: '</table>',
+                                                        followPointer: true
+                                                },
+
+                                                plotOptions: {
+                                                        series: {
+                                                                dataLabels: {
+                                                                        enabled: true,
+                                                                        format: '{point.name}'
+                                                                }
+                                                        }
+                                                },
+
+                                                series: dta.internetChurnSeries
+                                        });
+
+                                        Highcharts.chart('container2', {
+
+                                                chart: {
+                                                        type: 'bubble',
+                                                        plotBorderWidth: 1,
+                                                        zoomType: 'xy'
+                                                },
+
+                                                legend: {
+                                                        enabled: false
+                                                },
+                                                title: {
+                                                        text: ''
+                                                },
+                                                xAxis: {
+                                                        gridLineWidth: 1,
+                                                        title: {
+                                                                text: 'Region'
+                                                        },
+                                                        categories: ["0", "1","2","3","4","5","6","7"]
+
+                                                },
+
+                                                yAxis: {
+                                                        gridLineWidth: 1,
+                                                        title: {
+                                                                text: 'Age'
+                                                        },
+                                                        tickInterval: 6,
+                                                        categories:[]
+                                                },
+
+                                                colors: dta.internetChurnColor2,
+                                                tooltip: {
+                                                        useHTML: true,
+                                                        headerFormat: '<table>',
+                                                        pointFormat: '' +
+                                                        '<tr><th>Resiong:</th><td>{point.x}g</td></tr>' +
+                                                        '<tr><th>Age:</th><td>{point.y}g</td></tr>' +
+                                                        '<tr><th>Rate:</th><td>{point.z}%</td></tr>' +
+                                                        '<tr><th>Percent:</th><td>{point.c}%</td></tr>',
+                                                        footerFormat: '</table>',
+                                                        followPointer: true
+                                                },
+
+                                                plotOptions: {
+                                                        series: {
+                                                                dataLabels: {
+                                                                        enabled: true,
+                                                                        format: '{point.name}'
+                                                                }
+                                                        }
+                                                },
+
+                                                series: dta.internetChurnSeries2
+                                        });
+                                }
+                                else{
+                                        location.href = "/internet/churn";
+                                }
+                        }
+                });
+        }
+
+</script>

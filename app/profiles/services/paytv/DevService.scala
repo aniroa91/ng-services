@@ -249,6 +249,199 @@ object DevService {
   //      .sortBy(x => x._1)
   //  }
 
+
+
+  def getChurn(month: String) = {
+    val request = search(s"profile-internet-${month}" / "docs") aggregations (
+      termsAggregation("Region")
+        .field("RegionCode")
+        .subaggs(
+          termsAggregation("Age")
+            .field("Age")
+            .subaggs(
+              termsAgg("Status", "StatusCode")) size 20))
+    val reponse = client.execute(request).await
+    //reponse.aggregations.foreach(println)
+    getChurnRateAndPercentage(reponse, "Region", "Age", "Status")
+
+    //getBucketTerm(reponse, "province", "month").map(x => (x._2, ProvinceUtil.getProvince(x._1.toInt), x._3) )
+  }
+
+  private def getBucketTerm3(response: SearchResponse, term1: String, term2: String, term3: String): Array[(String, String, String, Int)] = {
+    if (response.aggregations != null) {
+      response.aggregations
+        .getOrElse(term1, Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+        .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+        .map(x => x.asInstanceOf[Map[String, AnyRef]])
+        .flatMap(x => {
+          val term1Key = x.getOrElse("key", "key").toString()
+          x.getOrElse(term2, Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+            .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+            .map(y => y.asInstanceOf[Map[String, AnyRef]])
+            .flatMap(y => {
+              val term2Key = y.getOrElse("key", "key").toString()
+              y.getOrElse(term3, Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+                .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+                .map(z => z.asInstanceOf[Map[String, AnyRef]])
+                .map(z => {
+                  val term3Key = z.getOrElse("key", "key").toString()
+                  (term1Key, term2Key, term3Key, z.getOrElse("doc_count", "0").toString().toInt)
+                })
+            })
+        }).toArray
+    } else {
+      Array[(String, String, String, Int)]()
+    }
+  }
+
+  private def getChurnRateAndPercentage(response: SearchResponse, term1: String, term2: String, term3: String): Array[(String, String, String, Int, Int, Int)] = {
+    if (response.aggregations != null) {
+      response.aggregations
+        .getOrElse(term1, Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+        .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+        .map(x => x.asInstanceOf[Map[String, AnyRef]])
+        .flatMap(x => {
+          val term1Key = x.getOrElse("key", "key").toString()
+          val term1Count = x.getOrElse("doc_count", "0").toString().toInt
+          x.getOrElse(term2, Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+            .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+            .map(y => y.asInstanceOf[Map[String, AnyRef]])
+            .flatMap(y => {
+              val term2Key = y.getOrElse("key", "key").toString()
+              val term2Count = y.getOrElse("doc_count", "0").toString().toInt
+              y.getOrElse(term3, Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+                .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+                .map(z => z.asInstanceOf[Map[String, AnyRef]])
+                .map(z => {
+                  val term3Key = z.getOrElse("key", "key").toString()
+                  val term3Count = z.getOrElse("doc_count", "0").toString().toInt
+                  (term1Key, term2Key, term3Key, term1Count, term2Count, term3Count)
+                })
+            })
+        }).toArray
+    } else {
+      Array[(String, String, String, Int, Int, Int)]()
+    }
+  }
+
+  private def calChurnRateAndPercentage(array: Array[(String, String, String, Int)]): Array[(Int, Int, Int, Int)] = {
+    // (region, age, churn_Val no_churn_val)
+    val rs = array
+      .map(x => (x._1.toInt, x._2.toInt) -> (if(x._3.toInt == 1) x._4.toInt else 0, if(x._3.toInt == 0) x._4.toInt else 0 ))
+      .groupBy(x => x._1)
+      .map(x => x._1 -> (x._2.map(y => y._2._1).sum, x._2.map(y => y._2._2).sum))
+      .map(x => (x._1._1, x._1._2, x._2._1, x._2._2))
+      .toArray
+
+    rs
+  }
+
+  private def calChurnRateAndPercentageForCTBDV(array: Array[(String, String, String, Int, Int, Int)]) = {
+    val ctbdv = array.filter(x => x._3.toInt == 3)
+    val sumByRegion = ctbdv.map(x => x._1 -> x._6)
+      .groupBy(x => x._1)
+      .map(x => x._1 -> x._2.map(y => y._2).sum)
+    // region, age, rate, percentage
+    ctbdv.map(x => (x._1.toInt, x._2.toInt, x._6  * 1.0/ x._5, x._6 * 1.0 / (sumByRegion.getOrElse(x._1, 0)) ) )
+  }
+
+  private def calChurnRateAndPercentageForChurn(array: Array[(String, String, String, Int, Int, Int)]) = {
+    val ctbdv = array.filter(x => x._3.toInt == 1)
+    val sumByRegion = ctbdv.map(x => x._1 -> x._6)
+      .groupBy(x => x._1)
+      .map(x => x._1 -> x._2.map(y => y._2).sum)
+    // region, age, rate, percentage
+    ctbdv.map(x => (x._1.toInt, x._2.toInt, x._6  * 1.0/ x._5, x._6 * 1.0 / (sumByRegion.getOrElse(x._1, 0)) ) )
+  }
+
+  def getInternet(month: String) = {
+    //calChurnRateAndPercentage()
+    val response = getChurn(month)
+    (calChurnRateAndPercentageForCTBDV(response),calChurnRateAndPercentageForChurn(response))
+  }
+
+  def bubbleHeatChart(array: Array[(Int, Int, Double, Double)]): (JsValue, JsValue) = {
+    val color = Json.toJson(array.map(x => x._4).map(x => hsv2rgb(hsv(x * 1000))))
+    //implicit val bubbleWrites = Json.writes[Bubble]
+
+    val series = Json.toJson(array.map(x => JsObject(Seq(
+      "x" -> JsNumber(x._1),
+      "y" -> JsNumber(x._2),
+      "z" -> JsNumber(x._3),
+      "c" -> JsNumber(x._4))))
+      .map(x => {
+        JsObject(Seq(
+          "data" -> JsArray(Seq(x)),
+          "maxSize" -> JsNumber(50),
+          "minSize" -> JsNumber(1)
+        ))
+      }))
+
+    //val a = JsObject(Seq("x" -> JsNumber(0)))
+    //"data" -> JsArray(Seq(a))
+
+    (color, series)
+  }
+
+  //  def seriesForLineChart(array: Array[(String, String, Int)], typeChart: String): JsValue = {
+  //    implicit val bubbleWrites = Json.writes[Bubble]
+  //    Json.toJson(anomaly.points.map(x => Bubble(-x._2._2, x._2._1, 1.0, x._1)))
+  //
+  //    val group = array.groupBy(x => x._2).map(x => x._1 -> x._2.map(y => (y._1, y._3)).sortBy(y => y._1))
+  //    val a = group.map(x => JsObject(Seq(
+  //      "name" -> JsString(x._1),
+  //      "type" -> JsString(typeChart),
+  //      "data" -> JsArray(x._2.map(y => JsNumber(y._2))))))
+  //    Json.toJson(a)
+  //  }
+
+  def hsv(number: Double): (Double, Double, Double) = {
+    hsv(number, 1, 1000)
+  }
+
+  def hsv(number: Double, min: Double, max: Double): (Double, Double, Double) = {
+    val h= Math.floor((max - number) * 1200 / max);
+    val s = 1.0//Math.abs(number - min)/min;
+    val v = 1.0;
+    (h,s,v)
+  }
+
+  //  def hsv2rgb(hsv: (Double, Double, Double)): (Double, Double, Double) = {
+  //    val colorCode = Color.HSBtoRGB(hsv._1.toFloat, hsv._2.toFloat, hsv._3.toFloat)
+  //    println(colorCode)
+  //    var rgbaBuffer: ListBuffer[Double] = List.fill(3)(0.0).to[ListBuffer]
+  //    rgbaBuffer(0) = ((colorCode & 0x00ff0000) >> 16).toDouble // r
+  //    rgbaBuffer(1) = ((colorCode & 0x0000ff00) >> 8).toDouble // g
+  //    rgbaBuffer(2) = ((colorCode & 0x000000ff)).toDouble // b
+  //    //  rgbaBuffer(3) = (((colorCode & 0xff000000) >> 24) & 0x000000ff).toDouble/255.0 // alpha
+  //    (rgbaBuffer(0), rgbaBuffer(1), rgbaBuffer(2))
+  //  }
+
+  def hsv2rgb(hsv: (Double, Double, Double)) = {
+    val v = hsv._3
+    val s = hsv._2
+    val rgb = if (s == 0) {
+      (v, v, v)
+    } else {
+      val h = hsv._1 / 60
+      val i = Math.floor(h)
+      val data = (v*(1-s), v*(1-s*(h-i)), v*(1-s*(1-(h-i))))
+      i match {
+        case 0 => (v, data._3, data._1)
+        case 1 => (data._2, v, data._1)
+        case 2 => (data._1, v, data._3)
+        case 3 => (data._1, data._2, v)
+        case 4 => (data._3, data._1, v)
+        case _ => (v, data._1, data._2)
+      }
+    }
+    val r = "0" + Math.round(rgb._1 * 255).toHexString
+    val g = "0" + Math.round(rgb._2 * 255).toHexString
+    val b = "0" + Math.round(rgb._3 * 255).toHexString
+    "#" + r.substring(r.length()-2) + g.substring(g.length()-2) + b.substring(b.length()-2)
+  }
+
+
   def main(args: Array[String]) {
     val reponse = get("NOT StatusCode:0")
     //    reponse.getTenGoiForSparkline().foreach(println)

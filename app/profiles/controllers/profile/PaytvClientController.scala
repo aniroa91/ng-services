@@ -11,7 +11,7 @@ import services.domain.CommonService
 import play.api.mvc._
 import profile.utils.CommonUtil
 import service.DevService
-import service.PaytvService
+
 /**
   * This controller creates an `Action` to handle HTTP requests to the
   * application's home page.
@@ -36,11 +36,11 @@ class PaytvClientController @Inject() (cc: ControllerComponents) extends Abstrac
 
   def index() = Authenticated { implicit request =>
     // get paytv contract response
-    val response = PaytvService.getContractResponse(null)
+    //val response = PaytvService.getContractResponse(null)
     //DevService.get().status.foreach(println)
     val rs = DevService.get()
 
-    Ok(profiles.views.html.paytv.index(rs,response,request.session.get("username").get.toString))
+    Ok(profiles.views.html.paytv.index(rs,request.session.get("username").get.toString))
   }
 
   def drilldownJson(code: String) = Action { implicit request =>
