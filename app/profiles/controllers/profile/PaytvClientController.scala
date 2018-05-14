@@ -9,6 +9,7 @@ import play.api.mvc.AbstractController
 import play.api.mvc.ControllerComponents
 import services.domain.CommonService
 import play.api.mvc._
+import profile.model.PayTVResponse
 import profile.utils.CommonUtil
 import service.DevService
 
@@ -35,9 +36,6 @@ class PaytvClientController @Inject() (cc: ControllerComponents) extends Abstrac
   }
 
   def index() = Authenticated { implicit request =>
-    // get paytv contract response
-    //val response = PaytvService.getContractResponse(null)
-    //DevService.get().status.foreach(println)
     val rs = DevService.get()
 
     Ok(profiles.views.html.paytv.index(rs,request.session.get("username").get.toString))
@@ -46,8 +44,9 @@ class PaytvClientController @Inject() (cc: ControllerComponents) extends Abstrac
   def drilldownJson(code: String) = Action { implicit request =>
     try{
       println(code)
-      val jSon = DevService.get(code)
-      println(jSon.usage.filter(x => x._2 == "usage").map(x=>x._3))
+      var isRegion = 1
+      if(code.indexOf("Region")<0) isRegion = 0
+      val jSon = DevService.get(code,isRegion)
 
       val jsBras = Json.obj(
         // Status Contract
@@ -59,19 +58,39 @@ class PaytvClientController @Inject() (cc: ControllerComponents) extends Abstrac
         "nameContract" -> jSon.tengoi,
         "keyName" -> jSon.tengoi.map(x=> x._2).asInstanceOf[Array[(String)]].distinct,
 
-        // Province Contract
-        "provinceContract" -> jSon.province,
-        "keyProvince" -> jSon.province.map(x=> x._2).asInstanceOf[Array[(String)]].distinct,
+        // Province or Region Contract
+        "provinceContract" -> jSon.regions,
+        "keyProvince" -> jSon.regions.map(x=> x._2).asInstanceOf[Array[(String)]].distinct.sorted,
 
         // UsageQuantile
         "dtaUsageQuantile" -> jSon.usageQuantile.map(x=>x._2),
         // LteQuantile
         "dtaLteQuantile" -> jSon.lteQuantile.map(x=> x._2),
+        // sparkline
+        "tenGoiForSparkline" -> jSon.getTenGoiForSparkline(),
         // Usage Bar chart
         "maxRange" -> jSon.usage.filter(x => x._2 == "usage").map(x=>x._3).asInstanceOf[Array[(Int)]].max,
-        "no_usage" -> jSon.usage.filter(x => x._2 == "no_usage").map(x => -x._3),
+        "no_usage" -> jSon.usage.filter(x => x._2 == "no_usage").map(x => x._3),
         "usage" -> jSon.usage.filter(x => x._2 == "usage").map(x => x._3)
 
+      )
+      Ok(Json.toJson(jsBras))
+    }
+    catch{
+      case e: Exception => Ok("Error")
+    }
+  }
+
+  def getProvincesByRegion(regionId: String) = Action { implicit request =>
+    try{
+      println(regionId)
+      val lstProvince = if(regionId.indexOf("(RegionCode")>=0) DevService.getRegion(regionId) else DevService.getProvincesByRegion(regionId)
+      val months = DevService.getMonth().map(x => x._1)
+      val rs = CommonService.normalizeArray(months,lstProvince)
+      val jsBras = Json.obj(
+        "lstProvince" -> rs,
+        "monthArray" -> months,
+        "keyProvince" -> rs.map(x=> x._2).asInstanceOf[Array[(String)]].distinct.sorted
       )
       Ok(Json.toJson(jsBras))
     }

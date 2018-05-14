@@ -50,6 +50,7 @@ GET      /report                       controllers.ReportController.index(day: S
 GET     /paytv                         controllers.PaytvClientController.index
 GET     /paytv/drilldownJson           controllers.PaytvClientController.drilldownJson(code: String ?= "")
 GET     /profile                       controllers.ProfileContractController.index(day: String ?= "")
+GET     /paytv/getProvincesByRegion    controllers.PaytvClientController.getProvincesByRegion(regionId: String ?= "")
 
 ### PROFILE INTERNET
 GET     /internet/getMonthJson         profile.controllers.internet.ChurnController.getMonthJson(month: String ?= "")

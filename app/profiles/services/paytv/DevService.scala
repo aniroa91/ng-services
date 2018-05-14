@@ -94,16 +94,41 @@ object DevService {
 
   }
 
-  def getProvince(queryString: String) = {
-    val request = search(s"profile-paytv-*" / "docs") query(queryString) aggregations (
+  def getProvincesByRegion(regionString: String): Array[(String, String, Int)] = {
+    val request = search(s"profile-paytv-*" / "docs") query(regionString) aggregations (
       termsAggregation("province")
         .field("ProvinceCode")
         .subaggs(
-          termsAgg("month", "month") size 20
-        ) size 5
+          termsAgg("month", "month")
+        ) size 1000
       )
     val reponse = client.execute(request).await
     getBucketTerm(reponse, "province", "month").map(x => (x._2, ProvinceUtil.getProvince(x._1.toInt), x._3) )
+  }
+
+  def getRegion(queryString: String) = {
+    val request = search(s"profile-paytv-*" / "docs") query(queryString) aggregations (
+      termsAggregation("region")
+        .field("RegionCode")
+        .subaggs(
+          termsAgg("month", "month")
+        ) size 1000
+      )
+    //println(client.show(request))
+    val reponse = client.execute(request).await
+    getBucketTerm(reponse, "region", "month").map(x => (x._2, "Region "+x._1, x._3) )
+  }
+
+  def getRegionProvinces() = {
+    val request = search(s"profile-paytv-*" / "docs") aggregations (
+      termsAggregation("region")
+        .field("RegionCode")
+        .subaggs(
+          termsAgg("ProvinceCode", "ProvinceCode")
+        ) size 1000
+      )
+    val reponse = client.execute(request).await
+    getBucketTerm(reponse, "region", "ProvinceCode").map(x => (x._1,x._2,ProvinceUtil.getProvince(x._2.toInt) )).sorted
   }
 
   private def getBucketTerm(response: SearchResponse, nameTerm: String, nameSubTerm: String): Array[(String, String, Int)] = {
@@ -145,12 +170,13 @@ object DevService {
     Json.toJson(a)
   }
 
-  def get(): PayTVResponse = get("*")
+  def get(): PayTVResponse = get("*",1)
 
-  def get(query: String): PayTVResponse = {
+  // isRegion = 0:Region, 1: Province
+  def get(query: String,isRegion: Int): PayTVResponse = {
     val months = getMonth().map(x => x._1)
 
-    val rs = PayTVResponse(getStatus(query), getTenGoi(query), getUsage(query), getProvince(query), getQuantile("SumUsage", query), getQuantile("LifeToEndC", query))
+    val rs = PayTVResponse(getStatus(query), getTenGoi(query), getUsage(query),getRegionProvinces(), if(isRegion ==0) getProvincesByRegion(query) else getRegion(query), getQuantile("SumUsage", query), getQuantile("LifeToEndC", query))
     //rs.usage.foreach(println)
     rs.normalize(months)
   }
@@ -441,11 +467,11 @@ object DevService {
     "#" + r.substring(r.length()-2) + g.substring(g.length()-2) + b.substring(b.length()-2)
   }
 
-
+/*
   def main(args: Array[String]) {
     val reponse = get("NOT StatusCode:0")
     //    reponse.getTenGoiForSparkline().foreach(println)
     getMonth().foreach(println)
     client.close()
-  }
+  }*/
 }

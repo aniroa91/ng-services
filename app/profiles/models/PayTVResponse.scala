@@ -8,7 +8,8 @@ case class PayTVResponse(
                           status: Array[(String, String, Int)],
                           tengoi: Array[(String, String, Int)],
                           usage: Array[(String, String, Int)],
-                          province: Array[(String, String, Int)],
+                          provincesOfRegion: Array[(String, String, String)],
+                          regions: Array[(String, String, Int)],
                           usageQuantile: Array[(String, JsArray)],
                           lteQuantile: Array[(String, JsArray)]) {
   def getTenGoiForSparkline(): Array[(String, Int, Array[Int])] = {
@@ -32,7 +33,8 @@ case class PayTVResponse(
       normalize(months, status),
       normalize(months, tengoi),
       normalize(months, usage),
-      normalize(months, province),
+      provincesOfRegion,
+      normalize(months, regions),
       usageQuantile,
       lteQuantile)
   }

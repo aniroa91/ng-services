@@ -644,15 +644,23 @@
     <link href="../assets/vendors/datatables.net-fixedColumn/css/fixedColumn.bootstrap.min.css" rel="stylesheet">
         <!-- bootstrap-daterangepicker -->
     <link href="/assets/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
-
+    <link href="../assets/custom/css/waitMe.css" rel="stylesheet">
     <link href="../assets/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
     <link href="../assets/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
     <link href="../assets/custom/css/animate.min.css" rel="stylesheet">
     <link href="../assets/custom/css/hover-min.css" rel="stylesheet">
+    <link href="../assets/custom/css/jsTree.css" rel="stylesheet">
+
 
     <style type="text/css">
             .top_nav .navbar-right {
                 width: auto;
+            }
+            .highcharts-tooltip>span {
+                border: 1px solid silver;
+                border-radius: 3px;
+                box-shadow: 1px 1px 2px #888;
+                z-index: 9999!important;
             }
             .panel-heading {
                 padding: 10px 10px 0px!important;
@@ -695,9 +703,7 @@
                 margin:100px auto;
                 height:1000px;
             }
-            .right_col{
-                min-height: inherit!important;
-            }
+
             .dropdown-menu>li>a{
                 white-space: inherit!important;
             }
@@ -814,7 +820,7 @@
                 font-weight: 700;color:green;font-size: 24px
             }
             .highcharts-contextbutton{display: none}
-            .highcharts-title{ opacity: 0}
+
             .line{
                 width: 136px;
                 background: #ddd;
@@ -835,7 +841,6 @@
                 top: 0;
                 left: 0;
             }
-
             .bottom {
                 position: absolute;
                 bottom: 1px;
@@ -855,6 +860,145 @@
             tfoot{
                 background: #fafafa;
                 color: #096898;
+            }
+            .label-text,.jstree-default .jstree-anchor{
+                color: #2A3F54!important;
+                font-weight: 600;
+            }
+            input[type="checkbox"]{
+                margin-top: 1px;
+            }
+            /*Radio box*/
+            input[type="radio"]{
+                position: absolute;
+                right: 9000px;
+            }
+            input[type="radio"] + .label-text:before{
+                content: "\f10c";
+                font-family: "FontAwesome";
+                speak: none;
+                font-style: normal;
+                font-weight: normal;
+                font-variant: normal;
+                text-transform: none;
+                line-height: 1;
+                -webkit-font-smoothing:antialiased;
+                width: 1em;
+                display: inline-block;
+                margin-right: 5px;
+            }
+
+            input[type="radio"]:checked + .label-text:before{
+                content: "\f192";
+                color: green;
+                animation: effect 250ms ease-in;
+            }
+
+            input[type="radio"]:disabled + .label-text{
+                color: #aaa;
+            }
+
+            input[type="radio"]:disabled + .label-text:before{
+                content: "\f111";
+                color: #ccc;
+            }
+            .bdR{
+                border-right: 1px solid #ddd;
+                border-bottom: 1px solid #ddd;
+                padding: 10px;
+            }
+            .titFilter{
+                font-size: 18px;color: #16a085;
+                font-weight: 600;
+            }
+            .check{
+                font-size:12px;cursor: pointer;
+            }
+            .refresh{
+                font-size:12px;cursor: pointer;margin-right: 5px
+            }
+            .radioGroup{
+                padding:2px 18px 0px 18px;
+                margin-top: 7px;
+            }
+            .nav.navbar-nav>li>a{
+                color: #fff!important;
+            }
+            .nav.navbar-nav>li>a:hover,.top_nav .dropdown-menu li a:hover,.top_nav .nav .open>a, .top_nav .nav .open>a:focus, .top_nav .nav .open>a:hover, .top_nav .nav>li>a:focus, .top_nav .nav>li>a:hover{
+                color: #fff!important;
+                background: #16a085 !important;
+            }
+            .top_nav .dropdown-menu li a{
+                background: #2A3F54!important;
+                color: #fff!important;
+            }
+            .nav_title{
+                background: #2A3F54!important;
+            }
+            .left_col{
+                background: #e4e3e3;
+            }
+            #region{
+                max-height: 400px;
+                overflow-y: auto;
+            }
+            body{
+                background: #F7F7F7;
+                overflow:hidden;
+            }
+            .lineDiv{
+                border: 1px solid #eee;
+                margin: 10px 0px 10px 0px
+            }
+            .filter{
+                padding: 5px 0px 0px 10px;
+                margin-top: -20px;
+                margin-bottom: 20px;
+                color: #f90;
+                font-size: 18px;
+                background: #F7F7F7;
+            }
+            .btn-custom{
+                background: #fff;
+                border: transparent;
+                color: #555;
+            }
+            .multiselect-container{
+                width: 210px;
+            }
+            .dropdown-menu>li>a{
+                padding: 0px 33px;
+                font-size: 12px;
+            }
+            .dropdown-menu>li>a:focus, .dropdown-menu>li>a:hover{
+                color: #fff;
+                background: #f90;
+            }
+            /* Extra small devices (phones, 600px and down) */
+            @@media only screen and (max-width: 600px) {
+                .right_col{
+                    min-height: 0px!important;
+                    max-height: 400px;
+                    overflow-y: auto;
+                }
+            }
+
+            /* Medium devices (landscape tablets, 768px and up) */
+            @@media only screen and (min-width: 1200px) {
+                .right_col{
+                    min-height: 0px!important;
+                    max-height: 700px;
+                    overflow-y: auto;
+                }
+            }
+
+            /* Extra large devices (large laptops and desktops, 1200px and up) */
+            @@media only screen and (min-width: 1400px) {
+                .right_col{
+                    min-height: 0px!important;
+                    max-height: 850px;
+                    overflow-y: auto;
+                }
             }
     </style>
 }

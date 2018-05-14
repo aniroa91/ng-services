@@ -4,6 +4,62 @@
 
 <script type="text/javascript">
         $(document).ready(function () {
+            $('#table-sparkline').DataTable( {
+                "scrollY":        "250px",
+                "scrollCollapse": true,
+                "paging":         false,
+                "info":     false,
+                "searching":     false,
+                "sort":     false
+            });
+            // multi select
+            $('#slName').multiselect({
+                /*enableFiltering: true,*/
+                nonSelectedText: 'Choose Name',
+                includeSelectAllOption: true,
+                maxHeight: 400,
+                dropUp: false,
+                numberDisplayed:1,
+                inheritClass: true
+            });
+            $('#slStatus').multiselect({
+                /*enableFiltering: true,*/
+                nonSelectedText: 'Choose Status',
+                includeSelectAllOption: true,
+                maxHeight: 400,
+                numberDisplayed:1,
+                dropUp: false,
+                inheritClass: true
+            });
+            // jsTree Region and province
+            $('#region').jstree({
+                "plugins" : ["checkbox"],
+                'core' : {
+                    "themes":{
+                        "icons":false
+                    },
+                    'data' : getJsonTreeListRegion(@Html(Json.stringify(Json.toJson(rs.provincesOfRegion))),@Html(Json.stringify(Json.toJson( rs.provincesOfRegion.map(x => x._1).distinct.sorted ))))
+                }
+            }).on('changed.jstree', function (e, data) {
+                var i, j, nodes = [], regions = [], provinces= [];
+                for(i = 0, j = data.selected.length; i < j; i++) {
+                    nodes.push(data.instance.get_node(data.selected[i]).id);
+                }
+                var regionArr = nodes.join(', ').split(',')
+                for(var i=0;i< regionArr.length;i++){
+                    if(isNaN(regionArr[i])){
+                        regions.push(regionArr[i].split('-')[1])
+                    }
+                    else{
+                        provinces.push(regionArr[i])
+                    }
+                }
+                $('#provinces').val(provinces)
+                $('#regions').val(regions)
+            })
+            $('input:radio').change(function () {
+                $('#slUsage').val($(this).val())
+            });
             // dropdownlist country
             var csv_path = "/assets/province.csv";
             var renderCSVDropdown = function(csv) {
@@ -26,55 +82,60 @@
 
             @if(rs.status != null){
                 Highcharts.chart('line-status', {
+                    chart: {
+                        zoomType: 'xy'
+                    },
 
                     title: {
                         text: ''
                     },
 
-                    colors : ['#dc5a78', '#3498DB', '#9B59B6', '#f1b53d', '#73879C', '#1ABB9C', '#832d1d', '#0000cc',  '#E74C3C', '#09006d', '#cccccc', '#669999', '#f2ccff', '#e6e600', '#132639', '#99cc00', '#466d6d', '#ffc6b3', '#666633', '#ffff00'],
-                    yAxis: {
-                        title: {
-                            text: 'Number of Status'
-                        }
-                    },
+                    colors : ['#9B59B6','#73879C','#dc5a78', '#3498DB', '#f1b53d', '#1ABB9C', '#832d1d', '#0000cc',  '#E74C3C', '#09006d', '#cccccc', '#669999', '#f2ccff', '#e6e600', '#132639', '#99cc00', '#466d6d', '#ffc6b3', '#666633', '#ffff00'],
+
                     xAxis: {
                         categories: @Html(Json.stringify(Json.toJson(rs.status.map(x=> x._1).distinct.sorted)))
                     },
 
-                    series: getJsonMultiLines(@Html(Json.stringify(Json.toJson(rs.status))), @Html(Json.stringify(Json.toJson(rs.status.map(x=> x._1).distinct.sorted))), @Html(Json.stringify(Json.toJson(rs.status.map(x=> x._2).distinct))))
-
-                });
-            }
-            @if(rs.tengoi != null){
-                Highcharts.chart('line-name', {
-                    title: {
-                        text: ''
-                    },
-
-                    colors : ['#99cc00','#dc5a78', '#3498DB', '#f2ccff','#09006d', '#9B59B6', '#f1b53d','#cccccc', '#669999', '#e6e600', '#132639',  '#73879C', '#1ABB9C', '#832d1d', '#0000cc', '#E74C3C', '#466d6d', '#ffc6b3', '#666633', '#ffff00'],
-
-                    yAxis: {
+                    yAxis: [{ // Primary yAxis
+                        labels: {
+                            format: '{value}',
+                            style: {
+                                color: "#5A738E"
+                            }
+                        },
                         title: {
-                            text: 'Number of Name'
+                            text: 'Others',
+                            style: {
+                                color: "#5A738E"
+                            }
                         }
-                    },
-                    xAxis: {
-                        categories: @Html(Json.stringify(Json.toJson(rs.tengoi.map(x=> x._1).distinct.sorted)))
+                    }, { // Secondary yAxis
+                        title: {
+                            text: 'Binh thuong',
+                            style: {
+                                color: "#9B59B6"
+                            }
+                        },
+                        labels: {
+                            format: '{value}',
+                            style: {
+                                color: "#9B59B6"
+                            }
+                        },
+                        opposite: true
+                    }],
+                    tooltip: {
+                        shared: true
                     },
 
-                    series: getJsonMultiLines(@Html(Json.stringify(Json.toJson(rs.tengoi))), @Html(Json.stringify(Json.toJson(rs.tengoi.map(x=> x._1).distinct.sorted))), @Html(Json.stringify(Json.toJson(rs.tengoi.map(x=> x._2).distinct))))
-                    /*[{
-                        name: 'Installation',
-                        data: [43934, 52503, 57177, 69658, 97031, 119931, 137133, 154175]
-                    }, {
-                        name: 'Manufacturing',
-                        data: [24916, 24064, 29742, 29851, 32490, 30282, 38121, 40434]
-                    }]*/
+                    series: getJsonMultiLinesColumn(@Html(Json.stringify(Json.toJson(rs.status))), @Html(Json.stringify(Json.toJson(rs.status.map(x=> x._1).distinct.sorted))), @Html(Json.stringify(Json.toJson(rs.status.map(x=> x._2).distinct))))
 
                 });
             }
-            @if(rs.province != null){
-                Highcharts.chart('line-province', {
+
+
+            @if(rs.regions != null){
+                Highcharts.chart('line-region', {
                     chart: {
                         type: 'column'
                     },
@@ -82,25 +143,35 @@
                         text: ''
                     },
 
-                    colors : ['#9B59B6', '#1ABB9C', '#832d1d', '#0000cc',  '#73879C ','#E74C3C','#dc5a78', '#3498DB', '#f1b53d','#09006d', '#cccccc', '#669999', '#f2ccff', '#e6e600', '#132639', '#99cc00', '#466d6d', '#ffc6b3', '#666633', '#ffff00'],
+                    plotOptions: {
+                        series: {
+                            events: {
+                                legendItemClick: function () {
+                                    var regionId = this.chart.series[this.index].name.split(' ')[1]
+                                    drillDrawLegendProvince(regionId);
+                                }
+                            }
+                        }
+                    },
+
+                    colors : ['#9B59B6', '#1ABB9C', '#832d1d', '#0000cc',  '#73879C ','#E74C3C','#f90', '#3498DB', '#f1b53d','#09006d', '#cccccc', '#669999', '#f2ccff', '#e6e600', '#132639', '#99cc00', '#466d6d', '#ffc6b3', '#666633', '#ffff00'],
 
                     yAxis: {
                         title: {
-                            text: 'Number of Province'
+                            text: 'Number of regions'
                         }
                     },
                     xAxis: {
-                        categories: @Html(Json.stringify(Json.toJson(rs.province.map(x=> x._1).distinct.sorted)))
+                        categories: @Html(Json.stringify(Json.toJson(rs.regions.map(x=> x._1).distinct.sorted)))
                     },
 
-                    series: getJsonMultiLines(@Html(Json.stringify(Json.toJson(rs.province))), @Html(Json.stringify(Json.toJson(rs.province.map(x=> x._1).distinct.sorted))), @Html(Json.stringify(Json.toJson(rs.province.map(x=> x._2).distinct))))
+                    series: getJsonMultiLines(@Html(Json.stringify(Json.toJson(rs.regions))), @Html(Json.stringify(Json.toJson(rs.regions.map(x=> x._1).distinct.sorted))), @Html(Json.stringify(Json.toJson(rs.regions.map(x=> x._2).distinct.sorted))))
 
                 });
             }
             @if(rs.usage != null){
-                var no_usage = @Html(Json.stringify(Json.toJson(rs.usage.filter(x => x._2 == "no_usage").map(x => -x._3))))
+                var no_usage = @Html(Json.stringify(Json.toJson(rs.usage.filter(x => x._2 == "no_usage").map(x => x._3))))
                 var usage = @Html(Json.stringify(Json.toJson(rs.usage.filter(x => x._2 == "usage").map(x => x._3))))
-                var max = @Html(Json.stringify(Json.toJson(rs.usage.filter(x => x._2 == "usage").map(x => x._3).max)))
                 Highcharts.chart('usage-bar', {
                     chart: {
                         type: 'bar'
@@ -108,34 +179,18 @@
                     title: {
                         text: ''
                     },
-                    xAxis: [{
+                    xAxis: {
                         categories: @Html(Json.stringify(Json.toJson(rs.usage.map(x => x._1).distinct))),
-                        reversed: false,
-                        labels: {
-                            step: 1
-                        },
-                    }, { // mirror axis on right side
-                        opposite: true,
-                        reversed: false,
-                        categories: @Html(Json.stringify(Json.toJson(rs.usage.map(x => x._1).distinct))),
-                        linkedTo: 0,
-                        labels: {
-                            step: 1
-                        }
-                    }],
-                    yAxis: {
-                        title: {
-                            text: null
-                        },
-                        labels: {
-                            formatter: function () {
-                                return Math.abs(this.value);
-                            }
-                        },
-                        max: max,
-                        min: -max
                     },
-
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: ''
+                        }
+                    },
+                    legend: {
+                        reversed: true
+                    },
                     plotOptions: {
                         series: {
                             stacking: 'normal'
@@ -150,11 +205,11 @@
                     },
 
                     series: [{
-                        name: 'No_Usage',
+                        name: '0h-1h',
                         data: no_usage,
                         color:'#73879C'
                     }, {
-                        name: 'Usage',
+                        name: '>1h',
                         data: usage,
                         color:'#832d1d'
                     }]
@@ -246,12 +301,335 @@
 
                 });
             }
+            /**
+             * Create a constructor for sparklines that takes some sensible defaults and merges in the individual
+             * chart options. This function is also available from the jQuery plugin as $(element).highcharts('SparkLine').
+             */
+            Highcharts.SparkLine = function (a, b, c) {
+                var hasRenderToArg = typeof a === 'string' || a.nodeName,
+                    options = arguments[hasRenderToArg ? 1 : 0],
+                    defaultOptions = {
+                        chart: {
+                            renderTo: (options.chart && options.chart.renderTo) || this,
+                            borderWidth: 0,
+                            type: 'area',
+                            margin: [2, 0, 2, 0],
+                            width: 120,
+                            height: 20,
+                            style: {
+                                overflow: 'visible'
+                            },
+                            // small optimalization, saves 1-2 ms each sparkline
+                            skipClone: true
+                        },
+                        title: {
+                            text: ''
+                        },
+                        credits: {
+                            enabled: false
+                        },
+                        xAxis: {
+                            labels: {
+                                enabled: false
+                            },
+                            title: {
+                                text: null
+                            },
+                            startOnTick: false,
+                            endOnTick: false,
+                            tickPositions: []
+                        },
+                        yAxis: {
+                            endOnTick: false,
+                            startOnTick: false,
+                            labels: {
+                                enabled: false
+                            },
+                            title: {
+                                text: null
+                            },
+                            tickPositions: [0]
+                        },
+                        legend: {
+                            enabled: false
+                        },
+                        tooltip: {
+                            borderWidth: 0,
+                            shadow: false,
+                            useHTML: true,
+                            hideDelay: 0,
+                            padding: 0,
+                            positioner: function (w, h, point) {
+                                return { x: point.plotX - w, y: (point.plotY - h/3) };
+                            }
+                        },
+                        plotOptions: {
+                            series: {
+                                enableMouseTracking: true,
+                                lineWidth: 1,
+                                shadow: false,
+                                states: {
+                                    hover: {
+                                        lineWidth: 1
+                                    }
+                                },
+                                marker: {
+                                    radius: 2
+                                }
+                            }
+                        }
+                    };
+
+                options = Highcharts.merge(defaultOptions, options);
+
+                return hasRenderToArg ?
+                    new Highcharts.Chart(a, options, c) :
+                    new Highcharts.Chart(options, b);
+            };
+
+            doChunk();
         });
+
+        function doChunk() {
+            var start = +new Date(), $tds = $('td[data-sparkline]'), fullLen = $tds.length, n = 0;
+
+            // Creating 153 sparkline charts is quite fast in modern browsers, but IE8 and mobile
+            // can take some seconds, so we split the input into chunks and apply them in timeouts
+            // in order avoid locking up the browser process and allow interaction.
+            var time = +new Date(),
+                    i,
+                    len = $tds.length,
+                    $td,
+                    stringdata,
+                    arr,
+                    data,
+                    chart;
+
+            for (i = 0; i < len; i += 1) {
+                $td = $($tds[i]);
+                stringdata = $td.data('sparkline');
+                arr = stringdata.split('; ');
+                data = $.map(arr[0].split(', '), parseFloat);
+                chart = {};
+
+                if (arr[1]) {
+                    chart.type = arr[1];
+                }
+                $td.highcharts('SparkLine', {
+                    series: [{
+                        data: data,
+                        fillColor: {
+                            linearGradient: [100, 0, 100, 30],
+                            stops: [
+                                [0, "#1ABB9C"]
+                            ]
+                        },
+                        pointStart: Date.UTC(2017, 04, 1),
+                        pointIntervalUnit: 'month'
+                    }],
+                    tooltip: {
+
+                        formatter: function () {
+                            return 'Month: '+Highcharts.dateFormat('%Y-%m', this.x) + '<br/>Avg: ' + Highcharts.numberFormat(this.y, 0);
+                        }
+                    },
+                    chart: chart,
+                    exporting: { enabled: false }
+                });
+
+                n += 1;
+
+                // If the process takes too much time, run a timeout to allow interaction with the browser
+                if (new Date() - time > 500) {
+                    $tds.splice(0, i + 1);
+                    setTimeout(doChunk, 0);
+                    break;
+                }
+                /*
+                                    // Print a feedback on the performance
+                                    if (n === fullLen) {
+                                        $('#result').html('Generated ' + fullLen + ' sparklines in ' + (new Date() - start) + ' ms');
+                                    }*/
+            }
+        }
+
+        function drillDrawLegendProvince(regionId){
+            var fields = getParamFields(regionId)
+            $('#regionsOld').val($('#regions').val())
+            $.ajax({
+                url: "/paytv/getProvincesByRegion?regionId="+fields,
+                cache: false,
+                beforeSend: function () {
+                    $('#line-region').waitMe({
+                        effect: 'progressBar',
+                        text: 'Please wait...',
+                        bg: 'rgba(255,255,255,0.7)',
+                        color: '#000',
+                        textPos: 'vertical'
+                    });
+                },
+                success: function (dta) {
+                    if(dta != "Error"){
+                        $('#backRegion').show();
+                        Highcharts.chart('line-region', {
+                            chart: {
+                                type: 'column'
+                            },
+                            title: {
+                                text: 'Provinces of Region '+regionId,
+                                style: {
+                                    color: "#832d1d"
+                                }
+                            },
+
+                            colors : ['#1ABB9C', '#9B59B6', '#832d1d', '#0000cc',  '#73879C ','#E74C3C','#f90', '#3498DB', '#f1b53d','#09006d', '#cccccc', '#669999', '#f2ccff', '#e6e600', '#132639', '#99cc00', '#466d6d', '#ffc6b3', '#666633', '#ffff00'],
+
+                            yAxis: {
+                                title: {
+                                    text: 'Number of provinces'
+                                }
+                            },
+                            xAxis: {
+                                categories: dta.monthArray
+                            },
+
+                            series: getJsonMultiLines(dta.lstProvince,dta.monthArray,dta.keyProvince)
+
+                        });
+                    }
+                },
+                complete: function () {
+                    $('#line-region').waitMe("hide");
+                },
+            });
+        }
+
+        function backToRegion(){
+            var fields = getParamFields("")
+            $.ajax({
+                url: "/paytv/getProvincesByRegion?regionId="+fields,
+                cache: false,
+                beforeSend: function () {
+                    $('#line-region').waitMe({
+                        effect: 'progressBar',
+                        text: 'Please wait...',
+                        bg: 'rgba(255,255,255,0.7)',
+                        color: '#000',
+                        textPos: 'vertical'
+                    });
+                },
+                success: function (dta) {
+                    $('#backRegion').hide()
+                    if(dta != "Error"){
+                        Highcharts.chart('line-region', {
+                            chart: {
+                                type: 'column'
+                            },
+                            title: {
+                                text: ''
+                            },
+
+                            plotOptions: {
+                                series: {
+                                    events: {
+                                        legendItemClick: function () {
+                                            var regionId = this.chart.series[this.index].name.split(' ')[1]
+                                            drillDrawLegendProvince(regionId);
+                                        }
+                                    }
+                                }
+                            },
+
+                            colors : ['#1ABB9C', '#9B59B6', '#832d1d', '#0000cc',  '#73879C ','#E74C3C','#f90', '#3498DB', '#f1b53d','#09006d', '#cccccc', '#669999', '#f2ccff', '#e6e600', '#132639', '#99cc00', '#466d6d', '#ffc6b3', '#666633', '#ffff00'],
+
+                            yAxis: {
+                                title: {
+                                    text: 'Number of Region'
+                                }
+                            },
+                            xAxis: {
+                                categories: dta.monthArray
+                            },
+
+                            series: getJsonMultiLines(dta.lstProvince,dta.monthArray,dta.keyProvince)
+
+                        });
+                    }
+                },
+                complete: function () {
+                    $('#line-region').waitMe("hide");
+                },
+            });
+        }
+
+        function getJsonTreeListRegion(dta,arrKey){
+            /*[
+                   { "id" : "ajson1", "parent" : "#", "text" : "Simple root node" },
+                   { "id" : "ajson2", "parent" : "#", "text" : "Root node 2" },
+                   { "id" : "ajson3", "parent" : "ajson2", "text" : "Child 1" },
+                   { "id" : "ajson4", "parent" : "ajson2", "text" : "Child 2" },
+                    ]*/
+            var jsArray = []
+            jsArray.push({
+                "text": "Choose Region",
+                "id": "All",
+                "parent": "#"
+            })
+            for(var key=0;key<arrKey.length;key++){
+                jsArray.push({
+                    "text": "Region "+arrKey[key],
+                    "id": "Region-"+arrKey[key],
+                    "parent": "All"
+                })
+                for(var i=0;i<dta.length;i++){
+                    if(arrKey[key] == dta[i][0]){
+                        jsArray.push({
+                            "text": dta[i][2],
+                            "id": dta[i][1],
+                            "parent": "Region-"+arrKey[key]
+                        })
+                    }
+                }
+            }
+            return jsArray
+        }
+
+        function getJsonMultiLinesColumn(dta, arrMonth, arrKey){
+            var jsArray = []
+            var sizeKey = arrKey.length
+            if(arrKey.length >5) sizeKey =5
+            for(var key=0;key< sizeKey;key++ ){
+                var arrData = []
+                for(var month=0;month<arrMonth.length;month++ ) {
+                    for (var i = 0; i < dta.length; i++) {
+                        if (arrKey[key] == dta[i][1] && arrMonth[month] == dta[i][0]){
+                            arrData.push(dta[i][2])
+                        }
+                    }
+                }
+                if(key == 0){
+                    jsArray.push({
+                        name: arrKey[key],
+                        type: 'spline',
+                        yAxis: 0,
+                        data: arrData
+                    })
+                }
+                else {
+                    jsArray.push({
+                        name: arrKey[key],
+                        type: 'column',
+                        yAxis: 1,
+                        data: arrData
+                    })
+                }
+            }
+            return jsArray
+        }
 
         function getJsonMultiLines(dta, arrMonth, arrKey){
             var jsArray = []
             var sizeKey = arrKey.length
-            if(arrKey.length >5) sizeKey =5
             for(var key=0;key< sizeKey;key++ ){
                 var arrData = []
                 for(var month=0;month<arrMonth.length;month++ ) {
@@ -270,100 +648,158 @@
             return jsArray
         }
 
-/*        function json(dta, arrKey,arrMonth){
-            var jsArray = []
-            var sumOthers = []
-            for(var month=0;month<arrMonth.length;month++ ) {
-                sumOthers.push(0)
+        function getParamFields(regionId){
+            var jsonStatus = [
+                {name:"HUY DICH VU",id:1},
+                {name:"NVLDTT", id:2},
+                {name:"CTBDV",id:3},
+                {name:"BINH THUONG",id:0}]
+
+            var fields = "", sttCode= [],StatusCode= "StatusCode:*", arrTen=[],TenGoi = "TenGoi:*"
+            var arrStt = $('#divStatus .multiselect.dropdown-toggle').attr('title');
+            if(arrStt.indexOf(",")>=0){
+                for(var i=0;i<arrStt.split(',').length;i++){
+                    var idStt = jsonStatus.find(x => x.name === arrStt.split(',')[i].trim()).id
+                    sttCode.push("StatusCode:"+Number(idStt))
+                }
+                StatusCode = sttCode.join(" OR ")
             }
-            for(var key=0;key<arrKey.length;key++ ){
-                var arrData = []
-                var arrOthers = []
-                for(var month=0;month<arrMonth.length;month++ ) {
-                    var isMonth = 0
-                    for (var i = 0; i < dta.length; i++) {
-                        if (arrKey[key] == dta[i][0][2] && arrMonth[month] == dta[i][0][0]){
-                            arrData.push(dta[i][1])
-                            isMonth = 1
-                            if(key >= 5)
-                                arrOthers.push(dta[i][1])
+            else if(arrStt != "Choose Status")
+                StatusCode = "StatusCode:"+Number(jsonStatus.find(x => x.name === arrStt.trim()).id)
+
+            var arrName = $('#divName .multiselect.dropdown-toggle').attr('title');
+            if(arrName.indexOf(",")>=0){
+                for(var i=0;i<arrName.split(",").length;i++){
+                    var nameCT = "\""+arrName.split(",")[i].trim()+"\""
+                    arrTen.push('TenGoi:'+nameCT)
+                }
+                TenGoi = arrTen.join(" OR ")
+            }
+            else if(arrName != "Choose Name") TenGoi = "TenGoi:"+arrName
+
+            // set params ajax
+            var others = '('+StatusCode+') AND ('+TenGoi+') AND SumUsage:'+$('#slUsage').val()
+            if(regionId != ""){
+                fields = others + " AND RegionCode:"+regionId
+            }
+            else{
+                if($('.jstree-undetermined').length == 1){
+                    //for regions
+                    if($('#regions').val().indexOf(",")>=0){
+                        var arrId = $('#regions').val().split(",");
+                        fields = "RegionCode:"+arrId[0]
+                        for(var i=0;i<arrId.length;i++){
+                            fields += " OR RegionCode:"+arrId[i]
                         }
+                        fields = others+ " AND ("+fields+")"
+                        $('#titleRegion').text("Paytv Contract By Region")
+                        $('#isRegion').val("regions")
+                        $('#backRegion').hide()
                     }
-                    if(isMonth == 0){
-                       arrData.push(0)
-                        if(key >= 5)
-                            arrOthers.push(0)
+                    // for provincces
+                    else{
+                        var arrId = $('#provinces').val().split(",");
+                        fields = "ProvinceCode:"+arrId[0]
+                        for(var i=0;i<arrId.length;i++){
+                            fields += " OR ProvinceCode:"+arrId[i]
+                        }
+                        fields = others+ " AND ("+fields+")"
+                        $('#isRegion').val("provinces")
+                        $('#backRegion').hide()
+                        $('#titleRegion').text("Paytv Contract By Province")
                     }
                 }
-                if(key<5){
-                    jsArray.push({
-                        name: arrKey[key],
-                        data: arrData
-                    })
+                else if($('.jstree-undetermined').length > 1){
+                    var arrId = $('#provinces').val().split(",");
+                    fields = "ProvinceCode:"+arrId[0]
+                    for(var i=0;i<arrId.length;i++){
+                        fields += " OR ProvinceCode:"+arrId[i]
+                    }
+                    fields = others+ " AND ("+fields+")"
+                    $('#isRegion').val("provinces")
+                    $('#titleRegion').text("Paytv Contract By Province")
+                    $('#backRegion').hide()
                 }
                 else{
-                    sumOthers = sumOthers.map(function (num, idx) {
-                        return num + arrOthers[idx];
-                    });
+                    $('#backRegion').hide()
+                    $('#isRegion').val("regions")
+                    fields = others+" AND (RegionCode:*)"
+                    $('#titleRegion').text("Paytv Contract By Region")
                 }
-
             }
-            if(arrKey.length >= 5) {
-                jsArray.push({
-                    name: 'Others',
-                    data: sumOthers
-                })
-            }
-            return jsArray
-        }*/
+            return fields
+        }
 
-        function drillDownJson(element){
-            var nameCT = "*"
-            if($('#slName').val() != "*")
-                nameCT = "\""+$('#slName').val()+"\""
-//          var fields = 'StatusCode:'+$('#slStatus').val()+',ProvinceCode:'+$('#slProvince').val()+',TenGoi:'+$('#slName').val()+',Usage:'+$('#slUsage').val()
-            var fields = 'StatusCode:'+$('#slStatus').val()+' AND ProvinceCode:'+$('#slProvince').val()+' AND TenGoi:'+nameCT+' AND SumUsage:'+$('#slUsage').val()
+        function drillDownJson(){
+            $('#backRegion').hide()
+            var fields = getParamFields("")
             $.ajax({
                 url: "/paytv/drilldownJson?code="+fields,
                 cache: false,
                 success: function (dta) {
                     if(dta != "Error"){
-                        console.log(dta.maxRange)
+                        // sparkline TenGoi
+                        $('#tbody-sparkline').html("")
+                        var tengoi = "<tr><td></td><td></td><td></td></tr>"
+                        for(var i=0;i<dta.tenGoiForSparkline.length;i++){
+                            tengoi+= '<tr><th href="#">'+dta.tenGoiForSparkline[i][0]+'</th><td>'+dta.tenGoiForSparkline[i][1]+'</td><td data-sparkline="'+dta.tenGoiForSparkline[i][2].join(', ')+'"/></tr>'
+                        }
+                        tengoi += "<tr><td></td><td></td><td></td></tr>"
+                        $('#tbody-sparkline').append(tengoi)
+                        doChunk();
                         // set data line status contract
                         Highcharts.chart('line-status', {
+                            chart: {
+                                zoomType: 'xy'
+                            },
 
                             title: {
                                 text: ''
                             },
 
-                            colors : ['#dc5a78', '#3498DB', '#9B59B6', '#f1b53d', '#73879C', '#1ABB9C', '#832d1d', '#0000cc',  '#E74C3C', '#09006d', '#cccccc', '#669999', '#f2ccff', '#e6e600', '#132639', '#99cc00', '#466d6d', '#ffc6b3', '#666633', '#ffff00'],
+                            colors : ['#9B59B6','#73879C','#dc5a78', '#3498DB', '#f1b53d', '#1ABB9C', '#832d1d', '#0000cc',  '#E74C3C', '#09006d', '#cccccc', '#669999', '#f2ccff', '#e6e600', '#132639', '#99cc00', '#466d6d', '#ffc6b3', '#666633', '#ffff00'],
 
-                            yAxis: {
-                                title: {
-                                    text: 'Number of Status'
-                                }
-                            },
                             xAxis: {
-                                categories: dta.monthStatus
+                                categories:  dta.monthStatus
                             },
 
-                            series: getJsonMultiLines(dta.statusContract,dta.monthStatus,dta.keyCodeStatus)
+                            yAxis: [{ // Primary yAxis
+                                labels: {
+                                    format: '{value}',
+                                    style: {
+                                        color: "#5A738E"
+                                    }
+                                },
+                                title: {
+                                    text: 'Others',
+                                    style: {
+                                        color: "#5A738E"
+                                    }
+                                }
+                            }, { // Secondary yAxis
+                                title: {
+                                    text: 'Binh thuong',
+                                    style: {
+                                        color: "#9B59B6"
+                                    }
+                                },
+                                labels: {
+                                    format: '{value}',
+                                    style: {
+                                        color: "#9B59B6"
+                                    }
+                                },
+                                opposite: true
+                            }],
+                            tooltip: {
+                                shared: true
+                            },
+
+                            series: getJsonMultiLinesColumn(dta.statusContract,dta.monthStatus,dta.keyCodeStatus)
 
                         });
-                        /*var chartStatus = $('#line-status').highcharts();
-                        var arrDtaStt = getJsonMultiLines(dta.statusContract,dta.keyStatus,dta.monthStatus)
-                        for(var i=0;i<arrDtaStt.length;i++) {
-                            chartStatus.series[i].update(arrDtaStt[i]);
-                        }
-                        chartStatus.redraw();*/
-                        // set data line name contract
-                        /*var chartName = $('#line-name').highcharts();
-                        var arrDtaName = getJsonMultiLines(dta.nameContract,dta.keyName,dta.monthName)
-                        for(var i=0;i<arrDtaName.length;i++) {
-                            chartName.series[i].update(arrDtaName[i]);
-                        }
-                        chartName.redraw();*/
-                        Highcharts.chart('line-name', {
+
+                        /*Highcharts.chart('line-name', {
                             title: {
                                 text: ''
                             },
@@ -381,15 +817,9 @@
 
                             series: getJsonMultiLines(dta.nameContract,dta.monthStatus,dta.keyName)
 
-                        });
-                        // set data line province contract
-                        /*var chartProvince = $('#line-province').highcharts();
-                        var arrDtaProvince = getJsonMultiLines(dta.provinceContract,dta.keyProvince,dta.monthProvince)
-                        for(var i=0;i<arrDtaProvince.length;i++) {
-                            chartProvince.series[i].update(arrDtaProvince[i]);
-                        }
-                        chartProvince.redraw();*/
-                        Highcharts.chart('line-province', {
+                        });*/
+
+                        Highcharts.chart('line-region', {
                             chart: {
                                 type: 'column'
                             },
@@ -397,12 +827,24 @@
                                 text: ''
                             },
 
-                            colors : ['#9B59B6', '#1ABB9C', '#832d1d', '#0000cc',  '#73879C','#E74C3C','#dc5a78', '#3498DB', '#f1b53d','#09006d', '#cccccc', '#669999', '#f2ccff', '#e6e600', '#132639', '#99cc00', '#466d6d', '#ffc6b3', '#666633', '#ffff00'],
+                            plotOptions: {
+                                series: {
+                                    events: {
+                                        legendItemClick: function () {
+                                            if($('#isRegion').val() == "regions") {
+                                                var regionId = this.chart.series[this.index].name.split(' ')[1]
+                                                drillDrawLegendProvince(regionId);
+                                            }
+                                        }
+                                    }
+                                }
+                            },
 
+                            colors : ['#9B59B6', '#1ABB9C', '#832d1d', '#0000cc',  '#73879C ','#E74C3C','#f90', '#3498DB', '#f1b53d','#09006d', '#cccccc', '#669999', '#f2ccff', '#e6e600', '#132639', '#99cc00', '#466d6d', '#ffc6b3', '#666633', '#ffff00'],
 
                             yAxis: {
                                 title: {
-                                    text: 'Number of Province'
+                                    text: 'Number of '+$('#isRegion').val()
                                 }
                             },
                             xAxis: {
@@ -412,6 +854,7 @@
                             series: getJsonMultiLines(dta.provinceContract,dta.monthStatus,dta.keyProvince)
 
                         });
+
                         Highcharts.chart('sumusage-quantile', {
 
                             chart: {
@@ -499,32 +942,12 @@
                             title: {
                                 text: ''
                             },
-                            xAxis: [{
-                                categories: dta.monthStatus,
-                                reversed: false,
-                                labels: {
-                                    step: 1
-                                },
-                            }, { // mirror axis on right side
-                                opposite: true,
-                                reversed: false,
-                                categories: dta.monthStatus,
-                                linkedTo: 0,
-                                labels: {
-                                    step: 1
-                                }
-                            }],
+                            xAxis: {categories: dta.monthStatus},
                             yAxis: {
                                 title: {
                                     text: null
                                 },
-                                labels: {
-                                    formatter: function () {
-                                        return Math.abs(this.value);
-                                    }
-                                },
-                                max: dta.maxRange,
-                                min: -dta.maxRange
+                                min:0
                             },
 
                             plotOptions: {
@@ -541,11 +964,11 @@
                             },
 
                             series: [{
-                                name: 'No_Usage',
+                                name: '0h-1h',
                                 data: dta.no_usage,
                                 color:'#73879C'
                             }, {
-                                name: 'Usage',
+                                name: '>1h',
                                 data: dta.usage,
                                 color:'#832d1d'
                             }]

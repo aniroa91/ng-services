@@ -17,160 +17,289 @@
         <title>Dashboard Admin </title>
 
             <!-- Bootstrap -->
-       @common.views.html.common.css("Paytv",1)
+        @common.views.html.common.css("Paytv",1)
+
     </head>
-    @common.views.html.common.top("Paytv",1,"")
-        <!-- top navigation -->
-    <div class="top_nav">
-        <div class="nav_menu">
-            <nav>
-                <div class="nav toggle" style="margin-bottom: 10px">
-                    <a id="menu_toggle"><i class="fa fa-bars"></i></a>
-                </div>
-                <ul class="nav navbar-nav navbar-right">
-                    <li class="">
-                        <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                            <img src="../assets/images/user.default.png" alt="">@email
-                            <span class=" fa fa-angle-down"></span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-usermenu pull-right">
-                            <li><a href="/logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </nav>
 
-        </div>
-    </div>
-        <!-- /top navigation -->
-        <!-- page content -->
-        <div class="right_col" role="main">
-            @if(rs != null) {
-                <div class="row top_tiles">
-                    <div class="col-lg-6 col-md-6 col-sm-6">
-                        <div class="x_panel tile" style="padding: 0px">
-                            <div class="title disInline">
-                                <span style="width: 80%">Paytv Contract By Status</span>
-                                <select class="form-control" id="slStatus" onchange="drillDownJson(this)">
-                                    <option value="*" selected>--- Choose status ---</option>
-                                @for( (k,v) <- CommonUtil.STATUS_MAP){
-                                    <option value="@v">@k</option>
-                                }
-                                </select>
-                                <div class="clearfix"></div>
-                            </div>
-                            <div class="x_content">
-                                <div id="line-status" style="height: 300px;"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 col-md-6 col-sm-6">
-                        <div class="x_panel tile" style="padding: 0px">
-                            <div class="title disInline">
-                                <span style="width: 80%">Paytv Contract By Province</span>
-                                <select class="form-control" id="slProvince" onchange="drillDownJson(this)">
 
-                                </select>
-                                <div class="clearfix"></div>
-                            </div>
-                            <div class="x_content">
-                                <div id="line-province" style="height: 300px;"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row top_tiles">
-                    <div class="col-lg-12">
-                        <div class="x_panel tile" style="padding: 0px">
-                            <div class="title disInline">
-                                <span style="width: 90%">Paytv Contract By Name</span>
-                                <select class="form-control" id="slName" onchange="drillDownJson(this)">
-                                    <option value="*" selected>--- Choose name ---</option>
-                                @for(i <- 0 until rs.tengoi.map(x=>x._2).distinct.length){
-                                    <option value="@rs.tengoi.map(x=>x._2).distinct(i)">@rs.tengoi.map(x=>x._2).distinct(i)</option>
-                                }
-                                </select>
-                                <div class="clearfix"></div>
-                            </div>
-                            <div class="x_content">
-                                <div id="line-name" style="height: 300px;"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row top_tiles">
-                    <div class="col-lg-12">
-                        <div class="x_panel tile" style="padding: 0px">
-                            <div class="title disInline">
-                                <span style="width: 90%">Paytv Usage</span>
-                                <select class="form-control" id="slUsage" onchange="drillDownJson(this)">
-                                    <option value="*" selected>--- Choose usage ---</option>
-                                    <option value=">0">Usage</option>
-                                    <option value="<1">No Usage</option>
-                                </select>
-                                <div class="clearfix"></div>
-                            </div>
-                            <div class="x_content">
-                                <div id="usage-bar" style="height: 300px;"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row top_tiles">
-                    <div class="col-sm-6">
-                        <div class="x_panel tile" style="padding: 0px">
-                            <div class="title disInline">
-                                <span>Quantile For Usage</span>
-                                <div class="clearfix"></div>
-                            </div>
-                            <div class="x_content">
-                                <div id="sumusage-quantile" style="height: 300px;"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="x_panel tile" style="padding: 0px">
-                            <div class="title disInline">
-                                <span>Quantile For Life</span>
-                                <div class="clearfix"></div>
-                            </div>
-                            <div class="x_content">
-                                <div id="lte-quantile" style="height: 300px;"></div>
-                            </div>
-                        </div>
+    <body class="nav-md">
+        <div class="container body">
+            <div class="main_container">
+                <div class="col-md-3 left_col">
+                    <div class="left_col scroll-view">
+                        <div class="navbar nav_title" style="border: 0;width: 100%!important;">
 
+                            <ul class="navTop" style="margin-top: -20px">
+                                <li class="dropdown">
+                                    <a data-toggle="dropdown" class="site_title curSor dropdown-toggle">
+                                        <i class="fa fa-user"></i> Profile
+                                        <span class="fa fa-chevron-down downTopMenu"></span></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="/dns" class="topLi">DNS <i class="fa fa-globe pull-right"></i></a></li>
+                                        <li class="divider"></li>
+                                        <li><a href="/paytv">Profile <i class="fa fa-user pull-right"></i></a></li>
+                                        <li class="divider"></li>
+                                        <li><a href="/device" class="botLi">Device <i class="fa fa-server pull-right"></i></a></li>
+                                        @*<li>
+                                        <a href="/demo" class="botLi">Demo <i class="fa fa-laptop pull-right"></i></a>
+                                        </li>*@
+
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="clearfix"></div>
+                        <br />
+                            <!-- sidebar menu -->
+                        <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+                            <input type="hidden" id="filters"/>
+                            <input type="hidden" id="slUsage" value="*">
+                            <input type="hidden" id="regions" value="*">
+                            <input type="hidden" id="regionsOld">
+                            <input type="hidden" id="provinces"/>
+                            <input type="hidden" id="isRegion" value="regions">
+                            <div class="col-lg-12 filter"><i class="fa fa-filter"></i> FILTERING </div>
+                            <div class="menu_section">
+                                <div class="col-lg-12" id="divStatus">
+                                    <span class="titFilter"><i class="fa fa-bell"></i> Status</span></i>
+                                    <select class="form-control" id="slStatus" multiple="multiple" style="cursor: pointer;margin-top: 10px">
+                                        @for( (k,v) <- CommonUtil.STATUS_MAP){
+                                            <option value="@v">@k</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-lg-12 lineDiv"></div>
+                                <div class="col-lg-12" id="divName">
+                                    <span class="titFilter"><i class="fa fa-search"></i> Name</span></i>
+                                    <select class="form-control" id="slName" multiple="multiple"  style="cursor: pointer;margin-top: 10px" >
+                                        @for(i <- 0 until rs.tengoi.map(x=>x._2).distinct.length){
+                                            <option value="@rs.tengoi.map(x=>x._2).distinct(i)">@rs.tengoi.map(x=>x._2).distinct(i)</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-lg-12 lineDiv"></div>
+                                <div class="col-lg-12">
+                                    <span class="titFilter"><i class="fa fa-user"></i> Usage</span></i>
+                                    <div class="radioGroup" id="usage">
+                                            <!--Radio group-->
+                                        <div class="form-check">
+                                            <label style="cursor: pointer;">
+                                                <input type="radio" name="Usage" id="none" value="*" checked> <span class="label-text">--All--</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <label style="cursor: pointer;">
+                                                <input type="radio" name="Usage" id="usage" value=">0"> <span class="label-text">Usage</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <label style="cursor: pointer;">
+                                                <input type="radio" name="Usage" id="noUsage" value="<1"> <span class="label-text">No Usage</span>
+                                            </label>
+                                        </div>
+                                            <!--Radio group-->
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 lineDiv"></div>
+                                <div class="col-lg-12">
+                                    <span class="titFilter"><i class="fa fa-map-marker"></i> Region & Province</span></i>
+                                    <div id="region" style="margin-top: 10px;margin-bottom: 20px"></div>
+                                </div>
+                                <div class="col-lg-12 lineDiv"></div>
+
+                                <div class="col-lg-12 filter">
+                                    <a onclick="drillDownJson()" class="btn btn-xs btn-success" style="float: right;"><i class="fa fa-check-circle"></i> Apply</a>
+                                    <a href="/paytv" class="btn btn-xs btn-secondary" style="float: right;background: #6c757d;color: #fff"><i class="fa fa-refresh"></i> Refresh</a>
+                                </div>
+                            </div>
+
+                        </div>
+                            <!-- /sidebar menu -->
                     </div>
                 </div>
-            } else{
-                <div class="row"><h2 class="noData-title">
-                    Sorry, This page is under construction, please come back later...</h2></div>
-            }
 
-        </div>
-            <!-- /page content -->
+                    <!-- top navigation -->
+                <div class="top_nav">
+                    <div class="nav_menu" style="background: #2A3F54">
+                        <nav>
+                            <ul class="nav navbar-nav" style="float: right">
+                                <li><a href="/paytv"><i class="fa fa-home"></i> PAYTV </a>
+                                </li>
+                                <li><a href="/profile"><i class="fa fa-book"></i> CONTRACT </a>
+                                </li>
+                                <li><a  href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-internet-explorer"></i> INTERNET <span class="caret"></span> </a>
+                                    <ul class="dropdown-menu dropdown-usermenu">
+                                        <li><a href="/internet/churn"><i class="fa fa-book"></i> Churn </a></li>
+                                        <li><a href="/internet/realtime"><i class="fa  fa-clock-o"></i> Real time</a></li>
+                                        <li><a href="/internet/history"> <i class="fa  fa-history"></i> History</a></li>
+                                        <li><a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-compress"></i> Compare </a>
+                                            <ul class="dropdown-menu">
+                                                <li><a href="/internet/compareTime"><i class="fa fa-calendar"></i>Compare Date</a></li>
+                                                <li><a href="/internet/compareCt"><i class="fa fa-book"></i> Compare Contract</a></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                        <img src="../assets/images/user-default-white.png" alt="">@email
+                                        <span class=" fa fa-angle-down"></span>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-usermenu">
+                                        <li><a href="/logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </nav>
 
-            <!-- footer content -->
-        <footer>
-            <div class="pull-right">
-                Dashboard Admin 21/09/2017
+                    </div>
+                </div>
+                    <!-- /top navigation -->
+                    <!-- page content -->
+                <div class="right_col" role="main">
+                @if(rs != null) {
+
+                    <div class="row top_tiles">
+                        <div class="col-sm-6 col-xs-12 col-lg-6 col-md-6">
+                            <div class="x_panel tile" style="padding: 0px">
+                                <div class="title disInline">
+                                    <span style="width: 80%">Paytv Contract By Status</span>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content">
+                                    <div id="line-status" style="height: 300px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-xs-12 col-lg-6 col-md-6">
+                            <div class="x_panel tile" style="padding: 0px">
+                                <div class="title disInline">
+                                    <span style="width: 90%">Paytv Contract By Name</span>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content" style="height: 305px">
+                                    @*<div id="line-name" style="height: 300px;"></div>
+                                    *@
+                                    <table id="table-sparkline" class="table no-margin border table-fixed" width="100%">
+                                        <thead>
+                                            <tr>
+                                                <th>TenGoi</th>
+                                                <th>Avg Contract</th>
+                                                <th>Monthly</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tbody-sparkline">
+                                            <tr><td></td><td></td><td></td></tr>
+                                        @for(i <- rs.getTenGoiForSparkline()) {
+                                            <tr>
+                                                <th><a href="#">@i._1</a></th>
+                                                <td>@i._2</td>
+                                                <td data-sparkline="@i._3.mkString(", ")"/>
+                                            </tr>
+                                        }
+                                            <tr><td></td><td></td><td></td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row top_tiles">
+                        <div class="col-lg-12 col-xs-12 col-lg-12 col-md-12">
+                            <div class="x_panel tile" style="padding: 0px">
+                                <div class="title disInline">
+                                    <span id="titleRegion" style="width: 95%">Paytv Contract By Region</span>
+                                    <a class="btn btn-warning" id="backRegion" onclick="backToRegion()" style="display: none;float: right">Back to Region</a>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content">
+                                    <div id="line-region" style="height: 300px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row top_tiles">
+                        <div class="col-lg-12 col-xs-12 col-lg-12 col-md-12">
+                            <div class="x_panel tile" style="padding: 0px">
+                                <div class="title disInline">
+                                    <span style="width: 90%">Paytv Usage</span>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content">
+                                    <div id="usage-bar" style="height: 300px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row top_tiles">
+                        <div class="col-sm-6 col-xs-12 col-lg-6 col-md-6">
+                            <div class="x_panel tile" style="padding: 0px">
+                                <div class="title disInline">
+                                    <span>Quantile For Usage</span>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content">
+                                    <div id="sumusage-quantile" style="height: 300px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-xs-12 col-lg-6 col-md-6">
+                            <div class="x_panel tile" style="padding: 0px">
+                                <div class="title disInline">
+                                    <span>Quantile For Life</span>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content">
+                                    <div id="lte-quantile" style="height: 300px;"></div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                } else{
+                    <div class="row"><h2 class="noData-title">
+                        Sorry, This page is under construction, please come back later...</h2></div>
+                }
+
+                </div>
+                    <!-- /page content -->
+                    <!-- footer content -->
+               @* <footer>
+                    <div class="pull-right">
+                        Dashboard Admin 21/09/2017
+                    </div>
+                    <div class="clearfix"></div>
+                </footer>*@
+                    <!-- /footer content -->
             </div>
-            <div class="clearfix"></div>
-        </footer>
-        <!-- /footer content -->
-      </div>
-    </div>
+        </div>
 
             <!-- jQuery -->
         <script src="../assets/vendors/jquery/dist/jquery.min.js"></script>
+        <script src="../assets/javascripts/jsTree.js"></script>
             <!-- Bootstrap -->
         <script src="../assets/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
             <!-- Custom Theme Scripts -->
         <script src="../assets/custom/js/custom.min.js"></script>
-            <!-- Hight chart -->
+        <!-- Hight chart -->
         <script src="../assets/javascripts/highcharts.js"></script>
         <script src="../assets/javascripts/exporting.js"></script>
         <script src="../assets/javascripts/highcharts-more.js"></script>
         <script src="../assets/javascripts/jquery.counterup.min.js"></script>
+        <script src="../assets/javascripts/waitMe.js"></script>
+        <script src="../assets/javascripts/bootstrap-multiselect.js"></script>
+            <!-- Datatable -->
+        <script src="../assets/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+        <script src="../assets/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+        <script src="../assets/vendors/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+        <script src="../assets/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+        <script src="../assets/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
+        <script src="../assets/vendors/datatables.net-fixedColumn/js/dataTables.fixedColumn.min.js"></script>
+
+        <script src="../assets/vendors/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+        <script src="../assets/vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+        <script src="../assets/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
+        <script src="../assets/vendors/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
         @if(rs != null) {
             @scripts(rs)
         }

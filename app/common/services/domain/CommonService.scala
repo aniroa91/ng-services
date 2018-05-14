@@ -48,6 +48,15 @@ object CommonService extends AbstractService {
    * Service for Get Information about day
    */
 
+  def normalizeArray(months: Array[String], array: Array[(String, String, Int)]): Array[(String, String, Int)] = {
+    val terms = array.map(x => x._2).distinct
+    val map = array.map(x => (x._1, x._2) -> x._3).toMap
+    months.flatMap(x => terms.map(y => (x,y)))
+      .map(x => x -> map.getOrElse(x, 0))
+      .map(x => (x._1._1, x._1._2, x._2) )
+
+  }
+
   def getLongValueByKey(arr: Array[(String,Long)], key:String):Int = {
     var value = 0;
     breakable{for(i <- 0 until arr.length){
