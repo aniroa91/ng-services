@@ -1,12 +1,480 @@
-@(rs: (Array[(Int, Int, Double, Double)], Array[(Int, Int, Double, Double)]) )
+@(rs: (Array[(Int, Int, Double, Double)],Array[(Int, Double, Double)], Array[(String, Double, Double)]) )
 @import play.api.libs.json.Json
 @import services.domain.CommonService.getOthers
 @import _root_.service.DevService.bubbleHeatChart
 
 <script type="text/javascript">
-        $(document).ready(function () {
-                var internetChurnColor = @Html(Json.stringify(bubbleHeatChart(rs._1)._1))
-                var internetChurnSeries = @Html(Json.stringify(bubbleHeatChart(rs._1)._2))
+        var categories = @Html(Json.stringify(Json.toJson(rs._3.map(x=>x._1))))
+        var categoryAges = @Html(Json.stringify(Json.toJson(rs._2.map(x=>x._1))))
+        var options = {
+                title: 'Churn Rate',
+                hAxis: {title: 'Contract Age(month)',gridlines: {count: 13}},
+                vAxis: {title: 'Region',gridlines: {count: 9}},
+                chartArea: {
+                        height: "80%",
+                        width: "80%"
+                },
+                colorAxis: {colors: ['#e8f3f0', '#832d1d']},
+                bubble: {
+                        textStyle: {
+                                auraColor: 'none',
+                        }
+                }
+        };
+        google.load('visualization', '1.0', {
+                'packages' : [ 'corechart' ]
+        });
+        google.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+                var internetChurnCTBTV = getDataChurn(@Html(Json.stringify(Json.toJson(rs._1))))
+                var dataCTBTV = google.visualization.arrayToDataTable(internetChurnCTBTV);
+                var chartCTBTV = new google.visualization.BubbleChart(document.getElementById('container'));
+                chartCTBTV.draw(dataCTBTV, options);
+
+                Highcharts.chart('churn1', {
+                        chart: {
+                                zoomType: 'xy'
+                        },
+
+                        title: {
+                                text: ''
+                        },
+
+                        colors : ['#73879C','#dc5a78'],
+
+                        xAxis: {
+                                categories: @Html(Json.stringify(Json.toJson(rs._2.map(x=>x._1)))),
+                                title: {
+                                        text: 'Age(month)'
+                                }
+                        },
+
+                        yAxis: [{ // Primary yAxis
+                                labels: {
+                                        format: '{value}',
+                                        style: {
+                                                color: "#73879C"
+                                        }
+                                },
+                                title: {
+                                        text: '%',
+                                        style: {
+                                                color: "#73879C"
+                                        }
+                                }
+                        }, { // Secondary yAxis
+                                title: {
+                                        text: '%',
+                                        style: {
+                                                color: "#dc5a78"
+                                        }
+                                },
+                                labels: {
+                                        format: '{value}',
+                                        style: {
+                                                color: "#dc5a78"
+                                        }
+                                },
+                                opposite: true
+                        }],
+                        tooltip: {
+                                shared: true
+                        },
+
+                        series: getJsonChurnMonth(@Html(Json.stringify(Json.toJson(rs._2.map(x=> x._2)))),@Html(Json.stringify(Json.toJson(rs._2.map(x=> x._3)))))
+
+                });
+
+                Highcharts.chart('churn2', {
+                        chart: {
+                                zoomType: 'xy'
+                        },
+
+                        title: {
+                                text: ''
+                        },
+                        plotOptions: {
+                                series: {
+                                        cursor: 'pointer',
+                                        point: {
+                                                events: {
+                                                        click: function () {
+                                                                $('#month').val(this.category)
+                                                                for (var i = 0; i < this.series.data.length; i++) {
+                                                                        this.series.data[i].update({ color: '#096898' }, true, false);
+                                                                }
+                                                                this.update({ color: '#ECB631' }, true, false)
+                                                                $.ajax({
+                                                                        url: "/internet/getJsonByMonth?status="+$('#slStatus').val()+"&month="+this.category,
+                                                                        cache: false,
+                                                                        beforeSend: function () {
+                                                                                $('#chartWithOverlay').waitMe({
+                                                                                        effect: 'progressBar',
+                                                                                        text: 'Please wait...',
+                                                                                        bg: 'rgba(255,255,255,0.7)',
+                                                                                        color: '#000',
+                                                                                        textPos: 'vertical'
+                                                                                });
+                                                                                $('#churn1').waitMe({
+                                                                                        effect: 'progressBar',
+                                                                                        text: 'Please wait...',
+                                                                                        bg: 'rgba(255,255,255,0.7)',
+                                                                                        color: '#000',
+                                                                                        textPos: 'vertical'
+                                                                                });
+                                                                        },
+                                                                        success: function (dta) {
+                                                                                if(dta != "Error"){
+                                                                                        // bubble chart
+                                                                                        var internetChurnSeries = getDataChurn(dta.churnBubbleChart)
+                                                                                        var data = google.visualization.arrayToDataTable(internetChurnSeries);
+                                                                                        var chart = new google.visualization.BubbleChart(document.getElementById('container'));
+                                                                                        console.log(dta.maxPercent)
+                                                                                        $('#txtMin').text(dta.minPercent)
+                                                                                        $('#txtMax').text(dta.maxPercent)
+                                                                                        chart.draw(data, options);
+                                                                                        // churn contract time
+                                                                                        Highcharts.chart('churn1', {
+                                                                                                chart: {
+                                                                                                        zoomType: 'xy'
+                                                                                                },
+
+                                                                                                title: {
+                                                                                                        text: ''
+                                                                                                },
+
+                                                                                                colors : ['#73879C','#dc5a78'],
+
+                                                                                                xAxis: {
+                                                                                                        categories: categoryAges,
+                                                                                                        title: {
+                                                                                                                text: 'Age(month)'
+                                                                                                        }
+                                                                                                },
+
+                                                                                                yAxis: [{ // Primary yAxis
+                                                                                                        labels: {
+                                                                                                                format: '{value}',
+                                                                                                                style: {
+                                                                                                                        color: "#73879C"
+                                                                                                                }
+                                                                                                        },
+                                                                                                        title: {
+                                                                                                                text: '%',
+                                                                                                                style: {
+                                                                                                                        color: "#73879C"
+                                                                                                                }
+                                                                                                        }
+                                                                                                }, { // Secondary yAxis
+                                                                                                        title: {
+                                                                                                                text: '%',
+                                                                                                                style: {
+                                                                                                                        color: "#dc5a78"
+                                                                                                                }
+                                                                                                        },
+                                                                                                        labels: {
+                                                                                                                format: '{value}',
+                                                                                                                style: {
+                                                                                                                        color: "#dc5a78"
+                                                                                                                }
+                                                                                                        },
+                                                                                                        opposite: true
+                                                                                                }],
+                                                                                                tooltip: {
+                                                                                                        shared: true
+                                                                                                },
+
+                                                                                                series: getJsonChurnMonth(dta.churnRate,dta.churnPercent)
+
+                                                                                        });
+                                                                                }
+                                                                        },
+                                                                        complete: function () {
+                                                                                $('#churn1').waitMe("hide");
+                                                                                $('#chartWithOverlay').waitMe("hide");
+                                                                        }
+                                                                });
+                                                        }
+                                                }
+                                        }
+                                }
+                        },
+                        colors : ['#096898','#dc5a78'],
+
+                        xAxis: {
+                                categories: @Html(Json.stringify(Json.toJson(rs._3.map(x=>x._1))))
+                        },
+
+                        yAxis: [{ // Primary yAxis
+                                labels: {
+                                        format: '{value}',
+                                        style: {
+                                                color: "#096898"
+                                        }
+                                },
+                                title: {
+                                        text: '%',
+                                        style: {
+                                                color: "#096898"
+                                        }
+                                }
+                        }, { // Secondary yAxis
+                                title: {
+                                        text: '%',
+                                        style: {
+                                                color: "#dc5a78"
+                                        }
+                                },
+                                labels: {
+                                        format: '{value}',
+                                        style: {
+                                                color: "#dc5a78"
+                                        }
+                                },
+                                opposite: true
+                        }],
+                        tooltip: {
+                                shared: true
+                        },
+
+                        series: getJsonChurnMonth(@Html(Json.stringify(Json.toJson(rs._3.map(x=> x._2)))),@Html(Json.stringify(Json.toJson(rs._3.map(x=> x._3)))))
+
+                });
+        }
+
+        function getJsonByStatus(element){
+            // 0: huy hop dong, 1: CTBTV
+                $.ajax({
+                        url: "/internet/getJsonByStatus?status="+$(element).val()+"&month="+$('#month').val(),
+                        cache: false,
+                        beforeSend: function () {
+                                $('#chartWithOverlay').waitMe({
+                                        effect: 'progressBar',
+                                        text: 'Please wait...',
+                                        bg: 'rgba(255,255,255,0.7)',
+                                        color: '#000',
+                                        textPos: 'vertical'
+                                });
+                        },
+                        success: function (dta) {
+                                if(dta != "Error"){
+                                        console.log(dta.maxPercent)
+                                        $('#txtMin').text(dta.minPercent)
+                                        $('#txtMax').text(dta.maxPercent)
+                                        var internetChurnSeries = getDataChurn(dta.churnRate)
+                                        var data = google.visualization.arrayToDataTable(internetChurnSeries);
+                                        var chart = new google.visualization.BubbleChart(document.getElementById('container'));
+                                        chart.draw(data, options);
+                                }
+                        },
+                        complete: function () {
+                                $('#chartWithOverlay').waitMe("hide");
+                        }
+                });
+        }
+
+        function getChurnJsonByAge(element){
+                $.ajax({
+                        url: "/internet/getJsonByAge?age=Age:"+$(element).val(),
+                        cache: false,
+                        success: function (dta) {
+                                if(dta != "Error"){
+                                        Highcharts.chart('churn2', {
+                                                chart: {
+                                                        zoomType: 'xy'
+                                                },
+
+                                                title: {
+                                                        text: ''
+                                                },
+
+                                                plotOptions: {
+                                                        series: {
+                                                                cursor: 'pointer',
+                                                                point: {
+                                                                        events: {
+                                                                                click: function () {
+                                                                                        $('#month').val(this.category)
+                                                                                        for (var i = 0; i < this.series.data.length; i++) {
+                                                                                                this.series.data[i].update({ color: '#096898' }, true, false);
+                                                                                        }
+                                                                                        this.update({ color: '#ECB631' }, true, false)
+                                                                                        $.ajax({
+                                                                                                url: "/internet/getJsonByMonth?status="+$('#slStatus').val()+"&month="+this.category,
+                                                                                                cache: false,
+                                                                                                beforeSend: function () {
+                                                                                                        $('#chartWithOverlay').waitMe({
+                                                                                                                effect: 'progressBar',
+                                                                                                                text: 'Please wait...',
+                                                                                                                bg: 'rgba(255,255,255,0.7)',
+                                                                                                                color: '#000',
+                                                                                                                textPos: 'vertical'
+                                                                                                        });
+                                                                                                        $('#churn1').waitMe({
+                                                                                                                effect: 'progressBar',
+                                                                                                                text: 'Please wait...',
+                                                                                                                bg: 'rgba(255,255,255,0.7)',
+                                                                                                                color: '#000',
+                                                                                                                textPos: 'vertical'
+                                                                                                        });
+                                                                                                },
+                                                                                                success: function (dta) {
+                                                                                                        if(dta != "Error"){
+                                                                                                                // bubble chart
+                                                                                                                var internetChurnSeries = getDataChurn(dta.churnBubbleChart)
+                                                                                                                var data = google.visualization.arrayToDataTable(internetChurnSeries);
+                                                                                                                var chart = new google.visualization.BubbleChart(document.getElementById('container'));
+                                                                                                                chart.draw(data, options);
+                                                                                                                // churn contract time
+                                                                                                                Highcharts.chart('churn1', {
+                                                                                                                        chart: {
+                                                                                                                                zoomType: 'xy'
+                                                                                                                        },
+
+                                                                                                                        title: {
+                                                                                                                                text: ''
+                                                                                                                        },
+
+                                                                                                                        colors : ['#73879C','#dc5a78'],
+
+                                                                                                                        xAxis: {
+                                                                                                                                categories: categoryAges,
+                                                                                                                                title: {
+                                                                                                                                        text: 'Age(month)'
+                                                                                                                                }
+                                                                                                                        },
+
+                                                                                                                        yAxis: [{ // Primary yAxis
+                                                                                                                                labels: {
+                                                                                                                                        format: '{value}',
+                                                                                                                                        style: {
+                                                                                                                                                color: "#73879C"
+                                                                                                                                        }
+                                                                                                                                },
+                                                                                                                                title: {
+                                                                                                                                        text: '%',
+                                                                                                                                        style: {
+                                                                                                                                                color: "#73879C"
+                                                                                                                                        }
+                                                                                                                                }
+                                                                                                                        }, { // Secondary yAxis
+                                                                                                                                title: {
+                                                                                                                                        text: '%',
+                                                                                                                                        style: {
+                                                                                                                                                color: "#dc5a78"
+                                                                                                                                        }
+                                                                                                                                },
+                                                                                                                                labels: {
+                                                                                                                                        format: '{value}',
+                                                                                                                                        style: {
+                                                                                                                                                color: "#dc5a78"
+                                                                                                                                        }
+                                                                                                                                },
+                                                                                                                                opposite: true
+                                                                                                                        }],
+                                                                                                                        tooltip: {
+                                                                                                                                shared: true
+                                                                                                                        },
+
+                                                                                                                        series: getJsonChurnMonth(dta.churnRate,dta.churnPercent)
+
+                                                                                                                });
+                                                                                                        }
+                                                                                                },
+                                                                                                complete: function () {
+                                                                                                        $('#churn1').waitMe("hide");
+                                                                                                        $('#chartWithOverlay').waitMe("hide");
+                                                                                                }
+                                                                                        });
+                                                                                }
+                                                                        }
+                                                                }
+                                                        }
+                                                },
+
+                                                colors : ['#096898','#dc5a78'],
+
+                                                xAxis: {
+                                                        categories: categories
+                                                },
+
+                                                yAxis: [{ // Primary yAxis
+                                                        labels: {
+                                                                format: '{value}',
+                                                                style: {
+                                                                        color: "#096898"
+                                                                }
+                                                        },
+                                                        title: {
+                                                                text: '%',
+                                                                style: {
+                                                                        color: "#096898"
+                                                                }
+                                                        }
+                                                }, { // Secondary yAxis
+                                                        title: {
+                                                                text: '%',
+                                                                style: {
+                                                                        color: "#dc5a78"
+                                                                }
+                                                        },
+                                                        labels: {
+                                                                format: '{value}',
+                                                                style: {
+                                                                        color: "#dc5a78"
+                                                                }
+                                                        },
+                                                        opposite: true
+                                                }],
+                                                tooltip: {
+                                                        shared: true
+                                                },
+
+                                                series: getJsonChurnMonth(dta.churnRate,dta.churnPercent)
+
+                                        });
+                                }
+                        }
+                });
+        }
+
+        function getJsonChurnMonth(churnRate,churnPercent){
+                var rs = []
+                rs.push({
+                        name: "Churn Rate",
+                        type: 'column',
+                        yAxis: 0,
+                        data: churnRate
+                })
+                rs.push({
+                        name: "Churn Percent",
+                        type: 'spline',
+                        yAxis: 1,
+                        data: churnPercent
+                });
+
+                return rs
+        }
+
+        function getDataChurn(dta){
+            var rs = []
+            rs.push(['ID', 'Age', 'Region','Rate', 'Percent'])
+            for(var i=0;i<dta.length;i++){
+                var arr = []
+                    arr[0]=''
+                    arr[1]=dta[i][1]
+                    arr[2]=dta[i][0]
+                    arr[3]=dta[i][2]
+                    arr[4]=dta[i][3]
+                rs.push(arr)
+            }
+            return rs
+        }
+
+        /*$(document).ready(function () {
+                var internetChurnColor = Html(Json.stringify(bubbleHeatChart(rs._1)._1))
+                var internetChurnSeries = Html(Json.stringify(bubbleHeatChart(rs._1)._2))
 
                         Highcharts.chart('container', {
 
@@ -65,8 +533,8 @@
                                 series: internetChurnSeries
                         });
 
-                var internetChurnColor2 = @Html(Json.stringify(bubbleHeatChart(rs._2)._1))
-                var internetChurnSeries2 = @Html(Json.stringify(bubbleHeatChart(rs._2)._2))
+                var internetChurnColor2 = Html(Json.stringify(bubbleHeatChart(rs._2)._1))
+                var internetChurnSeries2 = Html(Json.stringify(bubbleHeatChart(rs._2)._2))
 
                         Highcharts.chart('container2', {
 
@@ -124,135 +592,8 @@
 
                                 series: internetChurnSeries2
                         });
-        });
+        });*/
 
-        function getDataByMonth(el){
-                var month = $(el).val();
-                $.ajax({
-                        url: "/internet/getMonthJson?month="+month,
-                        cache: false,
-                        success: function (dta) {
-                                if(dta != "Error"){
 
-                                        Highcharts.chart('container', {
-
-                                                chart: {
-                                                        type: 'bubble',
-                                                        plotBorderWidth: 1,
-                                                        zoomType: 'xy'
-                                                },
-
-                                                legend: {
-                                                        enabled: false
-                                                },
-                                                title: {
-                                                        text: ''
-                                                },
-                                                xAxis: {
-                                                        gridLineWidth: 1,
-                                                        title: {
-                                                                text: 'Region'
-                                                        },
-                                                        categories: ["0", "1","2","3","4","5","6","7"]
-
-                                                },
-
-                                                yAxis: {
-                                                        gridLineWidth: 1,
-                                                        title: {
-                                                                text: 'Age'
-                                                        },
-                                                        tickInterval: 6,
-                                                        categories:[]
-                                                },
-
-                                                colors: dta.internetChurnColor,
-                                                tooltip: {
-                                                        useHTML: true,
-                                                        headerFormat: '<table>',
-                                                        pointFormat: '' +
-                                                        '<tr><th>Resiong:</th><td>{point.x}g</td></tr>' +
-                                                        '<tr><th>Age:</th><td>{point.y}g</td></tr>' +
-                                                        '<tr><th>Rate:</th><td>{point.z}%</td></tr>' +
-                                                        '<tr><th>Percent:</th><td>{point.c}%</td></tr>',
-                                                        footerFormat: '</table>',
-                                                        followPointer: true
-                                                },
-
-                                                plotOptions: {
-                                                        series: {
-                                                                dataLabels: {
-                                                                        enabled: true,
-                                                                        format: '{point.name}'
-                                                                }
-                                                        }
-                                                },
-
-                                                series: dta.internetChurnSeries
-                                        });
-
-                                        Highcharts.chart('container2', {
-
-                                                chart: {
-                                                        type: 'bubble',
-                                                        plotBorderWidth: 1,
-                                                        zoomType: 'xy'
-                                                },
-
-                                                legend: {
-                                                        enabled: false
-                                                },
-                                                title: {
-                                                        text: ''
-                                                },
-                                                xAxis: {
-                                                        gridLineWidth: 1,
-                                                        title: {
-                                                                text: 'Region'
-                                                        },
-                                                        categories: ["0", "1","2","3","4","5","6","7"]
-
-                                                },
-
-                                                yAxis: {
-                                                        gridLineWidth: 1,
-                                                        title: {
-                                                                text: 'Age'
-                                                        },
-                                                        tickInterval: 6,
-                                                        categories:[]
-                                                },
-
-                                                colors: dta.internetChurnColor2,
-                                                tooltip: {
-                                                        useHTML: true,
-                                                        headerFormat: '<table>',
-                                                        pointFormat: '' +
-                                                        '<tr><th>Resiong:</th><td>{point.x}g</td></tr>' +
-                                                        '<tr><th>Age:</th><td>{point.y}g</td></tr>' +
-                                                        '<tr><th>Rate:</th><td>{point.z}%</td></tr>' +
-                                                        '<tr><th>Percent:</th><td>{point.c}%</td></tr>',
-                                                        footerFormat: '</table>',
-                                                        followPointer: true
-                                                },
-
-                                                plotOptions: {
-                                                        series: {
-                                                                dataLabels: {
-                                                                        enabled: true,
-                                                                        format: '{point.name}'
-                                                                }
-                                                        }
-                                                },
-
-                                                series: dta.internetChurnSeries2
-                                        });
-                                }
-                                else{
-                                        location.href = "/internet/churn";
-                                }
-                        }
-                });
-        }
 
 </script>

@@ -1,8 +1,9 @@
 @import profile.utils.CommonUtil
-@(rs: profile.model.PayTVResponse,email: String)
+@(rs: profile.model.PayTVResponse,othersTengoi:(Int,Array[Int]),email: String)
 
 @import services.domain.CommonService.formatNumber
 @import services.domain.CommonService.percent
+@import services.domain.CommonService.divided
 
 <!DOCTYPE html>
 
@@ -70,35 +71,21 @@
                                 </div>
                                 <div class="col-lg-12 lineDiv"></div>
                                 <div class="col-lg-12" id="divName">
-                                    <span class="titFilter"><i class="fa fa-search"></i> Name</span></i>
+                                    <span class="titFilter"><i class="fa fa-search"></i> TenGoi</span></i>
                                     <select class="form-control" id="slName" multiple="multiple"  style="cursor: pointer;margin-top: 10px" >
-                                        @for(i <- 0 until rs.tengoi.map(x=>x._2).distinct.length){
+                                        @for(i <- 0 until 10){
                                             <option value="@rs.tengoi.map(x=>x._2).distinct(i)">@rs.tengoi.map(x=>x._2).distinct(i)</option>
                                         }
                                     </select>
                                 </div>
                                 <div class="col-lg-12 lineDiv"></div>
-                                <div class="col-lg-12">
+                                <div class="col-lg-12" id="divUsage">
                                     <span class="titFilter"><i class="fa fa-user"></i> Usage</span></i>
-                                    <div class="radioGroup" id="usage">
-                                            <!--Radio group-->
-                                        <div class="form-check">
-                                            <label style="cursor: pointer;">
-                                                <input type="radio" name="Usage" id="none" value="*" checked> <span class="label-text">--All--</span>
-                                            </label>
-                                        </div>
-                                        <div class="form-check">
-                                            <label style="cursor: pointer;">
-                                                <input type="radio" name="Usage" id="usage" value=">0"> <span class="label-text">Usage</span>
-                                            </label>
-                                        </div>
-                                        <div class="form-check">
-                                            <label style="cursor: pointer;">
-                                                <input type="radio" name="Usage" id="noUsage" value="<1"> <span class="label-text">No Usage</span>
-                                            </label>
-                                        </div>
-                                            <!--Radio group-->
-                                    </div>
+                                    <select class="form-control" id="cbbUsage" multiple="multiple" style="cursor: pointer;margin-top: 10px">
+                                    @for( (k,v) <- CommonUtil.RANGE_USAGE_MAP){
+                                        <option value="@v">@k</option>
+                                    }
+                                    </select>
                                 </div>
                                 <div class="col-lg-12 lineDiv"></div>
                                 <div class="col-lg-12">
@@ -123,7 +110,7 @@
                     <div class="nav_menu" style="background: #2A3F54">
                         <nav>
                             <ul class="nav navbar-nav" style="float: right">
-                                <li><a href="/paytv"><i class="fa fa-home"></i> PAYTV </a>
+                                <li class="activeLi"><a href="/paytv"><i class="fa fa-home"></i> PAYTV </a>
                                 </li>
                                 <li><a href="/profile"><i class="fa fa-book"></i> CONTRACT </a>
                                 </li>
@@ -174,7 +161,7 @@
                         <div class="col-sm-6 col-xs-12 col-lg-6 col-md-6">
                             <div class="x_panel tile" style="padding: 0px">
                                 <div class="title disInline">
-                                    <span style="width: 90%">Paytv Contract By Name</span>
+                                    <span style="width: 90%">Paytv Contract By TenGoi</span>
                                     <div class="clearfix"></div>
                                 </div>
                                 <div class="x_content" style="height: 305px">
@@ -190,13 +177,19 @@
                                         </thead>
                                         <tbody id="tbody-sparkline">
                                             <tr><td></td><td></td><td></td></tr>
-                                        @for(i <- rs.getTenGoiForSparkline()) {
+                                        @for(i <- 0 until 10) {
                                             <tr>
-                                                <th><a href="#">@i._1</a></th>
-                                                <td>@i._2</td>
-                                                <td data-sparkline="@i._3.mkString(", ")"/>
+                                                <th><a>@rs.getTenGoiForSparkline()(i)._1</a></th>
+                                                <td>@rs.getTenGoiForSparkline()(i)._2</td>
+
+                                                <td data-sparkline="@rs.getTenGoiForSparkline()(i)._3.mkString(", ")"/>
                                             </tr>
                                         }
+                                            <tr>
+                                                <th><a>Others</a></th>
+                                                <td>@divided(othersTengoi._1,rs.getTenGoiForSparkline().length-10)</td>
+                                                <td data-sparkline="@othersTengoi._2.mkString(", ")"/>
+                                            </tr>
                                             <tr><td></td><td></td><td></td></tr>
                                         </tbody>
                                     </table>

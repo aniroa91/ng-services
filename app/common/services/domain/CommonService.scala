@@ -473,10 +473,19 @@ object CommonService extends AbstractService {
     val frnum = new DecimalFormat("###,###.###");
     frnum.format(number);
   }
+
+  def divided(number: Int, prev: Int): Int = {
+    val value = number / prev
+    value
+  }
   
   def percent(number: Long, prev: Long): Double = {
     val value = ((number - prev) / (prev * 1.0)) * 100.0
     BigDecimal(value).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
+  }
+
+  def format3Decimal(number: Double): Double = {
+    BigDecimal(number).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble
   }
   
   def percentInfor(number: Long, total: Long): Double = {

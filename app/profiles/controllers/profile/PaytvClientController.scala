@@ -37,13 +37,24 @@ class PaytvClientController @Inject() (cc: ControllerComponents) extends Abstrac
 
   def index() = Authenticated { implicit request =>
     val rs = DevService.get()
+    val arr = rs.getTenGoiForSparkline()
+    val arrOthersSparklines = arr.map(x=> x._3)
 
-    Ok(profiles.views.html.paytv.index(rs,request.session.get("username").get.toString))
+    val contractOthers = arr.map(x=>x._2)
+    var sumOthercontract = 0
+    for(i <- 11 until contractOthers.length){
+      sumOthercontract += contractOthers(i)
+    }
+    var others = arrOthersSparklines(11)
+    for(i <- 12 until arrOthersSparklines.length){
+      others = others.zip(arrOthersSparklines(i)).map { case (x, y) => x + y }
+    }
+    Ok(profiles.views.html.paytv.index(rs,(sumOthercontract,others),request.session.get("username").get.toString))
   }
 
   def drilldownJson(code: String) = Action { implicit request =>
     try{
-      println(code)
+      //println(code)
       var isRegion = 1
       if(code.indexOf("Region")<0) isRegion = 0
       val jSon = DevService.get(code,isRegion)
@@ -69,10 +80,10 @@ class PaytvClientController @Inject() (cc: ControllerComponents) extends Abstrac
         // sparkline
         "tenGoiForSparkline" -> jSon.getTenGoiForSparkline(),
         // Usage Bar chart
-        "maxRange" -> jSon.usage.filter(x => x._2 == "usage").map(x=>x._3).asInstanceOf[Array[(Int)]].max,
-        "no_usage" -> jSon.usage.filter(x => x._2 == "no_usage").map(x => x._3),
-        "usage" -> jSon.usage.filter(x => x._2 == "usage").map(x => x._3)
-
+        "range0" -> jSon.usage.filter(x => x._2 == "range0").map(x => x._3),
+        "range1" -> jSon.usage.filter(x => x._2 == "range1").map(x => x._3),
+        "range2" -> jSon.usage.filter(x => x._2 == "range2").map(x => x._3),
+        "range3" -> jSon.usage.filter(x => x._2 == "range3").map(x => x._3)
       )
       Ok(Json.toJson(jsBras))
     }
@@ -83,7 +94,7 @@ class PaytvClientController @Inject() (cc: ControllerComponents) extends Abstrac
 
   def getProvincesByRegion(regionId: String) = Action { implicit request =>
     try{
-      println(regionId)
+      //println(regionId)
       val lstProvince = if(regionId.indexOf("(RegionCode")>=0) DevService.getRegion(regionId) else DevService.getProvincesByRegion(regionId)
       val months = DevService.getMonth().map(x => x._1)
       val rs = CommonService.normalizeArray(months,lstProvince)

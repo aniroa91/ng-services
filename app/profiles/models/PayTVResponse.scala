@@ -12,13 +12,14 @@ case class PayTVResponse(
                           regions: Array[(String, String, Int)],
                           usageQuantile: Array[(String, JsArray)],
                           lteQuantile: Array[(String, JsArray)]) {
+
   def getTenGoiForSparkline(): Array[(String, Int, Array[Int])] = {
     tengoi.map(x => x._2 -> x)
       .groupBy(x => x._1)
       .map(x => x._1 -> x._2.map(y => (y._2._1, y._2._3)).sortBy(x => x._1))
       .map(x => (x._1, x._2.map(y => y._2)))
       .map(x => (x._1, x._2(x._2.length-1), x._2) )
-      .toArray
+      .toArray.sortWith((x,y)=> x._2>y._2)
   }
 
   //  def nomalize(from: String, to: String): PayTVResponse = {

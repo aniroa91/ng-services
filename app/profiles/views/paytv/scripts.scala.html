@@ -13,6 +13,15 @@
                 "sort":     false
             });
             // multi select
+            $('#cbbUsage').multiselect({
+                /*enableFiltering: true,*/
+                nonSelectedText: 'Choose Range',
+                includeSelectAllOption: true,
+                maxHeight: 400,
+                dropUp: false,
+                numberDisplayed:1,
+                inheritClass: true
+            });
             $('#slName').multiselect({
                 /*enableFiltering: true,*/
                 nonSelectedText: 'Choose Name',
@@ -100,26 +109,26 @@
                         labels: {
                             format: '{value}',
                             style: {
-                                color: "#5A738E"
+                                color: "#9B59B6"
                             }
                         },
+                        title: {
+                            text: 'Binh Thuong',
+                            style: {
+                                color: "#9B59B6"
+                            }
+                        }
+                    }, { // Secondary yAxis
                         title: {
                             text: 'Others',
                             style: {
                                 color: "#5A738E"
                             }
-                        }
-                    }, { // Secondary yAxis
-                        title: {
-                            text: 'Binh thuong',
-                            style: {
-                                color: "#9B59B6"
-                            }
                         },
                         labels: {
                             format: '{value}',
                             style: {
-                                color: "#9B59B6"
+                                color: "#5A738E"
                             }
                         },
                         opposite: true
@@ -158,7 +167,7 @@
 
                     yAxis: {
                         title: {
-                            text: 'Number of regions'
+                            text: 'Number of contracts'
                         }
                     },
                     xAxis: {
@@ -170,8 +179,10 @@
                 });
             }
             @if(rs.usage != null){
-                var no_usage = @Html(Json.stringify(Json.toJson(rs.usage.filter(x => x._2 == "no_usage").map(x => x._3))))
-                var usage = @Html(Json.stringify(Json.toJson(rs.usage.filter(x => x._2 == "usage").map(x => x._3))))
+                var range0 = @Html(Json.stringify(Json.toJson(rs.usage.filter(x => x._2 == "range0").map(x => x._3))))
+                var range1 = @Html(Json.stringify(Json.toJson(rs.usage.filter(x => x._2 == "range1").map(x => x._3))))
+                var range2 = @Html(Json.stringify(Json.toJson(rs.usage.filter(x => x._2 == "range2").map(x => x._3))))
+                var range3 = @Html(Json.stringify(Json.toJson(rs.usage.filter(x => x._2 == "range3").map(x => x._3))))
                 Highcharts.chart('usage-bar', {
                     chart: {
                         type: 'bar'
@@ -205,12 +216,21 @@
                     },
 
                     series: [{
-                        name: '0h-1h',
-                        data: no_usage,
+                        name: '>15min/day',
+                        data: range3,
                         color:'#73879C'
-                    }, {
-                        name: '>1h',
-                        data: usage,
+                    },{
+                        name: '15min/day',
+                        data: range2,
+                        color:'green'
+                    },{
+                        name: '5min/day',
+                        data: range1,
+                        color:'#0000cc'
+                    },
+                        {
+                        name: '<0min/day',
+                        data: range0,
                         color:'#832d1d'
                     }]
                 });
@@ -486,7 +506,7 @@
 
                             yAxis: {
                                 title: {
-                                    text: 'Number of provinces'
+                                    text: 'Number of contracts'
                                 }
                             },
                             xAxis: {
@@ -544,7 +564,7 @@
 
                             yAxis: {
                                 title: {
-                                    text: 'Number of Region'
+                                    text: 'Number of Contracts'
                                 }
                             },
                             xAxis: {
@@ -654,8 +674,45 @@
                 {name:"NVLDTT", id:2},
                 {name:"CTBDV",id:3},
                 {name:"BINH THUONG",id:0}]
+            var jsonUsage = [
+                {name:"0min/day",id:"<1"},
+                {name:"5min/day", id:">0_<=8400"},
+                {name:"15min/day",id:">8400_<=25200"},
+                {name:">15min/day",id:">25200"}]
 
-            var fields = "", sttCode= [],StatusCode= "StatusCode:*", arrTen=[],TenGoi = "TenGoi:*"
+            var fields = "", sttCode= [],StatusCode= "StatusCode:*",UsageRange="SumUsage:*",usageArr = [], arrTen=[],TenGoi = "TenGoi:*"
+            //get param usage
+            var arrUsage = $('#divUsage .multiselect.dropdown-toggle').attr('title');
+            if(arrUsage.indexOf(",")>=0){
+                for(var i=0;i<arrUsage.split(',').length;i++){
+                    var id = jsonUsage.find(x => x.name === arrUsage.split(',')[i].trim()).id
+                    // choose multi range
+                    if(id.indexOf("_")>=0){
+                        UsageRange = "(SumUsage:"+id.split("_")[0]
+                        for(var j=1;j<id.split("_").length;j++){
+                            UsageRange += " AND SumUsage:"+id.split("_")[j]
+                        }
+                        UsageRange += ")"
+                        usageArr.push(UsageRange)
+                    }
+                    else{
+                        usageArr.push("SumUsage:"+id)
+                    }
+                }
+                UsageRange = usageArr.join(" OR ")
+            }
+            else if(arrUsage != "Choose Range"){
+                var id = jsonUsage.find(x => x.name === arrUsage.trim()).id
+                if(id.indexOf(",")){
+                    UsageRange = "SumUsage:"+id.split("_")[0]
+                    for(var i=1;i<id.split("_").length;i++){
+                        UsageRange += " AND SumUsage:"+id.split("_")[i]
+                    }
+                }
+                else
+                   UsageRange = "SumUsage:"+id
+            }
+            //get param status
             var arrStt = $('#divStatus .multiselect.dropdown-toggle').attr('title');
             if(arrStt.indexOf(",")>=0){
                 for(var i=0;i<arrStt.split(',').length;i++){
@@ -666,7 +723,7 @@
             }
             else if(arrStt != "Choose Status")
                 StatusCode = "StatusCode:"+Number(jsonStatus.find(x => x.name === arrStt.trim()).id)
-
+            //get param tengoi
             var arrName = $('#divName .multiselect.dropdown-toggle').attr('title');
             if(arrName.indexOf(",")>=0){
                 for(var i=0;i<arrName.split(",").length;i++){
@@ -678,7 +735,7 @@
             else if(arrName != "Choose Name") TenGoi = "TenGoi:"+arrName
 
             // set params ajax
-            var others = '('+StatusCode+') AND ('+TenGoi+') AND SumUsage:'+$('#slUsage').val()
+            var others = '('+StatusCode+') AND ('+TenGoi+') AND ('+UsageRange+')'
             if(regionId != ""){
                 fields = others + " AND RegionCode:"+regionId
             }
@@ -767,26 +824,26 @@
                                 labels: {
                                     format: '{value}',
                                     style: {
-                                        color: "#5A738E"
+                                        color: "#9B59B6"
                                     }
                                 },
+                                title: {
+                                    text: 'Binh Thuong',
+                                    style: {
+                                        color: "#9B59B6"
+                                    }
+                                }
+                            }, { // Secondary yAxis
                                 title: {
                                     text: 'Others',
                                     style: {
                                         color: "#5A738E"
                                     }
-                                }
-                            }, { // Secondary yAxis
-                                title: {
-                                    text: 'Binh thuong',
-                                    style: {
-                                        color: "#9B59B6"
-                                    }
                                 },
                                 labels: {
                                     format: '{value}',
                                     style: {
-                                        color: "#9B59B6"
+                                        color: "#5A738E"
                                     }
                                 },
                                 opposite: true
@@ -798,26 +855,6 @@
                             series: getJsonMultiLinesColumn(dta.statusContract,dta.monthStatus,dta.keyCodeStatus)
 
                         });
-
-                        /*Highcharts.chart('line-name', {
-                            title: {
-                                text: ''
-                            },
-
-                            colors : ['#99cc00','#dc5a78', '#3498DB', '#f2ccff','#09006d', '#9B59B6', '#f1b53d','#cccccc', '#669999', '#e6e600', '#132639',  '#73879C', '#1ABB9C', '#832d1d', '#0000cc', '#E74C3C', '#466d6d', '#ffc6b3', '#666633', '#ffff00'],
-
-                            yAxis: {
-                                title: {
-                                    text: 'Number of Name'
-                                }
-                            },
-                            xAxis: {
-                                categories: dta.monthStatus
-                            },
-
-                            series: getJsonMultiLines(dta.nameContract,dta.monthStatus,dta.keyName)
-
-                        });*/
 
                         Highcharts.chart('line-region', {
                             chart: {
@@ -844,7 +881,7 @@
 
                             yAxis: {
                                 title: {
-                                    text: 'Number of '+$('#isRegion').val()
+                                    text: 'Number of contracts'
                                 }
                             },
                             xAxis: {
@@ -962,16 +999,25 @@
                                             'Number Of Contract: ' + Highcharts.numberFormat(Math.abs(this.point.y), 0);
                                 }
                             },
-
-                            series: [{
-                                name: '0h-1h',
-                                data: dta.no_usage,
+                            series: getDataUsage(dta)
+                            /*[{
+                                name: '>15min/day',
+                                data: dta.range3,
                                 color:'#73879C'
-                            }, {
-                                name: '>1h',
-                                data: dta.usage,
-                                color:'#832d1d'
-                            }]
+                            },{
+                                name: '15min/day',
+                                data: dta.range2,
+                                color:'green'
+                            },{
+                                name: '5min/day',
+                                data: dta.range1,
+                                color:'#0000cc'
+                            },
+                                {
+                                    name: '<0min/day',
+                                    data: dta.range0,
+                                    color:'#832d1d'
+                                }]*/
                         });
                     }
                     else{
@@ -979,6 +1025,46 @@
                     }
                 }
             });
+        }
+
+        function getDataUsage(dta){
+            var rs = [], colors=['#832d1d','#0000cc','green','#73879C']
+            var jsonUsage = [
+                {name:"0min/day",id:dta.range0},
+                {name:"5min/day", id:dta.range1},
+                {name:"15min/day",id:dta.range2},
+                {name:">15min/day",id:dta.range3}]
+            var arrUsage = $('#divUsage .multiselect.dropdown-toggle').attr('title');
+            if(arrUsage.indexOf(',')>=0){
+                for(var i=arrUsage.split(',').length-1;i>=0;i--){
+                    var data = jsonUsage.find(x => x.name === arrUsage.split(',')[i].trim()).id
+                    rs.push({
+                        name:arrUsage.split(',')[i].trim(),
+                        data:data,
+                        color:colors[i]
+                    })
+                }
+            }
+            else{
+                if(arrUsage == "Choose Range"){
+                    for(var i=3;i>=0;i--){
+                        rs.push({
+                            name:jsonUsage[i].name,
+                            data:jsonUsage[i].id,
+                            color:colors[i]
+                        })
+                    }
+                }
+                else{
+                    var data = jsonUsage.find(x => x.name === arrUsage.trim()).id
+                    rs.push({
+                        name:arrUsage,
+                        data:data,
+                        color:'#73879C'
+                    })
+                }
+            }
+            return rs
         }
 
         function CSVToArray( strData, strDelimiter ){

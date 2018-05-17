@@ -1,7 +1,6 @@
 package service
 
 import scala.collection.immutable.Map
-
 import com.sksamuel.elastic4s.ElasticsearchClientUri
 import com.sksamuel.elastic4s.TcpClient
 import com.sksamuel.elastic4s.http.ElasticDsl.RichFuture
@@ -15,7 +14,6 @@ import com.sksamuel.elastic4s.http.ElasticDsl.termsAgg
 import com.sksamuel.elastic4s.http.ElasticDsl.termsAggregation
 import com.sksamuel.elastic4s.http.search.SearchResponse
 import com.sksamuel.elastic4s.http.ElasticDsl._
-
 import play.api.libs.json.JsArray
 import play.api.libs.json.JsNumber
 import play.api.libs.json.JsObject
@@ -25,8 +23,10 @@ import play.api.libs.json.Json
 import profile.model.PayTVResponse
 import profile.utils.CommonUtil
 import profile.utils.ProvinceUtil
+
 import scalaj.http.Http
 import services.Configure
+import services.domain.CommonService
 
 case class Bubble(x: Double, y: Double, z: Double, name: String)
 
@@ -71,7 +71,7 @@ object DevService {
       termsAggregation("month")
         .field("month")
         .subaggs(
-          termsAgg("TenGoi", "TenGoi") size 12
+          termsAgg("TenGoi", "TenGoi") size 1000
         ) size 1000
       )
     val reponse = client.execute(request).await
@@ -79,14 +79,16 @@ object DevService {
   }
 
   def getUsage(queryString: String) = {
-    val request = search(s"profile-paytv-*" / "docs") query(queryString) aggregations (
+    val request = search(s"profile-paytv-*" / "docs") query(queryString + " AND LifeToEndC:>=28") aggregations (
       termsAggregation("month")
         .field("month")
         .subaggs(
           rangeAggregation("usage")
             .field("SumUsage")
-            .range("no_usage", Double.MinValue, 0.0001)
-            .range("usage", 0.0001, Double.MaxValue)
+            .range("range0", Double.MinValue, 0.001)
+            .range("range1", 0.001, 8400)
+            .range("range2", 8400, 25200)
+            .range("range3", 25200, Double.MaxValue)
         ) size 1000
       )
     val reponse = client.execute(request).await
@@ -176,7 +178,7 @@ object DevService {
   def get(query: String,isRegion: Int): PayTVResponse = {
     val months = getMonth().map(x => x._1)
 
-    val rs = PayTVResponse(getStatus(query), getTenGoi(query), getUsage(query),getRegionProvinces(), if(isRegion ==0) getProvincesByRegion(query) else getRegion(query), getQuantile("SumUsage", query), getQuantile("LifeToEndC", query))
+    val rs = PayTVResponse(getStatus(query), getTenGoi(query), getUsage(query),getRegionProvinces(), if(isRegion ==0) getProvincesByRegion(query) else getRegion(query), getQuantile("SumUsage", query +" AND LifeToEndC:>=28"), getQuantile("LifeToEndC", query))
     //rs.usage.foreach(println)
     rs.normalize(months)
   }
@@ -275,7 +277,19 @@ object DevService {
   //      .sortBy(x => x._1)
   //  }
 
-
+  def getChurnByMonth(queryString: String) ={
+    val request = search(s"profile-internet-*" / "docs") query(queryString) aggregations (
+      termsAggregation("month")
+        .field("month")
+        .subaggs(
+          termsAggregation("Age")
+            .field("Age")
+            .subaggs(
+              termsAgg("Status", "StatusCode")) size 1000))
+    val reponse = client.execute(request).await
+    //reponse.aggregations.foreach(println)
+    getChurnRateAndPercentage(reponse, "month", "Age", "Status")
+  }
 
   def getChurn(month: String) = {
     val request = search(s"profile-internet-${month}" / "docs") aggregations (
@@ -285,7 +299,7 @@ object DevService {
           termsAggregation("Age")
             .field("Age")
             .subaggs(
-              termsAgg("Status", "StatusCode")) size 20))
+              termsAgg("Status", "StatusCode")) size 1000))
     val reponse = client.execute(request).await
     //reponse.aggregations.foreach(println)
     getChurnRateAndPercentage(reponse, "Region", "Age", "Status")
@@ -362,7 +376,25 @@ object DevService {
     rs
   }
 
-  private def calChurnRateAndPercentageForCTBDV(array: Array[(String, String, String, Int, Int, Int)]) = {
+   def calChurnRateAndPercentageByAge(array: Array[(String, String, String, Int, Int, Int)]) = {
+    val sumByMonth = array.map(x=> x._2 -> (x._5 -> x._6))
+      .groupBy(x=> x._1)
+      .map(x=> x._1-> (x._2.map(y=> y._2._1).sum -> x._2.map(y=> y._2._2).sum))
+    val sumAll = array.map(x=>x._6).sum
+    // month, age, rate, percentage
+    sumByMonth.map(x => (x._1.toInt, CommonService.format3Decimal(x._2._2  * 1.0/ x._2._1), CommonService.format3Decimal(x._2._2 * 1.0 / sumAll) ) ).toArray.sorted
+  }
+
+   def calChurnRateAndPercentageByMonth(array: Array[(String, String, String, Int, Int, Int)]) = {
+    val sumByMonth = array.map(x=> x._1 -> (x._5 -> x._6))
+      .groupBy(x=> x._1)
+      .map(x=> x._1-> (x._2.map(y=> y._2._1).sum -> x._2.map(y=> y._2._2).sum))
+    val sumAll = array.map(x=>x._6).sum
+    // month, age, rate, percentage
+    sumByMonth.map(x => (x._1, CommonService.format3Decimal(x._2._2  * 1.0/ x._2._1), CommonService.format3Decimal(x._2._2 * 1.0 / sumAll) ) ).toArray.sorted
+  }
+
+   def calChurnRateAndPercentageForCTBDV(array: Array[(String, String, String, Int, Int, Int)]) = {
     val ctbdv = array.filter(x => x._3.toInt == 3)
     val sumByRegion = ctbdv.map(x => x._1 -> x._6)
       .groupBy(x => x._1)
@@ -371,7 +403,7 @@ object DevService {
     ctbdv.map(x => (x._1.toInt, x._2.toInt, x._6  * 1.0/ x._5, x._6 * 1.0 / (sumByRegion.getOrElse(x._1, 0)) ) )
   }
 
-  private def calChurnRateAndPercentageForChurn(array: Array[(String, String, String, Int, Int, Int)]) = {
+   def calChurnRateAndPercentageForChurn(array: Array[(String, String, String, Int, Int, Int)]) = {
     val ctbdv = array.filter(x => x._3.toInt == 1)
     val sumByRegion = ctbdv.map(x => x._1 -> x._6)
       .groupBy(x => x._1)
@@ -383,7 +415,7 @@ object DevService {
   def getInternet(month: String) = {
     //calChurnRateAndPercentage()
     val response = getChurn(month)
-    (calChurnRateAndPercentageForCTBDV(response),calChurnRateAndPercentageForChurn(response))
+    (calChurnRateAndPercentageForCTBDV(response),calChurnRateAndPercentageByAge(getChurnByMonth(s"month:$month")),calChurnRateAndPercentageByMonth(getChurnByMonth("*")))
   }
 
   def bubbleHeatChart(array: Array[(Int, Int, Double, Double)]): (JsValue, JsValue) = {

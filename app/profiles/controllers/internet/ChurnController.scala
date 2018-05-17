@@ -54,15 +54,51 @@ class ChurnController @Inject() (cc: ControllerComponents) extends AbstractContr
     Ok(profiles.views.html.internet.churn.index(rs,request.session.get("username").get.toString))
   }
 
-  def getMonthJson(month: String) = Action { implicit request =>
+  def getJsonByStatus(status: String,month: String) = Action { implicit request =>
     try{
-      println(month)
-      val jSon = DevService.getInternet(month)
+      val jSon = if(month.equals("")) DevService.getChurn("2018-03") else DevService.getChurn(month)
+      var rsChurn = DevService.calChurnRateAndPercentageForCTBDV(jSon)
+      if(status.equals("0"))
+        rsChurn = DevService.calChurnRateAndPercentageForChurn(jSon)
       val jsChurn = Json.obj(
-        "internetChurnColor" -> bubbleHeatChart(jSon._1)._1,
-        "internetChurnSeries"  -> bubbleHeatChart(jSon._1)._2,
-        "internetChurnColor2" -> bubbleHeatChart(jSon._2)._1,
-        "internetChurnSeries2"  -> bubbleHeatChart(jSon._2)._2
+        "churnRate" -> rsChurn,
+        "minPercent" -> CommonService.format3Decimal(rsChurn.map(x=>x._4).asInstanceOf[Array[(Double)]].min),
+        "maxPercent" -> CommonService.format3Decimal(rsChurn.map(x=>x._4).asInstanceOf[Array[(Double)]].max)
+      )
+      Ok(Json.toJson(jsChurn))
+    }
+    catch{
+      case e: Exception => Ok("Error")
+    }
+  }
+
+  def getJsonByMonth(status: String,month: String) = Action { implicit request =>
+    try{
+      val jSon = DevService.getChurn(month)
+      var rsChurn = DevService.calChurnRateAndPercentageForCTBDV(jSon)
+      if(status.equals("0"))
+        rsChurn = DevService.calChurnRateAndPercentageForChurn(jSon)
+      val jsChurn = Json.obj(
+        "churnBubbleChart" -> rsChurn,
+        "minPercent" -> CommonService.format3Decimal(rsChurn.map(x=>x._4).asInstanceOf[Array[(Double)]].min),
+        "maxPercent" -> CommonService.format3Decimal(rsChurn.map(x=>x._4).asInstanceOf[Array[(Double)]].max),
+        "churnRate" -> DevService.calChurnRateAndPercentageByAge(DevService.getChurnByMonth(s"month:$month")).map(x=> x._2),
+        "churnPercent" -> DevService.calChurnRateAndPercentageByAge(DevService.getChurnByMonth(s"month:$month")).map(x=> x._3)
+
+      )
+      Ok(Json.toJson(jsChurn))
+    }
+    catch{
+      case e: Exception => Ok("Error")
+    }
+  }
+
+  def getJsonByAge(query: String) = Action { implicit request =>
+    try{
+      val jSon = DevService.getChurnByMonth(query)
+      val jsChurn = Json.obj(
+        "churnRate" -> DevService.calChurnRateAndPercentageByMonth(jSon).map(x=> x._2),
+        "churnPercent" -> DevService.calChurnRateAndPercentageByMonth(jSon).map(x=> x._3)
 
       )
       Ok(Json.toJson(jsChurn))
