@@ -48,9 +48,15 @@ GET      /report                       controllers.ReportController.index(day: S
 #######################################################################
 ### PROFILE
 GET     /paytv                         controllers.PaytvClientController.index
+GET     /paytv/drilldownJson           controllers.PaytvClientController.drilldownJson(code: String ?= "")
 GET     /profile                       controllers.ProfileContractController.index(day: String ?= "")
+GET     /paytv/getProvincesByRegion    controllers.PaytvClientController.getProvincesByRegion(regionId: String ?= "")
 
 ### PROFILE INTERNET
+GET     /internet/churn                profile.controllers.internet.ChurnController.index
+GET     /internet/getJsonByAge         profile.controllers.internet.ChurnController.getJsonByAge(age: String ?= "")
+GET     /internet/getJsonByMonth       profile.controllers.internet.ChurnController.getJsonByMonth(status: String ?= "",month: String?="")
+GET     /internet/getJsonByStatus      profile.controllers.internet.ChurnController.getJsonByStatus(status: String ?= "",month: String ?="")
 GET     /internet/history              profile.controllers.internet.HistoryController.index(date: String ?= "")
 GET     /internet/realtime             profile.controllers.internet.HistoryController.realtime
 GET     /internet/realtime-json        profile.controllers.internet.HistoryController.realtimeJson

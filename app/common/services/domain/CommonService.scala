@@ -48,6 +48,15 @@ object CommonService extends AbstractService {
    * Service for Get Information about day
    */
 
+  def normalizeArray(months: Array[String], array: Array[(String, String, Int)]): Array[(String, String, Int)] = {
+    val terms = array.map(x => x._2).distinct
+    val map = array.map(x => (x._1, x._2) -> x._3).toMap
+    months.flatMap(x => terms.map(y => (x,y)))
+      .map(x => x -> map.getOrElse(x, 0))
+      .map(x => (x._1._1, x._1._2, x._2) )
+
+  }
+
   def getLongValueByKey(arr: Array[(String,Long)], key:String):Int = {
     var value = 0;
     breakable{for(i <- 0 until arr.length){
@@ -88,6 +97,11 @@ object CommonService extends AbstractService {
   def getCurrentDay(): String = {
     val date = new DateTime()
     date.toString(DateTimeFormat.forPattern("yyyy-MM-dd"))
+  }
+
+  def getCurrentMonth(): String = {
+    val date = new DateTime()
+    date.toString(DateTimeFormat.forPattern("yyyy-MM"))
   }
 
   def getpreviousMinutes(times: Int): String = {
@@ -162,6 +176,26 @@ object CommonService extends AbstractService {
             val keyCard = x.getOrElse("key","0L").toString
             val count = x.getOrElse("doc_count",0L).toString.toLong
             (keyCard,count)
+          }).toArray
+        (key, map)
+      })
+      .toArray
+  }
+
+  def getSecondSumAggregations(aggr: Option[AnyRef],secondField: String):  Array[(String, Array[(String, Long)])] = {
+    aggr.getOrElse("buckets", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+      .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+      .map(x => x.asInstanceOf[Map[String, AnyRef]])
+      .map(x => {
+        val key = x.getOrElse("key", "0L").toString
+        val map = x.getOrElse(s"$secondField",Map[String,AnyRef]()).asInstanceOf[Map[String,AnyRef]]
+          .getOrElse("buckets",List).asInstanceOf[List[AnyRef]]
+          .map(x => x.asInstanceOf[Map[String,AnyRef]])
+          .map(x => {
+            val keyCard = x.getOrElse("key","0L").toString
+            val sum = x.getOrElse("sum",Map[String,AnyRef]()).asInstanceOf[Map[String,AnyRef]]
+              .map(x=> x._2.toString.toDouble).toList(0).toLong
+            (keyCard,sum)
           }).toArray
         (key, map)
       })
@@ -439,10 +473,19 @@ object CommonService extends AbstractService {
     val frnum = new DecimalFormat("###,###.###");
     frnum.format(number);
   }
+
+  def divided(number: Int, prev: Int): Int = {
+    val value = number / prev
+    value
+  }
   
   def percent(number: Long, prev: Long): Double = {
     val value = ((number - prev) / (prev * 1.0)) * 100.0
     BigDecimal(value).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
+  }
+
+  def format3Decimal(number: Double): Double = {
+    BigDecimal(number).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble
   }
   
   def percentInfor(number: Long, total: Long): Double = {

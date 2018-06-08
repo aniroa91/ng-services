@@ -110,7 +110,7 @@
                               }else if(id == 1){
                                   @if(item == "Paytv" || item == "Contract" || item =="History"){
                                       <ul class="nav side-menu">
-                                          <li><a href="/paytv"><i class="fa fa-home"></i> Dashboard </a>
+                                          <li><a href="/paytv"><i class="fa fa-home"></i> PayTV </a>
                                           </li>
                                           @if(day != ""){
                                               <li class="current-page"><a href="/profile?ct=@day"><i class="fa fa-book"></i> Contract </a>
@@ -121,6 +121,7 @@
                                           }
                                           <li><a><i class="fa fa-internet-explorer"></i> Internet </a>
                                               <ul class="nav child_menu">
+                                                  <li><a href="/internet/churn">Churn </a></li>
                                                   <li><a href="/internet/realtime">Real time</a></li>
                                                   <li><a href="/internet/history">History</a></li>
                                                   <li><a> Compare </a>

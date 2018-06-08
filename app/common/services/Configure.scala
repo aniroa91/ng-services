@@ -40,8 +40,10 @@ object Configure {
   
   val LOGO_DEFAULT = "../assets/images/logo/domain.png"
   
-  val redis = new RedisClient(REDIS_HOST, REDIS_PORT)
-  val redisDga: RedisClient = new RedisClient(REDIS_DGA_HOST, REDIS_DGA_PORT)
+  //val redis = new RedisClient(REDIS_HOST, REDIS_PORT)
+  val redis: RedisClient = null
+  //val redisDga: RedisClient = new RedisClient(REDIS_DGA_HOST, REDIS_DGA_PORT)
+  val redisDga: RedisClient =  null
   val client = HttpClient(ElasticsearchClientUri(Configure.ES_HOST, Configure.ES_PORT))
   val client_kibana = HttpClient(ElasticsearchClientUri(Configure.ES_KIBANA_HOST,Configure.ES_KIBANA_PORT))
 
