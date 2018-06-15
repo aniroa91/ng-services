@@ -18,9 +18,6 @@ object Configure {
   
   val ES_HOST = ConfigFactory.load().getString("es.dns.host")
   val ES_PORT = ConfigFactory.load().getString("es.dns.port").toInt
-
-  val ES_KIBANA_HOST = ConfigFactory.load().getString("es.dwh.host")
-  val ES_KIBANA_PORT = ConfigFactory.load().getString("es.dwh.port").toInt
   
   val REDIS_HOST = ConfigFactory.load().getString("redis.whois.host")
   val REDIS_PORT = ConfigFactory.load().getString("redis.whois.port").toInt
@@ -45,7 +42,6 @@ object Configure {
   //val redisDga: RedisClient = new RedisClient(REDIS_DGA_HOST, REDIS_DGA_PORT)
   val redisDga: RedisClient =  null
   val client = HttpClient(ElasticsearchClientUri(Configure.ES_HOST, Configure.ES_PORT))
-  val client_kibana = HttpClient(ElasticsearchClientUri(Configure.ES_KIBANA_HOST,Configure.ES_KIBANA_PORT))
 
   def main(args: Array[String]) {
     println("")

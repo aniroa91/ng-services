@@ -23,7 +23,7 @@ class LoginController @Inject()(cc: ControllerComponents) extends AbstractContro
   )
 
   def check(username: String, password: String) = {
-    ((username == "btgd@ftel" && password == "da@171020") || (username == "noc" && password == "noc123"))
+    (username == "btgd@ftel" && password == "da@171020")
   }
 
   def index = Action { implicit request =>
@@ -33,8 +33,6 @@ class LoginController @Inject()(cc: ControllerComponents) extends AbstractContro
       username match {
         case "btgd@ftel" =>
           Redirect(routes.DashboardController.index)
-        case "noc" =>
-          Redirect("/device")
       }
     }
     else
@@ -48,8 +46,6 @@ class LoginController @Inject()(cc: ControllerComponents) extends AbstractContro
         user._1 match {
           case "btgd@ftel" =>
             Redirect(routes.DashboardController.index).withSession(Security.username -> user._1)
-          case "noc" =>
-            Redirect("/device").withSession(Security.username -> user._1)
         }
       }
     )

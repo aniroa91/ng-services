@@ -24,19 +24,7 @@ GET      /login                        controllers.LoginController.login
 GET      /logout                       controllers.LoginController.logout
 
 #######################################################################
-### DEVICE
-GET      /device                       controllers.DeviceController.dashboard
-GET      /searchBras                   controllers.DeviceController.search
-POST     /searchBras                   controllers.DeviceController.getFormBras
-GET      /bras                         controllers.BrasController.index
-GET      /brasInfo                     controllers.BrasDetailController.index
-GET      /device/realtime-bras         controllers.DeviceController.realtimeBras
-GET      /host-json                    controllers.DeviceController.getHostJson(id: String ?= "")
-GET      /bras-json                    controllers.DeviceController.getBrasJson(id: String ?= "")
-GET      /confirmLabel                 controllers.BrasController.confirmLabel(id: String ?= "",time: String ?= "")
-GET      /rejectLabel                  controllers.BrasController.rejectLabel(id: String ?= "",time: String ?= "")
 
-#######################################################################
 ### DNS
 GET      /dns                          controllers.DashboardController.index
 GET      /search/compare               controllers.CompareController.index(domains: String ?= "")

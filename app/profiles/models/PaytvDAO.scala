@@ -20,7 +20,6 @@ import org.joda.time.DateTimeZone
 import com.ftel.bigdata.utils.DateTimeUtil
 import org.elasticsearch.search.sort.SortOrder
 import profile.utils.CommonUtil
-import service.BrasService.client
 
 object PaytvDAO {
 

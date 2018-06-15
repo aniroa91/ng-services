@@ -21,19 +21,11 @@
                                                 <i class="fa fa-laptop"></i> Demo
                                             }
                                         }
-                                        @if(id == 2){
-                                            <i class="fa fa-server"></i> Device
-                                        }
                                         <span class="fa fa-chevron-down downTopMenu"></span></a>
                                     <ul class="dropdown-menu">
                                         <li><a href="/dns" class="topLi">DNS <i class="fa fa-globe pull-right"></i></a></li>
                                         <li class="divider"></li>
-                                        <li><a href="/paytv">Profile <i class="fa fa-user pull-right"></i></a></li>
-                                        <li class="divider"></li>
-                                        <li><a href="/device" class="botLi">Device <i class="fa fa-server pull-right"></i></a></li>
-                                        @*<li>
-                                            <a href="/demo" class="botLi">Demo <i class="fa fa-laptop pull-right"></i></a>
-                                        </li>*@
+                                        <li><a href="/paytv" class="botLi">Profile <i class="fa fa-user pull-right"></i></a></li>
 
                                     </ul>
                                 </li>
@@ -142,23 +134,6 @@
                                       </ul>
                                   }
 
-                              }else{
-                                <ul class="nav side-menu">
-                                    <li><a href="/device"><i class="fa fa-home"></i> Dashboard </a>
-                                    </li>
-                                    @if(item == "BrasDetail") {
-                                        <li class="current-page"><a href="/searchBras" id="searchBras"><i class="fa fa-search"></i>
-                                            Search </a>
-                                        </li>
-                                    }else {
-                                        <li><a href="/searchBras" id="searchBras"><i class="fa fa-search"></i>
-                                            Search </a>
-                                        </li>
-                                    }
-                                   @* <li><a href="/bras"><i class="fa fa-credit-card-alt"></i> Bras Outlier </a>
-                                    </li>*@
-
-                                </ul>
                               }
                             </div>
 

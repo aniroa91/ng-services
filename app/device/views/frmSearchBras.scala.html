@@ -1,7 +1,0 @@
-@(form: Form[BrasOutlier], route: Call,bras: String,day: String,_typeS: String)
-
-@helper.form(action = route,'id -> "ctSearch") {
-        <input type="hidden" id="_typeS" name="_typeS" value="@_typeS">
-        <input type="hidden" id="date" name="date" value="@day">
-        <input type="text" style="height: 36px" class="form-control autocomplete search" required id="bras" name="bras" placeholder="Search bras..." value="@bras">
-}

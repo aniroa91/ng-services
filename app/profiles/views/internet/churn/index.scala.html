@@ -97,22 +97,12 @@
                             <div id="container" style="width: auto; height: 650px;"></div>
                             <div class="overlay">
                                 <span style="font-size: 16px;color: #0D3349">ChurnPert</span>
-                                <div style="margin-bottom: 2px;margin-top: 4px"><div class="circle" style="background: #832d1d;"><span style="opacity: 0">1</span></div><span id="txtMin" style="color:#0D3349 ">@format3Decimal(rs._1.toSeq.map(x=>x._4).min)</span></div>
-                                <div style="margin-bottom: 2px"><div class="circle" style="background: #832d1d;"><span style="opacity: 0">111</span></div><span style="color:#0D3349 ">@format3Decimal((rs._1.toSeq.map(x=>x._4).max -rs._1.toSeq.map(x=>x._4).min)/5*2)</span></div>
-                                <div style="margin-bottom: 2px"><div class="circle" style="background: #832d1d;"><span style="opacity: 0">1111</span></div><span style="color:#0D3349 ">@format3Decimal((rs._1.toSeq.map(x=>x._4).max -rs._1.toSeq.map(x=>x._4).min)/5*3)</span></div>
-                                <div><div class="circle" style="background: #832d1d"><span style="opacity: 0">11111</span></div><span id="txtMax" style="color:#0D3349 ">@format3Decimal(rs._1.toSeq.map(x=>x._4).max)</span></div>
+                                <div style="margin-bottom: 2px;margin-top: 4px"><div class="circle" style="background: #f2473c;"><span style="opacity: 0">1</span></div><span id="txtMin" style="color:#0D3349 ">@format3Decimal(rs._1.toSeq.map(x=>x._4).min)</span></div>
+                                <div style="margin-bottom: 2px"><div class="circle" style="background: #f2473c;"><span style="opacity: 0">111</span></div><span style="color:#0D3349 ">@format3Decimal((rs._1.toSeq.map(x=>x._4).max -rs._1.toSeq.map(x=>x._4).min)/5*2)</span></div>
+                                <div style="margin-bottom: 2px"><div class="circle" style="background: #f2473c;"><span style="opacity: 0">1111</span></div><span style="color:#0D3349 ">@format3Decimal((rs._1.toSeq.map(x=>x._4).max -rs._1.toSeq.map(x=>x._4).min)/5*3)</span></div>
+                                <div><div class="circle" style="background: #f2473c"><span style="opacity: 0">11111</span></div><span id="txtMax" style="color:#0D3349 ">@format3Decimal(rs._1.toSeq.map(x=>x._4).max)</span></div>
                             </div>
                         </div>
-                        @*<div class="chartWithOverlay animated slideInUp" id="chartWithOverlay0" style="">
-                            <div id="container2" style="width: auto; height: 650px;"></div>
-                            <div class="overlay">
-                                <span style="font-size: 16px;color: #0D3349">ChurnPert</span>
-                                <div style="margin-bottom: 2px;margin-top: 4px"><div class="circle" style="background: #8fc783;"><span style="opacity: 0">1</span></div><span style="color:#0D3349 ">@format3Decimal(rs._1.toSeq.map(x=>x._4).min)</span></div>
-                                <div style="margin-bottom: 2px"><div class="circle" style="background: #8fc783;"><span style="opacity: 0">111</span></div><span style="color:#0D3349 ">@format3Decimal((rs._1.toSeq.map(x=>x._4).max -rs._1.toSeq.map(x=>x._4).min)/5*2)</span></div>
-                                <div style="margin-bottom: 2px"><div class="circle" style="background: #8fc783;"><span style="opacity: 0">1111</span></div><span style="color:#0D3349 ">@format3Decimal((rs._1.toSeq.map(x=>x._4).max -rs._1.toSeq.map(x=>x._4).min)/5*3)</span></div>
-                                <div><div class="circle" style="background: #8fc783"><span style="opacity: 0">11111</span></div><span style="color:#0D3349 ">@format3Decimal(rs._1.toSeq.map(x=>x._4).max)</span></div>
-                            </div>
-                        </div>*@
                     </div>
                 </div>
             </div>
