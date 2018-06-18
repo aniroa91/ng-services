@@ -18,9 +18,9 @@
         <title>Dashboard Admin </title>
 
             <!-- Bootstrap -->
-        @common.views.html.common.css("Contract",1)
+        @common.views.html.common.css("Contract")
     </head>
-    @common.views.html.common.top("Contract",1,contract)
+    @common.views.html.common.top("Contract",contract)
                     <!-- top navigation -->
                 <div class="top_nav">
                     <div class="nav_menu">
@@ -993,7 +993,7 @@
             </div>
         </div>
             <!-- jQuery -->
-       @common.views.html.common.bottom("Contract",1)
+       @common.views.html.common.bottom("Contract")
         @if( response != null) {
             @if(response.paytv != null) {
                 @scripts(response, contract, if(!response.paytv.segments.isEmpty) {

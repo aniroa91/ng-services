@@ -1,4 +1,4 @@
-@(item: String,id: Int, day: String)
+@(item: String, day: String)
 @import services.domain.CommonService.formatDateDDMMYY
 
 <body class="nav-md">
@@ -10,24 +10,8 @@
 
                             <ul class="navTop">
                                 <li class="dropdown">
-                                    <a data-toggle="dropdown" class="site_title curSor dropdown-toggle">
-                                        @if(id == 0) {
-                                            <i class="fa fa-globe"></i> DNS
-                                        }
-                                        @if(id == 1) {
-                                            @if(item == "Paytv" || item == "Contract" || item == "History"){
-                                                <i class="fa fa-user"></i> Profile
-                                            }else{
-                                                <i class="fa fa-laptop"></i> Demo
-                                            }
-                                        }
-                                        <span class="fa fa-chevron-down downTopMenu"></span></a>
-                                    <ul class="dropdown-menu">
-                                        <li><a href="/dns" class="topLi">DNS <i class="fa fa-globe pull-right"></i></a></li>
-                                        <li class="divider"></li>
-                                        <li><a href="/paytv" class="botLi">Profile <i class="fa fa-user pull-right"></i></a></li>
-
-                                    </ul>
+                                    <a class="site_title curSor dropdown-toggle">
+                                        <i class="fa fa-user"></i> User Profile</a>
                                 </li>
                             </ul>
                         </div>
@@ -36,105 +20,30 @@
                             <!-- sidebar menu -->
                         <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
                             <div class="menu_section">
-                              @if(id == 0) {
-                                  <ul class="nav side-menu">
-                                      <li><a href="/dns"><i class="fa fa-home"></i> Dashboard </a>
-                                      </li>
-                                      @if(item == "Search"){
-                                          @if(day != null) {
-                                              <li class="active"><a><i class="fa fa-search"></i> Search </a>
-                                                  <ul class="nav child_menu" style="display: block">
-                                                      <li class="current-page"><a href="/search?ct=@day">Profile</a></li>
-                                                      <li><a href="/search/subdomain?domain=@day">Sub domain</a></li>
-                                                      <li><a href="/search/compare?domains=@day">Compare</a></li>
-                                                  </ul>
-                                              </li>
-                                          } else {
-                                              <li class="active"><a><i class="fa fa-search"></i> Search </a>
-                                                  <ul class="nav child_menu" style="display: block">
-                                                      <li class="current-page"><a href="/search">Profile</a></li>
-                                                      <li><a href="/search/subdomain">Sub domain</a></li>
-                                                      <li><a href="/search/compare?domains=@day">Compare</a></li>
-                                                  </ul>
-                                              </li>
-                                          }
-                                      } else if(item == "Compare"){
-                                          <li class="active"><a><i class="fa fa-search"></i> Search </a>
-                                              <ul class="nav child_menu" style="display: block">
-                                                  <li><a href="/search">Profile</a></li>
-                                                  <li><a href="/search/subdomain">Sub domain</a></li>
-                                                  <li class="current-page"><a href="/search/compare?domains=@day">Compare</a></li>
-                                              </ul>
-                                          </li>
-                                      }else if(item == "Subdomain"){
-                                          @if(day != null) {
-                                              <li class="active"><a><i class="fa fa-search"></i> Search </a>
-                                                  <ul class="nav child_menu" style="display: block">
-                                                      <li><a href="/search?ct=@day">Profile</a></li>
-                                                      <li class="current-page"><a href="/search/subdomain?domain=@day">Sub domain</a></li>
-                                                      <li><a href="/search/compare?domains=@day">Compare</a></li>
-                                                  </ul>
-                                              </li>
-                                          } else {
-                                              <li class="active"><a><i class="fa fa-search"></i> Search </a>
-                                                  <ul class="nav child_menu" style="display: block">
-                                                      <li><a href="/search">Profile</a></li>
-                                                      <li class="current-page"><a href="/search/subdomain">Sub domain</a></li>
-                                                      <li><a href="/search/compare?domains=@day">Compare</a></li>
-                                                  </ul>
-                                              </li>
-                                          }
-                                      }else {
-                                          <li><a><i class="fa fa-search"></i> Search </a>
-                                              <ul class="nav child_menu">
-                                                  <li><a href="/search">Profile</a></li>
-                                                  <li><a href="/search/subdomain">Sub domain</a></li>
-                                                  <li><a class="current-page" href="/search/compare">Compare</a></li>
-                                              </ul>
-                                          </li>
-                                      }
-
-                                      <li><a href="/rank"><i class="fa fa-star-o"></i> Rank </a>
-                                      </li>
-                                      <li><a href="/report"><i class="fa fa-edit"></i> Report </a>
-                                      </li>
-                                  </ul>
-                              }else if(id == 1){
-                                  @if(item == "Paytv" || item == "Contract" || item =="History"){
-                                      <ul class="nav side-menu">
-                                          <li><a href="/paytv"><i class="fa fa-home"></i> PayTV </a>
-                                          </li>
-                                          @if(day != ""){
-                                              <li class="current-page"><a href="/profile?ct=@day"><i class="fa fa-book"></i> Contract </a>
-                                              </li>
-                                          }else{
-                                              <li><a href="/profile"><i class="fa fa-book"></i> Contract </a>
-                                              </li>
-                                          }
-                                          <li><a><i class="fa fa-internet-explorer"></i> Internet </a>
-                                              <ul class="nav child_menu">
-                                                  <li><a href="/internet/churn">Churn </a></li>
-                                                  <li><a href="/internet/realtime">Real time</a></li>
-                                                  <li><a href="/internet/history">History</a></li>
-                                                  <li><a> Compare </a>
-                                                      <ul class="nav child_menu">
-                                                          <li><a href="/internet/compareTime"><i class="fa fa-calendar"></i>Compare Date</a></li>
-                                                          <li><a href="/internet/compareCt"><i class="fa fa-book"></i> Compare Contract</a></li>
-                                                      </ul>
-                                                  </li>
-                                              </ul>
-                                          </li>
-                                      </ul>
-                                  }else{
-                                      <ul class="nav side-menu">
-                                          <li><a href="/demo"><i class="fa fa-television"></i> Demo </a>
-                                          </li>
-                                          <li><a href="/msg"><i class="fa fa-book"></i> Message </a>
-                                          </li>
-                                      </ul>
-                                  }
-
-                              }
+                                <ul class="nav side-menu">
+                                    <li><a href="/paytv"><i class="fa fa-home"></i> PayTV </a>
+                                    </li>
+                                    @if(day != ""){
+                                        <li class="current-page"><a href="/profile?ct=@day"><i class="fa fa-book"></i> Contract </a>
+                                        </li>
+                                    }else{
+                                        <li><a href="/profile"><i class="fa fa-book"></i> Contract </a>
+                                        </li>
+                                    }
+                                    <li><a><i class="fa fa-internet-explorer"></i> Internet </a>
+                                        <ul class="nav child_menu">
+                                            <li><a href="/internet/churn">Churn </a></li>
+                                            <li><a href="/internet/realtime">Real time</a></li>
+                                            <li><a href="/internet/history">History</a></li>
+                                            <li><a> Compare </a>
+                                                <ul class="nav child_menu">
+                                                    <li><a href="/internet/compareTime"><i class="fa fa-calendar"></i>Compare Date</a></li>
+                                                    <li><a href="/internet/compareCt"><i class="fa fa-book"></i> Compare Contract</a></li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
                             </div>
 
                         </div>

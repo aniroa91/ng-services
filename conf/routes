@@ -14,8 +14,6 @@ GET     /assets/*file                  controllers.Assets.versioned(path="/publi
 # Static resources (not managed by the Play framework)
 #GET     /extassets/*file            controllers.Assets.versioned(path="/home/dungvc/Desktop", file: Asset)
 
-GET     /extassets/*file               controllers.DnsController.getImage(file: String)
-
 #######################################################################
 
 ### LOGIN , LOGOUT
@@ -25,15 +23,6 @@ GET      /logout                       controllers.LoginController.logout
 
 #######################################################################
 
-### DNS
-GET      /dns                          controllers.DashboardController.index
-GET      /search/compare               controllers.CompareController.index(domains: String ?= "")
-GET      /search/subdomain             controllers.SubdomainController.index(domain: String ?= "")
-GET      /search                       controllers.ProfileController.index
-GET      /rank                         controllers.RankController.index
-GET      /report                       controllers.ReportController.index(day: String ?= "")
-
-#######################################################################
 ### PROFILE
 GET     /paytv                         controllers.PaytvClientController.index
 GET     /paytv/drilldownJson           controllers.PaytvClientController.drilldownJson(code: String ?= "")

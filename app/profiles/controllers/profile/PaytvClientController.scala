@@ -17,6 +17,9 @@ import service.DevService
   * This controller creates an `Action` to handle HTTP requests to the
   * application's home page.
   */
+case class AuthenticatedRequest (val username: String, request: Request[AnyContent])
+  extends WrappedRequest(request)
+
 @Singleton
 class PaytvClientController @Inject() (cc: ControllerComponents) extends AbstractController(cc) with Secured{
 

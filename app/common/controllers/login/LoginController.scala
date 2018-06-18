@@ -32,7 +32,7 @@ class LoginController @Inject()(cc: ControllerComponents) extends AbstractContro
       val username = request.session.get("username").get.toString
       username match {
         case "btgd@ftel" =>
-          Redirect(routes.DashboardController.index)
+          Redirect(routes.PaytvClientController.index)
       }
     }
     else
@@ -45,7 +45,7 @@ class LoginController @Inject()(cc: ControllerComponents) extends AbstractContro
       user =>{
         user._1 match {
           case "btgd@ftel" =>
-            Redirect(routes.DashboardController.index).withSession(Security.username -> user._1)
+            Redirect(routes.PaytvClientController.index).withSession(Security.username -> user._1)
         }
       }
     )

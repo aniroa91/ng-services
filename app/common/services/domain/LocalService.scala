@@ -7,7 +7,6 @@ import model.ProfileResponse
 import utils.SearchReponseUtil
 import org.elasticsearch.search.aggregations.bucket.terms.Terms.Bucket
 import model.ClientResponse
-import services.CacheService
 import org.apache.http.impl.client.DefaultHttpClient
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.HttpHost
@@ -79,20 +78,7 @@ object LocalService extends AbstractService {
 ////    println("--- HEADERS ---")
 ////    response.getAllHeaders.foreach(arg => println(arg))
 //  }
-  
-  def main(args: Array[String]) {
-    val day = CommonService.getLatestDay()
-    println(day)
-    //val last30Days = CommonService.getPreviousDay(day, 30)
-    //val topLast30Day = CommonService.getTopByNumOfQueryWithRange(last30Days, day)
-    //println(topLast30Day.sortBy(x => x.queries).reverse.head)
-//    val profile = ProfileService.get("hurxrcfene.info")
-    val profile = ProfileService.get("google.com")
-    //val map = redis.hgetall1("google.com")
-    //println(map)
-    client.close()
-    
-  }
+
 
   private def clientProfile() {
     val clientIP = "103.27.237.102"
