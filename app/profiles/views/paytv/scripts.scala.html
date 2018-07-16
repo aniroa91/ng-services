@@ -793,6 +793,15 @@
             $.ajax({
                 url: "/paytv/drilldownJson?code="+fields,
                 cache: false,
+                beforeSend: function () {
+                    $('.right_col').waitMe({
+                        effect: 'progressBar',
+                        text: 'Please wait...',
+                        bg: 'rgba(255,255,255,0.7)',
+                        color: '#000',
+                        textPos: 'vertical'
+                    });
+                },
                 success: function (dta) {
                     if(dta != "Error"){
                         // sparkline TenGoi
@@ -1023,7 +1032,10 @@
                     else{
                         location.href = "/paytv";
                     }
-                }
+                },
+                complete: function () {
+                    $('.right_col').waitMe("hide");
+                },
             });
         }
 

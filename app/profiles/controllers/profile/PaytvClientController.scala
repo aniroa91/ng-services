@@ -1,4 +1,4 @@
-package controllers
+package controllers.profile
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -39,6 +39,7 @@ class PaytvClientController @Inject() (cc: ControllerComponents) extends Abstrac
   }
 
   def index() = Authenticated { implicit request =>
+    println("222")
     val rs = DevService.get()
     val arr = rs.getTenGoiForSparkline()
     val arrOthersSparklines = arr.map(x=> x._3)

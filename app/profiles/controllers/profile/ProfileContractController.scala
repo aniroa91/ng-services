@@ -1,4 +1,4 @@
-package controllers
+package controllers.profile
 
 import com.ftel.bigdata.utils.DomainUtil
 

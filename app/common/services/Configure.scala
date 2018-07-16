@@ -16,8 +16,8 @@ object Configure {
   val PROXY_HOST = ConfigFactory.load().getString("proxy.host")
   val PROXY_PORT = ConfigFactory.load().getString("proxy.port").toInt
   
-  val ES_HOST = ConfigFactory.load().getString("es.dns.host")
-  val ES_PORT = ConfigFactory.load().getString("es.dns.port").toInt
+  val ES_HOST = ConfigFactory.load().getString("es.profile.host")
+  val ES_PORT = ConfigFactory.load().getString("es.profile.port").toInt
   
   val REDIS_HOST = ConfigFactory.load().getString("redis.whois.host")
   val REDIS_PORT = ConfigFactory.load().getString("redis.whois.port").toInt
