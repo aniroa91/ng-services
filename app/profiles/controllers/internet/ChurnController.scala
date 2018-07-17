@@ -1,4 +1,4 @@
-package controllers.internet
+package profile.controllers.internet
 
 import play.api.data.Form
 import play.api.data.Forms.mapping

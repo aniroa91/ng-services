@@ -1,4 +1,4 @@
-package controllers.profile
+package controllers
 
 import javax.inject.Inject
 import javax.inject.Singleton
