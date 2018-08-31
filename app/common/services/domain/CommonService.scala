@@ -18,7 +18,6 @@ import com.sksamuel.elastic4s.http.ElasticDsl.IndexHttpExecutable
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.search.SearchResponse
 
-import model.MainDomainInfo
 import scala.util.Try
 import services.Configure
 import services.Bucket2
@@ -104,6 +103,11 @@ object CommonService extends AbstractService {
     date.toString(DateTimeFormat.forPattern("yyyy-MM"))
   }
 
+  def getPrevMonth(): String = {
+    val date = new DateTime()
+    date.minusMonths(1).toString(DateTimeFormat.forPattern("yyyy-MM"))
+  }
+
   def getpreviousMinutes(times: Int): String = {
     val date = new DateTime()
     date.minusMinutes(times).toString()
@@ -137,18 +141,18 @@ object CommonService extends AbstractService {
       .toArray
   }
 
-  def getMultiAggregations(aggr: Option[AnyRef]):  Array[(String, Array[(String, Array[(String, Long)])])] = {
+  def getMultiAggregations(aggr: Option[AnyRef], secondField: String, thirdField: String):  Array[(String, Array[(String, Array[(String, Long)])])] = {
     aggr.getOrElse("buckets", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
       .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
       .map(x => x.asInstanceOf[Map[String, AnyRef]])
       .map(x => {
         val key = x.getOrElse("key", "0L").toString
-        val map = x.getOrElse("card",Map[String,AnyRef]()).asInstanceOf[Map[String,AnyRef]]
+        val map = x.getOrElse(s"$secondField",Map[String,AnyRef]()).asInstanceOf[Map[String,AnyRef]]
            .getOrElse("buckets",List).asInstanceOf[List[AnyRef]]
              .map(x => x.asInstanceOf[Map[String,AnyRef]])
                .map(x => {
                  val keyCard = x.getOrElse("key","0L").toString
-                 val map = x.getOrElse("port",Map[String,AnyRef]()).asInstanceOf[Map[String,AnyRef]]
+                 val map = x.getOrElse(s"$thirdField",Map[String,AnyRef]()).asInstanceOf[Map[String,AnyRef]]
                              .getOrElse("buckets",List).asInstanceOf[List[AnyRef]]
                                .map(x=> x.asInstanceOf[Map[String,AnyRef]])
                                   .map(x=> {
@@ -222,223 +226,6 @@ object CommonService extends AbstractService {
   def isDayValid(day: String): Boolean = {
     Try(DateTimeUtil.create(day, DateTimeUtil.YMD)).isSuccess
   }
-
-  def getWhoisInfo(domain: String): Whois = {
-    //new Whois()
-    if (redis == null) new Whois()
-    else {
-      val map = redis.hgetall1(domain).getOrElse(Map[String, String]())
-      if (!map.isEmpty) {
-        Whois(
-          domain,
-          getValueAsString(map, "registrar"),
-          getValueAsString(map, "whoisServer"),
-          getValueAsString(map, "referral"),
-          getValueAsString(map, "nameServer").split(","),
-          getValueAsString(map, "status"),
-          getValueAsString(map, "create"),
-          getValueAsString(map, "update"),
-          getValueAsString(map, "expire"))
-      } else new Whois()
-    }
-  }
-  
-  /**
-   * Get Whois From Web
-   */
-  @deprecated
-  def getWhoisInfo(whoisResponse: SearchResponse, domain: String, label: String, malware: String): Whois = {
-    if (whoisResponse != null) {
-      println("Whois: " + whoisResponse + "-" + whoisResponse.totalHits)
-    if (whoisResponse.totalHits > 0) {
-      val map = whoisResponse.hits.hits.head.sourceAsMap
-      val whois = Whois(
-        map.getOrElse("domain", "").toString(),
-        map.getOrElse("registrar", "").toString(),
-        map.getOrElse("whoisServer", "").toString(),
-        map.getOrElse("referral", "").toString(),
-        map.getOrElse("servername", "").toString().split(" "),
-        map.getOrElse("status", "").toString(),
-        map.getOrElse("create", "").toString(),
-        map.getOrElse("update", "").toString(),
-        map.getOrElse("expire", "").toString())//,
-        //map.getOrElse("label", "").toString(),
-        //map.getOrElse("malware", "").toString())
-      whois
-    } else {
-      CommonService.backgroupJob(
-          getWhoisFromWeb(domain, label, malware),
-          "Download Whois for " + domain)
-      //getWhoisFromWeb(domain, label, malware)
-      new Whois()
-    } } else  new Whois()
-  }
-  
-  private def getWhoisFromWeb(domain: String, label: String, malware: String): Whois = {
-    val esIndex = s"dns-service-domain-whois"
-    val esType = "whois"
-    try {
-      val whois = WhoisUtil.whoisService(domain, Configure.PROXY_HOST, Configure.PROXY_PORT)
-      //println(whois)
-      if (whois.isValid()) {
-        indexWhois(esIndex, esType, whois)
-        whois
-      } else new Whois()
-    } catch {
-      case e: Exception => e.printStackTrace(); new Whois()
-    }
-  }
-  
-  private def indexWhois(esIndex: String, esType: String, whois: Whois) {
-    client.execute(
-      indexInto(esIndex / esType) fields (
-        "domain" -> whois.domainName,
-        "registrar" -> whois.registrar,
-        "whoisServer" -> whois.whoisServer,
-        "referral" -> whois.referral,
-        "servername" -> whois.nameServer.mkString(" "),
-        "status" -> whois.status,
-        "create" -> whois.create.substring(0, 10),
-        "update" -> whois.update.substring(0, 10),
-        "expire" -> (if (whois.expire.isEmpty()) "2999-12-31" else whois.expire.substring(0, 10)),
-        "label" -> "",
-        "malware" -> "")
-        id whois.domainName).await(Duration(30, SECONDS))
-  }
-
-  /**
-   * Get Category
-   */
-  def getCategory(domain: String): String = {
-    val getResponse = client.execute(com.sksamuel.elastic4s.http.ElasticDsl.get(domain) from "dns-category/docs").await(Duration(30, SECONDS))
-    println(domain -> getResponse.sourceAsMap)
-    val category = getResponse.sourceAsMap.getOrElse("category", "N/A").toString()
-    if (category == "N/A") {
-      CommonService.backgroupJob(indexCategory(domain),"Download Category for " + domain)
-    }
-    category
-  }
-  
-  def indexCategory(domain: String) {
-    //val category = getCategorySitereviewBluecoatCom(domain)
-    val category = getCategoryFromApiXforceIbmcloud(domain)
-//    println(category)
-    if (StringUtil.isNotNullAndEmpty(category)) {
-      client.execute( indexInto("dns-category" / "docs") fields ("category" -> category) id domain).await(Duration(30, SECONDS))//(Duration.apply(10, TimeUnit.SECONDS))
-    }
-  }
-  
-  def getCategorySitereviewBluecoatCom(domain: String): String = {
-    
-    val req = Http("http://sitereview.bluecoat.com/rest/categorization")
-                .proxy(Configure.PROXY_HOST, Configure.PROXY_PORT)
-                .postForm(Seq("url" -> domain))
-                
-    val res = req.asString.body
-    //println(res)
-    val json = Json.parse(res)
-    val option = json.\("categorization")
-    if (option.isEmpty) {
-      null
-    } else {
-      val doc = Jsoup.parse(option.get.toString())
-      val elements = doc.body().select("a")
-      val seq = 0 until elements.size()
-      seq.map(x => elements.get(x))
-         .map(x => x.text())
-         .mkString(" AND ")
-
-//      elements.
-//      for (e <- elements.toArray(Elements)) {
-//        println("1" + e.text())
-//      }
-      
-//      val endIndex = option.get.toString().lastIndexOf("</a>")
-//      val beginIndex = option.get.toString().substring(0, endIndex).lastIndexOf("\\\">") + 3
-//      option.get.toString().substring(beginIndex, endIndex)
-      
-    }
-  }
-  
-  def getCategoryFromApiXforceIbmcloud(domain: String): String = {
-    val req = Http("https://api.xforce.ibmcloud.com/url/" + domain)
-                .proxy(Configure.PROXY_HOST, Configure.PROXY_PORT)
-                .header("Accept", "application/json")
-                .header("Authorization", "Basic YTdiYzdiMjctMWRlYy00NTAyLTliM2YtYjVmMGQ3NzNmYjU3OjgyN2RlZWY5LWRkZjUtNDc2MS05ZTkyLTNhYmY5YzVkNDlmYQ==")
-    val res = req.asString.body
-    //println(res)
-    val json = Json.parse(res)
-    val cats = json.\\("cats")
-    cats.map(x => x.asInstanceOf[JsObject].keys.mkString("/")).distinct.mkString(" AND ")
-  }
-  
-  //curl -X GET --header 'Accept: application/json' --header 'Authorization: Basic YTdiYzdiMjctMWRlYy00NTAyLTliM2YtYjVmMGQ3NzNmYjU3OjgyN2RlZWY5LWRkZjUtNDc2MS05ZTkyLTNhYmY5YzVkNDlmYQ==' 'https://api.xforce.ibmcloud.com/url/vnexpress.net'
-  
-  /**
-   * Get Top
-   */
-//  def getTopBlackByNumOfQuery(day: String): Array[MainDomainInfo] = {
-//    val response = client.execute(
-//      search(s"dns-second-${day}" / "docs") query {
-//        boolQuery()
-//          .must(termQuery("day", day))
-//          .not(termQuery("malware", "none"), termQuery("malware", "null"))
-//      } sortBy {
-//        fieldSort("queries") order (SortOrder.DESC)
-//      } limit MAX_SIZE_RETURN).await
-//    getMainDomainInfo(response)
-//  }
-
-  def getTopByNumOfQuery(day: String, label: String): Array[MainDomainInfo] = {
-    val response = client.execute(
-      search(s"dns-second-${day}" / "docs") query {
-        boolQuery().must(termQuery("day", day), termQuery("label", label))
-      } sortBy {
-        fieldSort("queries") order (SortOrder.DESC)
-      } limit MAX_SIZE_RETURN).await(Duration(30, SECONDS))
-    println(s"Time(${day} ${label}): " + response.took)
-    getMainDomainInfo(response)
-  }
-
-  def getTopByNumOfQueryWithRange(fromDay: String, endDay: String): Array[MainDomainInfo] = {
-    val response = client.execute(
-      search(s"dns-second-*" / "docs") query {
-        boolQuery()
-          .must(
-              rangeQuery("day").gte(fromDay).lte(endDay),
-              rangeQuery("rank").gt(0).lte(MAX_SIZE_RETURN * 10)
-              )
-      } aggregations (
-          termsAggregation("top")
-            .field("second")
-            .subagg(sumAgg("sum", "queries")) order(Terms.Order.aggregation("sum", false)) size MAX_SIZE_RETURN * 1000
-      ) sortBy {
-        fieldSort("queries") order (SortOrder.DESC)
-      } limit MAX_SIZE_RETURN).await(Duration(30, SECONDS))
-    println(s"Time(${fromDay} ${endDay}): " + response.took)
-    //response.aggregations.foreach(println)
-    getMainDomainInfo2(response)
-    //println(response)
-    //null
-  }
-  
-  def getTopRank(from: Int, day: String): Array[MainDomainInfo] = {
-    val response = client.execute(
-      search(s"dns-second-${day}" / "docs") query {
-        boolQuery().must(rangeQuery(RANK_FIELD).gt(from - 1).lt(MAX_SIZE_RETURN), termQuery(DAY_FIELD, day))
-      } sortBy {
-        fieldSort(RANK_FIELD)
-      } limit MAX_SIZE_RETURN).await(Duration(30, SECONDS))
-    getMainDomainInfo(response)
-  }
-
-  /**
-   * Utils
-   */
-//  def formatNumber(number: Int): String = {
-//    val formatter = java.text.NumberFormat.getIntegerInstance
-//    formatter.format(number)
-//  }
   
   def formatNumber(number: Long): String = {
     val formatter = java.text.NumberFormat.getIntegerInstance
@@ -486,6 +273,10 @@ object CommonService extends AbstractService {
 
   def format3Decimal(number: Double): Double = {
     BigDecimal(number).setScale(3, BigDecimal.RoundingMode.HALF_UP).toDouble
+  }
+
+  def format2Decimal(number: Double): Double = {
+    BigDecimal(number).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
   }
   
   def percentInfor(number: Long, total: Long): Double = {

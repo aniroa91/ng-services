@@ -1,0 +1,358 @@
+@(rs: (Array[(Int, Int, Double, Double)],Array[(Int, Double, Double)], Array[(String, Double, Double)]) )
+@import play.api.libs.json.Json
+@import services.domain.CommonService
+@import churn.utils.AgeGroupUtil
+
+<script type="text/javascript">
+        var options = {
+                title: 'Churn Rate (%)',
+                hAxis: {title: 'Contract Age (month)',gridlines: {count: 13}},
+                vAxis: {title: 'Region',gridlines: {count: 9}},
+                chartArea: {
+                        height: "80%",
+                        width: "70%"
+                },
+                colorAxis: {colors: ['#f7f1f1', 'red']},
+                bubble: {
+                        textStyle: {
+                                auraColor: 'none',
+                        },
+                        cursor: 'pointer',
+                        opacity: 1
+                }
+        };
+        google.load('visualization', '1.0', {
+                'packages' : [ 'corechart' ]
+        });
+        google.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+                $('#monthPicker').datepicker({
+                        autoclose: true,
+                        minViewMode: 1,
+                        startDate: '-12m',
+                        endDate: '-1m',
+                        format: 'yyyy-mm'
+                }).on('changeDate', function (selected) {
+                        var startDate = new Date(selected.date.valueOf());
+                        var yr = startDate.getFullYear();
+                        var month = startDate.getMonth() < 9 ? ('0' + Number(startDate.getMonth() + 1)) : (Number(startDate.getMonth() + 1));
+                        var newDate = yr + '-' + month;
+                        $('#month').val(newDate)
+                });
+                // bublle charts
+                var container = document.getElementById('container')
+                var internetChurnHuyDv = getDataChurn(@Html(Json.stringify(Json.toJson(rs._1))))
+                var dataHuyDv = google.visualization.arrayToDataTable(internetChurnHuyDv)
+                var chartHuyDv = new google.visualization.BubbleChart(container);
+                google.visualization.events.addListener(chartHuyDv, 'ready', function () {
+                        Array.prototype.forEach.call(container.getElementsByTagName('text'), function(text) {
+                                if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444')) {
+                                        if(text.innerHTML == 0 || text.innerHTML == 8)
+                                            text.setAttribute('fill-opacity',0)
+                                }
+                                // change label age
+                                if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#444444')) {
+                                        if(text.innerHTML == 0 || text.innerHTML == 72)
+                                                text.setAttribute('fill-opacity',0)
+                                        else{
+                                                switch ( text.innerHTML){
+                                                        case "6" :
+                                                                text.innerHTML = "0-6";break;
+                                                        case "12" :
+                                                                text.innerHTML = "06-12";break;
+                                                        case "18" :
+                                                                text.innerHTML = "12-18";break;
+                                                        case "24" :
+                                                                text.innerHTML = "18-24";break;
+                                                        case "30" :
+                                                                text.innerHTML = "24-30";break;
+                                                        case "36" :
+                                                                text.innerHTML = "30-36";break;
+                                                        case "42" :
+                                                                text.innerHTML = "36-42";break;
+                                                        case "48" :
+                                                                text.innerHTML = "42-48";break;
+                                                        case "54" :
+                                                                text.innerHTML = "48-54";break;
+                                                        case "60" :
+                                                                text.innerHTML = "54-60";break;
+                                                        case "66" :
+                                                                text.innerHTML = ">60";break;
+                                                }
+                                        }
+                                }
+                        });
+                });
+                chartHuyDv.draw(dataHuyDv, options);
+                google.visualization.events.addListener(chartHuyDv, 'select', function () {
+                        var selection = chartHuyDv.getSelection();
+                        if(selection.length >0) {
+                                var row = selection[0].row;
+                                var region = dataHuyDv.getValue(row, 2)
+                                var age = dataHuyDv.getValue(row, 1)
+                                $('#age').val(age)
+                                $('#region').val(region)
+                                $('#ageTitle').text("")
+                                ajaxGetChurn("regionAge")
+                        }
+                });
+
+                var churn_age = Highcharts.chart('churn1', {
+                        chart: {
+                                zoomType: 'xy'
+                        },
+
+                        title: {
+                                text: ''
+                        },
+
+                        colors : ['#73879C','#dc5a78'],
+
+                        xAxis: {
+                                categories: @Html(Json.stringify(Json.toJson(rs._2.map(x=> AgeGroupUtil.getAgeById(x._1)))))
+                        },
+
+                        yAxis: [{ // Primary yAxis
+                                /*max: rs._2.map(x=> x._3).max,
+                                tickInterval:0.01,
+                                min: rs._2.map(x=> x._3).min,*/
+                                labels: {
+                                        format: '{value} %',
+                                        style: {
+                                                color: "#73879C"
+                                        }
+                                },
+                                title: {
+                                        text: '',
+                                        style: {
+                                                color: "#73879C"
+                                        }
+                                }
+                        }, { // Secondary yAxis
+                                title: {
+                                        text: '',
+                                        style: {
+                                                color: "#dc5a78"
+                                        }
+                                },
+                                labels: {
+                                        format: '{value} %',
+                                        style: {
+                                                color: "#dc5a78"
+                                        }
+                                },
+                                opposite: true
+                        }],
+
+                        plotOptions: {
+                                series: {
+                                        cursor: 'pointer',
+                                        point: {
+                                                events: {
+                                                        click: function () {
+                                                              /*  for (var i = 0; i < this.series.data.length; i++) {
+                                                                        this.series.data[i].update({ color: '#73879C' }, true, false);
+                                                                }
+                                                                this.update({ color: '#ECB631' }, true, false)*/
+                                                                $('#region').val("")
+                                                                $('#age').val(getIdBynameAge(this.category))
+                                                                $('#ageTitle').text("(Age: "+this.category+")")
+                                                                ajaxGetChurn("age")
+                                                        }
+                                                }
+                                        }
+                                }
+                        },
+
+                        tooltip: {
+                                shared: true
+                        },
+
+                        series: getJsonChurnMonth(@Html(Json.stringify(Json.toJson(rs._2.map(x=> x._2)))),@Html(Json.stringify(Json.toJson(rs._2.map(x=> x._3)))))
+
+                });
+
+                var churn_month = Highcharts.chart('churn2', {
+                        chart: {
+                                zoomType: 'xy'
+                        },
+
+                        title: {
+                                text: ''
+                        },
+                        colors : ['#149c7f','#dc5a78'],
+
+                        xAxis: {
+                                categories: @Html(Json.stringify(Json.toJson(rs._3.map(x=>x._1))))
+                        },
+
+                        yAxis: [{ // Primary yAxis
+                                labels: {
+                                        format: '{value} %',
+                                        style: {
+                                                color: "#149c7f"
+                                        }
+                                },
+                                title: {
+                                        text: '',
+                                        style: {
+                                                color: "#149c7f"
+                                        }
+                                }
+                        }, { // Secondary yAxis
+                                title: {
+                                        text: '',
+                                        style: {
+                                                color: "#dc5a78"
+                                        }
+                                },
+                                labels: {
+                                        format: '{value} %',
+                                        style: {
+                                                color: "#dc5a78"
+                                        }
+                                },
+                                opposite: true
+                        }],
+                        tooltip: {
+                                shared: true
+                        },
+
+                        series: getJsonChurnMonth(@Html(Json.stringify(Json.toJson(rs._3.map(x=> x._2)))),@Html(Json.stringify(Json.toJson(rs._3.map(x=> x._3)))))
+
+                });
+
+                // click apply fitler
+                $('#apply').click(function () {
+                      $('#region').val("")
+                      $('#age').val("")
+                      $('#ageTitle').text("")
+                      ajaxGetChurn("*")
+                })
+
+                function ajaxGetChurn(_type){
+                        var fields = getParamFields(document.querySelector('input[name=csrfToken]').value)
+                        $.ajax({
+                                url: "/internet/getJsonChurn",
+                                cache: false,
+                                data:  fields,
+                                type:"POST",
+                                beforeSend: function () {
+                                        $('.divLeft').waitMe({
+                                                effect: 'progressBar',
+                                                text: 'Please wait...',
+                                                bg: 'rgba(255,255,255,0.7)',
+                                                color: '#000',
+                                                textPos: 'vertical'
+                                        });
+                                },
+                                success: function (dta) {
+                                        if(dta != "Error"){
+                                            $('#monthAge').text("("+$('#month').val()+")")
+                                            $('#monthRegion').text("("+$('#month').val()+")")
+                                            // update chart Age
+                                            if(_type != "age") {
+                                                updateCharts(churn_age, getJsonChurnMonth(dta.churnAge.churnRate, dta.churnAge.churnPercent))
+                                            }
+                                            // update chart Month
+                                            updateCharts(churn_month, getJsonChurnMonth(dta.churnMonth.churnRate, dta.churnMonth.churnPercent))
+                                            // update chart bubble
+                                            if(_type != "regionAge" && _type != "age") {
+                                                $('#txtMin').text(dta.churnRegionAge.minPercent)
+                                                $('#txtMax').text(dta.churnRegionAge.maxPercent)
+                                                chartHuyDv.draw(google.visualization.arrayToDataTable(getDataChurn(dta.churnRegionAge.data)), options)
+                                            }
+                                        }
+                                },
+                                complete: function () {
+                                        $('.divLeft').waitMe("hide");
+                                }
+                        });
+                }
+        }
+
+        function getIdBynameAge(name){
+                var age = 0
+                switch (name){
+                        case "0-6" :
+                                age = 6;break;
+                        case "6-12" :
+                                age = 12;break;
+                        case "12-18" :
+                                age = 18;break;
+                        case "18-24" :
+                                age = 24;break;
+                        case "24-30" :
+                                age = 30;break;
+                        case "30-36" :
+                                age = 36;break;
+                        case "36-42" :
+                                age = 42;break;
+                        case "42-48" :
+                                age = 48;break;
+                        case "48-54" :
+                                age = 54;break;
+                        case "54-60" :
+                                age = 60;break;
+                        case ">60" :
+                                age = 66;break;
+                }
+                return age
+        }
+
+        function updateCharts(charts, data){
+                var seriesLength = charts.series.length;
+                for(var i = seriesLength -1; i > -1; i--) {
+                        charts.series[i].remove();
+                }
+                for(var i=0; i< data.length; i++) {
+                        charts.addSeries(data[i]);
+                }
+        }
+
+        function getParamFields(token){
+                var obj = {
+                        "csrfToken" : token,
+                        "region" : $('#region').val(),
+                        "age"    : $('#age').val(),
+                        "month"  : $('#month').val(),
+                        "status" : $('#slStatus').val()
+                }
+                return obj
+        }
+
+        function getJsonChurnMonth(churnRate, churnPercent){
+                var rs = []
+                rs.push({
+                        name: "Churn Percent",
+                        type: 'column',
+                        yAxis: 0,
+                        data: churnPercent
+                })
+                rs.push({
+                        name: "Churn Rate",
+                        type: 'spline',
+                        yAxis: 1,
+                        data: churnRate
+                });
+
+                return rs
+        }
+
+        function getDataChurn(dta){
+            var rs = []
+            rs.push(['ID', 'Age', 'Region','Rate', 'Percent'])
+            for(var i=0;i<dta.length;i++){
+                var arr = []
+                    arr[0]=''
+                    arr[1]=dta[i][1]
+                    arr[2]=dta[i][0]
+                    arr[3]=dta[i][2]
+                    arr[4]=dta[i][3]
+                rs.push(arr)
+            }
+            return rs
+        }
+
+</script>

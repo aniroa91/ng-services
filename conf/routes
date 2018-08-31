@@ -23,25 +23,14 @@ GET      /logout                       controllers.LoginController.logout
 
 #######################################################################
 
-### PROFILE
-GET     /paytv                         controllers.PaytvClientController.index
-GET     /paytv/drilldownJson           controllers.PaytvClientController.drilldownJson(code: String ?= "")
-GET     /profile                       controllers.ProfileContractController.index(day: String ?= "")
-GET     /paytv/getProvincesByRegion    controllers.PaytvClientController.getProvincesByRegion(regionId: String ?= "")
 
 ### PROFILE INTERNET
-GET     /internet/churn                profile.controllers.internet.ChurnController.index
-GET     /internet/getJsonByAge         profile.controllers.internet.ChurnController.getJsonByAge(age: String ?= "")
-GET     /internet/getJsonByMonth       profile.controllers.internet.ChurnController.getJsonByMonth(status: String ?= "",month: String?="")
-GET     /internet/getJsonByStatus      profile.controllers.internet.ChurnController.getJsonByStatus(status: String ?= "",month: String ?="")
-GET     /internet/getChurnByRegionAge  profile.controllers.internet.ChurnController.getChurnByRegionAge(age: String ?= "",region: String ?="")
-GET     /internet/history              profile.controllers.internet.HistoryController.index(date: String ?= "")
-GET     /internet/realtime             profile.controllers.internet.HistoryController.realtime
-GET     /internet/realtime-json        profile.controllers.internet.HistoryController.realtimeJson
-#GET    /internet/history              controllers.InternetHistoryController.index
-GET     /internet/compareCt            controllers.InternetHistoryController.compareContract
-GET     /internet/compareTime          profile.controllers.internet.CompareController.index
-GET     /internet/bras                 profile.controllers.internet.BrasController.index
-GET     /internet/brasJson             profile.controllers.internet.BrasController.json
+GET     /internet/age                  churn.controllers.ChurnAgeController.index
+GET     /internet/getJsonByAge         churn.controllers.ChurnAgeController.getJsonByAge(age: String ?= "")
+GET     /internet/getJsonByMonth       churn.controllers.ChurnAgeController.getJsonByMonth(status: String ?= "",month: String?="")
+GET     /internet/getJsonByStatus      churn.controllers.ChurnAgeController.getJsonByStatus(status: String ?= "",month: String ?="")
+GET     /internet/getChurnByRegionAge  churn.controllers.ChurnAgeController.getChurnByRegionAge(age: String ?= "",region: String ?="")
+
+POST    /internet/getJsonChurn         churn.controllers.ChurnAgeController.getJsonChurn
 
 #######################################################################
