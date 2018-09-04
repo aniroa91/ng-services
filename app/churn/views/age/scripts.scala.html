@@ -96,6 +96,12 @@
                                 $('#ageTitle').text("")
                                 ajaxGetChurn("regionAge")
                         }
+                        else{
+                                $('#age').val("")
+                                $('#region').val("")
+                                $('#ageTitle').text("")
+                                ajaxGetChurn("regionAge")
+                        }
                 });
 
                 var churn_age = Highcharts.chart('churn1', {
@@ -156,8 +162,14 @@
                                                                 }
                                                                 this.update({ color: '#ECB631' }, true, false)*/
                                                                 $('#region').val("")
-                                                                $('#age').val(getIdBynameAge(this.category))
-                                                                $('#ageTitle').text("(Age: "+this.category+")")
+                                                                if(getIdBynameAge(this.category) == $('#age').val()){
+                                                                        $('#age').val("")
+                                                                        $('#ageTitle').text("")
+                                                                }
+                                                                else{
+                                                                        $('#age').val(getIdBynameAge(this.category))
+                                                                        $('#ageTitle').text("(Age: "+this.category+")")
+                                                                }
                                                                 ajaxGetChurn("age")
                                                         }
                                                 }

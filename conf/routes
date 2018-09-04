@@ -26,10 +26,6 @@ GET      /logout                       controllers.LoginController.logout
 
 ### PROFILE INTERNET
 GET     /internet/age                  churn.controllers.ChurnAgeController.index
-GET     /internet/getJsonByAge         churn.controllers.ChurnAgeController.getJsonByAge(age: String ?= "")
-GET     /internet/getJsonByMonth       churn.controllers.ChurnAgeController.getJsonByMonth(status: String ?= "",month: String?="")
-GET     /internet/getJsonByStatus      churn.controllers.ChurnAgeController.getJsonByStatus(status: String ?= "",month: String ?="")
-GET     /internet/getChurnByRegionAge  churn.controllers.ChurnAgeController.getChurnByRegionAge(age: String ?= "",region: String ?="")
 
 POST    /internet/getJsonChurn         churn.controllers.ChurnAgeController.getJsonChurn
 

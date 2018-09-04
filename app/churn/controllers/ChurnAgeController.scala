@@ -51,21 +51,6 @@ class ChurnAgeController @Inject() (cc: ControllerComponents) extends AbstractCo
     Ok(churn.views.html.age.index(rs,month,request.session.get("username").get.toString, churn.controllers.routes.ChurnAgeController.index()))
   }
 
-  def getJsonByStatus(status: String,month: String) = Action { implicit request =>
-    try{
-      val jSon = if(month.equals("")) ChurnAgeService.getChurn("2018-03") else ChurnAgeService.getChurn(month)
-      val rsChurn = ChurnAgeService.calChurnRateAndPercentageForChurnbyStatus(jSon,status.toInt)
-      val jsChurn = Json.obj(
-        "churnRate" -> rsChurn,
-        "minPercent" -> CommonService.format3Decimal(rsChurn.map(x=>x._4).asInstanceOf[Array[(Double)]].min),
-        "maxPercent" -> CommonService.format3Decimal(rsChurn.map(x=>x._4).asInstanceOf[Array[(Double)]].max)
-      )
-      Ok(Json.toJson(jsChurn))
-    }
-    catch{
-      case e: Exception => Ok("Error")
-    }
-  }
 
   def getJsonChurn() = Action { implicit request: Request[AnyContent] =>
    // try{
@@ -96,68 +81,5 @@ class ChurnAgeController @Inject() (cc: ControllerComponents) extends AbstractCo
 
   }
 
-  def getChurnByRegionAge(age: String,region: String) = Action { implicit request =>
-    try{
-     /* val jsChurn1 = Json.obj(
-        "churnRate" -> ChurnAgeService.calChurnRateAndPercentageByAge(ChurnAgeService.getChurnByMonth(s"$age AND $region")).map(x=> x._2),
-        "churnPercent" -> ChurnAgeService.calChurnRateAndPercentageByAge(ChurnAgeService.getChurnByMonth(s"$age AND $region")).map(x=> x._3),
-        "categories" -> ChurnAgeService.calChurnRateAndPercentageByAge(ChurnAgeService.getChurnByMonth(s"$age AND $region")).map(x=> AgeGroupUtil.getIdAge(x._1))
-      )
-      val jsChurn2 = Json.obj(
-        "churnRate" -> ChurnAgeService.calChurnRateAndPercentageByMonth(ChurnAgeService.getChurnByMonth(s"$age AND $region")).map(x=> x._2),
-        "churnPercent" -> ChurnAgeService.calChurnRateAndPercentageByMonth(ChurnAgeService.getChurnByMonth(s"$age AND $region")).map(x=> x._3),
-        "min" -> ChurnAgeService.calChurnRateAndPercentageByMonth(ChurnAgeService.getChurnByMonth(s"$age AND $region")).map(x=> x._3).min,
-        "max" -> ChurnAgeService.calChurnRateAndPercentageByMonth(ChurnAgeService.getChurnByMonth(s"$age AND $region")).map(x=> x._3).max
-      )
-
-      val jsChurn = Json.obj(
-        "jsChurn1" -> jsChurn1,
-        "jsChurn2" -> jsChurn2
-
-      )
-      Ok(Json.toJson(jsChurn))*/
-      Ok("ok")
-    }
-    catch{
-      case e: Exception => Ok("Error")
-    }
-  }
-
-  def getJsonByMonth(status: String,month: String) = Action { implicit request =>
-    try{
-      /*val jSon = ChurnAgeService.getChurn(month)
-      var rsChurn = ChurnAgeService.calChurnRateAndPercentageForChurnbyStatus(jSon,status.toInt)
-      val jsChurn = Json.obj(
-        "churnBubbleChart" -> rsChurn,
-        "minPercent" -> CommonService.format3Decimal(rsChurn.map(x=>x._4).asInstanceOf[Array[(Double)]].min),
-        "maxPercent" -> CommonService.format3Decimal(rsChurn.map(x=>x._4).asInstanceOf[Array[(Double)]].max),
-        "churnRate" -> ChurnAgeService.calChurnRateAndPercentageByAge(ChurnAgeService.getChurnByMonth(s"month:$month")).map(x=> x._2),
-        "churnPercent" -> ChurnAgeService.calChurnRateAndPercentageByAge(ChurnAgeService.getChurnByMonth(s"month:$month")).map(x=> x._3),
-        "minPercent" -> ChurnAgeService.calChurnRateAndPercentageByAge(ChurnAgeService.getChurnByMonth(s"month:$month")).map(x=> x._3).min,
-        "maxPercent" -> ChurnAgeService.calChurnRateAndPercentageByAge(ChurnAgeService.getChurnByMonth(s"month:$month")).map(x=> x._3).max
-      )
-      Ok(Json.toJson(jsChurn))*/
-      Ok("ok")
-    }
-    catch{
-      case e: Exception => Ok("Error")
-    }
-  }
-
-  def getJsonByAge(query: String) = Action { implicit request =>
-    try{
-     /* val jSon = ChurnAgeService.getChurnByMonth(query)
-      val jsChurn = Json.obj(
-        "churnRate" -> ChurnAgeService.calChurnRateAndPercentageByMonth(jSon).map(x=> x._2),
-        "churnPercent" -> ChurnAgeService.calChurnRateAndPercentageByMonth(jSon).map(x=> x._3)
-
-      )
-      Ok(Json.toJson(jsChurn))*/
-      Ok("ok")
-    }
-    catch{
-      case e: Exception => Ok("Error")
-    }
-  }
 
 }
