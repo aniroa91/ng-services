@@ -23,18 +23,7 @@ pipeline {
                 }
             }
         }
-        stage('Deploying'){
-
-            steps {
-                sshagent (credentials: ['4a18733a-bef4-4220-84d7-30dd315c7483']) {
-                    sh "ssh -o StrictHostKeyChecking=no root@172.27.11.161 'docker login -u admin -p 1nc0rrect bigdata-registry.local:5043'"
-                    sh "ssh -o StrictHostKeyChecking=no root@172.27.11.161 'docker pull bigdata-registry.local:5043/${env.JOB_NAME}:${env.BUILD_ID}'"
-                    sh "ssh -o StrictHostKeyChecking=no root@172.27.11.161 'docker rm -f ${env.JOB_NAME} && docker run -d -p 9000:9000 --net=${env.JOB_NAME} -h ${env.JOB_NAME} --name ${env.JOB_NAME} -v /public/images/:/opt/bigdata-play/public/ bigdata-registry.local:5043/${env.JOB_NAME}:${env.BUILD_ID}'"
-                    //sh "ssh root@10.0.1.201 'docker service create --name ${env.JOB_NAME} --mode global --publish mode=host,target=80,published=80 bigdata-registry.local:5043/${env.JOB_NAME}:${env.BUILD_NUMBER}'"
-                    //sh "ssh root@10.0.1.201 'docker service update --image bigdata-registry.local:5043/${env.JOB_NAME}:${env.BUILD_NUMBER} ${env.JOB_NAME}'"
-                } 
-            }
-        }
+        
         
     }
 }
