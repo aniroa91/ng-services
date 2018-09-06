@@ -1,0 +1,53 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: ${JOB_NAME}
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ${JOB_NAME}
+  template:
+    metadata:
+      labels:
+        app: ${JOB_NAME}
+    spec:
+      containers:
+      - name: ${JOB_NAME}
+        image: bigdata-registry.local:5043/${JOB_NAME}:${BUILD_ID}
+        ports:
+        - containerPort: 9000
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${JOB_NAME}
+  labels:
+    app: ${JOB_NAME}
+spec:
+  ports:
+  - port: 9000
+    targetPort: 9000
+    protocol: TCP
+    name: http
+  selector:
+    app: ${JOB_NAME}
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-${JOB_NAME}
+spec:
+  rules:
+  - host: internet-churn-staging.bigdata.local
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: ${JOB_NAME}
+          servicePort: 9000
+---
