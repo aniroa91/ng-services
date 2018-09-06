@@ -48,6 +48,7 @@ object  ChurnAgeService{
             ) size 1000
         ) size 13
       )
+    //println(client.show(request))
     val rs = client.execute(request).await
     CommonService.getMultiAggregations(rs.aggregations.get("month"),"Status" ,"Age").flatMap(x => x._2.map(y => x._1 -> y))
       .map(x => (x._1 , x._2._1) -> x._2._2)

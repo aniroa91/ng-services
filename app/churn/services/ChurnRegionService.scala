@@ -63,8 +63,8 @@ object  ChurnRegionService{
         ) size 1000
       )
     val rs = client.execute(request).await
-    CommonService.getSecondAggregations(rs.aggregations.get("Status"), field).flatMap(x=> x._2.map(y=> x._1 -> y))
-      .map(x=> (x._1, x._2._1, x._2._2))
+    getSecondAggregations(rs.aggregations.get("Status"), field).flatMap(x=> x._3.map(y=> (x._1,x._2) -> y))
+      .map(x=> (x._1._1, x._2._1, x._2._2, x._1._2))
   }
 
   def getTrendRegionMonth() ={
@@ -83,6 +83,26 @@ object  ChurnRegionService{
    // println(client.show(request))
     val rs = client.execute(request).await
     getChurnRateAndPercentage(rs,"month","Status" ,"Region").map(x=> (x._1, x._2, x._3, x._5, x._6))
+  }
+
+  private def getSecondAggregations(aggr: Option[AnyRef],secondField: String):  Array[(String,Long, Array[(String, Long)])] = {
+    aggr.getOrElse("buckets", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+      .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+      .map(x => x.asInstanceOf[Map[String, AnyRef]])
+      .map(x => {
+        val key = x.getOrElse("key", "0L").toString
+        val count = x.getOrElse("doc_count",0L).toString.toLong
+        val map = x.getOrElse(s"$secondField",Map[String,AnyRef]()).asInstanceOf[Map[String,AnyRef]]
+          .getOrElse("buckets",List).asInstanceOf[List[AnyRef]]
+          .map(x => x.asInstanceOf[Map[String,AnyRef]])
+          .map(x => {
+            val keyCard = x.getOrElse("key","0L").toString
+            val count = x.getOrElse("doc_count",0L).toString.toLong
+            (keyCard,count)
+          }).toArray
+        (key, count, map)
+      })
+      .toArray
   }
 
   private def getChurnRateAndPercentage(response: SearchResponse, term1: String, term2: String, term3: String): Array[(String, String, String, Int, Int, Int)] = {
@@ -115,8 +135,9 @@ object  ChurnRegionService{
     }
   }
 
-  def calChurnRateAndPercentageByStatus(array: Array[(String, String, Long)], status: Int) = {
-    val sumAll = array.filter(x=> x._1.toInt == status).map(x=> x._3).sum
+  def calChurnRateAndPercentageByStatus(array: Array[(String, String, Long, Long)], status: Int, _type: String) = {
+    var sumAll = array.filter(x=> x._1.toInt == status).map(x=> x._3).sum
+    if(_type.equals("Profile")) sumAll =  array.filter(x=> x._1.toInt == status).slice(0,1).map(x=> x._4).sum
     val sumByStatus    = array.filter(x=> x._1.toInt == status).groupBy(x=> x._2).map(x=> x._1 -> x._2.map(y=> y._3).sum)
     val sumByStatusAll = array.groupBy(x=> x._2).map(x=>x._1 -> x._2.map(y=> y._3).sum)
 
@@ -148,11 +169,10 @@ object  ChurnRegionService{
 
     val churnRegionMonth = calChurnRateAndPercentageForRegionMonth(getTrendRegionMonth(), status).filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
     //println(s"month:$month AND Region:$region")
-    val churnRegion      = calChurnRateAndPercentageByStatus(getChurnGroupbyStatus(s"month:$month", "Region"), status)
-    val churnProfile     = calChurnRateAndPercentageByStatus(getChurnGroupbyStatus(s"month:$month", "Profile"), status)
-    getChurnGroupbyStatus(s"month:$month", "Profile").filter(x=> x._1.toInt == status).foreach(println)
-    println("===")
-    churnProfile.map(x=> (x._1, x._2, x._3, 2 * x._2 * x._3 * 0.01/(x._2 + x._3))).sortWith((x, y) => x._4 > y._4).slice(0, 8).map(x=> (x._1, x._2, x._3)).foreach(println)
+    val churnRegion      = calChurnRateAndPercentageByStatus(getChurnGroupbyStatus(s"month:$month", "Region"), status, "Region")
+    val churnProfile     = calChurnRateAndPercentageByStatus(getChurnGroupbyStatus(s"month:$month", "Profile"), status, "Profile")
+      .map(x=> (x._1, x._2, x._3, 2 * x._2 * x._3 * 0.01/(x._2 + x._3))).sortWith((x, y) => x._4 > y._4)
+      .slice(0, 8).map(x=> (x._1, x._2, x._3))
 
     (churnRegion, churnRegionMonth, churnProfile)
   }

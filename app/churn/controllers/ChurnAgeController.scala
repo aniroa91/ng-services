@@ -30,6 +30,7 @@ class ChurnAgeController @Inject() (cc: ControllerComponents) extends AbstractCo
 
   def index() = withAuth { username => implicit request: Request[AnyContent] =>
     val month = CommonService.getPrevMonth()
+    println("test deploy staging age")
     val rs = ChurnAgeService.getInternet(null)
     Ok(churn.views.html.age.index(rs,month,username, churn.controllers.routes.ChurnAgeController.index()))
   }
