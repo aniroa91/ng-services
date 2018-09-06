@@ -48,7 +48,6 @@ object  ChurnAgeService{
             ) size 1000
         ) size 13
       )
-    //println(client.show(request))
     val rs = client.execute(request).await
     CommonService.getMultiAggregations(rs.aggregations.get("month"),"Status" ,"Age").flatMap(x => x._2.map(y => x._1 -> y))
       .map(x => (x._1 , x._2._1) -> x._2._2)
@@ -148,13 +147,22 @@ object  ChurnAgeService{
        .map(x => (x._1.toInt, CommonService.format2Decimal(x._2  * 100.0/ x._3), CommonService.format2Decimal(x._2 * 100.0 / sumAll) ) ).toArray.sorted
   }
 
-   def calChurnRateAndPercentageByMonth(array: Array[(String, String, String, Long)], status: Int) = {
+   def calChurnRateAndPercentageByMonth(array: Array[(String, String, String, Long)], status: Int, age: String) = {
     val sumByMonth     = array.filter(x=> x._1 != CommonService.getCurrentMonth())
-    val sumByStatus    = sumByMonth.filter(x=> x._2.toInt == status).groupBy(x=> x._1).map(x=> x._1 -> x._2.map(y=> y._4).sum).toArray.sortWith((x, y) => x._1 > y._1).sorted
-    val sumByStatusAll = sumByMonth.groupBy(x=> x._1).map(x=> x._1 -> x._2.map(y=> y._4).sum).toArray.sortWith((x, y) => x._1 > y._1).sorted
-    // month, age, rate, percentage
-     sumByStatus.map(x=> (x._1, x._2, sumByStatusAll.filter(y=> y._1 == x._1).map(x=> x._2).sum))
-       .map(x => (x._1, CommonService.format2Decimal(x._2  * 100.0/ x._3), CommonService.format2Decimal(x._3 * 100.0 / x._3) ) ).sorted
+     if(age.equals("*")) {
+       val sumByStatus = sumByMonth.filter(x => x._2.toInt == status).groupBy(x => x._1).map(x => x._1 -> x._2.map(y => y._4).sum).toArray.sortWith((x, y) => x._1 > y._1).sorted
+       val sumByStatusAll = sumByMonth.groupBy(x => x._1).map(x => x._1 -> x._2.map(y => y._4).sum).toArray.sortWith((x, y) => x._1 > y._1).sorted
+       sumByStatus.map(x => (x._1, x._2, sumByStatusAll.filter(y => y._1 == x._1).map(x => x._2).sum))
+         .map(x => (x._1, CommonService.format2Decimal(x._2 * 100.0 / x._3), CommonService.format2Decimal(x._3 * 100.0 / x._3))).sorted
+     }
+     else{
+       val sumByStatus = sumByMonth.filter(x=> x._2.toInt == status).filter(x=> x._3 == age).groupBy(x=> x._1-> x._3).map(x=> (x._1._1, x._1._2, x._2.map(y=> y._4).sum)).toArray.sortWith((x, y) => x._1 > y._1).sorted
+       val sumRate     = sumByMonth.filter(x=> x._2.toInt == status).groupBy(x=> x._1).map(x=> (x._1, x._2.map(y=> y._4).sum)).toArray.sortWith((x, y) => x._1 > y._1).sorted
+       val sumPercent  = sumByMonth.filter(x=> x._3 == age).groupBy(x=> x._1-> x._3).map(x=> (x._1._1, x._1._2, x._2.map(y=> y._4).sum)).toArray.sortWith((x, y) => x._1 > y._1).sorted
+
+       sumByStatus.map(x=> (x._1, CommonService.format2Decimal(x._3 * 100.0 / sumRate.filter(y=> y._1 == x._1).map(y=> y._2).sum),
+         CommonService.format2Decimal(x._3 * 100.0 / sumPercent.filter(k=> k._1 == x._1).map(k=> k._3).sum)))
+     }
   }
 
    def calChurnRateAndPercentageForChurnbyStatus(array: Array[(String, String, String, Int, Int)], status: Int) = {
@@ -193,7 +201,7 @@ object  ChurnAgeService{
 
     //println(s"month:$month AND Region:$region")
     val churnAge = calChurnRateAndPercentageByAge(getChurnGroupAge(s"month:$month AND Region:$region"), status)
-    val churnMonth = calChurnRateAndPercentageByMonth(getChurnGroupMonth(s"Age:$age AND Region:$region"), status)
+    val churnMonth = calChurnRateAndPercentageByMonth(getChurnGroupMonth(s"Region:$region"), status, age)
 
     (churnStatus, churnAge, churnMonth)
   }

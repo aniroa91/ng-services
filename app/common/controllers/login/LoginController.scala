@@ -23,7 +23,7 @@ class LoginController @Inject()(cc: ControllerComponents) extends AbstractContro
   )
 
   def check(username: String, password: String) = {
-    (username == "admin" && password == "admin111")
+    (username == "admin" && password == "churn123")
   }
 
   def index = Action { implicit request =>

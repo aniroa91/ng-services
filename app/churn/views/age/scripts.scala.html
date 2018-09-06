@@ -268,7 +268,7 @@
                                             // update chart Month
                                             updateCharts(churn_month, getJsonChurnMonth(dta.churnMonth.churnRate, dta.churnMonth.churnPercent))
                                             // update chart bubble
-                                            if(_type != "regionAge" && _type != "age") {
+                                            if(_type != "regionAge") {
                                                 $('#txtMin').text(dta.churnRegionAge.minPercent)
                                                 $('#txtMax').text(dta.churnRegionAge.maxPercent)
                                                 chartHuyDv.draw(google.visualization.arrayToDataTable(getDataChurn(dta.churnRegionAge.data)), options)
@@ -287,7 +287,7 @@
                 switch (name){
                         case "0-6" :
                                 age = 6;break;
-                        case "6-12" :
+                        case "06-12" :
                                 age = 12;break;
                         case "12-18" :
                                 age = 18;break;

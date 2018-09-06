@@ -45,6 +45,7 @@ abstract class AbstractService {
       })
     }).toArray
   }
+
   def getBuckets(map: Map[String, AnyRef], name: String): List[Map[String, AnyRef]] = {
     map.getOrElse(name, Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
       .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
