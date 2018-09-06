@@ -26,6 +26,7 @@ GET      /logout                       controllers.LoginController.logout
 
 ### PROFILE INTERNET
 GET     /internet/age                  churn.controllers.ChurnAgeController.index
+GET     /internet/region               churn.controllers.ChurnRegionController.index
 
 POST    /internet/getJsonChurn         churn.controllers.ChurnAgeController.getJsonChurn
 

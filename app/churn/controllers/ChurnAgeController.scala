@@ -7,7 +7,6 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 import play.api.mvc._
-import churn.controllers.AuthenticatedRequest
 import play.api.mvc.AbstractController
 import play.api.mvc.ControllerComponents
 import churn.utils.AgeGroupUtil
@@ -25,35 +24,19 @@ import service.ChurnAgeService
   * This controller creates an `Action` to handle HTTP requests to the
   * application's home page.
   */
-case class AuthenticatedRequest (val username: String, request: Request[AnyContent]) extends WrappedRequest(request)
 
 @Singleton
 class ChurnAgeController @Inject() (cc: ControllerComponents) extends AbstractController(cc) with Secured{
 
-  /* Authentication action*/
-  def Authenticated(f: AuthenticatedRequest => Result) = {
-    Action { request =>
-      val username = request.session.get("username").get.toString
-      username match {
-        case "admin" =>
-          f(AuthenticatedRequest(username, request))
-        case none =>
-          Redirect("/").withNewSession.flashing(
-            "success" -> "You are now logged out."
-          )
-      }
-    }
-  }
-
-  def index() = Authenticated { implicit request: Request[AnyContent] =>
+  def index() = withAuth { username => implicit request: Request[AnyContent] =>
     val month = CommonService.getPrevMonth()
     val rs = ChurnAgeService.getInternet(null)
-    Ok(churn.views.html.age.index(rs,month,request.session.get("username").get.toString, churn.controllers.routes.ChurnAgeController.index()))
+    Ok(churn.views.html.age.index(rs,month,username, churn.controllers.routes.ChurnAgeController.index()))
   }
 
 
-  def getJsonChurn() = Action { implicit request: Request[AnyContent] =>
-   // try{
+  def getJsonChurn() = withAuth {username => implicit request: Request[AnyContent] =>
+   try{
       val rs = ChurnAgeService.getInternet(request)
       val regionAge = Json.obj(
         "data"       -> rs._1,
@@ -74,10 +57,10 @@ class ChurnAgeController @Inject() (cc: ControllerComponents) extends AbstractCo
         "churnRegionAge" -> regionAge
       )
       Ok(Json.toJson(json))
-    /*}
+    }
     catch{
       case e: Exception => Ok("Error")
-    }*/
+    }
 
   }
 

@@ -93,15 +93,13 @@
                                 var age = dataHuyDv.getValue(row, 1)
                                 $('#age').val(age)
                                 $('#region').val(region)
-                                $('#ageTitle').text("")
-                                ajaxGetChurn("regionAge")
                         }
                         else{
                                 $('#age').val("")
                                 $('#region').val("")
-                                $('#ageTitle').text("")
-                                ajaxGetChurn("regionAge")
                         }
+                        $('#ageTitle').text("")
+                        ajaxGetChurn("regionAge")
                 });
 
                 var churn_age = Highcharts.chart('churn1', {
