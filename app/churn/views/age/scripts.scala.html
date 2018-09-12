@@ -19,6 +19,9 @@
                         },
                         cursor: 'pointer',
                         opacity: 1
+                },
+                tooltip: {
+                        trigger: 'none'
                 }
         };
         google.load('visualization', '1.0', {
@@ -42,6 +45,7 @@
                 });
                 // bublle charts
                 var container = document.getElementById('container')
+                var catesAge = @Html(Json.stringify(Json.toJson(AgeGroupUtil.AGE)))
                 var internetChurnHuyDv = getDataChurn(@Html(Json.stringify(Json.toJson(rs._1))))
                 var dataHuyDv = google.visualization.arrayToDataTable(internetChurnHuyDv)
                 var chartHuyDv = new google.visualization.BubbleChart(container);
@@ -101,6 +105,29 @@
                         $('#ageTitle').text("")
                         ajaxGetChurn("regionAge")
                 });
+                var mouseX;
+                var mouseY;
+                $(document).mousemove(function(e) {
+                        mouseX = e.pageX;
+                        mouseY = e.pageY;
+                });
+
+                function handlerOut() {
+                        $('.custom_tooltip').fadeOut('fast');
+                }
+                google.visualization.events.addListener(chartHuyDv, 'onmouseover', function (event) {
+                        var rate = dataHuyDv.getValue(event.row, 3);
+                        var xAxis = dataHuyDv.getValue(event.row, 1);
+                        var yAxis = dataHuyDv.getValue(event.row, 2);
+                        var percent = dataHuyDv.getValue(event.row, 4);
+                        var x = mouseX - 225;
+                        var y = mouseY - 450;
+                        $('#churn_tooltip').html('<div><p><b>Age:</b> ' + keyByValue( catesAge, xAxis) +'</p><p><b>Region:</b> '+ yAxis +'</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p></div>').css({
+                                'top': y,
+                                'left': x
+                        }).fadeIn('slow');
+                });
+                google.visualization.events.addListener(chartHuyDv, 'onmouseout', handlerOut);
 
                 var churn_age = Highcharts.chart('churn1', {
                         chart: {
@@ -237,6 +264,7 @@
                 $('#apply').click(function () {
                       $('#region').val("")
                       $('#age').val("")
+                      $('#profile').val("")
                       $('#ageTitle').text("")
                       ajaxGetChurn("*")
                 })
@@ -244,7 +272,7 @@
                 function ajaxGetChurn(_type){
                         var fields = getParamFields(document.querySelector('input[name=csrfToken]').value)
                         $.ajax({
-                                url: "/internet/getJsonChurn",
+                                url: "/internet/age/getJsonChurn",
                                 cache: false,
                                 data:  fields,
                                 type:"POST",
@@ -311,16 +339,6 @@
                 return age
         }
 
-        function updateCharts(charts, data){
-                var seriesLength = charts.series.length;
-                for(var i = seriesLength -1; i > -1; i--) {
-                        charts.series[i].remove();
-                }
-                for(var i=0; i< data.length; i++) {
-                        charts.addSeries(data[i]);
-                }
-        }
-
         function getParamFields(token){
                 var obj = {
                         "csrfToken" : token,
@@ -330,24 +348,6 @@
                         "status" : $('#slStatus').val()
                 }
                 return obj
-        }
-
-        function getJsonChurnMonth(churnRate, churnPercent){
-                var rs = []
-                rs.push({
-                        name: "Churn Percent",
-                        type: 'column',
-                        yAxis: 0,
-                        data: churnPercent
-                })
-                rs.push({
-                        name: "Churn Rate",
-                        type: 'spline',
-                        yAxis: 1,
-                        data: churnRate
-                });
-
-                return rs
         }
 
         function getDataChurn(dta){

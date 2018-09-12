@@ -1,4 +1,4 @@
-@(rs: String, month: String, email: String ,postUrl: Call)(implicit request: RequestHeader)
+@(rs: churn.models.RegionResponse, month: String, email: String ,postUrl: Call)(implicit request: RequestHeader)
 
 @import services.domain.CommonService.formatNumber
 @import services.domain.CommonService.percent
@@ -30,6 +30,24 @@
             <!-- bootstrap-daterangepicker -->
         <link href="/assets/datepicker/css/bootstrap-datepicker.css" rel="stylesheet">
         <style type="text/css">
+                .custom_tooltip{
+                    position: absolute;
+                    z-index: 1000;
+                    opacity: 1!important;
+                    color: #0D3349;
+                    border: 1px solid #ddd;
+                    background: white;
+                    padding: 10px;
+                }
+                .noData-title {
+                    margin-bottom: 13px;
+                    text-align: center;
+                    text-transform: uppercase;
+                    font-weight: 300;
+                    font-size: 40px;
+                    color: #f60;
+                    font-size: 2.5rem;
+                }
                 .top_nav .navbar-right {
                     width: auto;
                 }
@@ -192,6 +210,36 @@
                     max-height: 400px;
                     overflow-y: auto;
                 }
+                .barIcon{
+                    display: block
+                }
+                }
+
+                @@media only screen and (min-width: 991px) {
+                .barIcon{
+                    display: none
+                }
+                .divLeft{
+                    width: 230px
+                }
+                .divRight{
+                    margin-left: 0!important
+                }
+                .navbar-toggle{
+                    display: none
+                }
+                }
+                @@media only screen and (max-width: 1200px) {
+                .right_col{
+                    min-height: 0px!important;
+                    max-height: 500px;
+                    overflow-y: auto;
+                }
+                .divGroup{
+                    overflow-y: auto;
+                    max-height: 350px;
+                }
+
                 }
 
                 /* Medium devices (landscape tablets, 768px and up) */
@@ -201,6 +249,13 @@
                     max-height: 700px;
                     overflow-y: auto;
                 }
+                .divGroup{
+                    overflow-y: auto;
+                    max-height: 450px;
+                }
+                .barIcon{
+                    display: none
+                }
                 }
 
                 /* Extra large devices (large laptops and desktops, 1200px and up) */
@@ -209,6 +264,16 @@
                     min-height: 0px!important;
                     max-height: 850px;
                     overflow-y: auto;
+                }
+                .divGroup{
+                    overflow-y: auto;
+                    max-height: 550px;
+                }
+                }
+                @@media only screen and (min-width: 1600px) {
+                .divGroup{
+                    overflow-y: auto;
+                    max-height: 720px;
                 }
                 }
                 @@media screen and (-webkit-min-device-pixel-ratio:0)
@@ -227,7 +292,7 @@
     <body class="nav-md">
         <div class="container body">
             <div class="main_container">
-                <div class="col-md-3 left_col">
+                <div class="col-md-3 left_col sidenav">
                     <div class="left_col scroll-view">
                         <div class="navbar nav_title" style="border: 0;width: 100%!important;">
 
@@ -258,7 +323,17 @@
                                     </select>
                                 </div>
                                 <div class="col-lg-12 lineDiv"></div>
-                                <div class="col-lg-12" id="divStatus" style="height: 125px">
+                                <div class="col-lg-12" style="height: 100px">
+                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Region</span></i>
+                                    <select class="form-control" id="slRegion" style="cursor: pointer;margin-top: 10px">
+                                        <option value="*" selected>--- Choose Region ---</option>
+                                    @for( (k,v) <- CommonUtil.REGION.toArray.sorted){
+                                        <option value="@v">@k</option>
+                                    }
+                                    </select>
+                                </div>
+                                <div class="col-lg-12 lineDiv"></div>
+                                <div class="col-lg-12" style="height: 125px">
                                     <span class="titFilter"><i class="fa fa-bell"></i> Group Month</span></i>
                                     <div class="input-group date" id="monthPicker" style="margin-top: 10px">
                                         <input type="text" id="monthGrp" class="form-control" value="@month" readonly="true" style="text-align: center;cursor: pointer;background-color: white" >
@@ -268,7 +343,7 @@
                                 </div>
                                 <div class="col-lg-12 filter">
                                     <a id="apply" class="btn btn-xs btn-success" style="float: right;"><i class="fa fa-check-circle"></i> Apply</a>
-                                    <a href="/internet/age" class="btn btn-xs btn-secondary" style="float: right;background: #6c757d;color: #fff"><i class="fa fa-refresh"></i> Refresh</a>
+                                    <a href="/internet/region" class="btn btn-xs btn-secondary" style="float: right;background: #6c757d;color: #fff"><i class="fa fa-refresh"></i> Refresh</a>
                                 </div>
                             </div>
 
@@ -280,7 +355,11 @@
                     <!-- top navigation -->
                 <div class="top_nav">
                     <div class="nav_menu" style="background: #2A3F54">
-                        <nav>
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="true">
+                            <span class="sr-only">Toggle navigation</span>
+                            <i class="fa fa-bars" aria-hidden="true" style="font-size: 26px"></i>
+                        </button>
+                        <nav class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                             <ul class="nav navbar-nav" style="float: right">
                                 <li><a href="/internet/age"><i class="fa fa-user"></i> AGE </a>
                                 </li>
@@ -311,16 +390,19 @@
                     <!-- /top navigation -->
                     <!-- page content -->
                 <div class="right_col" role="main">
+                    <div class="divRight">
+                        <div class="row top_tiles"> <div class="col-xs-12"><a class="barIcon" style="cursor: pointer;font-size: 26px;" onclick="triggerNavleft(this)"><i class="fa fa-bars"></i></a></div></div>
+
                 @if(rs != null) {
                     @helper.CSRF.formField
                     <input type="hidden" value="@month" id="month">
                     <input type="hidden" id="age">
-                    <input type="hidden" id="region">
+                    <input type="hidden" id="profile">
                     <div class="row top_tiles">
                         <div class="col-lg-6 col-sm-6 col-md-6 col-xs-12">
                             <div class="x_panel tile" style="padding: 0px">
                                 <div class="title disInline">
-                                    <span style="width: 90%">Churn Rate and Churn Percentage by Region <b id="monthAge" style="color: #f1b53d">(@month)</b></span>
+                                    <span style="width: 90%">Churn Rate & Percentage by Region <b id="churn1_profile" style="color: #f1b53d"></b></span>
                                     <div class="clearfix"></div>
                                 </div>
                                 <div class="x_content">
@@ -331,11 +413,70 @@
                         <div class="col-lg-6 col-sm-6 col-md-6 col-xs-12">
                             <div class="x_panel tile" style="padding: 0px">
                                 <div class="title disInline">
-                                    <span style="width: 90%">Trends in Churn Rate and Churn Percentage by Region </span>
+                                    <span style="width: 90%">Churn Rate and Churn Percentage by Profile <b id="churn2_profile" style="color: #f1b53d"></b></span>
                                     <div class="clearfix"></div>
                                 </div>
                                 <div class="x_content">
                                     <div id="churn2" style="width: auto; height: 350px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row top_tiles">
+                        <div class="col-lg-12 col-sm-12 col-md-12 col-xs-12">
+                            <div class="x_panel tile" style="padding: 0px">
+                                <div class="title disInline">
+                                    <span style="width: 90%">Trend in Churn Rate and Churn Percentage by Region <b id="churn3_profile" style="color: #f1b53d"></b></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content">
+                                    <div class="chartWithOverlay animated slideInUp" id="chartWithOverlay">
+                                        <div id="churn3_tooltip" class="custom_tooltip" style="display: none"></div>
+                                        <div id="churn3" style="width: auto; height: 600px;"></div>
+                                        <div class="overlay" id="churn3_overlay">
+                                        <span style="font-size: 16px;color: #0D3349">ChurnPert (%)</span>
+                                        <div style="margin-bottom: 2px;margin-top: 4px"><div class="circle" style="background: #f2473c;"><span style="opacity: 0">1</span></div><span id="churn3_txtMin" style="color:#0D3349 ">@format3Decimal(rs.trendRegionMonth._2.map(x=>x._4).min)</span></div>
+                                        <div style="margin-bottom: 2px"><div class="circle" style="background: #f2473c;"><span style="opacity: 0">111</span></div><span id="churn3_circle2" style="color:#0D3349 ">@format3Decimal((rs.trendRegionMonth._2.map(x=>x._4).max -rs.trendRegionMonth._2.map(x=>x._4).min)/5*2)</span></div>
+                                        <div style="margin-bottom: 2px"><div class="circle" style="background: #f2473c;"><span style="opacity: 0">1111</span></div><span id="churn3_circle3" style="color:#0D3349 ">@format3Decimal((rs.trendRegionMonth._2.map(x=>x._4).max -rs.trendRegionMonth._2.map(x=>x._4).min)/5*3)</span></div>
+                                        <div><div class="circle" style="background: #f2473c"><span style="opacity: 0">11111</span></div><span id="churn3_txtMax" style="color:#0D3349 ">@format3Decimal(rs.trendRegionMonth._2.map(x=>x._4).max)</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row top_tiles">
+                        <div class="col-lg-12 col-sm-12 col-md-12 col-xs-12">
+                            <div class="x_panel tile" style="padding: 0px">
+                                <div class="title disInline">
+                                    <span style="width: 90%">Number of Contracts by Contract Age for Profiles That Have High Churns </span>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content">
+                                    <div id="churn-heatmap" style="width: auto; height: 350px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row top_tiles">
+                        <div class="col-lg-12 col-sm-12 col-md-12 col-xs-12">
+                            <div class="x_panel tile" style="padding: 0px">
+                                <div class="title disInline">
+                                    <span style="width: 90%">Trend in Churn Rate and Churn Percentage by Profile <b id="churn4_profile" style="color: #f1b53d"></b></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content">
+                                    <div class="chartWithOverlay animated slideInUp" id="chartWithOverlay">
+                                        <div id="churn4_tooltip" class="custom_tooltip" style="display: none"></div>
+                                        <div id="churn4" style="width: auto; height: 600px;"></div>
+                                        <div class="overlay" id="churn4_overlay">
+                                        <span style="font-size: 16px;color: #0D3349">ChurnPert (%)</span>
+                                        <div style="margin-bottom: 2px;margin-top: 4px"><div class="circle" style="background: green;"><span style="opacity: 0">1</span></div><span id="churn4_txtMin" style="color:#0D3349 ">@format3Decimal(rs.trendProfileMonth._3.map(x=>x._4).min)</span></div>
+                                        <div style="margin-bottom: 2px"><div class="circle" style="background: green;"><span style="opacity: 0">111</span></div><span id="churn4_circle2" style="color:#0D3349 ">@format3Decimal((rs.trendProfileMonth._3.map(x=>x._4).max -rs.trendProfileMonth._3.map(x=>x._4).min)/5*2)</span></div>
+                                        <div style="margin-bottom: 2px"><div class="circle" style="background: green;"><span style="opacity: 0">1111</span></div><span id="churn4_circle3" style="color:#0D3349 ">@format3Decimal((rs.trendProfileMonth._3.map(x=>x._4).max -rs.trendProfileMonth._3.map(x=>x._4).min)/5*3)</span></div>
+                                        <div><div class="circle" style="background: green"><span style="opacity: 0">11111</span></div><span id="churn4_txtMax" style="color:#0D3349 ">@format3Decimal(rs.trendProfileMonth._3.map(x=>x._4).max)</span></div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -345,30 +486,33 @@
                         <div class="col-lg-12 col-sm-12 col-md-12 col-xs-12">
                             <div class="x_panel tile" style="padding: 0px">
                                 <div class="title disInline">
-                                    <span style="width: 90%">Churn Rate and Churn Percentage by Contract Age by Region <b id="monthRegion" style="color: #f1b53d">(@month)</b></span>
+                                    <span style="width: 90%">Churn Rate and Churn Percentage by Profile by Contract Age </span>
                                     <div class="clearfix"></div>
                                 </div>
                                 <div class="x_content">
                                     <div class="chartWithOverlay animated slideInUp" id="chartWithOverlay">
-                                        <div id="container" style="width: auto; height: 600px;"></div>
-                                        @*<div class="overlay">
+                                        <div id="churn5_tooltip" class="custom_tooltip" style="display: none"></div>
+                                        <div id="churn5" style="width: auto; height: 600px;"></div>
+                                        <div class="overlay" id="churn5_overlay">
                                             <span style="font-size: 16px;color: #0D3349">ChurnPert (%)</span>
-                                            <div style="margin-bottom: 2px;margin-top: 4px"><div class="circle" style="background: #f2473c;"><span style="opacity: 0">1</span></div><span id="txtMin" style="color:#0D3349 ">@format3Decimal(rs._1.toSeq.map(x=>x._4).min)</span></div>
-                                            <div style="margin-bottom: 2px"><div class="circle" style="background: #f2473c;"><span style="opacity: 0">111</span></div><span style="color:#0D3349 ">@format3Decimal((rs._1.toSeq.map(x=>x._4).max -rs._1.toSeq.map(x=>x._4).min)/5*2)</span></div>
-                                            <div style="margin-bottom: 2px"><div class="circle" style="background: #f2473c;"><span style="opacity: 0">1111</span></div><span style="color:#0D3349 ">@format3Decimal((rs._1.toSeq.map(x=>x._4).max -rs._1.toSeq.map(x=>x._4).min)/5*3)</span></div>
-                                            <div><div class="circle" style="background: #f2473c"><span style="opacity: 0">11111</span></div><span id="txtMax" style="color:#0D3349 ">@format3Decimal(rs._1.toSeq.map(x=>x._4).max)</span></div>
-                                        </div>*@
+                                            <div style="margin-bottom: 2px;margin-top: 4px"><div class="circle" style="background: #f60;"><span style="opacity: 0">1</span></div><span id="churn5_txtMin" style="color:#0D3349 ">@format3Decimal(rs.trendAgeProfile._2.map(x=>x._4).min)</span></div>
+                                            <div style="margin-bottom: 2px"><div class="circle" style="background: #f60;"><span style="opacity: 0">111</span></div><span id="churn5_circle2" style="color:#0D3349 ">@format3Decimal((rs.trendAgeProfile._2.map(x=>x._4).max -rs.trendAgeProfile._2.map(x=>x._4).min)/5*2)</span></div>
+                                            <div style="margin-bottom: 2px"><div class="circle" style="background: #f60;"><span style="opacity: 0">1111</span></div><span id="churn5_circle3" style="color:#0D3349 ">@format3Decimal((rs.trendAgeProfile._2.map(x=>x._4).max -rs.trendAgeProfile._2.map(x=>x._4).min)/5*3)</span></div>
+                                            <div><div class="circle" style="background: #f60"><span style="opacity: 0">11111</span></div><span id="churn5_txtMax" style="color:#0D3349 ">@format3Decimal(rs.trendAgeProfile._2.map(x=>x._4).max)</span></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
                     </div>
+
 
                 } else{
                     <div class="row"><h2 class="noData-title">
                         Sorry, This page is under construction, please come back later...</h2></div>
                 }
-
+                    </div>
                 </div>
             </div>
         </div>
@@ -380,17 +524,34 @@
         <script src="/assets/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
             <!-- Custom Theme Scripts -->
         <script src="/assets/custom/js/custom.min.js"></script>
-        <script type="text/javascript" src="../assets/javascripts/jsapi.js"></script>
+        <script type="text/javascript" src="/assets/javascripts/jsapi.js"></script>
             <!-- Hight chart -->
         <script src="/assets/javascripts/highcharts.js"></script>
+        <script src="/assets/javascripts/heatmap.js"></script>
         <script src="/assets/javascripts/exporting.js"></script>
         <script src="/assets/javascripts/jquery.counterup.min.js"></script>
         <script src="/assets/javascripts/waitMe.js"></script>
+        <script src="/assets/javascripts/common_churn.js"></script>
             <!--  Datepicker -->
         <script src="/assets/datepicker/js/bootstrap-datepicker.js"></script>
 
+        <script type="text/javascript">
+                function triggerNavleft(el) {
+                    if($(el).hasClass('openLeft')){
+                        $('.divLeft').attr('style','width: 0')
+                        $('.divRight').removeAttr('style')
+                        $(el).removeClass('openLeft')
+                    }
+                    else{
+                        $(el).addClass('openLeft')
+                        $('.divLeft').attr('style','width: 230px;display: block')
+                        $('.divRight').attr('style','margin-left: 230px;')
+                    }
+                }
+        </script>
+
         @if(rs != null) {
-            @scripts()
+            @scripts(rs)
         }
     </body>
 </html>

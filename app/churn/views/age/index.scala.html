@@ -33,6 +33,15 @@
                 .top_nav .navbar-right {
                     width: auto;
                 }
+                .custom_tooltip{
+                    position: absolute;
+                    z-index: 1000;
+                    opacity: 1!important;
+                    color: #0D3349;
+                    border: 1px solid #ddd;
+                    background: white;
+                    padding: 10px;
+                }
                 .table-condensed{
                     font-size: 13px!important;
                 }
@@ -112,6 +121,15 @@
 
                 .dropdown-menu>li>a{
                     white-space: inherit!important;
+                }
+                .noData-title {
+                    margin-bottom: 13px;
+                    text-align: center;
+                    text-transform: uppercase;
+                    font-weight: 300;
+                    font-size: 40px;
+                    color: #f60;
+                    font-size: 2.5rem;
                 }
                 .title{
                     color: #fff;
@@ -284,7 +302,7 @@
                                 <ul class="nav navbar-nav" style="float: right">
                                     <li class="activeLi"><a href="/internet/age"><i class="fa fa-user"></i> AGE </a>
                                     </li>
-                                    <li><a href="#"><i class="fa fa-map-marker"></i> REGION PROFILE </a>
+                                    <li><a href="/internet/region"><i class="fa fa-map-marker"></i> REGION PROFILE </a>
                                     </li>
                                     <li><a href="#"><i class="fa fa-bug"></i> CALLLOG </a>
                                     </li>
@@ -350,6 +368,7 @@
                                     </div>
                                     <div class="x_content">
                                         <div class="chartWithOverlay animated slideInUp" id="chartWithOverlay">
+                                            <div id="churn_tooltip" class="custom_tooltip" style="display: none"></div>
                                             <div id="container" style="width: auto; height: 600px;"></div>
                                             <div class="overlay">
                                                 <span style="font-size: 16px;color: #0D3349">ChurnPert (%)</span>
@@ -386,6 +405,7 @@
             <script src="/assets/javascripts/exporting.js"></script>
             <script src="/assets/javascripts/jquery.counterup.min.js"></script>
             <script src="/assets/javascripts/waitMe.js"></script>
+            <script src="/assets/javascripts/common_churn.js"></script>
                 <!--  Datepicker -->
             <script src="/assets/datepicker/js/bootstrap-datepicker.js"></script>
 

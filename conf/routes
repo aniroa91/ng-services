@@ -24,10 +24,13 @@ GET      /logout                       controllers.LoginController.logout
 #######################################################################
 
 
-### PROFILE INTERNET
+### PAGE AGE
 GET     /internet/age                  churn.controllers.ChurnAgeController.index
-GET     /internet/region               churn.controllers.ChurnRegionController.index
+POST    /internet/age/getJsonChurn     churn.controllers.ChurnAgeController.getJsonChurn
 
-POST    /internet/getJsonChurn         churn.controllers.ChurnAgeController.getJsonChurn
+### PAGE REGION
+GET     /internet/region               churn.controllers.ChurnRegionController.index
+POST    /internet/region/getJsonChurn  churn.controllers.ChurnRegionController.getJsonChurn
+
 
 #######################################################################
