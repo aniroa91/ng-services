@@ -6,7 +6,9 @@
 <script type="text/javascript">
         var optionsProfile = {
             title: 'Churn Rate (%)',
-            hAxis: {title: 'Month',gridlines: {count: 14}},
+            hAxis: {title: 'Month',gridlines: {count: 14}, viewWindow: {
+                min:0
+            }},
             vAxis: {title: 'Profile',gridlines: {count: 10}},
             chartArea: {
                 height: "83%",
@@ -46,7 +48,9 @@
         };
         var optionsRegion = {
             title: 'Churn Rate (%)',
-            hAxis: {title: 'Month',gridlines: {count: 14}},
+            hAxis: {title: 'Month',gridlines: {count: 14}, viewWindow: {
+                min:0
+            }},
             vAxis: {title: 'Region',gridlines: {count: 9}},
             chartArea: {
                 height: "83%",
@@ -648,8 +652,8 @@
                                updateCharts(churn_region, getJsonChurnMonth(dta.churn1.churnRate, dta.churn1.churnPercent))
 
                             // update chart Profile
-                            churn_profile.xAxis[0].update({categories: dta.churn2.cates});
-                            updateCharts(churn_profile, getJsonChurnMonth(dta.churn2.churnRate, dta.churn2.churnPercent))
+                               churn_profile.xAxis[0].update({categories: dta.churn2.cates});
+                               updateCharts(churn_profile, getJsonChurnMonth(dta.churn2.churnRate, dta.churn2.churnPercent))
 
                             // update chart Heatmap Contract
                                churn_heatmap.xAxis[0].update({categories: dta.heat_map.xAxis})
@@ -713,6 +717,7 @@
                                 });
                                 var dataRegionMonth = google.visualization.arrayToDataTable(getDataChurn(dta.churn3.data, "Month", "Region"))
                                 optionsRegion.hAxis.gridlines.count = Object.keys(dta.churn3.cates).length+2
+                                //alert(Object.keys(dta.churn3.cates).length+2)
                                 chartRegionMonth.draw(dataRegionMonth, optionsRegion)
                                 google.visualization.events.addListener(chartRegionMonth, 'select', function () {
                                     var selection = chartRegionMonth.getSelection();
