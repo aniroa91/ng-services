@@ -244,6 +244,8 @@ object  ChurnRegionService{
       profile = if(request.body.asFormUrlEncoded.get("profile").head != "") "\""+request.body.asFormUrlEncoded.get("profile").head +"\"" else "*"
       month = request.body.asFormUrlEncoded.get("month").head
     }
+    println(month)
+    println(region)
     // region and month trends
     val trendRegionMonth = calChurnRateAndPercentageForRegionMonth(getTrendRegionOrProfileMonth(s"$age AND Profile:$profile", "Region"), status).filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
     val top12monthRegion = trendRegionMonth.map(x=> x._2).distinct.sortWith((x, y) => x > y).filter(x=> x != CommonService.getCurrentMonth()).slice(0,12).sorted
@@ -271,6 +273,8 @@ object  ChurnRegionService{
       .map(x=> (x._1, x._2, x._3, 2 * x._2 * x._3 * 0.01/(x._2 + x._3))).sortWith((x, y) => x._4 > y._4)
       .slice(0, 8).map(x=> (x._1, x._2, x._3))
 
+    churnRegion.foreach(println)
+    println("==")
     // profile and month trends
     val trendProfileMonth = calChurnRateAndPercentageForProfileMonth(getTrendRegionOrProfileMonth(s"$age AND Region:$region", "Profile"), status).filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
     val topProfiles = if(trendProfileMonth.map(x=> x._1).distinct.length >= 8 ) 9 else trendProfileMonth.map(x=> x._1).distinct.length +1

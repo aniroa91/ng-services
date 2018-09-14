@@ -32,5 +32,8 @@ POST    /internet/age/getJsonChurn     churn.controllers.ChurnAgeController.getJ
 GET     /internet/region               churn.controllers.ChurnRegionController.index
 POST    /internet/region/getJsonChurn  churn.controllers.ChurnRegionController.getJsonChurn
 
+### PAGE CALLLOG
+GET     /internet/calllog              churn.controllers.ChurnCallogController.index
+
 
 #######################################################################

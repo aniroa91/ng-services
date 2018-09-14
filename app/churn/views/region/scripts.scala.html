@@ -173,7 +173,7 @@
                 }
                 $('#slRegion').val("*")
                 $('#age').val("")
-                $('#churn3_profile').text("")
+                $('#churn2_profile').text("")
                 $('#churn4_profile').text("")
                 ajaxGetChurn("profileMonth")
             });
@@ -497,6 +497,7 @@
                                 click: function () {
                                     $('#age').val("")
                                     $('#slRegion').val("*")
+                                    $("#monthPicker").datepicker("update", $('#month').val());
                                     $('#churn2_profile').text("")
                                     $('#churn4_profile').text("")
                                     if(this.category == $('#profile').val()){
@@ -644,11 +645,12 @@
                     success: function (dta) {
                         if(dta != "Error"){
                             // update chart Region
-                            if($('#slRegion').val() == "*")
                                updateCharts(churn_region, getJsonChurnMonth(dta.churn1.churnRate, dta.churn1.churnPercent))
+
                             // update chart Profile
-                            if($('#profile').val() == "")
-                               updateCharts(churn_profile, getJsonChurnMonth(dta.churn2.churnRate, dta.churn2.churnPercent))
+                            churn_profile.xAxis[0].update({categories: dta.churn2.cates});
+                            updateCharts(churn_profile, getJsonChurnMonth(dta.churn2.churnRate, dta.churn2.churnPercent))
+
                             // update chart Heatmap Contract
                                churn_heatmap.xAxis[0].update({categories: dta.heat_map.xAxis})
                                churn_heatmap.yAxis[0].update({categories: dta.heat_map.yAxis})
