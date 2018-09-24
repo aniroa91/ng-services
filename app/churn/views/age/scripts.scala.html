@@ -1,4 +1,4 @@
-@(rs: (Array[(Int, Int, Double, Double)],Array[(Int, Double, Double)], Array[(String, Double, Double)]) )
+@(rs: (Array[(Int, Int, Double, Double, Int)],Array[(Int, Double, Double)], Array[(String, Double, Double)]) )
 @import play.api.libs.json.Json
 @import services.domain.CommonService
 @import churn.utils.AgeGroupUtil
@@ -43,7 +43,7 @@
                         var newDate = yr + '-' + month;
                         $('#month').val(newDate)
                 });
-                // bublle charts
+                // bubble charts
                 var container = document.getElementById('container')
                 var catesAge = @Html(Json.stringify(Json.toJson(AgeGroupUtil.AGE)))
                 var internetChurnHuyDv = getDataChurn(@Html(Json.stringify(Json.toJson(rs._1))))
@@ -120,9 +120,11 @@
                         var xAxis = dataHuyDv.getValue(event.row, 1);
                         var yAxis = dataHuyDv.getValue(event.row, 2);
                         var percent = dataHuyDv.getValue(event.row, 4);
+                        var contracts = dataHuyDv.getValue(event.row, 5);
                         var x = mouseX - 225;
                         var y = mouseY - 450;
-                        $('#churn_tooltip').html('<div><p><b>Age:</b> ' + keyByValue( catesAge, xAxis) +'</p><p><b>Region:</b> '+ yAxis +'</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p></div>').css({
+                        $('#churn_tooltip').html('<div><p><b>Age:</b> ' + keyByValue( catesAge, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
+                                '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
                                 'top': y,
                                 'left': x
                         }).fadeIn('slow');
@@ -297,9 +299,84 @@
                                             updateCharts(churn_month, getJsonChurnMonth(dta.churnMonth.churnRate, dta.churnMonth.churnPercent))
                                             // update chart bubble
                                             if(_type != "regionAge") {
-                                                $('#txtMin').text(dta.churnRegionAge.minPercent)
-                                                $('#txtMax').text(dta.churnRegionAge.maxPercent)
-                                                chartHuyDv.draw(google.visualization.arrayToDataTable(getDataChurn(dta.churnRegionAge.data)), options)
+                                                    $('#txtMin').text(dta.churnRegionAge.minPercent)
+                                                    $('#txtMax').text(dta.churnRegionAge.maxPercent)
+                                                    $('#circle2').text(Number(dta.churnRegionAge.minPercent + (dta.churnRegionAge.maxPercent-dta.churnRegionAge.minPercent)/5*2).toFixed(2))
+                                                    $('#circle3').text(Number(dta.churnRegionAge.minPercent + (dta.churnRegionAge.maxPercent-dta.churnRegionAge.minPercent)/5*3).toFixed(2))
+                                                    var churnStatus = getDataChurn(dta.churnRegionAge.data)
+                                                    var dataStatus = google.visualization.arrayToDataTable(churnStatus)
+                                                    var chartStatus = new google.visualization.BubbleChart(document.getElementById('container'));
+                                                    google.visualization.events.addListener(chartStatus, 'ready', function () {
+                                                            Array.prototype.forEach.call(document.getElementById('container').getElementsByTagName('text'), function(text) {
+                                                                    if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444')) {
+                                                                            if(text.innerHTML == 0 || text.innerHTML == 8)
+                                                                                    text.setAttribute('fill-opacity',0)
+                                                                    }
+                                                                    // change label age
+                                                                    if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#444444')) {
+                                                                            if(text.innerHTML == 0 || text.innerHTML == 72)
+                                                                                    text.setAttribute('fill-opacity',0)
+                                                                            else{
+                                                                                    switch ( text.innerHTML){
+                                                                                            case "6" :
+                                                                                                    text.innerHTML = "0-6";break;
+                                                                                            case "12" :
+                                                                                                    text.innerHTML = "06-12";break;
+                                                                                            case "18" :
+                                                                                                    text.innerHTML = "12-18";break;
+                                                                                            case "24" :
+                                                                                                    text.innerHTML = "18-24";break;
+                                                                                            case "30" :
+                                                                                                    text.innerHTML = "24-30";break;
+                                                                                            case "36" :
+                                                                                                    text.innerHTML = "30-36";break;
+                                                                                            case "42" :
+                                                                                                    text.innerHTML = "36-42";break;
+                                                                                            case "48" :
+                                                                                                    text.innerHTML = "42-48";break;
+                                                                                            case "54" :
+                                                                                                    text.innerHTML = "48-54";break;
+                                                                                            case "60" :
+                                                                                                    text.innerHTML = "54-60";break;
+                                                                                            case "66" :
+                                                                                                    text.innerHTML = ">60";break;
+                                                                                    }
+                                                                            }
+                                                                    }
+                                                            });
+                                                    });
+                                                    chartStatus.draw(dataStatus, options);
+                                                    google.visualization.events.addListener(chartStatus, 'select', function () {
+                                                            var selection = chartStatus.getSelection();
+                                                            if(selection.length >0) {
+                                                                    var row = selection[0].row;
+                                                                    var region = dataStatus.getValue(row, 2)
+                                                                    var age = dataStatus.getValue(row, 1)
+                                                                    $('#age').val(age)
+                                                                    $('#region').val(region)
+                                                            }
+                                                            else{
+                                                                    $('#age').val("")
+                                                                    $('#region').val("")
+                                                            }
+                                                            $('#ageTitle').text("")
+                                                            ajaxGetChurn("regionAge")
+                                                    });
+                                                    google.visualization.events.addListener(chartStatus, 'onmouseover', function (event) {
+                                                            var rate = dataStatus.getValue(event.row, 3);
+                                                            var xAxis = dataStatus.getValue(event.row, 1);
+                                                            var yAxis = dataStatus.getValue(event.row, 2);
+                                                            var percent = dataStatus.getValue(event.row, 4);
+                                                            var contracts = dataStatus.getValue(event.row, 5);
+                                                            var x = mouseX - 225;
+                                                            var y = mouseY - 450;
+                                                            $('#churn_tooltip').html('<div><p><b>Age:</b> ' + keyByValue( catesAge, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
+                                                                    '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
+                                                                    'top': y,
+                                                                    'left': x
+                                                            }).fadeIn('slow');
+                                                    });
+                                                    google.visualization.events.addListener(chartStatus, 'onmouseout', handlerOut);
                                             }
                                         }
                                 },
@@ -352,7 +429,7 @@
 
         function getDataChurn(dta){
             var rs = []
-            rs.push(['ID', 'Age', 'Region','Rate', 'Percent'])
+            rs.push(['ID', 'Age', 'Region','Rate', 'Percent','Contract'])
             for(var i=0;i<dta.length;i++){
                 var arr = []
                     arr[0]=''
@@ -360,6 +437,7 @@
                     arr[2]=dta[i][0]
                     arr[3]=dta[i][2]
                     arr[4]=dta[i][3]
+                    arr[5]=dta[i][4]
                 rs.push(arr)
             }
             return rs

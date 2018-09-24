@@ -25,7 +25,7 @@ object  ChurnAgeService{
   val client = Configure.client
 
   def getChurnGroupMonth(queryString: String) ={
-    val request = search(s"profile-internet-contract-*" / "docs") query(queryString) aggregations (
+    val request = search(s"profile-internet-contract-*" / "docs") query(queryString+" AND !(Region:0) AND !(TenGoi: \"FTTH - TV Only\") AND !(TenGoi: \"ADSL - TV Only\") AND !(TenGoi: \"ADSL - TV Gold\") AND !(TenGoi: \"FTTH - TV Gold\") ") aggregations (
       termsAggregation("month")
         .field("month")
         .subaggs(
@@ -56,7 +56,7 @@ object  ChurnAgeService{
   }
 
   def getChurnGroupAge(queryString: String) ={
-    val request = search(s"profile-internet-contract-*" / "docs") query(queryString) aggregations (
+    val request = search(s"profile-internet-contract-*" / "docs") query(queryString+" AND !(Region:0) AND !(TenGoi: \"FTTH - TV Only\") AND !(TenGoi: \"ADSL - TV Only\") AND !(TenGoi: \"ADSL - TV Gold\") AND !(TenGoi: \"FTTH - TV Gold\") ") aggregations (
       termsAggregation("Status")
         .field("Status")
         .subaggs(
@@ -80,7 +80,7 @@ object  ChurnAgeService{
   }
 
   def getChurn(month: String) ={
-    val request = search(s"profile-internet-contract-${month}" / "docs") aggregations (
+    val request = search(s"profile-internet-contract-${month}" / "docs") query("!(region:0) AND !(TenGoi: \"FTTH - TV Only\") AND !(TenGoi: \"ADSL - TV Only\") AND !(TenGoi: \"ADSL - TV Gold\") AND !(TenGoi: \"FTTH - TV Gold\") ") aggregations (
       termsAggregation("Region")
         .field("Region")
         .subaggs(
@@ -107,7 +107,7 @@ object  ChurnAgeService{
     getChurnRateAndPercentage(rs,"Region","Status" ,"Age").map(x=> (x._1, x._2, x._3, x._5, x._6))
   }
 
-  private def getChurnRateAndPercentage(response: SearchResponse, term1: String, term2: String, term3: String): Array[(String, String, String, Int, Int, Int)] = {
+  def getChurnRateAndPercentage(response: SearchResponse, term1: String, term2: String, term3: String): Array[(String, String, String, Int, Int, Int)] = {
     if (response.aggregations != null) {
       response.aggregations
         .getOrElse(term1, Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
@@ -170,7 +170,7 @@ object  ChurnAgeService{
     val sumByRegionAge       = rs.map(x=> (x._1, x._3, x._5, CommonService.format2Decimal(x._5 * 100.0 / x._4)))
     val sumByRegionAgeStatus = array.groupBy(x=> x._1-> x._3).map(x=> (x._1._1,x._1._2, x._2.map(y=> y._5).sum))
      sumByRegionAge.map(x=> (x._1.toInt, x._2.toInt, CommonService.format2Decimal(x._3 * 100.0 / sumByRegionAgeStatus.filter(y=> y._1 == x._1).filter(y=> y._2 == x._2)
-      .map(y=> y._3).sum), x._4))
+      .map(y=> y._3).sum), x._4, x._3))
   }
 
   def getInternet(request: Request[AnyContent]) = {
@@ -189,15 +189,16 @@ object  ChurnAgeService{
     val mapAge = AgeGroupUtil.AGE.map(y=> y._2).toArray
     val mapRegion = CommonUtil.REGION.map(x=> x._2).toArray
     var mapGroup = Array[(Int, Int)]()
-    val arrEmpty = Array(0.0 -> 0.0)
+    val arrEmpty = Array((0.0, 0.0, 0))
     for(i <- 0 until mapRegion.size){
       for(j <- 0 until mapAge.size){
         mapGroup :+= (mapRegion(i) -> mapAge(j))
       }
     }
-    val churnStatus = mapGroup.map(x=> (x._1, x._2, if(rsStatus.filter(y=> y._1 == x._1).filter(y=> y._2 == x._2).length ==0) arrEmpty else rsStatus.filter(y=> y._1 == x._1).filter(y=> y._2 == x._2).map(x=> x._3 -> x._4)))
+    val churnStatus = mapGroup.map(x=> (x._1, x._2, if(rsStatus.filter(y=> y._1 == x._1).filter(y=> y._2 == x._2).length ==0) arrEmpty else rsStatus.filter(y=> y._1 == x._1)
+      .filter(y=> y._2 == x._2).map(x=>( x._3, x._4, x._5))))
       .flatMap(x=> x._3.map(y=> (x._1, x._2) -> y))
-      .map(x=> (x._1._1, x._1._2, x._2._1, x._2._2))
+      .map(x=> (x._1._1, x._1._2, x._2._1, x._2._2, x._2._3))
 
     //println(s"month:$month AND Region:$region")
     val churnAge = calChurnRateAndPercentageByAge(getChurnGroupAge(s"month:$month AND Region:$region"), status)

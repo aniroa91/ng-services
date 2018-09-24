@@ -45,6 +45,8 @@ object AgeGroupUtil {
 
   def getAgeById(id: Int): String = AGE.find(x=> x._2 == id).get._1
 
+  def getAgeIdByName(name: String): Int = AGE.find(x=> x._1 == name).get._2
+
   def getCalAgeByName(name: String): String = AGE_CALCULATE.find(x=> x._1 == name).get._2
 
 }

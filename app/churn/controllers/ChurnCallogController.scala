@@ -18,6 +18,7 @@ import services.Configure
 import play.api.libs.json.Json
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.ftel.bigdata.utils.StringUtil
+import service.ChurnCallogService
 
 /**
   * This controller creates an `Action` to handle HTTP requests to the
@@ -29,14 +30,71 @@ class ChurnCallogController @Inject() (cc: ControllerComponents) extends Abstrac
 
   def index() = withAuth { username => implicit request: Request[AnyContent] =>
     val month = CommonService.getPrevMonth()
-    try {
-      //val rs = ChurnAgeService.getInternet(null)
-      Ok(churn.views.html.calllog.index(null, month, username, churn.controllers.routes.ChurnCallogController.index()))
-    }
+    //try {
+      val rs = ChurnCallogService.getInternet(null)
+      Ok(churn.views.html.calllog.index(rs, month, username, churn.controllers.routes.ChurnCallogController.index()))
+   /* }
     catch {
-      case e: Exception => Ok(churn.views.html.age.index(null, month, username, churn.controllers.routes.ChurnCallogController.index()))
-    }
+      case e: Exception => Ok(churn.views.html.calllog.index(null, month, username, churn.controllers.routes.ChurnCallogController.index()))
+    }*/
   }
 
+  def getJsonChurn() = withAuth {username => implicit request: Request[AnyContent] =>
+    try{
+      val rs = ChurnCallogService.getInternet(request)
+      /*val churn1 = Json.obj(
+        "cates"        -> rs.churnRegion.map(x=> "Vung "+ x._1),
+        "churnRate"    -> rs.churnRegion.map(x=> x._2),
+        "churnPercent" -> rs.churnRegion.map(x=> x._3)
+      )
+      val churn2 = Json.obj(
+        "cates"        -> rs.churnProfile.map(x=> x._1),
+        "churnRate"    -> rs.churnProfile.map(x=> x._2),
+        "churnPercent" -> rs.churnProfile.map(x=> x._3)
+      )
+      val minPerc3 = if(rs.trendRegionMonth._2.length > 0) CommonService.format3Decimal(rs.trendRegionMonth._2.map(x=>x._4).min) else 0
+      val maxPerc3 = if(rs.trendRegionMonth._2.length > 0) CommonService.format3Decimal(rs.trendRegionMonth._2.map(x=>x._4).max) else 0
+      val churn3 = Json.obj(
+        "cates" -> rs.trendRegionMonth._1,
+        "data"       -> rs.trendRegionMonth._2,
+        "minPercent" -> minPerc3,
+        "maxPercent" -> maxPerc3
+      )
+      val minPerc4 = if(rs.trendProfileMonth._3.length > 0) CommonService.format3Decimal(rs.trendProfileMonth._3.map(x=>x._4).min) else 0
+      val maxPerc4 = if(rs.trendProfileMonth._3.length > 0) CommonService.format3Decimal(rs.trendProfileMonth._3.map(x=>x._4).max) else 0
+      val churn4 = Json.obj(
+        "catesProfile" -> rs.trendProfileMonth._1,
+        "catesMonth"  -> rs.trendProfileMonth._2,
+        "data"       -> rs.trendProfileMonth._3,
+        "minPercent" -> minPerc4,
+        "maxPercent" -> maxPerc4
+      )
+      val minPerc5 = if(rs.trendAgeProfile._2.length > 0) CommonService.format3Decimal(rs.trendAgeProfile._2.map(x=>x._4).min) else 0
+      val maxPerc5 = if(rs.trendAgeProfile._2.length > 0) CommonService.format3Decimal(rs.trendAgeProfile._2.map(x=>x._4).max) else 0
+      val churn5 = Json.obj(
+        "catesProfile" -> rs.trendAgeProfile._1,
+        "data"       -> rs.trendAgeProfile._2,
+        "minPercent" -> minPerc5,
+        "maxPercent" -> maxPerc5
+      )
+      val heat_map = Json.obj(
+        "data"   -> rs.numberOfContracts._3,
+        "xAxis"  -> rs.numberOfContracts._1,
+        "yAxis"  -> rs.numberOfContracts._2.map(x=> x._1)
+      )*/
+     /* val json = Json.obj(
+        "churn1" -> churn1,
+        "churn2" -> churn2,
+        "churn3" -> churn3,
+        "churn4" -> churn4,
+        "churn5" -> churn5,
+        "heat_map" -> heat_map
+      )*/
+      Ok("1")
+    }
+    catch{
+      case e: Exception => Ok("Error")
+    }
+  }
 
 }

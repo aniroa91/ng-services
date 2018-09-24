@@ -1,4 +1,4 @@
-@(rs: (Array[(Int, Int, Double, Double)], Array[(Int, Double, Double)], Array[(String, Double, Double)]), month: String, email: String ,postUrl: Call)(implicit request: RequestHeader)
+@(rs: churn.models.CallogResponse, month: String, email: String ,postUrl: Call)(implicit request: RequestHeader)
 
 @import services.domain.CommonService.formatNumber
 @import services.domain.CommonService.percent
@@ -205,27 +205,27 @@
                 }
                 /* Extra small devices (phones, 600px and down) */
                 @@media only screen and (max-width: 600px) {
-                .right_col{
+                .right_div2{
                     min-height: 0px!important;
-                    max-height: 400px;
+                    max-height: 200px;
                     overflow-y: auto;
                 }
                 }
 
                 /* Medium devices (landscape tablets, 768px and up) */
                 @@media only screen and (min-width: 1200px) {
-                .right_col{
+                .right_div2{
                     min-height: 0px!important;
-                    max-height: 700px;
+                    max-height: 450px;
                     overflow-y: auto;
                 }
                 }
 
                 /* Extra large devices (large laptops and desktops, 1200px and up) */
                 @@media only screen and (min-width: 1400px) {
-                .right_col{
+                .right_div2{
                     min-height: 0px!important;
-                    max-height: 850px;
+                    max-height: 725px;
                     overflow-y: auto;
                 }
                 }
@@ -276,7 +276,7 @@
                                     </select>
                                 </div>
                                 <div class="col-lg-12 lineDiv"></div>
-                                <div class="col-lg-12" id="divStatus" style="height: 125px">
+                                <div class="col-lg-12" id="divMonth" style="height: 125px">
                                     <span class="titFilter"><i class="fa fa-bell"></i> Group Month</span></i>
                                     <div class="input-group date" id="monthPicker" style="margin-top: 10px">
                                         <input type="text" id="monthGrp" class="form-control" value="@month" readonly="true" style="text-align: center;cursor: pointer;background-color: white" >
@@ -332,28 +332,46 @@
                 @if(rs != null) {
                     @helper.CSRF.formField
                     <input type="hidden" value="@month" id="month">
-                    <input type="hidden" id="age">
+                    <input type="hidden" id="age" value="*">
                     <input type="hidden" id="region">
+                    <input type="hidden" id="cateArr" value="@rs.churnCates.map(x=> x._1).mkString(",")">
+                    <input type="hidden" id="cateCurr">
                     <div class="row top_tiles">
                         <div class="col-lg-6 col-sm-6 col-md-6 col-xs-12">
                             <div class="x_panel tile" style="padding: 0px">
                                 <div class="title disInline">
-                                    <span style="width: 90%">Churn Rate and Churn Percentage by Contract Age <b id="monthAge" style="color: #f1b53d">(@month)</b></span>
+                                    <span style="width: 90%">Number of Inbound Calls and Number of Contracts Who Call in</span>
                                     <div class="clearfix"></div>
                                 </div>
                                 <div class="x_content">
-                                    <div id="churn1" style="width: auto; height: 350px;"></div>
+                                    <div id="churn1" style="width: auto; height: 320px;"></div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-6 col-sm-6 col-md-6 col-xs-12">
                             <div class="x_panel tile" style="padding: 0px">
                                 <div class="title disInline">
-                                    <span style="width: 90%">Churn Rate and Churn Percentage by Contract Month <b id="ageTitle" style="color: #f1b53d"></b> </span>
+                                    <span style="width: 90%">For Contracts Who Call in: Trend in Churn Rate and Churn Percentage</span>
                                     <div class="clearfix"></div>
                                 </div>
                                 <div class="x_content">
-                                    <div id="churn2" style="width: auto; height: 350px;"></div>
+                                    <div id="churn2" style="width: auto; height: 320px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="right_div2">
+
+                    <div class="row top_tiles">
+                        <div class="col-lg-12 col-sm-12 col-md-12 col-xs-12">
+                            <div class="x_panel tile" style="padding: 0px">
+                                <div class="title disInline">
+                                    <span style="width: 90%">Number of Contracts Who Call In by Region</span>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content">
+                                    <div id="churn3" style="width: auto; height: 350px;"></div>
                                 </div>
                             </div>
                         </div>
@@ -363,19 +381,19 @@
                         <div class="col-lg-12 col-sm-12 col-md-12 col-xs-12">
                             <div class="x_panel tile" style="padding: 0px">
                                 <div class="title disInline">
-                                    <span style="width: 90%">Churn Rate and Churn Percentage by Contract Age by Region <b id="monthRegion" style="color: #f1b53d">(@month)</b></span>
+                                    <span style="width: 90%">For Contracts Who Call in: Trend in Churn Rate and Churn Percentage by Region</span>
                                     <div class="clearfix"></div>
                                 </div>
                                 <div class="x_content">
                                     <div class="chartWithOverlay animated slideInUp" id="chartWithOverlay">
-                                        <div id="churn_tooltip" class="custom_tooltip" style="display: none"></div>
-                                        <div id="container" style="width: auto; height: 600px;"></div>
-                                        <div class="overlay">
+                                        <div id="churn4_tooltip" class="custom_tooltip" style="display: none"></div>
+                                        <div id="churn4" style="width: auto; height: 600px;"></div>
+                                        <div class="overlay" id="churn4_overlay">
                                             <span style="font-size: 16px;color: #0D3349">ChurnPert (%)</span>
-                                            <div style="margin-bottom: 2px;margin-top: 4px"><div class="circle" style="background: #f2473c;"><span style="opacity: 0">1</span></div><span id="txtMin" style="color:#0D3349 ">@format3Decimal(rs._1.toSeq.map(x=>x._4).min)</span></div>
-                                            <div style="margin-bottom: 2px"><div class="circle" style="background: #f2473c;"><span style="opacity: 0">111</span></div><span style="color:#0D3349 ">@format3Decimal((rs._1.toSeq.map(x=>x._4).max -rs._1.toSeq.map(x=>x._4).min)/5*2)</span></div>
-                                            <div style="margin-bottom: 2px"><div class="circle" style="background: #f2473c;"><span style="opacity: 0">1111</span></div><span style="color:#0D3349 ">@format3Decimal((rs._1.toSeq.map(x=>x._4).max -rs._1.toSeq.map(x=>x._4).min)/5*3)</span></div>
-                                            <div><div class="circle" style="background: #f2473c"><span style="opacity: 0">11111</span></div><span id="txtMax" style="color:#0D3349 ">@format3Decimal(rs._1.toSeq.map(x=>x._4).max)</span></div>
+                                            <div style="margin-bottom: 2px;margin-top: 4px"><div class="circle" style="background: #f2473c;"><span style="opacity: 0">1</span></div><span id="churn4_txtMin" style="color:#0D3349 ">@format3Decimal(rs.trendRegionMonth._2.map(x=>x._4).min)</span></div>
+                                            <div style="margin-bottom: 2px"><div class="circle" style="background: #f2473c;"><span style="opacity: 0">111</span></div><span id="churn4_circle2" style="color:#0D3349 ">@format3Decimal((rs.trendRegionMonth._2.map(x=>x._4).max -rs.trendRegionMonth._2.map(x=>x._4).min)/5*2)</span></div>
+                                            <div style="margin-bottom: 2px"><div class="circle" style="background: #f2473c;"><span style="opacity: 0">1111</span></div><span id="churn4_circle3" style="color:#0D3349 ">@format3Decimal((rs.trendRegionMonth._2.map(x=>x._4).max -rs.trendRegionMonth._2.map(x=>x._4).min)/5*3)</span></div>
+                                            <div><div class="circle" style="background: #f2473c"><span style="opacity: 0">11111</span></div><span id="churn4_txtMax" style="color:#0D3349 ">@format3Decimal(rs.trendRegionMonth._2.map(x=>x._4).max)</span></div>
                                         </div>
                                     </div>
                                 </div>
@@ -383,6 +401,58 @@
                         </div>
                     </div>
 
+                    <div class="row top_tiles">
+                        <div class="col-lg-12 col-sm-12 col-md-12 col-xs-12">
+                            <div class="x_panel tile" style="padding: 0px">
+                                <div class="title disInline">
+                                    <span style="width: 90%">Number of Contracts Who Call in by Region by Contract Age</span>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content">
+                                    <div id="churn5" style="width: auto; height: 350px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row top_tiles">
+                        <div class="col-lg-12 col-sm-12 col-md-12 col-xs-12">
+                            <div class="x_panel tile" style="padding: 0px">
+                                <div class="title disInline">
+                                    <span style="width: 90%">For Contracts Who Call In: Churn Rate and Churn Percentage by Region by Contract Age</span>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content">
+                                    <div class="chartWithOverlay animated slideInUp" id="chartWithOverlay">
+                                        <div id="churn6_tooltip" class="custom_tooltip" style="display: none"></div>
+                                        <div id="churn6" style="width: auto; height: 600px;"></div>
+                                        <div class="overlay" id="churn4_overlay">
+                                            <span style="font-size: 16px;color: #0D3349">ChurnPert (%)</span>
+                                            <div style="margin-bottom: 2px;margin-top: 4px"><div class="circle" style="background: green;"><span style="opacity: 0">1</span></div><span id="churn6_txtMin" style="color:#0D3349 ">@format3Decimal(rs.callRegionAge.map(x=>x._4).min)</span></div>
+                                            <div style="margin-bottom: 2px"><div class="circle" style="background: green;"><span style="opacity: 0">111</span></div><span id="churn6_circle2" style="color:#0D3349 ">@format3Decimal((rs.callRegionAge.map(x=>x._4).max -rs.callRegionAge.map(x=>x._4).min)/5*2)</span></div>
+                                            <div style="margin-bottom: 2px"><div class="circle" style="background: green;"><span style="opacity: 0">1111</span></div><span id="churn6_circle3" style="color:#0D3349 ">@format3Decimal((rs.callRegionAge.map(x=>x._4).max -rs.callRegionAge.map(x=>x._4).min)/5*3)</span></div>
+                                            <div><div class="circle" style="background: green"><span style="opacity: 0">11111</span></div><span id="churn6_txtMax" style="color:#0D3349 ">@format3Decimal(rs.callRegionAge.map(x=>x._4).max)</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row top_tiles">
+                        <div class="col-lg-12 col-sm-12 col-md-12 col-xs-12">
+                            <div class="x_panel tile" style="padding: 0px">
+                                <div class="title disInline">
+                                    <span style="width: 90%">Churn Rate and Churn Percentage by Call Category</span>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content">
+                                    <div id="churn7" style="width: auto; height: 350px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
                 } else{
                     <div class="row"><h2 class="noData-title">
                         Sorry, This page is under construction, please come back later...</h2></div>
@@ -403,6 +473,7 @@
             <!-- Hight chart -->
         <script src="/assets/javascripts/highcharts.js"></script>
         <script src="/assets/javascripts/exporting.js"></script>
+        <script src="/assets/javascripts/heatmap.js"></script>
         <script src="/assets/javascripts/jquery.counterup.min.js"></script>
         <script src="/assets/javascripts/waitMe.js"></script>
         <script src="/assets/javascripts/common_churn.js"></script>
@@ -410,7 +481,7 @@
         <script src="/assets/datepicker/js/bootstrap-datepicker.js"></script>
 
         @if(rs != null) {
-            @scripts()
+            @scripts(rs)
         }
     </body>
 </html>
