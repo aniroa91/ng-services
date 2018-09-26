@@ -27,7 +27,7 @@ object  ChurnRegionService{
   val client = Configure.client
 
   def getChurnGroupMonth(queryString: String) ={
-    val request = search(s"profile-internet-contract-*" / "docs") query(queryString +" AND !(Region:0) AND !(TenGoi: \"FTTH - TV Only\") AND !(TenGoi: \"ADSL - TV Only\") AND !(TenGoi: \"ADSL - TV Gold\") AND !(TenGoi: \"FTTH - TV Gold\") ") aggregations (
+    val request = search(s"profile-internet-contract-*" / "docs") query(queryString +" AND !(Region:0) AND !(TenGoi: \"FTTH - TV ONLY\") AND !(TenGoi: \"ADSL - TV ONLY\") AND !(TenGoi: \"ADSL - TV GOLD\") AND !(TenGoi: \"FTTH - TV GOLD\") ") aggregations (
       termsAggregation("month")
         .field("month")
         .subaggs(
@@ -58,7 +58,7 @@ object  ChurnRegionService{
   }
 
   def getChurnGroupbyStatusRegion(queryString: String) ={
-    val request = search(s"profile-internet-contract-*" / "docs") query(queryString +" AND !(Region:0) AND !(TenGoi: \"FTTH - TV Only\") AND !(TenGoi: \"ADSL - TV Only\") AND !(TenGoi: \"ADSL - TV Gold\") AND !(TenGoi: \"FTTH - TV Gold\") ") aggregations (
+    val request = search(s"profile-internet-contract-*" / "docs") query(queryString +" AND !(Region:0) AND !(TenGoi: \"FTTH - TV ONLY\") AND !(TenGoi: \"ADSL - TV ONLY\") AND !(TenGoi: \"ADSL - TV GOLD\") AND !(TenGoi: \"FTTH - TV GOLD\") ") aggregations (
       termsAggregation("Status")
         .field("Status")
         .subaggs(
@@ -72,7 +72,7 @@ object  ChurnRegionService{
   }
 
   def getChurnGroupbyStatusProfile(queryString: String) ={
-    val request = search(s"profile-internet-contract-*" / "docs") query(queryString + " AND !(Region:0) AND !(TenGoi: \"FTTH - TV Only\") AND !(TenGoi: \"ADSL - TV Only\") AND !(TenGoi: \"ADSL - TV Gold\") AND !(TenGoi: \"FTTH - TV Gold\") ") aggregations (
+    val request = search(s"profile-internet-contract-*" / "docs") query(queryString + " AND !(Region:0) AND !(TenGoi: \"FTTH - TV ONLY\") AND !(TenGoi: \"ADSL - TV ONLY\") AND !(TenGoi: \"ADSL - TV GOLD\") AND !(TenGoi: \"FTTH - TV GOLD\") ") aggregations (
       termsAggregation("Status")
         .field("Status")
         .subaggs(
@@ -86,7 +86,7 @@ object  ChurnRegionService{
   }
 
   def getTrendRegionOrProfileMonth(queryString: String, _type: String) ={
-    val request = search(s"profile-internet-contract-*" / "docs") query(queryString + " AND !(Region:0) AND !(TenGoi: \"FTTH - TV Only\") AND !(TenGoi: \"ADSL - TV Only\") AND !(TenGoi: \"ADSL - TV Gold\") AND !(TenGoi: \"FTTH - TV Gold\") ") aggregations (
+    val request = search(s"profile-internet-contract-*" / "docs") query(queryString + " AND !(Region:0) AND !(TenGoi: \"FTTH - TV ONLY\") AND !(TenGoi: \"ADSL - TV ONLY\") AND !(TenGoi: \"ADSL - TV GOLD\") AND !(TenGoi: \"FTTH - TV GOLD\") ") aggregations (
       termsAggregation("month")
         .field("month")
         .subaggs(
@@ -103,7 +103,7 @@ object  ChurnRegionService{
   }
 
   def getTrendAgeProfile(month: String, region: String) = {
-    val request = search(s"profile-internet-contract-${month}" / "docs") query(region +" AND !(Region:0) AND !(TenGoi: \"FTTH - TV Only\") AND !(TenGoi: \"ADSL - TV Only\") AND !(TenGoi: \"ADSL - TV Gold\") AND !(TenGoi: \"FTTH - TV Gold\") ") aggregations (
+    val request = search(s"profile-internet-contract-${month}" / "docs") query(region +" AND !(Region:0) AND !(TenGoi: \"FTTH - TV ONLY\") AND !(TenGoi: \"ADSL - TV ONLY\") AND !(TenGoi: \"ADSL - TV GOLD\") AND !(TenGoi: \"FTTH - TV GOLD\") ") aggregations (
       rangeAggregation("Age")
         .field("Age")
         .range("6", 0, 6.0001)

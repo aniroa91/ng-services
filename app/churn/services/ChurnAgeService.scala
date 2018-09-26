@@ -25,7 +25,7 @@ object  ChurnAgeService{
   val client = Configure.client
 
   def getChurnGroupMonth(queryString: String) ={
-    val request = search(s"profile-internet-contract-*" / "docs") query(queryString+" AND !(Region:0) AND !(TenGoi: \"FTTH - TV Only\") AND !(TenGoi: \"ADSL - TV Only\") AND !(TenGoi: \"ADSL - TV Gold\") AND !(TenGoi: \"FTTH - TV Gold\") ") aggregations (
+    val request = search(s"profile-internet-contract-*" / "docs") query(queryString+" AND !(Region:0) AND !(TenGoi: \"FTTH - TV ONLY\") AND !(TenGoi: \"ADSL - TV ONLY\") AND !(TenGoi: \"ADSL - TV GOLD\") AND !(TenGoi: \"FTTH - TV GOLD\") ") aggregations (
       termsAggregation("month")
         .field("month")
         .subaggs(
@@ -56,7 +56,7 @@ object  ChurnAgeService{
   }
 
   def getChurnGroupAge(queryString: String) ={
-    val request = search(s"profile-internet-contract-*" / "docs") query(queryString+" AND !(Region:0) AND !(TenGoi: \"FTTH - TV Only\") AND !(TenGoi: \"ADSL - TV Only\") AND !(TenGoi: \"ADSL - TV Gold\") AND !(TenGoi: \"FTTH - TV Gold\") ") aggregations (
+    val request = search(s"profile-internet-contract-*" / "docs") query(queryString+" AND !(Region:0) AND !(TenGoi: \"FTTH - TV ONLY\") AND !(TenGoi: \"ADSL - TV ONLY\") AND !(TenGoi: \"ADSL - TV GOLD\") AND !(TenGoi: \"FTTH - TV GOLD\") ") aggregations (
       termsAggregation("Status")
         .field("Status")
         .subaggs(
@@ -80,7 +80,7 @@ object  ChurnAgeService{
   }
 
   def getChurn(month: String) ={
-    val request = search(s"profile-internet-contract-${month}" / "docs") query("!(region:0) AND !(TenGoi: \"FTTH - TV Only\") AND !(TenGoi: \"ADSL - TV Only\") AND !(TenGoi: \"ADSL - TV Gold\") AND !(TenGoi: \"FTTH - TV Gold\") ") aggregations (
+    val request = search(s"profile-internet-contract-${month}" / "docs") query("!(region:0) AND !(TenGoi: \"FTTH - TV ONLY\") AND !(TenGoi: \"ADSL - TV ONLY\") AND !(TenGoi: \"ADSL - TV GOLD\") AND !(TenGoi: \"FTTH - TV GOLD\") ") aggregations (
       termsAggregation("Region")
         .field("Region")
         .subaggs(

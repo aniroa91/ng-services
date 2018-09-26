@@ -26,10 +26,57 @@ function getJsonChurnMonth(churnRate, churnPercent){
     return rs
 }
 
+function getJson2Column1Line(count_ct, churnPercent){
+    var rs = []
+    rs.push({
+        name: "Count Contract",
+        type: 'column',
+        yAxis: 0,
+        data: count_ct
+    })
+    rs.push({
+        name: "Churn Percent",
+        type: 'line',
+        yAxis: 1,
+        data: churnPercent
+    })
+
+    return rs
+}
+
 var keyByValue = function(arrs, value) {
     var kArray = Object.keys(arrs);        // Creating array of keys
     var vArray = Object.values(arrs);      // Creating array of values
     var vIndex = vArray.indexOf(value);         // Finding value index
 
     return kArray[vIndex];                      // Returning key by value index
+}
+
+function getIdBynameAge(name){
+    var age = 0
+    switch (name){
+        case "0-6" :
+            age = 6;break;
+        case "06-12" :
+            age = 12;break;
+        case "12-18" :
+            age = 18;break;
+        case "18-24" :
+            age = 24;break;
+        case "24-30" :
+            age = 30;break;
+        case "30-36" :
+            age = 36;break;
+        case "36-42" :
+            age = 42;break;
+        case "42-48" :
+            age = 48;break;
+        case "48-54" :
+            age = 54;break;
+        case "54-60" :
+            age = 60;break;
+        case ">60" :
+            age = 66;break;
+    }
+    return age
 }
