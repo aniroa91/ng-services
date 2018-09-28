@@ -52,6 +52,35 @@ var keyByValue = function(arrs, value) {
     return kArray[vIndex];                      // Returning key by value index
 }
 
+function getNameByIdAge(id){
+    var age = "0-6"
+    switch (id){
+        case 6 :
+            age = "0-6";break;
+        case 12 :
+            age = "06-12";break;
+        case 18 :
+            age = "12-18";break;
+        case 24 :
+            age = "18-24";break;
+        case 30 :
+            age = "24-30";break;
+        case 36 :
+            age = "30-36";break;
+        case 42 :
+            age = "36-42";break;
+        case 48 :
+            age = "42-48";break;
+        case 54 :
+            age = "48-54";break;
+        case 60 :
+            age = "54-60";break;
+        case 66 :
+            age = ">60";break;
+    }
+    return age
+}
+
 function getIdBynameAge(name){
     var age = 0
     switch (name){

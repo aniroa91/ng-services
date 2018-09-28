@@ -40,7 +40,7 @@ class ChurnCallogController @Inject() (cc: ControllerComponents) extends Abstrac
   }
 
   def getJsonChurn() = withAuth {username => implicit request: Request[AnyContent] =>
-    //try{
+    try{
       val rs = ChurnCallogService.getInternet(request)
       val churn1 = Json.obj(
         "cates"        -> rs.whoCallIn.map(x=> x._1),
@@ -96,10 +96,10 @@ class ChurnCallogController @Inject() (cc: ControllerComponents) extends Abstrac
         "churn7" -> churn7
       )
       Ok(Json.toJson(json))
-   /* }
+    }
     catch{
       case e: Exception => Ok("Error")
-    }*/
+    }
   }
 
 }

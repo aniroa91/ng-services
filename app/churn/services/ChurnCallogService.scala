@@ -770,9 +770,9 @@ object  ChurnCallogService{
 
     val arrayOthers = getCateOthers(queryStr, top9Cates.map(x=> "!(calllog.cate:\""+x._1+"\")"))
     val sumOthersRate = arrayOthers.map(x=> x._2).sum
-    val sumOtherPercent = array.filter(x=> x._2.toInt == status)(0)._4
-    val others = arrayOthers.filter(x=> x._1.toInt == status).map(x=> ("Others", CommonService.format2Decimal(x._2 * 100.00 / sumOthersRate), CommonService.format2Decimal(x._2 * 100.00 / sumOtherPercent)))
-
+    val sumOtherPercent = if(array.filter(x=> x._2.toInt == status).length >0) array.filter(x=> x._2.toInt == status)(0)._4 else 0
+    val others = if(sumOtherPercent >0) arrayOthers.filter(x=> x._1.toInt == status).map(x=> ("Others", CommonService.format2Decimal(x._2 * 100.00 / sumOthersRate), CommonService.format2Decimal(x._2 * 100.00 / sumOtherPercent)))
+                 else Array[(String, Double, Double)]()
     top9Cates ++ others
   }
 

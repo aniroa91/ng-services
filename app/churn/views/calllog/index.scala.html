@@ -30,6 +30,14 @@
             <!-- bootstrap-daterangepicker -->
         <link href="/assets/datepicker/css/bootstrap-datepicker.css" rel="stylesheet">
         <style type="text/css">
+                .txtControl{
+                    margin-top: 5px;
+                    padding: 6px 12px;
+                    font-size: 14px;
+                    line-height: 1.42857143;
+                    color: #fff;
+                    background-color: #16a085;
+                }
                 .top_nav .navbar-right {
                     width: auto;
                 }
@@ -263,6 +271,22 @@
                         <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
                             <div class="col-xs-12 filter"><i class="fa fa-filter"></i> FILTERING </div>
                             <div class="menu_section divLeft col-xs-12" style="padding:0;">
+                                <div class="col-lg-12">
+                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Age</span></i>
+                                    <p class="txtControl" style="display: none" id="txtAge"></p>
+                                </div>
+                                <div class="col-lg-12 lineDiv"></div>
+                                <div class="col-lg-12">
+                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Region</span></i>
+                                    <p class="txtControl" id="txtRegion" style="display: none"></p>
+                                </div>
+                                <div class="col-lg-12 lineDiv"></div>
+                                <div class="col-lg-12">
+                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Category</span></i>
+                                    <p class="txtControl" id="txtCate" style="display: none"></p>
+                                </div>
+                                <div class="col-lg-12 lineDiv"></div>
+
                                 <div class="col-lg-12" id="divStatus" style="height: 100px">
                                     <span class="titFilter"><i class="fa fa-bell"></i> Group Status</span></i>
                                     <select class="form-control" id="slStatus" style="cursor: pointer;margin-top: 10px">
@@ -284,9 +308,10 @@
                                         </span>
                                     </div>
                                 </div>
+
                                 <div class="col-lg-12 filter">
                                     <a id="apply" class="btn btn-xs btn-success" style="float: right;"><i class="fa fa-check-circle"></i> Apply</a>
-                                    <a href="/internet/age" class="btn btn-xs btn-secondary" style="float: right;background: #6c757d;color: #fff"><i class="fa fa-refresh"></i> Refresh</a>
+                                    <a id="refresh" class="btn btn-xs btn-secondary" style="float: right;background: #6c757d;color: #fff"><i class="fa fa-refresh"></i> Refresh</a>
                                 </div>
                             </div>
 

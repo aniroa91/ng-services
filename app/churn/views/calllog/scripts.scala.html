@@ -259,39 +259,66 @@
                     }
                     // change label month
                     if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#444444')) {
-                        if(text.innerHTML == 0 || text.innerHTML == 13)
-                            text.setAttribute('fill-opacity',0)
-                        else{
-                            switch ( text.innerHTML){
-                                case "1" :
-                                    text.innerHTML = keyByValue(catesMonthRegion, 1) ;break;
-                                case "2" :
-                                    text.innerHTML = keyByValue(catesMonthRegion, 2) ;break;
-                                case "3" :
-                                    text.innerHTML = keyByValue(catesMonthRegion, 3) ;break;
-                                case "4" :
-                                    text.innerHTML = keyByValue(catesMonthRegion, 4) ;break;
-                                case "5" :
-                                    text.innerHTML = keyByValue(catesMonthRegion, 5) ;break;
-                                case "6" :
-                                    text.innerHTML = keyByValue(catesMonthRegion, 6) ;break;
-                                case "7" :
-                                    text.innerHTML = keyByValue(catesMonthRegion, 7) ;break;
-                                case "8" :
-                                    text.innerHTML = keyByValue(catesMonthRegion, 8) ;break;
-                                case "9" :
-                                    text.innerHTML = keyByValue(catesMonthRegion, 9) ;break;
-                                case "10" :
-                                    text.innerHTML = keyByValue(catesMonthRegion, 10) ;break;
-                                case "11" :
-                                    text.innerHTML = keyByValue(catesMonthRegion, 11) ;break;
-                                case "12" :
-                                    text.innerHTML = keyByValue(catesMonthRegion, 12) ;break;
+                        if(Object.keys(catesMonthRegion).length == 1){
+                            if (text.innerHTML == 0.5 || text.innerHTML == 0.0 || text.innerHTML == 1.5)
+                                text.setAttribute('fill-opacity', 0)
+                            else {
+                                if(text.innerHTML == 1.0){
+                                    text.innerHTML = keyByValue(catesMonthRegion, 1)
+                                }
+                            }
+                        }
+                        else {
+                            if (text.innerHTML == 0 || text.innerHTML == 13)
+                                text.setAttribute('fill-opacity', 0)
+                            else {
+                                switch (text.innerHTML) {
+                                    case "1" :
+                                        text.innerHTML = keyByValue(catesMonthRegion, 1) ;
+                                        break;
+                                    case "2" :
+                                        text.innerHTML = keyByValue(catesMonthRegion, 2) ;
+                                        break;
+                                    case "3" :
+                                        text.innerHTML = keyByValue(catesMonthRegion, 3) ;
+                                        break;
+                                    case "4" :
+                                        text.innerHTML = keyByValue(catesMonthRegion, 4) ;
+                                        break;
+                                    case "5" :
+                                        text.innerHTML = keyByValue(catesMonthRegion, 5) ;
+                                        break;
+                                    case "6" :
+                                        text.innerHTML = keyByValue(catesMonthRegion, 6) ;
+                                        break;
+                                    case "7" :
+                                        text.innerHTML = keyByValue(catesMonthRegion, 7) ;
+                                        break;
+                                    case "8" :
+                                        text.innerHTML = keyByValue(catesMonthRegion, 8) ;
+                                        break;
+                                    case "9" :
+                                        text.innerHTML = keyByValue(catesMonthRegion, 9) ;
+                                        break;
+                                    case "10" :
+                                        text.innerHTML = keyByValue(catesMonthRegion, 10) ;
+                                        break;
+                                    case "11" :
+                                        text.innerHTML = keyByValue(catesMonthRegion, 11) ;
+                                        break;
+                                    case "12" :
+                                        text.innerHTML = keyByValue(catesMonthRegion, 12) ;
+                                        break;
+                                }
                             }
                         }
                     }
                 });
             });
+            if(Object.keys(catesMonthRegion).length == 1)
+                optionsRegion.hAxis.gridlines.count = 4
+            else
+                optionsRegion.hAxis.gridlines.count = Object.keys(catesMonthRegion).length+2
             chartRegionHuyDv.draw(dataRegionHuyDv, optionsRegion);
             google.visualization.events.addListener(chartRegionHuyDv, 'onmouseover', function (event) {
                 var rate = dataRegionHuyDv.getValue(event.row, 3);
@@ -342,13 +369,18 @@
                             click: function (event) {
                                 var age = getIdBynameAge(event.point.series.xAxis.categories[event.point.x])
                                 var region = event.point.series.yAxis.categories[event.point.y].split(" ")[1]
-                                if(age == $('#age').val() && profile == $('#profile').val()){
+                                $('#txtCate').text("").hide()
+                                if(age == $('#age').val() && region == $('#region').val()){
                                     $('#region').val("")
                                     $('#age').val("")
+                                    $('#txtAge').text("").hide()
+                                    $('#txtRegion').text("").hide()
                                 }
                                 else{
                                     $('#region').val(region)
                                     $('#age').val(age)
+                                    $('#txtAge').text(getNameByIdAge(age)).show()
+                                    $('#txtRegion').text('Vung '+region).show()
                                 }
                                 $('#cateCurr').val("")
                                 ajaxGetChurnCallIn("churn5")
@@ -439,17 +471,22 @@
             });
             chartHuyDv.draw(dataHuyDv, options);
             google.visualization.events.addListener(chartHuyDv, 'select', function () {
-                var selection = chartHuyDv.getSelection();
+                var selection = chartHuyDv.getSelection()
+                $('#txtCate').text("").hide()
                 if(selection.length >0) {
                     var row = selection[0].row;
                     var region = dataHuyDv.getValue(row, 2)
                     var age = dataHuyDv.getValue(row, 1)
                     $('#age').val(age)
                     $('#region').val(region)
+                    $('#txtAge').text(getNameByIdAge(age)).show()
+                    $('#txtRegion').text('Vung ' +region).show()
                 }
                 else{
                     $('#age').val("")
                     $('#region').val("")
+                    $('#txtAge').text("").hide()
+                    $('#txtRegion').text("").hide()
                 }
                 $('#cateCurr').val("")
                 ajaxGetChurnCallIn("churn6")
@@ -522,11 +559,15 @@
                                 click: function () {
                                     $('#age').val("")
                                     $('#region').val("")
-                                    $("#monthPicker").datepicker("update", $('#month').val());
-                                    if(this.category == $('#profile').val()){
+                                    $("#monthPicker").datepicker("update", $('#monthGrp').val());
+                                    $('#txtAge').text("").hide()
+                                    $('#txtRegion').text("").hide()
+                                    if(this.category == $('#cateCurr').val()){
                                         $('#cateCurr').val("")
+                                        $('#txtCate').text("").hide()
                                     }
                                     else {
+                                        $('#txtCate').text(this.category).show()
                                         $('#cateCurr').val(this.category)
                                     }
                                     ajaxGetChurnCallIn("churn7")
@@ -549,6 +590,23 @@
                 $('#region').val("")
                 $('#age').val("")
                 $('#cateCurr').val("")
+                $('#txtAge').text("").hide()
+                $('#txtRegion').text("").hide()
+                $('#txtCate').text("").hide()
+                ajaxGetChurnCallIn("*")
+            })
+
+            // click refresh fitler
+            $('#refresh').click(function () {
+                $('#region').val("")
+                $('#age').val("")
+                $('#cateCurr').val("")
+                $("#monthPicker").datepicker("update", $('#monthGrp').val())
+                $('#slStatus').val("1")
+
+                $('#txtAge').text("").hide()
+                $('#txtRegion').text("").hide()
+                $('#txtCate').text("").hide()
                 ajaxGetChurnCallIn("*")
             })
 
@@ -695,125 +753,115 @@
                             });
                             google.visualization.events.addListener(chartRegionMonth, 'onmouseout', handlerOut);
 
-                          /*  // update chart bubble Trend profile & age
-                            if(_type != "profileAge") {
-                                if(dta.churn5.data.length <= 0){
-                                    $('#churn5_overlay').hide()
-                                    $('#churn5').hide()
+                            // update chart 6 For Contracts Who Call In: Churn Rate and Churn Percentage by Region by Contract Age
+                            if(_type != "churn6") {
+                                if (dta.churn6.data.length <= 0) {
+                                    $('#churn6_overlay').hide()
+                                    $('#churn6').hide()
                                 }
-                                else{
-                                    $('#churn5_overlay').show()
-                                    $('#churn5').show()
+                                else {
+                                    $('#churn6_overlay').show()
+                                    $('#churn6').show()
                                 }
-                                $('#churn5_txtMin').text(dta.churn5.minPercent)
-                                $('#churn5_txtMax').text(dta.churn5.maxPercent)
-                                $('#churn5_circle2').text(Number(dta.churn5.minPercent + (dta.churn5.maxPercent-dta.churn5.minPercent)/5*2).toFixed(2))
-                                $('#churn5_circle3').text(Number(dta.churn5.minPercent + (dta.churn5.maxPercent-dta.churn5.minPercent)/5*3).toFixed(2))
-                                var chartAgeProfile = new google.visualization.BubbleChart(document.getElementById('churn5'))
-                                google.visualization.events.addListener(chartAgeProfile, 'ready', function () {
-                                    Array.prototype.forEach.call(document.getElementById('churn5').getElementsByTagName('text'), function(text) {
+                                $('#churn6_txtMin').text(dta.churn6.minPercent)
+                                $('#churn6_txtMax').text(dta.churn6.maxPercent)
+                                $('#churn6_circle2').text(Number(dta.churn6.minPercent + (dta.churn6.maxPercent - dta.churn6.minPercent) / 5 * 2).toFixed(2))
+                                $('#churn6_circle3').text(Number(dta.churn6.minPercent + (dta.churn6.maxPercent - dta.churn6.minPercent) / 5 * 3).toFixed(2))
+                                var chartRegionAge = new google.visualization.BubbleChart(document.getElementById('churn6'))
+                                google.visualization.events.addListener(chartRegionAge, 'ready', function () {
+                                    Array.prototype.forEach.call(document.getElementById('churn6').getElementsByTagName('text'), function (text) {
                                         if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444')) {
-                                            if(text.innerHTML == 0 | text.innerHTML == undefined || text.innerHTML == Object.keys(dta.churn5.catesProfile).length+1)
-                                                text.setAttribute('fill-opacity',0)
-                                            else{
-                                                switch ( text.innerHTML){
-                                                    case "1" :
-                                                        text.innerHTML = keyByValue(dta.churn5.catesProfile, 1) ;break;
-                                                    case "2" :
-                                                        text.innerHTML = keyByValue(dta.churn5.catesProfile, 2) ;break;
-                                                    case "3" :
-                                                        text.innerHTML = keyByValue(dta.churn5.catesProfile, 3) ;break;
-                                                    case "4" :
-                                                        text.innerHTML = keyByValue(dta.churn5.catesProfile, 4) ;break;
-                                                    case "5" :
-                                                        text.innerHTML = keyByValue(dta.churn5.catesProfile, 5) ;break;
-                                                    case "6" :
-                                                        text.innerHTML = keyByValue(dta.churn5.catesProfile, 6) ;break;
-                                                    case "7" :
-                                                        text.innerHTML = keyByValue(dta.churn5.catesProfile, 7) ;break;
-                                                    case "8" :
-                                                        text.innerHTML = keyByValue(dta.churn5.catesProfile, 8) ;break;
-                                                }
-                                            }
+                                            if (text.innerHTML == 0 || text.innerHTML == 8)
+                                                text.setAttribute('fill-opacity', 0)
                                         }
                                         // change label age
                                         if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#444444')) {
-                                            if(text.innerHTML == 0 || text.innerHTML == 72)
-                                                text.setAttribute('fill-opacity',0)
-                                            else{
-                                                switch ( text.innerHTML){
+                                            if (text.innerHTML == 0 || text.innerHTML == 72)
+                                                text.setAttribute('fill-opacity', 0)
+                                            else {
+                                                switch (text.innerHTML) {
                                                     case "6" :
-                                                        text.innerHTML = "0-6";break;
+                                                        text.innerHTML = "0-6";
+                                                        break;
                                                     case "12" :
-                                                        text.innerHTML = "06-12";break;
+                                                        text.innerHTML = "06-12";
+                                                        break;
                                                     case "18" :
-                                                        text.innerHTML = "12-18";break;
+                                                        text.innerHTML = "12-18";
+                                                        break;
                                                     case "24" :
-                                                        text.innerHTML = "18-24";break;
+                                                        text.innerHTML = "18-24";
+                                                        break;
                                                     case "30" :
-                                                        text.innerHTML = "24-30";break;
+                                                        text.innerHTML = "24-30";
+                                                        break;
                                                     case "36" :
-                                                        text.innerHTML = "30-36";break;
+                                                        text.innerHTML = "30-36";
+                                                        break;
                                                     case "42" :
-                                                        text.innerHTML = "36-42";break;
+                                                        text.innerHTML = "36-42";
+                                                        break;
                                                     case "48" :
-                                                        text.innerHTML = "42-48";break;
+                                                        text.innerHTML = "42-48";
+                                                        break;
                                                     case "54" :
-                                                        text.innerHTML = "48-54";break;
+                                                        text.innerHTML = "48-54";
+                                                        break;
                                                     case "60" :
-                                                        text.innerHTML = "54-60";break;
+                                                        text.innerHTML = "54-60";
+                                                        break;
                                                     case "66" :
-                                                        text.innerHTML = ">60";break;
+                                                        text.innerHTML = ">60";
+                                                        break;
                                                 }
                                             }
                                         }
                                     });
-                                })
-                                var dataAgeProfile = google.visualization.arrayToDataTable(getDataChurn(dta.churn5.data,  "Age", "Profile"))
-                                optionsProfileAge.vAxis.gridlines.count = Object.keys(dta.churn5.catesProfile).length+2
-                                chartAgeProfile.draw(dataAgeProfile, optionsProfileAge)
-                                google.visualization.events.addListener(chartAgeProfile, 'onmouseover', function (event) {
-                                    var rate = dataAgeProfile.getValue(event.row, 3);
-                                    var xAxis = dataAgeProfile.getValue(event.row, 1);
-                                    var yAxis = dataAgeProfile.getValue(event.row, 2);
-                                    var percent = dataAgeProfile.getValue(event.row, 4);
-                                    var contracts = dataAgeProfile.getValue(event.row, 5);
+                                });
+                                var dataRegionAge = google.visualization.arrayToDataTable(getDataChurn(dta.churn6.data, "Month", "Age"))
+                                chartRegionAge.draw(dataRegionAge, options)
+                                google.visualization.events.addListener(chartRegionAge, 'select', function () {
+                                    var selection = chartRegionAge.getSelection()
+                                    $('#txtCate').text("").hide()
+                                    if (selection.length > 0) {
+                                        var row = selection[0].row;
+                                        var region = dataRegionAge.getValue(row, 2)
+                                        var age = dataRegionAge.getValue(row, 1)
+                                        $('#age').val(age)
+                                        $('#region').val(region)
+                                        $('#txtAge').text(getNameByIdAge(age)).show()
+                                        $('#txtRegion').text('Vung '+ region).show()
+                                    }
+                                    else {
+                                        $('#age').val("")
+                                        $('#region').val("")
+                                        $('#txtAge').text("").hide()
+                                        $('#txtRegion').text("").hide()
+                                    }
+                                    $('#cateCurr').val("")
+                                    ajaxGetChurnCallIn("churn6")
+                                });
+                                google.visualization.events.addListener(chartRegionAge, 'onmouseover', function (event) {
+                                    var rate = dataRegionAge.getValue(event.row, 3);
+                                    var xAxis = dataRegionAge.getValue(event.row, 1);
+                                    var yAxis = dataRegionAge.getValue(event.row, 2);
+                                    var percent = dataRegionAge.getValue(event.row, 4);
+                                    var contracts = dataRegionAge.getValue(event.row, 5);
                                     var x = mouseX - 225;
                                     var y = mouseY - 450;
-                                    $('#churn5_tooltip').html('<div><p><b>Age:</b> ' + keyByValue( catesAge, xAxis) +'</p><p><b>Profile:</b> '+ keyByValue( dta.churn5.catesProfile, yAxis) +
-                                            '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
+                                    $('#churn6_tooltip').html('<div><p><b>Age:</b> ' + keyByValue(catesAge, xAxis) + '</p><p><b>Region:</b> ' + yAxis +
+                                            '</p><p><b>Rate:</b> ' + rate + ' %</p><p><b>Percent:</b> ' + percent + ' %</p><p><b>Number of contract:</b> ' + contracts + '</p></div>').css({
                                         'top': y,
                                         'left': x
                                     }).fadeIn('slow');
-                                })
-                                google.visualization.events.addListener(chartAgeProfile, 'select', function () {
-                                    var selection = chartAgeProfile.getSelection();
-                                    if(selection.length >0) {
-                                        var row = selection[0].row;
-                                        var profile = keyByValue(dta.churn5.catesProfile, dataAgeProfile.getValue(row, 2))
-                                        var age = keyByValue(catesAge, dataAgeProfile.getValue(row, 1))
-                                        $('#profile').val(profile)
-                                        $('#age').val(age)
-                                        $('#churn1_profile').text("(Profile: " + profile + " & Age: "+age+")")
-                                        $('#churn3_profile').text("(Profile: " + profile + " & Age: "+age+")")
-                                        $('#churn2_profile').text("(Age: "+age+")")
-                                        $('#churn4_profile').text("(Age: "+age+")")
-                                    }
-                                    else{
-                                        $('#profile').val("")
-                                        $('#age').val("")
-                                        $('#churn1_profile').text("")
-                                        $('#churn2_profile').text("")
-                                        $('#churn3_profile').text("")
-                                        $('#churn4_profile').text("")
-                                    }
-                                    $('#slRegion').val("*")
-                                    $("#monthPicker").datepicker("update", $('#month').val());
-                                    ajaxGetChurn("profileAge")
-                                })
-                                google.visualization.events.addListener(chartAgeProfile, 'onmouseout', handlerOut);
-                            }*/
+                                });
+                                google.visualization.events.addListener(chartRegionAge, 'onmouseout', handlerOut);
+                            }
                         }
+                        else{
+                            alert("Error when excute query. Please check again your system!")
+                        }
+
                     },
                     complete: function () {
                         $('.divLeft').waitMe("hide");
@@ -829,10 +877,9 @@
                 "age"       : $('#age').val(),
                 "cateCurr"  : $('#cateCurr').val(),
                 "topCate"   : $('#cateArr').val(),
-                "month"     : $('#monthGrp').val(),
+                "month"     : $('#month').val(),
                 "status"    : $('#slStatus').val()
             }
-            console.log(obj)
             return obj
         }
 

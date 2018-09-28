@@ -157,14 +157,14 @@
                                         }
                                 },
                                 title: {
-                                        text: '',
+                                        text: 'Churn Percent',
                                         style: {
                                                 color: "#73879C"
                                         }
                                 }
                         }, { // Secondary yAxis
                                 title: {
-                                        text: '',
+                                        text: 'Churn Rate',
                                         style: {
                                                 color: "#dc5a78"
                                         }
@@ -234,14 +234,14 @@
                                         }
                                 },
                                 title: {
-                                        text: '',
+                                        text: 'Churn Percent',
                                         style: {
                                                 color: "#149c7f"
                                         }
                                 }
                         }, { // Secondary yAxis
                                 title: {
-                                        text: '',
+                                        text: 'Churn Rate',
                                         style: {
                                                 color: "#dc5a78"
                                         }
@@ -378,6 +378,9 @@
                                                     });
                                                     google.visualization.events.addListener(chartStatus, 'onmouseout', handlerOut);
                                             }
+                                        }
+                                        else{
+                                                alert("Error when excute query. Please check again your system!")
                                         }
                                 },
                                 complete: function () {

@@ -601,7 +601,7 @@
                                 }
                                 $('#slRegion').val("*")
                                 $("#monthPicker").datepicker("update", $('#month').val());
-                                ajaxGetChurn("*")
+                                ajaxGetChurn("churn5_heatmap")
                             }
                         },
                         dataLabels:{
@@ -658,13 +658,18 @@
                                updateCharts(churn_region, getJsonChurnMonth(dta.churn1.churnRate, dta.churn1.churnPercent))
 
                             // update chart Profile
+                            if(_type != "profile"){
                                churn_profile.xAxis[0].update({categories: dta.churn2.cates});
                                updateCharts(churn_profile, getJsonChurnMonth(dta.churn2.churnRate, dta.churn2.churnPercent))
+                            }
 
                             // update chart Heatmap Contract
-                               churn_heatmap.xAxis[0].update({categories: dta.heat_map.xAxis})
-                               churn_heatmap.yAxis[0].update({categories: dta.heat_map.yAxis})
-                               churn_heatmap.series[0].setData(dta.heat_map.data, true,true,false)
+                            if(_type != "churn5_heatmap") {
+                                churn_heatmap.xAxis[0].update({categories: dta.heat_map.xAxis})
+                                churn_heatmap.yAxis[0].update({categories: dta.heat_map.yAxis})
+                                churn_heatmap.series[0].setData(dta.heat_map.data, true, true, false)
+                            }
+
                             // update chart bubble Trend region & month
                             if(_type != "regionMonth") {
                                 if(dta.churn3.data.length <= 0){
@@ -688,42 +693,68 @@
                                         }
                                         // change label month
                                         if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#444444')) {
-                                            if(text.innerHTML == 0 || text.innerHTML == Object.keys(dta.churn3.cates).length+1)
-                                                text.setAttribute('fill-opacity',0)
-                                            else{
-                                                switch ( text.innerHTML){
-                                                    case "1" :
-                                                        text.innerHTML = keyByValue(dta.churn3.cates, 1) ;break;
-                                                    case "2" :
-                                                        text.innerHTML = keyByValue(dta.churn3.cates, 2) ;break;
-                                                    case "3" :
-                                                        text.innerHTML = keyByValue(dta.churn3.cates, 3) ;break;
-                                                    case "4" :
-                                                        text.innerHTML = keyByValue(dta.churn3.cates, 4) ;break;
-                                                    case "5" :
-                                                        text.innerHTML = keyByValue(dta.churn3.cates, 5) ;break;
-                                                    case "6" :
-                                                        text.innerHTML = keyByValue(dta.churn3.cates, 6) ;break;
-                                                    case "7" :
-                                                        text.innerHTML = keyByValue(dta.churn3.cates, 7) ;break;
-                                                    case "8" :
-                                                        text.innerHTML = keyByValue(dta.churn3.cates, 8) ;break;
-                                                    case "9" :
-                                                        text.innerHTML = keyByValue(dta.churn3.cates, 9) ;break;
-                                                    case "10" :
-                                                        text.innerHTML = keyByValue(dta.churn3.cates, 10) ;break;
-                                                    case "11" :
-                                                        text.innerHTML = keyByValue(dta.churn3.cates, 11) ;break;
-                                                    case "12" :
-                                                        text.innerHTML = keyByValue(dta.churn3.cates, 12) ;break;
+
+                                            if(Object.keys(dta.churn3.cates).length == 1){
+                                                if (text.innerHTML == 0.5 || text.innerHTML == 0.0 || text.innerHTML == 1.5)
+                                                    text.setAttribute('fill-opacity', 0)
+                                                else {
+                                                    if(text.innerHTML == 1.0){
+                                                        text.innerHTML = keyByValue(dta.churn3.cates, 1)
+                                                    }
+                                                }
+                                            }
+                                            else {
+                                                if (text.innerHTML == 0 || text.innerHTML == Object.keys(dta.churn3.cates).length + 1)
+                                                    text.setAttribute('fill-opacity', 0)
+                                                else {
+                                                    switch (text.innerHTML) {
+                                                        case "1" :
+                                                            text.innerHTML = keyByValue(dta.churn3.cates, 1) ;
+                                                            break;
+                                                        case "2" :
+                                                            text.innerHTML = keyByValue(dta.churn3.cates, 2) ;
+                                                            break;
+                                                        case "3" :
+                                                            text.innerHTML = keyByValue(dta.churn3.cates, 3) ;
+                                                            break;
+                                                        case "4" :
+                                                            text.innerHTML = keyByValue(dta.churn3.cates, 4) ;
+                                                            break;
+                                                        case "5" :
+                                                            text.innerHTML = keyByValue(dta.churn3.cates, 5) ;
+                                                            break;
+                                                        case "6" :
+                                                            text.innerHTML = keyByValue(dta.churn3.cates, 6) ;
+                                                            break;
+                                                        case "7" :
+                                                            text.innerHTML = keyByValue(dta.churn3.cates, 7) ;
+                                                            break;
+                                                        case "8" :
+                                                            text.innerHTML = keyByValue(dta.churn3.cates, 8) ;
+                                                            break;
+                                                        case "9" :
+                                                            text.innerHTML = keyByValue(dta.churn3.cates, 9) ;
+                                                            break;
+                                                        case "10" :
+                                                            text.innerHTML = keyByValue(dta.churn3.cates, 10) ;
+                                                            break;
+                                                        case "11" :
+                                                            text.innerHTML = keyByValue(dta.churn3.cates, 11) ;
+                                                            break;
+                                                        case "12" :
+                                                            text.innerHTML = keyByValue(dta.churn3.cates, 12) ;
+                                                            break;
+                                                    }
                                                 }
                                             }
                                         }
                                     });
                                 });
                                 var dataRegionMonth = google.visualization.arrayToDataTable(getDataChurn(dta.churn3.data, "Month", "Region"))
-                                optionsRegion.hAxis.gridlines.count = Object.keys(dta.churn3.cates).length+2
-                                //alert(Object.keys(dta.churn3.cates).length+2)
+                                if(Object.keys(dta.churn3.cates).length == 1)
+                                    optionsRegion.hAxis.gridlines.count = 4
+                                else
+                                    optionsRegion.hAxis.gridlines.count = Object.keys(dta.churn3.cates).length+2
                                 chartRegionMonth.draw(dataRegionMonth, optionsRegion)
                                 google.visualization.events.addListener(chartRegionMonth, 'select', function () {
                                     var selection = chartRegionMonth.getSelection();
@@ -999,6 +1030,9 @@
                                 })
                                 google.visualization.events.addListener(chartAgeProfile, 'onmouseout', handlerOut);
                             }
+                        }
+                        else{
+                            alert("Error when excute query. Please check again your system!")
                         }
                     },
                     complete: function () {
