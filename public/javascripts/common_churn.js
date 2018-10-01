@@ -26,13 +26,19 @@ function getJsonChurnMonth(churnRate, churnPercent){
     return rs
 }
 
-function getJson2Column1Line(count_ct, churnPercent){
+function getJson2Column1Line(count_ct, churnPercent, count_call){
     var rs = []
     rs.push({
         name: "Count Contract",
         type: 'column',
         yAxis: 0,
         data: count_ct
+    })
+    rs.push({
+        name: "Count Call",
+        type: 'column',
+        yAxis: 0,
+        data: count_call
     })
     rs.push({
         name: "Churn Percent",

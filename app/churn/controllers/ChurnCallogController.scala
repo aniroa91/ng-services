@@ -45,7 +45,8 @@ class ChurnCallogController @Inject() (cc: ControllerComponents) extends Abstrac
       val churn1 = Json.obj(
         "cates"        -> rs.whoCallIn.map(x=> x._1),
         "count_ct"     -> rs.whoCallIn.map(x=> x._2),
-        "churnPercent" -> rs.whoCallIn.map(x=> x._3)
+        "churnPercent" -> rs.whoCallIn.map(x=> x._3),
+        "count_all" -> rs.whoCallIn.map(x=> x._4)
       )
       val churn2 = Json.obj(
         "cates"        -> rs.trendCallIn.map(x=> x._1),

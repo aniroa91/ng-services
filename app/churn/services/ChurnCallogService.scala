@@ -50,6 +50,68 @@ object  ChurnCallogService{
                 }
             },
             "aggs": {
+              "month": {
+                  "terms": {
+                       "field": "month",
+                       "size": 24
+                  },
+                  "aggs": {
+                      "calllog": {
+                          "nested": {
+                             "path": "calllog"
+                          }
+                      }
+                  }
+              }
+            },
+            "size": 0,
+            "sort": [
+               {
+                 "month": {
+                    "order": "desc"
+                 }
+               }
+            ]
+        }
+        """
+    //println(query)
+    val body = Http("http://172.27.11.151:9200/churn-calllog-*/docs/_search")
+      .postData(query)
+      .header("content-type", "application/JSON")
+      .asString.body
+    val json = Json.parse(body)
+    val array = json.\("aggregations").\("month").\("buckets").get.asInstanceOf[JsArray].value.toArray
+    array.map(x => (x.\("key").get.asInstanceOf[JsString].toString().replace("\"",""), x.\("doc_count").get.asInstanceOf[JsNumber].toString().toLong,
+      x.\("calllog").\("doc_count").get.asInstanceOf[JsNumber].toString().toLong))
+  }
+
+  def getNumberOfContractCallIn1(region:String, age: String, category: String) ={
+    val queries = "region:"+region+" AND lifeGroup:"+age+" AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\")"
+    val queryNested = if(category == "*") "calllog.cate:*" else "calllog.cate:\""+category+"\""
+    val query = s"""
+        {
+            "query": {
+                "bool": {
+                    "filter": [
+                         {
+                           "query_string" : {
+                              "query": "${queries.replace("\"", "\\\"")}"
+                           }
+                         },
+                         {
+                           "nested": {
+                              "path": "calllog",
+                              "query": {
+                                "query_string": {
+                                    "query": "${queryNested.replace("\"", "\\\"")}"
+                                }
+                              }
+                           }
+                         }
+                    ]
+                }
+            },
+            "aggs": {
                "month": {
                   "terms": {
                     "field": "month",
@@ -836,7 +898,7 @@ object  ChurnCallogService{
     // Number of Contracts Who Call in and Number of Inbound Calls
     val contractAll = getNumberOfContractAll(s"Region:$region AND $ageAll").slice(0,12).sorted
     val whoCallIn   = getNumberOfContractCallIn(region, ageCallIn, cate).filter(x=> contractAll.map(y=> y._1).indexOf(x._1) >=0)
-      .map(x=> (x._1, x._2, CommonService.format2Decimal(x._2 * 100.00 / contractAll.toMap.get(x._1).get))).sorted
+      .map(x=> (x._1, x._2, CommonService.format2Decimal(x._2 * 100.00 / contractAll.toMap.get(x._1).get), x._3)).sorted
 
     // Churn Rate and Churn Percentage by Call Category
     val churnCates = calChurnRateAndPercentageCategory(getChurnByCates(s"month:$month AND region:$region AND lifeGroup:$ageCallIn"), status, s"month:$month AND region:$region AND lifeGroup:$ageCallIn")

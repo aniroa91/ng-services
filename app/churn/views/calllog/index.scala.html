@@ -357,6 +357,7 @@
                 @if(rs != null) {
                     @helper.CSRF.formField
                     <input type="hidden" value="@month" id="month">
+                    <input type="hidden" value="@month" id="monthCurr">
                     <input type="hidden" id="age" value="*">
                     <input type="hidden" id="region">
                     <input type="hidden" id="cateArr" value="@rs.churnCates.map(x=> x._1).mkString(",")">

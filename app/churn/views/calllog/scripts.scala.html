@@ -74,7 +74,7 @@
                     text: ''
                 },
 
-                colors : ['#f1b53d','#3498DB'],
+                colors : ['#f1b53d','#3498DB', '#dc5a78'],
 
                 xAxis: {
                     categories: @Html(Json.stringify(Json.toJson(rs.whoCallIn.map(x=> x._1))))
@@ -97,13 +97,13 @@
                     title: {
                         text: '',
                         style: {
-                            color: "#3498DB"
+                            color: "#dc5a78"
                         }
                     },
                     labels: {
                         format: '{value} %',
                         style: {
-                            color: "#3498DB"
+                            color: "#dc5a78"
                         }
                     },
                     opposite: true
@@ -113,7 +113,7 @@
                     shared: true
                 },
 
-                series: getJson2Column1Line(@Html(Json.stringify(Json.toJson(rs.whoCallIn.map(x=> x._2)))),@Html(Json.stringify(Json.toJson(rs.whoCallIn.map(x=> x._3)))))
+                series: getJson2Column1Line(@Html(Json.stringify(Json.toJson(rs.whoCallIn.map(x=> x._2)))),@Html(Json.stringify(Json.toJson(rs.whoCallIn.map(x=> x._3)))), @Html(Json.stringify(Json.toJson(rs.whoCallIn.map(x=> x._4)))))
 
             });
 
@@ -559,7 +559,8 @@
                                 click: function () {
                                     $('#age').val("")
                                     $('#region').val("")
-                                    $("#monthPicker").datepicker("update", $('#monthGrp').val());
+                                    $("#monthPicker").datepicker("update", $('#monthCurr').val())
+                                    $('#month').val($('#monthCurr').val())
                                     $('#txtAge').text("").hide()
                                     $('#txtRegion').text("").hide()
                                     if(this.category == $('#cateCurr').val()){
@@ -601,7 +602,8 @@
                 $('#region').val("")
                 $('#age').val("")
                 $('#cateCurr').val("")
-                $("#monthPicker").datepicker("update", $('#monthGrp').val())
+                $("#monthPicker").datepicker("update", $('#monthCurr').val())
+                $('#month').val($('#monthCurr').val())
                 $('#slStatus').val("1")
 
                 $('#txtAge').text("").hide()
@@ -630,7 +632,7 @@
                         if(dta != "Error"){
                             // update chart 1
                             churn1.xAxis[0].update({categories: dta.churn1.cates})
-                            updateCharts(churn1, getJson2Column1Line(dta.churn1.count_ct, dta.churn1.churnPercent))
+                            updateCharts(churn1, getJson2Column1Line(dta.churn1.count_ct, dta.churn1.churnPercent, dta.churn1.count_all))
 
                             // update chart 2
                             churn2.xAxis[0].update({categories: dta.churn2.cates});
