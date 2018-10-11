@@ -205,9 +205,6 @@ object  ChurnAgeService{
     val churnAge = calChurnRateAndPercentageByAge(getChurnGroupAge(s"month:$month AND Region:$region"), status)
     val churnMonth = calChurnRateAndPercentageByMonth(getChurnGroupMonth(s"Region:$region"), status, age)
 
-    churnMonth.foreach(println)
-    println("===")
-
     (churnStatus, churnAge, churnMonth)
   }
 }

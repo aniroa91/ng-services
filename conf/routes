@@ -25,16 +25,20 @@ GET      /logout                       controllers.LoginController.logout
 
 
 ### PAGE AGE
-GET     /internet/age                  churn.controllers.ChurnAgeController.index
-POST    /internet/age/getJsonChurn     churn.controllers.ChurnAgeController.getJsonChurn
+GET     /internet/age                    churn.controllers.ChurnAgeController.index
+POST    /internet/age/getJsonChurn       churn.controllers.ChurnAgeController.getJsonChurn
 
 ### PAGE REGION
-GET     /internet/region               churn.controllers.ChurnRegionController.index
-POST    /internet/region/getJsonChurn  churn.controllers.ChurnRegionController.getJsonChurn
+GET     /internet/region                 churn.controllers.ChurnRegionController.index
+POST    /internet/region/getJsonChurn    churn.controllers.ChurnRegionController.getJsonChurn
 
 ### PAGE CALLLOG
-GET     /internet/calllog              churn.controllers.ChurnCallogController.index
-POST    /internet/calllog/getJsonChurn churn.controllers.ChurnCallogController.getJsonChurn
+GET     /internet/calllog                churn.controllers.ChurnCallogController.index
+POST    /internet/calllog/getJsonChurn   churn.controllers.ChurnCallogController.getJsonChurn
+
+### PAGE CHECKLIST
+GET     /internet/checklist              churn.controllers.ChurnChecklistController.index
+POST    /internet/checklist/getJsonChurn churn.controllers.ChurnChecklistController.getJsonChurn
 
 
 #######################################################################

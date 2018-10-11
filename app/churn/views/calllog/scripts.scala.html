@@ -113,7 +113,7 @@
                     shared: true
                 },
 
-                series: getJson2Column1Line(@Html(Json.stringify(Json.toJson(rs.whoCallIn.map(x=> x._2)))),@Html(Json.stringify(Json.toJson(rs.whoCallIn.map(x=> x._3)))), @Html(Json.stringify(Json.toJson(rs.whoCallIn.map(x=> x._4)))))
+                series: getJson2Column1Line(@Html(Json.stringify(Json.toJson(rs.whoCallIn.map(x=> x._2)))),@Html(Json.stringify(Json.toJson(rs.whoCallIn.map(x=> x._3)))), @Html(Json.stringify(Json.toJson(rs.whoCallIn.map(x=> x._4)))), "Count Call")
 
             });
 
@@ -191,7 +191,6 @@
                 },
 
                 colorAxis: {
-                    min: 0,
                     minColor: '#FFFFFF',
                     maxColor: '#3498DB'
                 },
@@ -358,7 +357,6 @@
                 },
 
                 colorAxis: {
-                    min: 0,
                     minColor: '#FFFFFF',
                     maxColor: '#6495ED'
                 },
@@ -632,7 +630,7 @@
                         if(dta != "Error"){
                             // update chart 1
                             churn1.xAxis[0].update({categories: dta.churn1.cates})
-                            updateCharts(churn1, getJson2Column1Line(dta.churn1.count_ct, dta.churn1.churnPercent, dta.churn1.count_all))
+                            updateCharts(churn1, getJson2Column1Line(dta.churn1.count_ct, dta.churn1.churnPercent, dta.churn1.count_all, "Count Call"))
 
                             // update chart 2
                             churn2.xAxis[0].update({categories: dta.churn2.cates});

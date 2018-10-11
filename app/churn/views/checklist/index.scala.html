@@ -1,0 +1,641 @@
+@(rs: churn.models.ChecklistResponse, month: String, email: String ,postUrl: Call)(implicit request: RequestHeader)
+
+@import services.domain.CommonService.formatNumber
+@import services.domain.CommonService.percent
+@import services.domain.CommonService.format3Decimal
+@import churn.utils.CommonUtil
+@import churn.utils.AgeGroupUtil
+
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+            <!-- Meta, title, CSS, favicons, etc. -->
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>Dashboard Admin </title>
+
+            <!-- Bootstrap -->
+        <link href="/assets/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+            <!-- Font Awesome -->
+        <link href="/assets/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+            <!-- Custom Theme Style -->
+        <link href="/assets/custom/css/custom.min.css" rel="stylesheet">
+        <link href="/assets/custom/css/hover-min.css" rel="stylesheet">
+        <link href="/assets/custom/css/animate.min.css" rel="stylesheet">
+        <link href="/assets/custom/css/waitMe.css" rel="stylesheet">
+            <!-- bootstrap-daterangepicker -->
+        <link href="/assets/datepicker/css/bootstrap-datepicker.css" rel="stylesheet">
+        <style type="text/css">
+                .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
+                    color: #16a085;
+                    font-weight: 600;
+                    cursor: default;
+                    background-color: #fff;
+                    border: 1px solid #fff;
+                    border-bottom-color: transparent;
+                }
+
+                .nav-tabs>li>a{
+                    color: #fff;
+                }
+
+                .panel-primary{
+                    border-color: #ddd;
+                }
+
+                .panel-primary>.panel-heading{
+                    background-color: #1c2752;
+                }
+
+                .txtControl{
+                    margin-top: 5px;
+                    padding: 6px 12px;
+                    font-size: 14px;
+                    line-height: 1.42857143;
+                    color: #fff;
+                    background-color: #16a085;
+                }
+                .top_nav .navbar-right {
+                    width: auto;
+                }
+                .custom_tooltip{
+                    position: absolute;
+                    z-index: 1000;
+                    opacity: 1!important;
+                    color: #0D3349;
+                    border: 1px solid #ddd;
+                    background: white;
+                    padding: 10px;
+                }
+                .table-condensed{
+                    font-size: 13px!important;
+                }
+                .overlay {
+                    width: 96px;
+                    height: 170px;
+                    padding: 2px;
+                    position: absolute;
+                    border: 1px solid #73879C;
+                    top: 32px;   /* chartArea top  */
+                }
+                .circle {
+                    margin-right: 5px;
+                    margin-bottom: 5px;
+                    display: inline-block;
+                    border-radius: 50%;
+                    min-width: 13px;
+                    min-height: 13px;
+                    color: white;
+                    text-align: center;
+                    line-height: 1;
+                    box-sizing: content-box;
+                    white-space: nowrap;
+                }
+                .circle:before {
+                    content: "";
+                    display: inline-block;
+                    vertical-align: middle;
+                    padding-top: 100%;
+                    height: 0;
+                }
+                .circle span {
+                    display: inline-block;
+                    vertical-align: middle;
+                }
+                .highcharts-tooltip>span {
+                    border: 1px solid silver;
+                    border-radius: 3px;
+                    box-shadow: 1px 1px 2px #888;
+                    z-index: 9999!important;
+                }
+                .panel-heading {
+                    padding: 0px 0px 0px!important;
+                    border-bottom: 0px solid transparent!important;
+                    border-top-left-radius: 0px;
+                    border-top-right-radius: 0px;}
+                .highcharts-credits{display: none;}
+                .downTopMenu{
+                    font-size: 16px;float: right;margin-top: 20px;margin-right: 13px;
+                }
+                .curSor{
+                    cursor: pointer;
+                }
+                .dropdown-menu li {
+                    width:229px;
+                }
+                .navTop{
+                    margin-left: -41px;
+                }
+                .hight-light{    color: #26B99A;font-weight: 600;}
+                .fa.pull-right {
+                    margin-left: .3em;
+                    margin-top: 1px;
+                }
+                .dropdown-menu li a{
+                    font-size: 20px;
+                    padding-top: 12px;
+                }
+                .nav-sm .navbar.nav_title a i{
+                    margin:0px!important;
+                }
+
+                section{
+                    margin:100px auto;
+                    height:1000px;
+                }
+
+                .divLeft{
+                    width: 230px
+                }
+
+                .dropdown-menu>li>a{
+                    white-space: inherit!important;
+                }
+                .noData-title {
+                    margin-bottom: 13px;
+                    text-align: center;
+                    text-transform: uppercase;
+                    font-weight: 300;
+                    font-size: 40px;
+                    color: #f60;
+                    font-size: 2.5rem;
+                }
+                .title{
+                    color: #fff;
+                    background-color: #30827e;
+                    border-bottom: 1px solid rgba(111,111,111,.13);
+                    padding: .75rem 0.15rem;
+                    font-size: 18px;
+                }
+                .title select{
+                    float:right;cursor: pointer;width: 200px
+                }
+                .title span{
+                    padding-left: 20px;
+                }
+                .disInline{
+                    display: -webkit-inline-flex;
+                    display: -ms-inline-flexbox;
+                    display: inline-flex;
+                    width: 100%;
+                }
+                ul.bar_tabs>li.active{
+                    font-weight: 700;
+                }
+                .highcharts-contextbutton{display: none}
+                .titFilter{
+                    font-size: 18px;color: #16a085;
+                    font-weight: 600;
+                }
+                .nav.navbar-nav>li>a{
+                    color: #fff!important;
+                }
+                .nav.navbar-nav>li>a:hover,.top_nav .dropdown-menu li a:hover,.top_nav .nav .open>a, .top_nav .nav .open>a:focus, .top_nav .nav .open>a:hover, .top_nav .nav>li>a:focus, .top_nav .nav>li>a:hover{
+                    color: #fff!important;
+                    background: #16a085 !important;
+                }
+                .top_nav .dropdown-menu li a{
+                    background: #2A3F54!important;
+                    color: #fff!important;
+                }
+                .nav_title{
+                    background: #2A3F54!important;
+                }
+                .left_col{
+                    background: #e4e3e3;
+                }
+                #region{
+                    max-height: 400px;
+                    overflow-y: auto;
+                }
+                body{
+                    background: #F7F7F7;
+                    overflow:hidden;
+                }
+                .lineDiv{
+                    border: 1px solid #eee;
+                    margin: 10px 0px 10px 0px
+                }
+                .filter{
+                    padding: 5px 0px 0px 10px;
+                    margin-bottom: 20px;
+                    color: #f90;
+                    font-size: 18px;
+                    background: #F7F7F7;
+                }
+                .btn-custom{
+                    background: #fff;
+                    border: transparent;
+                    color: #555;
+                }
+                .activeLi{
+                    background: #1ABB9C;
+                    color: #fff;
+                }
+                /* Extra small devices (phones, 600px and down) */
+                @@media only screen and (max-width: 599px) {
+                    .right_col{
+                        min-height: 0px!important;
+                        max-height: 600px;
+                        overflow-y: auto;
+                    }
+                }
+
+                @@media only screen and (max-width: 767px) {
+                    .navbar-nav{
+                        width: 100%;
+                    }
+                }
+
+                /* Medium devices (landscape tablets, 768px and up) */
+                @@media only screen and (min-width: 992px) {
+                    .divRight{
+                        margin-left: 0!important
+                    }
+                }
+
+                @@media only screen and (max-width: 991px) {
+                    .barIcon{
+                        display: block!important;
+                    }
+                }
+
+                @@media only screen and (min-width: 600px) and (max-width: 1023px) {
+                    .right_col{
+                        min-height: 0px!important;
+                        max-height: 950px;
+                        overflow-y: auto;
+                    }
+                }
+
+                /* Extra large devices (large laptops and desktops, 1200px and up) */
+                @@media only screen and (min-width: 1024px) {
+                    .right_div2{
+                        min-height: 0px!important;
+                        max-height: 310px;
+                        overflow-y: auto;
+                    }
+                }
+
+                @@media only screen and (min-width: 1601px) {
+                    .right_div2{
+                        min-height: 0px!important;
+                        max-height: 525px;
+                        overflow-y: auto;
+                    }
+                }
+
+                @@media screen and (-webkit-min-device-pixel-ratio:0)
+                {
+                /* Safari and Chrome */
+                .site_title {
+                    margin-top: -15px;
+                }
+
+                }
+        </style>
+
+    </head>
+
+
+    <body class="nav-md">
+        <div class="container body">
+            <div class="main_container">
+                <div class="col-md-3 left_col sidenav divLeft">
+                    <div class="left_col scroll-view">
+                        <div class="navbar nav_title" style="border: 0;width: 100%!important;">
+
+                            <ul class="navTop">
+                                <li class="dropdown">
+                                    <a href="/internet/age" class="site_title curSor dropdown-toggle">
+                                        <i class="fa fa-home" aria-hidden="true"></i> INTERNET
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="clearfix"></div>
+                        <br />
+                            <!-- sidebar menu -->
+                        <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+                            <div class="col-xs-12 filter"><i class="fa fa-filter"></i> FILTERING </div>
+                            <div class="menu_section divGroup col-xs-12" style="padding:0;">
+
+                                <div class="col-xs-12">
+                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Age</span></i>
+                                    <p class="txtControl" style="display: none" id="txtAge"></p>
+                                </div>
+                                <div class="col-xs-12 lineDiv"></div>
+                                <div class="col-xs-12">
+                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Region</span></i>
+                                    <p class="txtControl" id="txtRegion" style="display: none"></p>
+                                </div>
+                                <div class="col-xs-12 lineDiv"></div>
+                                <div class="col-xs-12">
+                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Process Time</span></i>
+                                    <p class="txtControl" id="txtTime" style="display: none"></p>
+                                </div>
+                                <div class="col-xs-12 lineDiv"></div>
+                                <div class="col-xs-12">
+                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Type</span></i>
+                                    <p class="txtControl" id="txtType" style="display: none"></p>
+                                </div>
+                                <div class="col-xs-12 lineDiv"></div>
+                                <div class="col-xs-12" id="divStatus" style="height: 100px">
+                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Status</span></i>
+                                    <select class="form-control" id="slStatus" style="cursor: pointer;margin-top: 10px">
+                                    @for( (k,v) <- CommonUtil.STATUS_MAP){
+                                        @if(v == 1){
+                                            <option value="@v" selected>@k</option>
+                                        }else{
+                                            <option value="@v">@k</option>
+                                        }
+                                    }
+                                    </select>
+                                </div>
+                                <div class="col-xs-12 lineDiv"></div>
+                                <div class="col-xs-12" id="divMonth" style="height: 125px">
+                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Month</span></i>
+                                    <div class="input-group date" id="monthPicker" style="margin-top: 10px">
+                                        <input type="text" id="monthGrp" class="form-control" value="@month" readonly="true" style="text-align: center;cursor: pointer;background-color: white" >
+                                        <span class="input-group-addon" style="background-color: #5A738E!important;"><i class="fa fa-calendar" aria-hidden="true" style="color:white"></i>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12 filter">
+                                    <a id="apply" class="btn btn-xs btn-success" style="float: right;"><i class="fa fa-check-circle"></i> Apply</a>
+                                    <a id="refresh" class="btn btn-xs btn-secondary" style="float: right;background: #6c757d;color: #fff"><i class="fa fa-refresh"></i> Refresh</a>
+                                </div>
+                            </div>
+
+                        </div>
+                            <!-- /sidebar menu -->
+                    </div>
+                </div>
+
+                    <!-- top navigation -->
+                <div class="top_nav">
+                    <div class="nav_menu" style="background: #2A3F54">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="true">
+                            <span class="sr-only">Toggle navigation</span>
+                            <i class="fa fa-bars" aria-hidden="true" style="font-size: 26px"></i>
+                        </button>
+                        <nav class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                            <ul class="nav navbar-nav" style="float: right">
+                                <li><a href="/internet/age"><i class="fa fa-user"></i> AGE </a>
+                                </li>
+                                <li><a href="/internet/region"><i class="fa fa-map-marker"></i> REGION </a>
+                                </li>
+                                <li><a href="/internet/calllog"><i class="fa fa-bug"></i> CALLLOG </a>
+                                </li>
+                                <li class="activeLi"><a href="#"><i class="fa fa-building"></i> CHECKLIST </a>
+                                </li>
+                                <li><a href="#"><i class="fa fa-exclamation"></i> PROBLEM DETECT </a>
+                                </li>
+                                <li>
+                                    <a  href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                        <span class="user-profile dropdown-toggle" style="padding:13px 15px 12px;">
+                                            <img src="../assets/images/user-default-white.png" alt="">@email
+                                            <span class=" fa fa-angle-down"></span>
+                                        </span>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-usermenu">
+                                        <li><a href="/logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </nav>
+
+                    </div>
+                </div>
+                    <!-- /top navigation -->
+                    <!-- page content -->
+                <div class="right_col" role="main">
+                    <div class="divRight">
+                        <div class="row top_tiles"> <div class="col-xs-12"><a class="barIcon" style="display: none;cursor: pointer;font-size: 26px;" onclick="triggerNavleft(this)"><i class="fa fa-bars"></i></a></div></div>
+
+                        @if(rs != null) {
+                    @helper.CSRF.formField
+                    <input type="hidden" value="@month" id="month">
+                    <input type="hidden" value="@month" id="monthCurr">
+                    <input type="hidden" id="age" value="*">
+                    <input type="hidden" id="region">
+                    <input type="hidden" id="typeArr" value="@rs.trendTypeBubble._1.map(x=> x._1).mkString(",")">
+                    <input type="hidden" id="typeCurr">
+                    <input type="hidden" id="time">
+
+                    <div class="row top_tiles">
+                        <div class="col-lg-6 col-sm-12 col-md-6 col-xs-12">
+                            <div class="x_panel tile" style="padding: 0px">
+                                <div class="title disInline">
+                                    <span style="width: 90%">Number of Contracts That Have Checklist</span>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content">
+                                    <div id="churn1" style="width: auto; height: 300px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-sm-12 col-md-6 col-xs-12">
+                            <div class="x_panel tile" style="padding: 0px">
+                                <div class="title disInline">
+                                    <span style="width: 90%">Churn Rate & Percentage For Customers Who Have Checklist</span>
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="x_content">
+                                    <div id="churn2" style="width: auto; height: 300px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                        <div class="panel with-nav-tabs panel-primary">
+                            <div class="panel-heading">
+                                <ul class="nav nav-tabs">
+                                    <li class="active"><a class="tabRegion" style="cursor: pointer">Region Month</a></li>
+                                    <li><a class="tabAge" style="cursor: pointer">Region Age</a></li>
+                                    <li><a class="tabTime" style="cursor: pointer">Region Process Time</a></li>
+                                    <li><a class="tabType" style="cursor: pointer">Region Type</a></li>
+                                </ul>
+                            </div>
+                            <div class="panel-body">
+                                <div class="tab-content right_div2">
+                                    <div class="tab-pane fade in active" id="tabRegion">
+                                        <div class="row top_tiles">
+                                            <div class="col-lg-6 col-sm-12 col-md-12 col-xs-12">
+                                                <div class="x_panel tile" style="padding: 0px">
+                                                    <div class="title disInline">
+                                                        <span style="width: 90%">Number of Contracts That Have Checklist by Region</span>
+                                                        <div class="clearfix"></div>
+                                                    </div>
+                                                    <div class="x_content">
+                                                        <div id="churn3" style="width: auto; height: 350px;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6 col-sm-12 col-md-12 col-xs-12">
+                                                <div class="x_panel tile" style="padding: 0px">
+                                                    <div class="title disInline">
+                                                        <span style="width: 90%">For Contracts That Have Checklist: Churn Rate & Percentage by Region</span>
+                                                        <div class="clearfix"></div>
+                                                    </div>
+                                                    <div class="x_content">
+                                                        <div class="chartWithOverlay">
+                                                            <div id="churn4_tooltip" class="custom_tooltip" style="display: none"></div>
+                                                            <div id="churn4" style="width: auto; height: 535px;"></div>
+                                                            <div class="overlay" id="churn4_overlay">
+                                                                <span style="font-size: 14px;color: #0D3349">ChurnPert (%)</span>
+                                                                <div style="margin-bottom: 2px;margin-top: 4px"><div class="circle" style="background: #B40404;"><span style="opacity: 0">1</span></div><span id="churn4_txtMin" style="color:#0D3349 ">@format3Decimal(rs.trendRegionMonth._2.map(x=>x._4).min)</span></div>
+                                                                <div style="margin-bottom: 2px"><div class="circle" style="background: #B40404;"><span style="opacity: 0">111</span></div><span id="churn4_circle2" style="color:#0D3349 ">@format3Decimal((rs.trendRegionMonth._2.map(x=>x._4).max -rs.trendRegionMonth._2.map(x=>x._4).min)/5*2)</span></div>
+                                                                <div style="margin-bottom: 2px"><div class="circle" style="background: #B40404;"><span style="opacity: 0">1111</span></div><span id="churn4_circle3" style="color:#0D3349 ">@format3Decimal((rs.trendRegionMonth._2.map(x=>x._4).max -rs.trendRegionMonth._2.map(x=>x._4).min)/5*3)</span></div>
+                                                                <div><div class="circle" style="background: #B40404"><span style="opacity: 0">11111</span></div><span id="churn4_txtMax" style="color:#0D3349 ">@format3Decimal(rs.trendRegionMonth._2.map(x=>x._4).max)</span></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="tabAge">
+                                        <div class="row top_tiles">
+                                            <div class="col-lg-6 col-sm-12 col-md-12 col-xs-12">
+                                                <div class="x_panel tile" style="padding: 0px">
+                                                    <div class="title disInline">
+                                                        <span style="width: 90%">Number of Contracts Who Have Checklist by Region by Contract Age</span>
+                                                        <div class="clearfix"></div>
+                                                    </div>
+                                                    <div class="x_content">
+                                                        <div id="churn5" style="width: auto; height: 350px;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6 col-sm-12 col-md-12 col-xs-12">
+                                                <div class="x_panel tile" style="padding: 0px">
+                                                    <div class="title disInline">
+                                                        <span style="width: 90%">Contracts Who Have Checklist: Churn Rate & Percentage by Region by Age</span>
+                                                        <div class="clearfix"></div>
+                                                    </div>
+                                                    <div class="x_content">
+                                                        <div class="chartWithOverlay">
+                                                            <div id="churn6_tooltip" class="custom_tooltip" style="display: none"></div>
+                                                            <div id="churn6" style="width: auto; height: 530px;"></div>
+                                                            <div class="overlay" id="churn6_overlay">
+                                                                <span style="font-size: 14px;color: #0D3349">ChurnPert (%)</span>
+                                                                <div style="margin-bottom: 2px;margin-top: 4px"><div class="circle" style="background: green;"><span style="opacity: 0">1</span></div><span id="churn6_txtMin" style="color:#0D3349 ">@format3Decimal(rs.checklistRegionAge.map(x=>x._4).min)</span></div>
+                                                                <div style="margin-bottom: 2px"><div class="circle" style="background: green;"><span style="opacity: 0">111</span></div><span id="churn6_circle2" style="color:#0D3349 ">@format3Decimal((rs.checklistRegionAge.map(x=>x._4).max -rs.checklistRegionAge.map(x=>x._4).min)/5*2)</span></div>
+                                                                <div style="margin-bottom: 2px"><div class="circle" style="background: green;"><span style="opacity: 0">1111</span></div><span id="churn6_circle3" style="color:#0D3349 ">@format3Decimal((rs.checklistRegionAge.map(x=>x._4).max -rs.checklistRegionAge.map(x=>x._4).min)/5*3)</span></div>
+                                                                <div><div class="circle" style="background: green"><span style="opacity: 0">11111</span></div><span id="churn6_txtMax" style="color:#0D3349 ">@format3Decimal(rs.checklistRegionAge.map(x=>x._4).max)</span></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="tabTime">
+                                        <div class="row top_tiles">
+                                            <div class="col-lg-3 col-sm-12 col-md-12 col-xs-12"></div>
+                                            <div class="col-lg-6 col-sm-12 col-md-12 col-xs-12">
+                                                <div class="x_panel tile" style="padding: 0px">
+                                                    <div class="title disInline">
+                                                        <span style="width: 90%">Number of Checklist by Checklist Processing Time by Region</span>
+                                                        <div class="clearfix"></div>
+                                                    </div>
+                                                    <div class="x_content">
+                                                        <div id="churn7" style="width: auto; height: 350px;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-sm-12 col-md-12 col-xs-12"></div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="tabType">
+                                        <div class="row top_tiles">
+                                            <div class="col-lg-6 col-sm-12 col-md-12 col-xs-12">
+                                                <div class="x_panel tile" style="padding: 0px">
+                                                    <div class="title disInline">
+                                                        <span style="width: 90%">Number of Checklist by Checklist Types by Region</span>
+                                                        <div class="clearfix"></div>
+                                                    </div>
+                                                    <div class="x_content">
+                                                        <div id="churn8" style="width: auto; height: 350px;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6 col-sm-12 col-md-12 col-xs-12">
+                                                <div class="x_panel tile" style="padding: 0px">
+                                                    <div class="title disInline">
+                                                        <span style="width: 90%">Churn Rate and Churn Percentage by Checklist Type by Region</span>
+                                                        <div class="clearfix"></div>
+                                                    </div>
+                                                    <div class="x_content">
+                                                        <div class="chartWithOverlay">
+                                                            <div id="churn9_tooltip" class="custom_tooltip" style="white-space: normal; max-width:200px;display: none"></div>
+                                                            <div id="churn9" style="width: auto; height: 660px;"></div>
+                                                            <div class="overlay" id="churn9_overlay">
+                                                                <span style="font-size: 14px;color: #0D3349">ChurnPert (%)</span>
+                                                                <div style="margin-bottom: 2px;margin-top: 4px"><div class="circle" style="background: #1c2752;"><span style="opacity: 0">1</span></div><span id="churn9_txtMin" style="color:#0D3349 ">@format3Decimal(rs.trendTypeBubble._2.map(x=>x._4).min)</span></div>
+                                                                <div style="margin-bottom: 2px"><div class="circle" style="background: #1c2752;"><span style="opacity: 0">111</span></div><span id="churn9_circle2" style="color:#0D3349 ">@format3Decimal((rs.trendTypeBubble._2.map(x=>x._4).max -rs.trendTypeBubble._2.map(x=>x._4).min)/5*2)</span></div>
+                                                                <div style="margin-bottom: 2px"><div class="circle" style="background: #1c2752;"><span style="opacity: 0">1111</span></div><span id="churn9_circle3" style="color:#0D3349 ">@format3Decimal((rs.trendTypeBubble._2.map(x=>x._4).max -rs.trendTypeBubble._2.map(x=>x._4).min)/5*3)</span></div>
+                                                                <div><div class="circle" style="background: #1c2752"><span style="opacity: 0">11111</span></div><span id="churn9_txtMax" style="color:#0D3349 ">@format3Decimal(rs.trendTypeBubble._2.map(x=>x._4).max)</span></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                } else{
+                    <div class="row"><h2 class="noData-title">
+                        Sorry, This page is under construction, please come back later...</h2></div>
+                }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+            <!-- jQuery -->
+        <script src="/assets/vendors/jquery/dist/jquery.min.js"></script>
+        <script src="/assets/javascripts/jsTree.js"></script>
+            <!-- Bootstrap -->
+        <script src="/assets/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+            <!-- Custom Theme Scripts -->
+        <script src="/assets/custom/js/custom.min.js"></script>
+        <script type="text/javascript" src="../assets/javascripts/jsapi.js"></script>
+            <!-- Hight chart -->
+        <script src="/assets/javascripts/highcharts.js"></script>
+        <script src="/assets/javascripts/exporting.js"></script>
+        <script src="/assets/javascripts/heatmap.js"></script>
+        <script src="/assets/javascripts/jquery.counterup.min.js"></script>
+        <script src="/assets/javascripts/waitMe.js"></script>
+        <script src="/assets/javascripts/common_churn.js"></script>
+            <!--  Datepicker -->
+        <script src="/assets/datepicker/js/bootstrap-datepicker.js"></script>
+
+            <script type="text/javascript">
+                    function triggerNavleft(el) {
+                        if($(el).hasClass('openLeft')){
+                            $('.divLeft').attr('style','width: 0')
+                            $('.divRight').removeAttr('style')
+                            $(el).removeClass('openLeft')
+                        }
+                        else{
+                            $(el).addClass('openLeft')
+                            $('.divLeft').attr('style','width: 230px;display: block')
+                            $('.divRight').attr('style','margin-left: 230px;')
+                        }
+                    }
+            </script>
+        @if(rs != null) {
+            @scripts(rs)
+        }
+    </body>
+</html>
