@@ -28,20 +28,20 @@ import service.ChurnChecklistService
 @Singleton
 class ChurnChecklistController @Inject() (cc: ControllerComponents) extends AbstractController(cc) with Secured{
 
-  def index() = Action { implicit request =>
+  def index() =  withAuth {username => implicit request: Request[AnyContent] =>
     val month = CommonService.getPrevMonth()
     try {
       val rs = ChurnChecklistService.getInternet(null)
-      Ok(churn.views.html.checklist.index(rs, month, "admin", churn.controllers.routes.ChurnChecklistController.index()))
+      Ok(churn.views.html.checklist.index(rs, month, username, churn.controllers.routes.ChurnChecklistController.index()))
     }
     catch {
-      case e: Exception => Ok(churn.views.html.checklist.index(null, month, "", churn.controllers.routes.ChurnChecklistController.index()))
+      case e: Exception => Ok(churn.views.html.checklist.index(null, month, username, churn.controllers.routes.ChurnChecklistController.index()))
     }
   }
 
 
-  def getJsonChurn() = Action { implicit request =>
-    //try{
+  def getJsonChurn() =  withAuth {username => implicit request: Request[AnyContent] =>
+    try{
         val rs = ChurnChecklistService.getInternet(request)
         val churn1 = Json.obj(
           "cates"        -> rs.ctCheckList.map(x=> x._1),
@@ -113,10 +113,10 @@ class ChurnChecklistController @Inject() (cc: ControllerComponents) extends Abst
           "churn9" -> churn9
         )
         Ok(Json.toJson(json))
-    /*}
+    }
     catch{
       case e: Exception => Ok("Error")
-    }*/
+    }
 
   }
 

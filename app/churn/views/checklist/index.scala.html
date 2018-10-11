@@ -290,11 +290,11 @@
                 }
 
                 @@media screen and (-webkit-min-device-pixel-ratio:0)
-                {
-                /* Safari and Chrome */
-                .site_title {
-                    margin-top: -15px;
-                }
+                    {
+                    /* Safari and Chrome */
+                    .site_title {
+                        margin-top: -15px;
+                    }
 
                 }
         </style>
@@ -392,7 +392,7 @@
                                 </li>
                                 <li><a href="/internet/calllog"><i class="fa fa-bug"></i> CALLLOG </a>
                                 </li>
-                                <li class="activeLi"><a href="#"><i class="fa fa-building"></i> CHECKLIST </a>
+                                <li class="activeLi"><a href="/internet/checklist"><i class="fa fa-building"></i> CHECKLIST </a>
                                 </li>
                                 <li><a href="#"><i class="fa fa-exclamation"></i> PROBLEM DETECT </a>
                                 </li>
@@ -418,7 +418,7 @@
                     <div class="divRight">
                         <div class="row top_tiles"> <div class="col-xs-12"><a class="barIcon" style="display: none;cursor: pointer;font-size: 26px;" onclick="triggerNavleft(this)"><i class="fa fa-bars"></i></a></div></div>
 
-                        @if(rs != null) {
+                  @if(rs != null) {
                     @helper.CSRF.formField
                     <input type="hidden" value="@month" id="month">
                     <input type="hidden" value="@month" id="monthCurr">

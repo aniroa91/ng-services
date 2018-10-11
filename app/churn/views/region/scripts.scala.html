@@ -4,15 +4,44 @@
 @import churn.utils.AgeGroupUtil
 
 <script type="text/javascript">
+        var widthChart  = $(window).width()
+        var heightChart = $(window).height() * 0.46
+        var spaceText = 20
+        if($(window).width() > 991){
+            widthChart = $(window).width()*0.4
+        }
+        if($(window).width() >= 600){
+            spaceText = 40
+        }
         var optionsProfile = {
             title: 'Churn Rate (%)',
-            hAxis: {title: 'Month',gridlines: {count: 14}, viewWindow: {
-                min:0
-            }},
-            vAxis: {title: 'Profile',gridlines: {count: 10}},
+            hAxis: {
+                title: '',
+                gridlines: {count: 14},
+                viewWindow: {
+                  min:0
+                },
+                maxAlternation: 2, // use a maximum of 1 line of labels
+                showTextEvery: 1, // show every label if possible
+                minTextSpacing: spaceText // minimum spacing between adjacent labels, in pixels
+            },
+            vAxis: {
+                title: 'Profile',
+                gridlines: {count: 10},
+                textStyle : {
+                    fontSize: 9
+                }
+            },
             chartArea: {
-                height: "83%",
-                width: "70%"
+                height: "67%",
+                width: "73%",
+                left: 150,
+                right: 10
+            },
+            width: widthChart,
+            height: heightChart,
+            sizeAxis: {
+                maxSize: 20
             },
             colorAxis: {colors: ['#f7f1f1', 'green']},
             bubble: {
@@ -29,10 +58,23 @@
         var optionsProfileAge = {
             title: 'Churn Rate (%)',
             hAxis: {title: 'Age',gridlines: {count: 13}},
-            vAxis: {title: 'Profile',gridlines: {count: 10}},
+            vAxis: {
+                title: 'Profile',
+                gridlines: {count: 10},
+                textStyle : {
+                    fontSize: 9
+                }
+            },
             chartArea: {
-                height: "83%",
-                width: "70%"
+                height: "70%",
+                width: "73%",
+                left: 150,
+                right: 30
+            },
+            width: widthChart,
+            height: heightChart,
+            sizeAxis: {
+                maxSize: 20
             },
             colorAxis: {colors: ['#f7f1f1', '#f60']},
             bubble: {
@@ -48,13 +90,30 @@
         };
         var optionsRegion = {
             title: 'Churn Rate (%)',
-            hAxis: {title: 'Month',gridlines: {count: 14}, viewWindow: {
-                min:0
-            }},
-            vAxis: {title: 'Region',gridlines: {count: 9}},
+            hAxis: {
+                title: '',
+                gridlines: {count: 14},
+                viewWindow: {
+                   min:0
+                },
+                textStyle : {
+                    color:'#1c2752'
+                },
+                maxAlternation: 2, // use a maximum of 1 line of labels
+                showTextEvery: 1, // show every label if possible
+                minTextSpacing: spaceText // minimum spacing between adjacent labels, in pixels
+            },
+            vAxis: {title: '',gridlines: {count: 9}},
             chartArea: {
-                height: "83%",
-                width: "70%"
+                height: "70%",
+                width: "73%",
+                left: 120,
+                right: 20
+            },
+            width: '100%',
+            height: '100%',
+            sizeAxis: {
+                maxSize: 20
             },
             colorAxis: {colors: ['#f7f1f1', 'red']},
             bubble: {
@@ -200,7 +259,7 @@
                 var percent = dataHuyDv.getValue(event.row, 4);
                 var contracts = dataHuyDv.getValue(event.row, 5);
                 var x = mouseX - 225;
-                var y = mouseY - 450;
+                var y = mouseY - 350;
                 $('#churn4_tooltip').html('<div><p><b>Month:</b> ' + keyByValue(catesMonth, xAxis) +'</p><p><b>Profile:</b> '+ keyByValue( catesProfile, yAxis) +
                         '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
                     'top': y,
@@ -308,7 +367,7 @@
                 var percent = dataAgeProfHuyDv.getValue(event.row, 4);
                 var contracts = dataAgeProfHuyDv.getValue(event.row, 5);
                 var x = mouseX - 225;
-                var y = mouseY - 450;
+                var y = mouseY - 350;
                 $('#churn5_tooltip').html('<div><p><b>Age:</b> ' + keyByValue( catesAge, xAxis) +'</p><p><b>Profile:</b> '+ keyByValue( catesProfAge, yAxis) +
                         '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
                     'top': y,
@@ -330,7 +389,7 @@
                             text.setAttribute('fill-opacity',0)
                     }
                     // change label month
-                    if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#444444')) {
+                    if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#1c2752')) {
                         if(text.innerHTML == 0 || text.innerHTML == 13)
                             text.setAttribute('fill-opacity',0)
                         else{
@@ -465,7 +524,7 @@
                     text: ''
                 },
 
-                colors : ['#149c7f','#dc5a78'],
+                colors : ['#1c2752','#d9534f'],
 
                 xAxis: {
                     categories: @Html(Json.stringify(Json.toJson(rs.churnProfile.map(x=>x._1))))
@@ -475,26 +534,26 @@
                     labels: {
                         format: '{value} %',
                         style: {
-                            color: "#149c7f"
+                            color: "#1c2752"
                         }
                     },
                     title: {
                         text: '',
                         style: {
-                            color: "#149c7f"
+                            color: "#1c2752"
                         }
                     }
                 }, { // Secondary yAxis
                     title: {
                         text: '',
                         style: {
-                            color: "#dc5a78"
+                            color: "#d9534f"
                         }
                     },
                     labels: {
                         format: '{value} %',
                         style: {
-                            color: "#dc5a78"
+                            color: "#d9534f"
                         }
                     },
                     opposite: true
@@ -557,7 +616,13 @@
 
                 colorAxis: {
                     minColor: '#FFFFFF',
-                    maxColor: '#4980b5'
+                    maxColor: '#4980b5',
+                    type: 'logarithmic',
+                    stops: [
+                        [0, '#FFFFFF'],
+                        [0.67, '#81BEF7'],
+                        [1, '#4980b5']
+                    ]
                 },
 
                 legend: {
@@ -624,6 +689,16 @@
                 }]
 
             });
+            $('.nav-tabs li').click(function () {
+                var tabCurr = $('.nav-tabs li.active').find('a').attr('class')
+                var tab = $(this).find('a').attr('class')
+                if(tabCurr != tab){
+                    $('.nav-tabs li').removeClass('in').removeClass('active')
+                    $('.panel-body .tab-pane').removeClass('in').removeClass('active')
+                    $('#'+tab).addClass('in').addClass('active')
+                    $(this).addClass('in').addClass('active')
+                }
+            })
             // click apply fitler
             $('#apply').click(function () {
                 $('#profile').val("")
@@ -643,7 +718,7 @@
                     data:  fields,
                     type:"POST",
                     beforeSend: function () {
-                        $('.divLeft').waitMe({
+                        $('.divGroup').waitMe({
                             effect: 'progressBar',
                             text: 'Please wait...',
                             bg: 'rgba(255,255,255,0.7)',
@@ -691,7 +766,7 @@
                                                 text.setAttribute('fill-opacity',0)
                                         }
                                         // change label month
-                                        if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#444444')) {
+                                        if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#1c2752')) {
 
                                             if(Object.keys(dta.churn3.cates).length == 1){
                                                 if (text.innerHTML == 0.5 || text.innerHTML == 0.0 || text.innerHTML == 1.5)
@@ -902,7 +977,7 @@
                                     var percent = dataProfileMonth.getValue(event.row, 4);
                                     var contracts = dataProfileMonth.getValue(event.row, 5);
                                     var x = mouseX - 225;
-                                    var y = mouseY - 450;
+                                    var y = mouseY - 350;
                                     $('#churn4_tooltip').html('<div><p><b>Month:</b> ' + keyByValue(dta.churn4.catesMonth, xAxis) +'</p><p><b>Profile:</b> '+ keyByValue( dta.churn4.catesProfile, yAxis) +
                                             '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
                                         'top': y,
@@ -995,7 +1070,7 @@
                                     var percent = dataAgeProfile.getValue(event.row, 4);
                                     var contracts = dataAgeProfile.getValue(event.row, 5);
                                     var x = mouseX - 225;
-                                    var y = mouseY - 450;
+                                    var y = mouseY - 350;
                                     $('#churn5_tooltip').html('<div><p><b>Age:</b> ' + keyByValue( catesAge, xAxis) +'</p><p><b>Profile:</b> '+ keyByValue( dta.churn5.catesProfile, yAxis) +
                                             '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
                                         'top': y,
@@ -1031,11 +1106,11 @@
                             }
                         }
                         else{
-                            alert("Error when excute query. Please check again your system!")
+                            alert("Error when execute query. Please check again your system!")
                         }
                     },
                     complete: function () {
-                        $('.divLeft').waitMe("hide");
+                        $('.divGroup').waitMe("hide");
                     }
                 });
             }
