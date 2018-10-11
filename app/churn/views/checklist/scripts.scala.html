@@ -513,7 +513,7 @@
                 chart: {
                     type: 'heatmap',
                     marginTop: 40,
-                    marginBottom: 120,
+                    marginBottom: 125,
                     plotBorderWidth: 1
                 },
 
@@ -1241,7 +1241,7 @@
             var x = el.getAttribute('x').replace("\"", "");
             var y = el.getAttribute('y').replace("\"", "");
             var width = el.getAttribute('width') || 40;
-            var height = el.getAttribute('height') || 55;
+            var height = el.getAttribute('height') || 225;
 
             // A "ForeignObject" tag is how you can inject HTML into an SVG document.
             var fo = document.createElementNS("http://www.w3.org/2000/svg", "foreignObject");
