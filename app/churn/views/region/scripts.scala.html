@@ -17,17 +17,23 @@
             title: 'Churn Rate (%)',
             hAxis: {
                 title: '',
-                gridlines: {count: 14},
+                gridlines: {
+                    count: 14,
+                    color: 'transparent'
+                },
                 viewWindow: {
                   min:0
                 },
-                maxAlternation: 2, // use a maximum of 1 line of labels
-                showTextEvery: 1, // show every label if possible
-                minTextSpacing: spaceText // minimum spacing between adjacent labels, in pixels
+                textStyle : {
+                    fontSize: 10
+                }
             },
             vAxis: {
                 title: 'Profile',
-                gridlines: {count: 10},
+                gridlines: {
+                    count: 10,
+                    color: '#f0f0f0'
+                },
                 textStyle : {
                     fontSize: 9
                 }
@@ -43,7 +49,7 @@
             sizeAxis: {
                 maxSize: 20
             },
-            colorAxis: {colors: ['#f7f1f1', 'green']},
+            colorAxis: {colors: ['#F5F6CE', 'green']},
             bubble: {
                 textStyle: {
                     auraColor: 'none',
@@ -57,10 +63,10 @@
         };
         var optionsProfileAge = {
             title: 'Churn Rate (%)',
-            hAxis: {title: 'Age',gridlines: {count: 13}},
+            hAxis: {title: 'Age',gridlines: {count: 13,color: 'transparent'}},
             vAxis: {
                 title: 'Profile',
-                gridlines: {count: 10},
+                gridlines: {count: 10,color: '#f0f0f0'},
                 textStyle : {
                     fontSize: 9
                 }
@@ -76,7 +82,7 @@
             sizeAxis: {
                 maxSize: 20
             },
-            colorAxis: {colors: ['#f7f1f1', '#f60']},
+            colorAxis: {colors: ['#fdd0a2', '#d94801']},
             bubble: {
                 textStyle: {
                     auraColor: 'none',
@@ -92,20 +98,27 @@
             title: 'Churn Rate (%)',
             hAxis: {
                 title: '',
-                gridlines: {count: 14},
+                gridlines: {
+                    count: 14,
+                    color: 'transparent'
+                },
                 viewWindow: {
                    min:0
                 },
                 textStyle : {
-                    color:'#1c2752'
+                    color:'#1c2752',
+                    fontSize: 11
                 },
-                maxAlternation: 2, // use a maximum of 1 line of labels
-                showTextEvery: 1, // show every label if possible
-                minTextSpacing: spaceText // minimum spacing between adjacent labels, in pixels
             },
-            vAxis: {title: '',gridlines: {count: 9}},
+            vAxis: {
+                title: '',
+                gridlines: {
+                    count: 9,
+                    color: '#f0f0f0'
+                }
+            },
             chartArea: {
-                height: "70%",
+                height: "73%",
                 width: "73%",
                 left: 120,
                 right: 20
@@ -115,7 +128,7 @@
             sizeAxis: {
                 maxSize: 20
             },
-            colorAxis: {colors: ['#f7f1f1', 'red']},
+            colorAxis: {colors: ['#F6CECE', '#B40404']},
             bubble: {
                 textStyle: {
                     auraColor: 'none',
@@ -244,12 +257,11 @@
             var mouseX;
             var mouseY;
             $(document).mousemove(function(e) {
-                mouseX = e.pageX;
-                mouseY = e.pageY;
+                mouseY = e.pageY -290;
             });
 
             function handlerOut() {
-                $('.custom_tooltip').fadeOut('fast');
+                $('.custom_tooltip').hide()
             }
 
             google.visualization.events.addListener(chartHuyDv, 'onmouseover', function (event) {
@@ -259,7 +271,7 @@
                 var percent = dataHuyDv.getValue(event.row, 4);
                 var contracts = dataHuyDv.getValue(event.row, 5);
                 var x = mouseX - 225;
-                var y = mouseY - 350;
+                var y = mouseY - 400;
                 $('#churn4_tooltip').html('<div><p><b>Month:</b> ' + keyByValue(catesMonth, xAxis) +'</p><p><b>Profile:</b> '+ keyByValue( catesProfile, yAxis) +
                         '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
                     'top': y,
@@ -367,7 +379,7 @@
                 var percent = dataAgeProfHuyDv.getValue(event.row, 4);
                 var contracts = dataAgeProfHuyDv.getValue(event.row, 5);
                 var x = mouseX - 225;
-                var y = mouseY - 350;
+                var y = mouseY - 400;
                 $('#churn5_tooltip').html('<div><p><b>Age:</b> ' + keyByValue( catesAge, xAxis) +'</p><p><b>Profile:</b> '+ keyByValue( catesProfAge, yAxis) +
                         '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
                     'top': y,
@@ -451,10 +463,10 @@
                 var yAxis = dataRegionHuyDv.getValue(event.row, 2);
                 var percent = dataRegionHuyDv.getValue(event.row, 4);
                 var contracts = dataRegionHuyDv.getValue(event.row, 5);
-                var x = mouseX - 225;
-                var y = mouseY - 350;
+                var x = mouseX -225;
+                var y = mouseY +50;
                 $('#churn3_tooltip').html('<div><p><b>Month:</b> ' + keyByValue(catesMonthRegion, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
-                        '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
+                        '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>NumOfContracts: </b>'+contracts+'</p></div>').css({
                     'top': y,
                     'left': x
                 }).fadeIn('slow');
@@ -680,11 +692,14 @@
 
                 series: [{
                     name: 'total contracts',
-                    borderWidth: 1,
+                    borderWidth: 0.1,
+                    borderColor:'#81BEF7',
                     data: @Html(Json.stringify(Json.toJson(rs.numberOfContracts._3))),
                     dataLabels: {
                         enabled: true,
-                        color: '#000000'
+                        style: {
+                            "fontSize": "10px"
+                        }
                     }
                 }]
 
@@ -858,9 +873,9 @@
                                     var percent = dataRegionMonth.getValue(event.row, 4);
                                     var contracts = dataRegionMonth.getValue(event.row, 5);
                                     var x = mouseX - 225;
-                                    var y = mouseY - 350;
+                                    var y = mouseY + 50;
                                     $('#churn3_tooltip').html('<div><p><b>Month:</b> ' + keyByValue(dta.churn3.cates, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
-                                            '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
+                                            '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>NumOfContracts: </b>'+contracts+'</p></div>').css({
                                         'top': y,
                                         'left': x
                                     }).fadeIn('slow');
@@ -977,7 +992,7 @@
                                     var percent = dataProfileMonth.getValue(event.row, 4);
                                     var contracts = dataProfileMonth.getValue(event.row, 5);
                                     var x = mouseX - 225;
-                                    var y = mouseY - 350;
+                                    var y = mouseY - 400;
                                     $('#churn4_tooltip').html('<div><p><b>Month:</b> ' + keyByValue(dta.churn4.catesMonth, xAxis) +'</p><p><b>Profile:</b> '+ keyByValue( dta.churn4.catesProfile, yAxis) +
                                             '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
                                         'top': y,
@@ -1070,7 +1085,7 @@
                                     var percent = dataAgeProfile.getValue(event.row, 4);
                                     var contracts = dataAgeProfile.getValue(event.row, 5);
                                     var x = mouseX - 225;
-                                    var y = mouseY - 350;
+                                    var y = mouseY - 400;
                                     $('#churn5_tooltip').html('<div><p><b>Age:</b> ' + keyByValue( catesAge, xAxis) +'</p><p><b>Profile:</b> '+ keyByValue( dta.churn5.catesProfile, yAxis) +
                                             '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
                                         'top': y,

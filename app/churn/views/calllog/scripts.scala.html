@@ -17,12 +17,21 @@
             title: 'Churn Rate (%)',
             hAxis: {
                 title: 'Contract Age (month)',
-                gridlines: {count: 13},
+                gridlines: {
+                    count: 13,
+                    color: 'transparent'
+                },
                 textStyle : {
                     color:'#1c2752'
                 }
             },
-            vAxis: {title: 'Region',gridlines: {count: 9}},
+            vAxis: {
+                title: 'Region',
+                gridlines: {
+                    count: 9,
+                    color: '#f0f0f0'
+                }
+            },
             chartArea: {
                 height: "70%",
                 width: "73%",
@@ -34,7 +43,7 @@
             sizeAxis: {
                 maxSize: 25
             },
-            colorAxis: {colors: ['#f7f1f1', 'green']},
+            colorAxis: {colors: ['#F5F6CE', 'green']},
             bubble: {
                 textStyle: {
                     auraColor: 'none',
@@ -50,18 +59,25 @@
             title: 'Churn Rate (%)',
             hAxis: {
                 title: '',
-                gridlines: {count: 14},
+                gridlines: {
+                    count: 14,
+                    color: 'transparent'
+                },
                 viewWindow: {
                   min:0
                 },
                 textStyle : {
-                    color:'#1c2752'
-                },
-                maxAlternation: 2, // use a maximum of 1 line of labels
-                showTextEvery: 1, // show every label if possible
-                minTextSpacing: spaceText // minimum spacing between adjacent labels, in pixels
+                    color:'#1c2752',
+                    fontSize: 11
+                }
             },
-            vAxis: {title: 'Region',gridlines: {count: 9}},
+            vAxis: {
+                title: 'Region',
+                gridlines: {
+                    count: 9,
+                    color: '#f0f0f0'
+                }
+            },
             chartArea: {
                 height: "70%",
                 width: "73%",
@@ -73,7 +89,7 @@
             sizeAxis: {
                 maxSize: 25
             },
-            colorAxis: {colors: ['#f7f1f1', 'red']},
+            colorAxis: {colors: ['#F6CECE', '#B40404']},
             bubble: {
                 textStyle: {
                     auraColor: 'none',
@@ -263,11 +279,15 @@
 
                 series: [{
                     name: 'total contracts',
-                    borderWidth: 1,
+                    borderWidth: '0.03px',
+                    borderColor:'#3498DB',
                     data: getdataHeatMapRegionMonth(@Html(Json.stringify(Json.toJson(rs.callInRegion._2))), @Html(Json.stringify(Json.toJson(rs.callInRegion._2.map(x=>x._1).distinct.sorted))),@Html(Json.stringify(Json.toJson(rs.callInRegion._2.map(x=>x._2).distinct.sorted)))),
                     dataLabels: {
                         enabled: true,
-                        color: '#000000'
+                        color: '#000000',
+                        style: {
+                            "fontSize": "10px"
+                        }
                     }
                 }]
 
@@ -413,11 +433,14 @@
 
                 series: [{
                     name: 'total contracts',
-                    borderWidth: 1,
+                    borderWidth: '0.03px',
+                    borderColor:'#6495ED',
                     data: getdataHeatMapRegionMonth(@Html(Json.stringify(Json.toJson(rs.callInRegionAge))), @Html(Json.stringify(Json.toJson(rs.callInRegionAge.map(x=>x._1).distinct.sorted))),@Html(Json.stringify(Json.toJson(rs.callInRegionAge.map(x=>x._2).distinct.sorted)))),
                     dataLabels: {
                         enabled: true,
-                        color: '#000000'
+                        style: {
+                            "fontSize": "10px"
+                        }
                     }
                 }]
 
@@ -497,7 +520,7 @@
                 var percent = dataHuyDv.getValue(event.row, 4);
                 var contracts = dataHuyDv.getValue(event.row, 5);
                 var x = mouseX - 225;
-                var y = mouseY - 450;
+                var y = mouseY - 350;
                 $('#churn6_tooltip').html('<div><p><b>Age:</b> ' + keyByValue( catesAge, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
                         '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contract:</b> '+contracts+'</p></div>').css({
                     'top': y,
@@ -822,7 +845,7 @@
                                     var percent = dataRegionAge.getValue(event.row, 4);
                                     var contracts = dataRegionAge.getValue(event.row, 5);
                                     var x = mouseX - 225;
-                                    var y = mouseY - 450;
+                                    var y = mouseY - 350;
                                     $('#churn6_tooltip').html('<div><p><b>Age:</b> ' + keyByValue(catesAge, xAxis) + '</p><p><b>Region:</b> ' + yAxis +
                                             '</p><p><b>Rate:</b> ' + rate + ' %</p><p><b>Percent:</b> ' + percent + ' %</p><p><b>Number of contract:</b> ' + contracts + '</p></div>').css({
                                         'top': y,

@@ -76,14 +76,13 @@
                 }
                 .overlay {
                     width: 96px;
-                    height: 170px;
+                    height: 155px;
                     padding: 2px;
                     position: absolute;
                     border: 1px solid #73879C;
                     top: 32px;   /* chartArea top  */
                 }
                 .circle {
-                    margin-right: 5px;
                     margin-bottom: 5px;
                     display: inline-block;
                     border-radius: 50%;
@@ -236,6 +235,13 @@
                     background: #1ABB9C;
                     color: #fff;
                 }
+                .chartWithOverlay svg g g g rect:last-child{
+                    fill: none;
+                }
+                .chartWithOverlay svg g g g rect:first-child{
+                    fill: black;
+                }
+
                 /* Extra small devices (phones, 600px and down) */
                 @@media only screen and (max-width: 599px) {
                     .right_col{
@@ -473,7 +479,7 @@
                                                         <div class="clearfix"></div>
                                                     </div>
                                                     <div class="x_content">
-                                                        <div id="churn3" style="width: auto; height: 350px;"></div>
+                                                        <div id="churn3" style="width: auto; height: 370px;"></div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -489,10 +495,10 @@
                                                             <div id="churn4" style="width: auto; height: 535px;"></div>
                                                             <div class="overlay" id="churn4_overlay">
                                                                 <span style="font-size: 14px;color: #0D3349">ChurnPert (%)</span>
-                                                                <div style="margin-bottom: 2px;margin-top: 4px"><div class="circle" style="background: #B40404;"><span style="opacity: 0">1</span></div><span id="churn4_txtMin" style="color:#0D3349 ">@format3Decimal(rs.trendRegionMonth._2.map(x=>x._4).min)</span></div>
-                                                                <div style="margin-bottom: 2px"><div class="circle" style="background: #B40404;"><span style="opacity: 0">111</span></div><span id="churn4_circle2" style="color:#0D3349 ">@format3Decimal((rs.trendRegionMonth._2.map(x=>x._4).max -rs.trendRegionMonth._2.map(x=>x._4).min)/5*2)</span></div>
-                                                                <div style="margin-bottom: 2px"><div class="circle" style="background: #B40404;"><span style="opacity: 0">1111</span></div><span id="churn4_circle3" style="color:#0D3349 ">@format3Decimal((rs.trendRegionMonth._2.map(x=>x._4).max -rs.trendRegionMonth._2.map(x=>x._4).min)/5*3)</span></div>
-                                                                <div><div class="circle" style="background: #B40404"><span style="opacity: 0">11111</span></div><span id="churn4_txtMax" style="color:#0D3349 ">@format3Decimal(rs.trendRegionMonth._2.map(x=>x._4).max)</span></div>
+                                                                <div style="margin: 4px 0px 2px 7px"><div class="circle" style="background: black;margin-right: 11px"><span style="opacity: 0"></span></div><span id="churn4_txtMin" style="color:#0D3349 ">@format3Decimal(rs.trendRegionMonth._2.map(x=>x._4).min)</span></div>
+                                                                <div style="margin: 0px 0px 2px 5px"><div class="circle" style="background: black;margin-right: 8px"><span style="opacity: 0;width: 17px">11</span></div><span id="churn4_circle2" style="color:#0D3349 ">@format3Decimal((rs.trendRegionMonth._2.map(x=>x._4).max -rs.trendRegionMonth._2.map(x=>x._4).min)/5*2)</span></div>
+                                                                <div style="margin: 0px 0px 2px 3px"><div class="circle" style="background: black;margin-right: 6px"><span style="opacity: 0">111</span></div><span id="churn4_circle3" style="color:#0D3349 ">@format3Decimal((rs.trendRegionMonth._2.map(x=>x._4).max -rs.trendRegionMonth._2.map(x=>x._4).min)/5*3)</span></div>
+                                                                <div><div class="circle" style="background: black;margin-right: 4px"><span style="opacity: 0">1111</span></div><span id="churn4_txtMax" style="color:#0D3349 ">@format3Decimal(rs.trendRegionMonth._2.map(x=>x._4).max)</span></div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -509,7 +515,7 @@
                                                         <div class="clearfix"></div>
                                                     </div>
                                                     <div class="x_content">
-                                                        <div id="churn5" style="width: auto; height: 350px;"></div>
+                                                        <div id="churn5" style="width: auto; height: 370px;"></div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -525,10 +531,10 @@
                                                             <div id="churn6" style="width: auto; height: 530px;"></div>
                                                             <div class="overlay" id="churn6_overlay">
                                                                 <span style="font-size: 14px;color: #0D3349">ChurnPert (%)</span>
-                                                                <div style="margin-bottom: 2px;margin-top: 4px"><div class="circle" style="background: green;"><span style="opacity: 0">1</span></div><span id="churn6_txtMin" style="color:#0D3349 ">@format3Decimal(rs.checklistRegionAge.map(x=>x._4).min)</span></div>
-                                                                <div style="margin-bottom: 2px"><div class="circle" style="background: green;"><span style="opacity: 0">111</span></div><span id="churn6_circle2" style="color:#0D3349 ">@format3Decimal((rs.checklistRegionAge.map(x=>x._4).max -rs.checklistRegionAge.map(x=>x._4).min)/5*2)</span></div>
-                                                                <div style="margin-bottom: 2px"><div class="circle" style="background: green;"><span style="opacity: 0">1111</span></div><span id="churn6_circle3" style="color:#0D3349 ">@format3Decimal((rs.checklistRegionAge.map(x=>x._4).max -rs.checklistRegionAge.map(x=>x._4).min)/5*3)</span></div>
-                                                                <div><div class="circle" style="background: green"><span style="opacity: 0">11111</span></div><span id="churn6_txtMax" style="color:#0D3349 ">@format3Decimal(rs.checklistRegionAge.map(x=>x._4).max)</span></div>
+                                                                <div style="margin: 4px 0px 2px 7px"><div class="circle" style="background: black;margin-right: 11px"><span style="opacity: 0"></span></div><span id="churn6_txtMin" style="color:#0D3349 ">@format3Decimal(rs.checklistRegionAge.map(x=>x._4).min)</span></div>
+                                                                <div style="margin: 0px 0px 2px 5px"><div class="circle" style="background: black;margin-right: 8px"><span style="width: 17px;opacity: 0">11</span></div><span id="churn6_circle2" style="color:#0D3349 ">@format3Decimal((rs.checklistRegionAge.map(x=>x._4).max -rs.checklistRegionAge.map(x=>x._4).min)/5*2)</span></div>
+                                                                <div style="margin: 0px 0px 2px 3px"><div class="circle" style="background: black;margin-right: 6px"><span style="opacity: 0">111</span></div><span id="churn6_circle3" style="color:#0D3349 ">@format3Decimal((rs.checklistRegionAge.map(x=>x._4).max -rs.checklistRegionAge.map(x=>x._4).min)/5*3)</span></div>
+                                                                <div><div class="circle" style="background: black;margin-right: 4px"><span style="opacity: 0">1111</span></div><span id="churn6_txtMax" style="color:#0D3349 ">@format3Decimal(rs.checklistRegionAge.map(x=>x._4).max)</span></div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -539,18 +545,18 @@
                                     <div class="tab-pane fade" id="tabTime">
                                         <div class="row top_tiles">
                                             <div class="col-lg-3 col-sm-12 col-md-12 col-xs-12"></div>
-                                            <div class="col-lg-6 col-sm-12 col-md-12 col-xs-12">
+                                            <div class="col-lg-5 col-sm-12 col-md-12 col-xs-12">
                                                 <div class="x_panel tile" style="padding: 0px">
                                                     <div class="title disInline">
                                                         <span style="width: 90%">Number of Checklist by Checklist Processing Time by Region</span>
                                                         <div class="clearfix"></div>
                                                     </div>
                                                     <div class="x_content">
-                                                        <div id="churn7" style="width: auto; height: 350px;"></div>
+                                                        <div id="churn7" style="width: auto; height: 380px;"></div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-lg-3 col-sm-12 col-md-12 col-xs-12"></div>
+                                            <div class="col-lg-4 col-sm-12 col-md-12 col-xs-12"></div>
                                         </div>
                                     </div>
                                     <div class="tab-pane fade" id="tabType">
@@ -562,7 +568,7 @@
                                                         <div class="clearfix"></div>
                                                     </div>
                                                     <div class="x_content">
-                                                        <div id="churn8" style="width: auto; height: 350px;"></div>
+                                                        <div id="churn8" style="width: auto; height: 380px;"></div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -578,10 +584,10 @@
                                                             <div id="churn9" style="width: auto; height: 660px;"></div>
                                                             <div class="overlay" id="churn9_overlay">
                                                                 <span style="font-size: 14px;color: #0D3349">ChurnPert (%)</span>
-                                                                <div style="margin-bottom: 2px;margin-top: 4px"><div class="circle" style="background: #1c2752;"><span style="opacity: 0">1</span></div><span id="churn9_txtMin" style="color:#0D3349 ">@format3Decimal(rs.trendTypeBubble._2.map(x=>x._4).min)</span></div>
-                                                                <div style="margin-bottom: 2px"><div class="circle" style="background: #1c2752;"><span style="opacity: 0">111</span></div><span id="churn9_circle2" style="color:#0D3349 ">@format3Decimal((rs.trendTypeBubble._2.map(x=>x._4).max -rs.trendTypeBubble._2.map(x=>x._4).min)/5*2)</span></div>
-                                                                <div style="margin-bottom: 2px"><div class="circle" style="background: #1c2752;"><span style="opacity: 0">1111</span></div><span id="churn9_circle3" style="color:#0D3349 ">@format3Decimal((rs.trendTypeBubble._2.map(x=>x._4).max -rs.trendTypeBubble._2.map(x=>x._4).min)/5*3)</span></div>
-                                                                <div><div class="circle" style="background: #1c2752"><span style="opacity: 0">11111</span></div><span id="churn9_txtMax" style="color:#0D3349 ">@format3Decimal(rs.trendTypeBubble._2.map(x=>x._4).max)</span></div>
+                                                                <div style="margin: 4px 0px 2px 7px"><div class="circle" style="background: black;margin-right: 11px"><span style="opacity: 0"></span></div><span id="churn9_txtMin" style="color:#0D3349 ">@format3Decimal(rs.trendTypeBubble._2.map(x=>x._4).min)</span></div>
+                                                                <div style="margin: 0px 0px 2px 5px"><div class="circle" style="background: black;margin-right: 8px"><span style="width: 17px;opacity: 0">11</span></div><span id="churn9_circle2" style="color:#0D3349 ">@format3Decimal((rs.trendTypeBubble._2.map(x=>x._4).max -rs.trendTypeBubble._2.map(x=>x._4).min)/5*2)</span></div>
+                                                                <div style="margin: 0px 0px 2px 3px"><div class="circle" style="background: black;margin-right: 6px"><span style="opacity: 0">111</span></div><span id="churn9_circle3" style="color:#0D3349 ">@format3Decimal((rs.trendTypeBubble._2.map(x=>x._4).max -rs.trendTypeBubble._2.map(x=>x._4).min)/5*3)</span></div>
+                                                                <div><div class="circle" style="background: black;margin-right: 4px"><span style="opacity: 0">1111</span></div><span id="churn9_txtMax" style="color:#0D3349 ">@format3Decimal(rs.trendTypeBubble._2.map(x=>x._4).max)</span></div>
                                                             </div>
                                                         </div>
                                                     </div>

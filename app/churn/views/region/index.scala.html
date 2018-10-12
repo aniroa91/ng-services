@@ -76,14 +76,13 @@
                 }
                 .overlay {
                     width: 96px;
-                    height: 170px;
+                    height: 155px;
                     padding: 2px;
                     position: absolute;
                     border: 1px solid #73879C;
                     top: 32px;   /* chartArea top  */
                 }
                 .circle {
-                    margin-right: 5px;
                     margin-bottom: 5px;
                     display: inline-block;
                     border-radius: 50%;
@@ -235,6 +234,12 @@
                 .activeLi{
                     background: #1ABB9C;
                     color: #fff;
+                }
+                .chartWithOverlay svg g g g rect:last-child{
+                    fill: none;
+                }
+                .chartWithOverlay svg g g g rect:first-child{
+                    fill: black;
                 }
                 /* Extra small devices (phones, 600px and down) */
                 @@media only screen and (max-width: 599px) {
@@ -419,7 +424,7 @@
                                     <div class="clearfix"></div>
                                 </div>
                                 <div class="x_content">
-                                    <div id="churn1" style="width: auto; height: 370px;"></div>
+                                    <div id="churn1" style="width: auto; height: 320px;"></div>
                                 </div>
                             </div>
                         </div>
@@ -432,13 +437,13 @@
                                 <div class="x_content">
                                     <div class="chartWithOverlay animated slideInUp" id="chartWithOverlay">
                                         <div id="churn3_tooltip" class="custom_tooltip" style="display: none"></div>
-                                        <div id="churn3" style="width: auto; height: 370px;"></div>
+                                        <div id="churn3" style="width: auto; height: 320px;"></div>
                                         <div class="overlay" id="churn3_overlay">
                                             <span style="font-size: 14px;color: #0D3349">ChurnPert (%)</span>
-                                            <div style="margin-bottom: 2px;margin-top: 4px"><div class="circle" style="background: #f2473c;"><span style="opacity: 0">1</span></div><span id="churn3_txtMin" style="color:#0D3349 ">@format3Decimal(rs.trendRegionMonth._2.map(x=>x._4).min)</span></div>
-                                            <div style="margin-bottom: 2px"><div class="circle" style="background: #f2473c;"><span style="opacity: 0">111</span></div><span id="churn3_circle2" style="color:#0D3349 ">@format3Decimal((rs.trendRegionMonth._2.map(x=>x._4).max -rs.trendRegionMonth._2.map(x=>x._4).min)/5*2)</span></div>
-                                            <div style="margin-bottom: 2px"><div class="circle" style="background: #f2473c;"><span style="opacity: 0">1111</span></div><span id="churn3_circle3" style="color:#0D3349 ">@format3Decimal((rs.trendRegionMonth._2.map(x=>x._4).max -rs.trendRegionMonth._2.map(x=>x._4).min)/5*3)</span></div>
-                                            <div><div class="circle" style="background: #f2473c"><span style="opacity: 0">11111</span></div><span id="churn3_txtMax" style="color:#0D3349 ">@format3Decimal(rs.trendRegionMonth._2.map(x=>x._4).max)</span></div>
+                                            <div style="margin: 4px 0px 2px 7px"><div class="circle" style="background: black;margin-right: 10px"><span style="opacity: 0"></span></div><span id="churn3_txtMin" style="color:#0D3349 ">@format3Decimal(rs.trendRegionMonth._2.map(x=>x._4).min)</span></div>
+                                            <div style="margin: 0px 0px 2px 5px"><div class="circle" style="background: black;margin-right: 8px"><span style="width: 17px;opacity: 0">11</span></div><span id="churn3_circle2" style="color:#0D3349 ">@format3Decimal((rs.trendRegionMonth._2.map(x=>x._4).max -rs.trendRegionMonth._2.map(x=>x._4).min)/5*2)</span></div>
+                                            <div style="margin: 0px 0px 2px 3px"><div class="circle" style="background: black;margin-right: 6px"><span style="opacity: 0">111</span></div><span id="churn3_circle3" style="color:#0D3349 ">@format3Decimal((rs.trendRegionMonth._2.map(x=>x._4).max -rs.trendRegionMonth._2.map(x=>x._4).min)/5*3)</span></div>
+                                            <div><div class="circle" style="margin-right: 4px;background: black"><span style="opacity: 0">1111</span></div><span id="churn3_txtMax" style="color:#0D3349 ">@format3Decimal(rs.trendRegionMonth._2.map(x=>x._4).max)</span></div>
                                         </div>
                                     </div>
                                 </div>
@@ -480,10 +485,10 @@
                                                         <div id="churn4" style="width: auto; height: 600px;"></div>
                                                         <div class="overlay" id="churn4_overlay">
                                                             <span style="font-size: 14px;color: #0D3349">ChurnPert (%)</span>
-                                                            <div style="margin-bottom: 2px;margin-top: 4px"><div class="circle" style="background: green;"><span style="opacity: 0">1</span></div><span id="churn4_txtMin" style="color:#0D3349 ">@format3Decimal(rs.trendProfileMonth._3.map(x=>x._4).min)</span></div>
-                                                            <div style="margin-bottom: 2px"><div class="circle" style="background: green;"><span style="opacity: 0">111</span></div><span id="churn4_circle2" style="color:#0D3349 ">@format3Decimal((rs.trendProfileMonth._3.map(x=>x._4).max -rs.trendProfileMonth._3.map(x=>x._4).min)/5*2)</span></div>
-                                                            <div style="margin-bottom: 2px"><div class="circle" style="background: green;"><span style="opacity: 0">1111</span></div><span id="churn4_circle3" style="color:#0D3349 ">@format3Decimal((rs.trendProfileMonth._3.map(x=>x._4).max -rs.trendProfileMonth._3.map(x=>x._4).min)/5*3)</span></div>
-                                                            <div><div class="circle" style="background: green"><span style="opacity: 0">11111</span></div><span id="churn4_txtMax" style="color:#0D3349 ">@format3Decimal(rs.trendProfileMonth._3.map(x=>x._4).max)</span></div>
+                                                            <div style="margin: 4px 0px 2px 7px"><div class="circle" style="background: black;margin-right: 11px"><span style="opacity: 0"></span></div><span id="churn4_txtMin" style="color:#0D3349 ">@format3Decimal(rs.trendProfileMonth._3.map(x=>x._4).min)</span></div>
+                                                            <div style="margin: 0px 0px 2px 5px"><div class="circle" style="background: black;margin-right: 8px"><span style="width: 17px;opacity: 0">11</span></div><span id="churn4_circle2" style="color:#0D3349 ">@format3Decimal((rs.trendProfileMonth._3.map(x=>x._4).max -rs.trendProfileMonth._3.map(x=>x._4).min)/5*2)</span></div>
+                                                            <div style="margin: 0px 0px 2px 3px"><div class="circle" style="background: black;margin-right: 6px"><span style="opacity: 0">111</span></div><span id="churn4_circle3" style="color:#0D3349 ">@format3Decimal((rs.trendProfileMonth._3.map(x=>x._4).max -rs.trendProfileMonth._3.map(x=>x._4).min)/5*3)</span></div>
+                                                            <div><div class="circle" style="margin-right: 4px;background: black"><span style="opacity: 0">1111</span></div><span id="churn4_txtMax" style="color:#0D3349 ">@format3Decimal(rs.trendProfileMonth._3.map(x=>x._4).max)</span></div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -500,7 +505,7 @@
                                                     <div class="clearfix"></div>
                                                 </div>
                                                 <div class="x_content">
-                                                    <div id="churn-heatmap" style="width: auto; height: 350px;"></div>
+                                                    <div id="churn-heatmap" style="width: auto; height: 380px;"></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -516,10 +521,10 @@
                                                         <div id="churn5" style="width: auto; height: 600px;"></div>
                                                         <div class="overlay" id="churn5_overlay">
                                                             <span style="font-size: 14px;color: #0D3349">ChurnPert (%)</span>
-                                                            <div style="margin-bottom: 2px;margin-top: 4px"><div class="circle" style="background: #f60;"><span style="opacity: 0">1</span></div><span id="churn5_txtMin" style="color:#0D3349 ">@format3Decimal(rs.trendAgeProfile._2.map(x=>x._4).min)</span></div>
-                                                            <div style="margin-bottom: 2px"><div class="circle" style="background: #f60;"><span style="opacity: 0">111</span></div><span id="churn5_circle2" style="color:#0D3349 ">@format3Decimal((rs.trendAgeProfile._2.map(x=>x._4).max -rs.trendAgeProfile._2.map(x=>x._4).min)/5*2)</span></div>
-                                                            <div style="margin-bottom: 2px"><div class="circle" style="background: #f60;"><span style="opacity: 0">1111</span></div><span id="churn5_circle3" style="color:#0D3349 ">@format3Decimal((rs.trendAgeProfile._2.map(x=>x._4).max -rs.trendAgeProfile._2.map(x=>x._4).min)/5*3)</span></div>
-                                                            <div><div class="circle" style="background: #f60"><span style="opacity: 0">11111</span></div><span id="churn5_txtMax" style="color:#0D3349 ">@format3Decimal(rs.trendAgeProfile._2.map(x=>x._4).max)</span></div>
+                                                            <div style="margin: 4px 0px 2px 7px"><div class="circle" style="background: black;margin-right: 11px"><span style="opacity: 0"></span></div><span id="churn5_txtMin" style="color:#0D3349 ">@format3Decimal(rs.trendAgeProfile._2.map(x=>x._4).min)</span></div>
+                                                            <div style="margin: 0px 0px 2px 5px"><div class="circle" style="background: black;margin-right: 8px"><span style="width: 17px;opacity: 0">11</span></div><span id="churn5_circle2" style="color:#0D3349 ">@format3Decimal((rs.trendAgeProfile._2.map(x=>x._4).max -rs.trendAgeProfile._2.map(x=>x._4).min)/5*2)</span></div>
+                                                            <div style="margin: 0px 0px 2px 3px"><div class="circle" style="background: black;margin-right: 6px"><span style="opacity: 0">111</span></div><span id="churn5_circle3" style="color:#0D3349 ">@format3Decimal((rs.trendAgeProfile._2.map(x=>x._4).max -rs.trendAgeProfile._2.map(x=>x._4).min)/5*3)</span></div>
+                                                            <div><div class="circle" style="margin-right: 4px;background: black"><span style="opacity: 0">1111</span></div><span id="churn5_txtMax" style="color:#0D3349 ">@format3Decimal(rs.trendAgeProfile._2.map(x=>x._4).max)</span></div>
                                                         </div>
                                                     </div>
                                                 </div>

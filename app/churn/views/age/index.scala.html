@@ -49,7 +49,6 @@
                     font-size: 13px!important;
                 }
                 .circle {
-                    margin-right: 5px;
                     margin-bottom: 5px;
                     display: inline-block;
                     border-radius: 50%;
@@ -199,6 +198,13 @@
                     color: #fff;
                 }
 
+                .chartWithOverlay svg g g g rect:last-child{
+                    fill: none;
+                }
+                .chartWithOverlay svg g g g rect:first-child{
+                    fill: black;
+                }
+
                 @@media only screen and (max-width: 767px) {
                     .navbar-nav{
                         width: 100%;
@@ -244,7 +250,7 @@
                 @@media only screen and (min-width: 601px) and (max-width: 1023px) {
                     .overlay {
                         width: 120px;
-                        height: 170px;
+                        height: 155px;
                         padding: 2px;
                         position: absolute;
                         border: 1px solid #73879C;
@@ -261,7 +267,7 @@
                     }
                     .overlay {
                         width: 120px;
-                        height: 170px;
+                        height: 155px;
                         padding: 2px;
                         position: absolute;
                         border: 1px solid #73879C;
@@ -272,7 +278,7 @@
                 @@media only screen and (min-width: 1600px) {
                     .overlay {
                         width: 120px;
-                        height: 170px;
+                        height: 155px;
                         padding: 2px;
                         position: absolute;
                         border: 1px solid #73879C;
@@ -417,15 +423,15 @@
                                         <div class="clearfix"></div>
                                     </div>
                                     <div class="x_content">
-                                        <div class="chartWithOverlay animated slideInUp" id="chartWithOverlay">
+                                        <div class="chartWithOverlay" id="chartWithOverlay">
                                             <div id="churn_tooltip" class="custom_tooltip" style="display: none"></div>
                                             <div id="container" style="width: auto; height: 450px;"></div>
                                             <div class="overlay">
                                                 <span style="font-size: 16px;color: #0D3349">ChurnPert (%)</span>
-                                                <div style="margin-bottom: 2px;margin-top: 4px"><div class="circle" style="background: #f2473c;"><span style="opacity: 0">1</span></div><span id="txtMin" style="color:#0D3349 ">@format3Decimal(rs._1.toSeq.map(x=>x._4).min)</span></div>
-                                                <div style="margin-bottom: 2px"><div class="circle" style="background: #f2473c;"><span style="opacity: 0">111</span></div><span id="circle2" style="color:#0D3349 ">@format3Decimal((rs._1.toSeq.map(x=>x._4).max -rs._1.toSeq.map(x=>x._4).min)/5*2)</span></div>
-                                                <div style="margin-bottom: 2px"><div class="circle" style="background: #f2473c;"><span style="opacity: 0">1111</span></div><span id="circle3" style="color:#0D3349 ">@format3Decimal((rs._1.toSeq.map(x=>x._4).max -rs._1.toSeq.map(x=>x._4).min)/5*3)</span></div>
-                                                <div><div class="circle" style="background: #f2473c"><span style="opacity: 0">11111</span></div><span id="txtMax" style="color:#0D3349 ">@format3Decimal(rs._1.toSeq.map(x=>x._4).max)</span></div>
+                                                <div style="margin: 4px 0px 2px 7px"><div class="circle" style="background: black;margin-right: 11px"><span style="opacity: 0"></span></div><span id="txtMin" style="color:#0D3349 ">@format3Decimal(rs._1.toSeq.map(x=>x._4).min)</span></div>
+                                                <div style="margin: 0px 0px 2px 5px"><div class="circle" style="background: black;margin-right: 8px"><span style="width: 17px;opacity: 0">11</span></div><span id="circle2" style="color:#0D3349 ">@format3Decimal((rs._1.toSeq.map(x=>x._4).max -rs._1.toSeq.map(x=>x._4).min)/5*2)</span></div>
+                                                <div style="margin: 0px 0px 2px 3px"><div class="circle" style="background: black;margin-right: 6px"><span style="opacity: 0">111</span></div><span id="circle3" style="color:#0D3349 ">@format3Decimal((rs._1.toSeq.map(x=>x._4).max -rs._1.toSeq.map(x=>x._4).min)/5*3)</span></div>
+                                                <div><div class="circle" style="margin-right: 4px;background: black"><span style="opacity: 0">1111</span></div><span id="txtMax" style="color:#0D3349 ">@format3Decimal(rs._1.toSeq.map(x=>x._4).max)</span></div>
                                             </div>
                                         </div>
                                     </div>

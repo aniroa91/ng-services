@@ -7,17 +7,13 @@
         var widthChart  = $(window).width()
         var heightChart_region = $(window).height() * 0.46
         var heightChart_type   = $(window).height() * 0.67
-        var spaceText = 20
         if($(window).width() > 991){
             widthChart = $(window).width()*0.4
         }
-        if($(window).width() >= 600){
-            spaceText = 40
-        }
         var options = {
             title: 'Churn Rate (%)',
-            hAxis: {title: '',gridlines: {count: 13}},
-            vAxis: {title: 'Region',gridlines: {count: 9}},
+            hAxis: {title: '',gridlines: {count: 13, color: 'transparent'}},
+            vAxis: {title: 'Region',gridlines: {count: 9, color: '#f0f0f0'}},
             chartArea: {
                 height: "70%",
                 width: "73%",
@@ -45,7 +41,7 @@
             title: 'Churn Rate (%)',
             hAxis: {
                 title: '',
-                gridlines: {count: 15},
+                gridlines: {count: 15, color: 'transparent'},
                 viewWindow: {
                   min:0
                 },
@@ -59,7 +55,7 @@
             },
             width: widthChart,
             height: heightChart_type,
-            vAxis: {title: 'Region',gridlines: {count: 9}},
+            vAxis: {title: 'Region',gridlines: {count: 9, color: '#f0f0f0'}},
             chartArea: {
                 height: "54%",
                 width: "73%",
@@ -70,7 +66,7 @@
             sizeAxis: {
                 maxSize: 20
             },
-            colorAxis: {colors: ['#E0ECF8', '#1c2752']},
+            colorAxis: {colors: ['#f7fbff', '#08519c']},
             bubble: {
                 textStyle: {
                     auraColor: 'none',
@@ -86,18 +82,25 @@
             title: 'Churn Rate (%)',
             hAxis: {
                 title: '',
-                gridlines: {count: 14},
+                gridlines: {
+                    count: 14,
+                    color: 'transparent'
+                },
                 viewWindow: {
                    min:0
                 },
                 textStyle : {
-                    color:'#1c2752'
-                },
-                maxAlternation: 2, // use a maximum of 1 line of labels
-                showTextEvery: 1, // show every label if possible
-                minTextSpacing: spaceText // minimum spacing between adjacent labels, in pixels
+                    color:'#1c2752',
+                    fontSize: 11
+                }
             },
-            vAxis: {title: 'Region',gridlines: {count: 9}},
+            vAxis: {
+                title: 'Region',
+                gridlines: {
+                    count: 9,
+                    color: '#f0f0f0'
+                }
+            },
             chartArea: {
                 height: "70%",
                 width: "73%",
@@ -299,11 +302,15 @@
 
                 series: [{
                     name: 'total contracts',
-                    borderWidth: 1,
+                    borderWidth: 0.1,
+                    borderColor: '#78c679',
                     data: getdataHeatMapRegionMonth(@Html(Json.stringify(Json.toJson(rs.checklistRegion._2))), @Html(Json.stringify(Json.toJson(rs.checklistRegion._2.map(x=>x._1).distinct.sorted))),@Html(Json.stringify(Json.toJson(rs.checklistRegion._2.map(x=>x._2).distinct.sorted)))),
                     dataLabels: {
                         enabled: true,
-                        color: '#000000'
+                        color: '#000000',
+                        style: {
+                            "fontSize": "10px"
+                        }
                     }
                 }]
 
@@ -316,7 +323,7 @@
             });
 
             function handlerOut() {
-                $('.custom_tooltip').fadeOut('fast');
+                $('.custom_tooltip').hide()
             }
 
             // draw chart Bubble 4-6-9
@@ -402,11 +409,15 @@
 
                 series: [{
                     name: 'total contracts',
-                    borderWidth: 1,
+                    borderWidth: 0.05,
+                    borderColor:'#f1b53d',
                     data: getdataHeatMapRegionMonth(@Html(Json.stringify(Json.toJson(rs.numRegionAge))), @Html(Json.stringify(Json.toJson(rs.numRegionAge.map(x=>x._1).distinct.sorted))),@Html(Json.stringify(Json.toJson(rs.numRegionAge.map(x=>x._2).distinct.sorted)))),
                     dataLabels: {
                         enabled: true,
-                        color: '#000000'
+                        color: '#000000',
+                        style: {
+                            "fontSize": "10px"
+                        }
                     }
                 }]
 
@@ -435,13 +446,13 @@
                 },
 
                 colorAxis: {
-                    minColor: '#EFEFFF',
-                    maxColor: '#6495ED',
+                    minColor: '#ffffe5',
+                    maxColor: '#006837',
                     type: 'logarithmic',
                     stops: [
-                        [0, '#EFEFFF'],
-                        [0.67, '#81BEF7'],
-                        [1, '#6495ED']
+                        [0, '#ffffe5'],
+                        [0.67, '#78c679'],
+                        [1, '#006837']
                     ]
                 },
 
@@ -498,10 +509,14 @@
 
                 series: [{
                     name: 'total contracts',
-                    borderWidth: 1,
+                    borderWidth: 0.05,
+                    borderColor:'#78c679',
                     data: @Html(Json.stringify(Json.toJson(rs.processTime._3))),
                     dataLabels: {
                         enabled: true,
+                        style: {
+                            "fontSize": "10px"
+                        },
                         color: '#000000'
                     }
                 }]
@@ -543,7 +558,7 @@
 
                 colorAxis: {
                     minColor: '#FFFFFF',
-                    maxColor: '#d9534f'
+                    maxColor: '#b30000'
                 },
 
                 plotOptions: {
@@ -599,11 +614,14 @@
 
                 series: [{
                     name: 'total contracts',
-                    borderWidth: 1,
+                    borderWidth: '0.03px',
+                    borderColor:'#ef6548',
                     data: @Html(Json.stringify(Json.toJson(rs.typeRegion._3))),
                     dataLabels: {
                         enabled: true,
-                        color: '#000000'
+                        style: {
+                            "fontSize": "10px"
+                        }
                     }
                 }]
 
