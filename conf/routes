@@ -40,5 +40,9 @@ POST    /internet/calllog/getJsonChurn   churn.controllers.ChurnCallogController
 GET     /internet/checklist              churn.controllers.ChurnChecklistController.index
 POST    /internet/checklist/getJsonChurn churn.controllers.ChurnChecklistController.getJsonChurn
 
+### PAGE DETECT PROBLEM
+GET     /internet/detect                 churn.controllers.ChurnDetectController.index
+POST    /internet/detect/exportCSV       churn.controllers.ChurnDetectController.exportCSV
+POST    /internet/detect/getJsonChurn    churn.controllers.ChurnDetectController.getJsonChurn
 
 #######################################################################

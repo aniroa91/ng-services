@@ -29,6 +29,7 @@ import scalaj.http.Http
 import play.api.libs.json.Json
 import scala.concurrent.duration.Duration
 import scala.concurrent.duration._
+import scala.collection.mutable.ArrayBuffer
 
 import java.util.concurrent.TimeUnit
 import org.jsoup.Jsoup
@@ -54,6 +55,18 @@ object CommonService extends AbstractService {
       .map(x => x -> map.getOrElse(x, 0))
       .map(x => (x._1._1, x._1._2, x._2) )
 
+  }
+
+  def getMedian(numArray: Array[(Long, Long)]) = {
+    val sizeArray = numArray.map(x=> x._2).sum
+    val arrs = new ArrayBuffer[Long]()
+    numArray.map(x=> List.tabulate(x._2.toInt)(_ => x._1).map(y=> arrs += y))
+
+    val median = if (sizeArray % 2 == 0)
+      (arrs(arrs.length / 2).toDouble + arrs(arrs.length/2 - 1).toDouble)/2;
+    else
+      arrs(arrs.length/2).toDouble
+    median
   }
 
   def getLongValueByKey(arr: Array[(String,Long)], key:String):Int = {
@@ -106,6 +119,11 @@ object CommonService extends AbstractService {
   def getPrevMonth(): String = {
     val date = new DateTime()
     date.minusMonths(1).toString(DateTimeFormat.forPattern("yyyy-MM"))
+  }
+
+  def getLast6Month(): String = {
+    val date = new DateTime()
+    date.minusMonths(6).toString(DateTimeFormat.forPattern("yyyy-MM"))
   }
 
   def getpreviousMinutes(times: Int): String = {

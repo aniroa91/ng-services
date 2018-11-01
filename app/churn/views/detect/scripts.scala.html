@@ -1,0 +1,1446 @@
+@(rs: churn.models.DetectResponse)
+@import play.api.libs.json.Json
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#monthGrp').datepicker({
+            autoclose: true,
+            minViewMode: 1,
+            endDate: '-1m',
+            format: 'yyyy-mm'
+        })
+
+        Highcharts.setOptions({
+            lang: {
+                drillUpText: '◁ Back to Previous'
+            }
+        });
+
+        Highcharts.chart('chart-pie3', {
+            chart: {
+                type: 'pie',
+                options3d: {
+                    enabled: true,
+                    alpha: 45
+                }
+            },
+            title: {
+                text: 'Number of Contracts by Customers’ Complain'
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b>'
+            },
+            plotOptions: {
+                series: {
+                    cursor: 'pointer',
+                    point: {
+                        events: {
+                            click: function () {
+                                if(this.name != null) {
+                                    if (this.name == $('#complain').val()) {
+                                        $('#complain').val("*")
+                                        $('.otherFilt').hide()
+                                        $('#groupCont').text("")
+                                        $('#groupTit').text("")
+                                    }
+                                    else {
+                                        $('#complain').val(this.name)
+                                        $('.otherFilt').show()
+                                        $('#groupCont').text(this.name)
+                                        $('#groupTit').text("Group Complain")
+                                    }
+                                    $('#region').val("*")
+                                    $('#age').val("*")
+                                    $('#package').val("*")
+                                    $('#contractGrp').val("*")
+                                    $('#cause').val("")
+                                    $('#maintain').val("")
+                                    $('#cate').val("")
+                                    ajaxGetChurnDetect("churn3")
+                                }
+                            }
+                        }
+                    }
+                },
+                pie: {
+                    allowPointSelect: false,
+                    cursor: 'pointer',
+                    innerSize: 100,
+                    depth: 45,
+                    dataLabels: {
+                        enabled: false,
+                        format: '{point.name}'
+                    },
+                    showInLegend: true
+                }
+            },
+            colors: [
+                '#1ABB9C',
+                '#832d1d',
+                '#E74C3C',
+                '#9B59B6',
+                '#f1b53d',
+                '#09006d',
+                '#cccccc',
+                '#669999',
+                '#f2ccff',
+                '#666633',
+                '#73879C',
+                '#132639',
+                '#99cc00',
+                '#466d6d',
+                '#ffc6b3',
+                '#ffff00'],
+            series: [{
+                type: 'pie',
+                name: 'Contracts(%)',
+                data: getTopSeriesPieChart(@Html(Json.stringify(Json.toJson(rs.complain))))
+            }],
+            drilldown:{
+                drillUpButton: {
+                    theme: {
+                        fill: 'white',
+                        'stroke-width': 1,
+                        stroke: 'silver',
+                        r: 0,
+                        states: {
+                            hover: {
+                                fill: '#1ABB9C'
+                            },
+                            select: {
+                                stroke: '#039',
+                                fill: '#1ABB9C'
+                            }
+                        }
+                    }
+
+                },
+                series: getDrillDownOthersPiechart(@Html(Json.stringify(Json.toJson(rs.complain.slice(11, rs.complain.length)))), "others")
+            }
+        });
+
+        var churn4 = Highcharts.chart('chart-pie4', {
+            chart: {
+                type: 'pie',
+                options3d: {
+                    enabled: true,
+                    alpha: 45
+                }
+            },
+            title: {
+                text: 'Number of Contracts by Call Category'
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b>'
+            },
+            plotOptions: {
+                series: {
+                    cursor: 'pointer',
+                    point: {
+                        events: {
+                            click: function () {
+                                if(this.name == $('#cate').val()){
+                                    $('#cate').val("")
+                                    $('.otherFilt').hide()
+                                    $('#groupCont').text("")
+                                    $('#groupTit').text("")
+                                }
+                                else {
+                                    $('#cate').val(this.name)
+                                    $('.otherFilt').show()
+                                    $('#groupCont').text(this.name)
+                                    $('#groupTit').text("Group Category")
+                                }
+                                $('#region').val("*")
+                                $('#age').val("*")
+                                $('#package').val("*")
+                                $('#contractGrp').val("*")
+                                $('#cause').val("")
+                                $('#maintain').val("")
+                                $('#complain').val("*")
+                                ajaxGetChurnDetect("churn4")
+                            }
+                        }
+                    }
+                },
+                pie: {
+                    allowPointSelect: false,
+                    cursor: 'pointer',
+                    innerSize: 100,
+                    depth: 45,
+                    dataLabels: {
+                        enabled: false,
+                        format: '{point.name}'
+                    },
+                    showInLegend: true
+                }
+            },
+            colors: [
+                '#1ABB9C',
+                '#832d1d',
+                '#E74C3C',
+                '#9B59B6',
+                '#f1b53d',
+                '#09006d',
+                '#cccccc',
+                '#669999',
+                '#f2ccff',
+                '#666633',
+                '#73879C',
+                '#132639',
+                '#99cc00',
+                '#466d6d',
+                '#ffc6b3',
+                '#ffff00'],
+            series: [{
+                type: 'pie',
+                name: 'Contract(%)',
+                data: @Html(Json.stringify(Json.toJson(rs.cates)))
+            }]
+        });
+
+        var churn5 = Highcharts.chart('chart-line5', {
+            chart: {
+                type: 'line'
+            },
+            title: {
+                text: 'Trend in Checklist Processing Time (hours)'
+            },
+            xAxis: {
+                categories: @Html(Json.stringify(Json.toJson(rs.medianHours.map(x=> x._1))))
+            },
+            colors : ['#253494'],
+            legend: false,
+            yAxis: {
+                title: {
+                    text: ''
+                },
+                labels: {
+                    format: '{value} hours',
+                    style: {
+                        color: "#73879C"
+                    }
+                },
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0
+                }
+            },
+            series: [{
+                name: 'Median Time',
+                data: @Html(Json.stringify(Json.toJson(rs.medianHours.map(x=> x._2))))
+
+            }]
+        });
+
+        var churn6 = Highcharts.chart('chart-col6', {
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'Number of Contracts by Checklist Root Cause'
+            },
+            xAxis: {
+                categories: @Html(Json.stringify(Json.toJson(rs.numCauses.map(x=> x._1)))),
+                labels: {
+                    useHTML:true,//set to true
+                    style:{
+                        width:'25px',
+                        whiteSpace:'normal'//set to normal
+                    },
+                    step: 1,
+                    formatter: function () {//use formatter
+                        return '<div align="center" style="white-space:normal;width:25px">' + this.value + '</div>';
+                    }
+                }
+            },
+            colors : ['#dc5a78'],
+            yAxis: {
+                min: 0,
+                title: {
+                    text: ''
+                }
+            },
+            legend: false,
+            plotOptions: {
+                column: {
+                    dataLabels: {
+                        enabled: true,
+                        crop: false,
+                        overflow: 'none'
+                    }
+                },
+                series: {
+                    cursor: 'pointer',
+                    point: {
+                        events: {
+                            click: function () {
+                                if(this.category == $('#cause').val()){
+                                    $('#cause').val("")
+                                    $('.otherFilt').hide()
+                                    $('#groupCont').text("")
+                                    $('#groupTit').text("")
+                                }
+                                else {
+                                    $('#cause').val(this.category)
+                                    $('.otherFilt').show()
+                                    $('#groupCont').text(this.category)
+                                    $('#groupTit').text("Group Root Cause")
+                                }
+                                $('#region').val("*")
+                                $('#age').val("*")
+                                $('#package').val("*")
+                                $('#contractGrp').val("*")
+                                $('#complain').val("*")
+                                $('#maintain').val("")
+                                $('#cate').val("")
+                                ajaxGetChurnDetect("churn6")
+                            }
+                        }
+                    }
+                }
+            },
+            series: [{
+                name: 'Contracts',
+                data: @Html(Json.stringify(Json.toJson(rs.numCauses.map(x=> x._2))))
+
+            }]
+        });
+
+        var churn7 = Highcharts.chart('chart-line7', {
+            chart: {
+                zoomType: 'xy'
+            },
+
+            title: {
+                text: 'Checklist Processing Time by Maintenance Unit (hours)'
+            },
+
+            colors : ['#fc8d59', '#238443'],
+
+            xAxis: {
+                categories: @Html(Json.stringify(Json.toJson(rs.medianMaintain.map(x=> x._1)))),
+                title: {
+                    text: 'Maintenance Unit'
+                },
+                labels: {
+                    useHTML:true,//set to true
+                    style:{
+                        width:'25px',
+                        whiteSpace:'normal'//set to normal
+                    },
+                    step: 1,
+                    formatter: function () {//use formatter
+                        return '<div align="center" style="white-space:normal;width:25px">' + this.value + '</div>';
+                    }
+                }
+            },
+
+            yAxis: [{
+                labels: {
+                    format: '{value}',
+                    style: {
+                        color: "#fc8d59"
+                    }
+                },
+                title: {
+                    text: 'Number of contracts',
+                    style: {
+                        color: "#fc8d59"
+                    }
+                }
+            }, { // Secondary yAxis
+                title: {
+                    text: 'Hours',
+                    style: {
+                        color: "#238443"
+                    }
+                },
+                labels: {
+                    format: '{value}',
+                    style: {
+                        color: "#238443"
+                    }
+                },
+                opposite: true
+            }],
+
+            tooltip: {
+                shared: true,
+                style: {
+                    color: '#fff',
+                    zIndex: 9999
+                },
+                backgroundColor: '#73879C',
+                borderWidth: 0
+            },
+            plotOptions: {
+                series: {
+                    cursor: 'pointer',
+                    point: {
+                        events: {
+                            click: function () {
+                                if(this.category == $('#maintain').val()){
+                                    $('#maintain').val("")
+                                    $('.otherFilt').hide()
+                                    $('#groupCont').text("")
+                                    $('#groupTit').text("")
+                                }
+                                else {
+                                    $('#maintain').val(this.category)
+                                    $('.otherFilt').show()
+                                    $('#groupCont').text(this.category)
+                                    $('#groupTit').text("Maintainance Unit")
+                                }
+                                $('#region').val("*")
+                                $('#age').val("*")
+                                $('#package').val("*")
+                                $('#contractGrp').val("*")
+                                $('#cause').val("")
+                                $('#complain').val("*")
+                                $('#cate').val("")
+                                ajaxGetChurnDetect("churn7")
+                            }
+                        }
+                    }
+                }
+            },
+            series: [{
+                name: 'Contracts',
+                type: 'column',
+                yAxis: 0,
+                data: @Html(Json.stringify(Json.toJson(rs.medianMaintain.map(x=> x._3))))
+            },
+                {
+                    name: 'Median',
+                    type: 'spline',
+                    yAxis: 1,
+                    data: @Html(Json.stringify(Json.toJson(rs.medianMaintain.map(x=> x._2))))
+                }]
+
+        });
+
+        var churn8 = Highcharts.chart('chart-pie8', {
+            chart: {
+                type: 'pie',
+                options3d: {
+                    enabled: false,
+                    alpha: 45
+                }
+            },
+            title: {
+                text: 'Number of Contracts by Region'
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b>'
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: false,
+                    cursor: 'pointer',
+                    innerSize: 80,
+                    depth: 45,
+                    dataLabels: {
+                        enabled: false,
+                        format: '{point.name}'
+                    },
+                    showInLegend: true
+                },
+                series: {
+                    cursor: 'pointer',
+                    point: {
+                        events: {
+                            click: function () {
+                                if(this.name.split(" ")[1] == $('#region').val()){
+                                    $('#region').val("*")
+                                    $('.otherFilt').hide()
+                                    $('#groupCont').text("")
+                                    $('#groupTit').text("")
+                                }
+                                else {
+                                    $('#region').val(this.name.split(" ")[1])
+                                    $('.otherFilt').show()
+                                    $('#groupCont').text(this.name)
+                                    $('#groupTit').text("Group Region")
+                                }
+                                $('#complain').val("*")
+                                $('#age').val("*")
+                                $('#package').val("*")
+                                $('#contractGrp').val("*")
+                                $('#cause').val("")
+                                $('#maintain').val("")
+                                $('#cate').val("")
+                                ajaxGetChurnDetect("churn8")
+                            }
+                        }
+                    }
+                }
+            },
+            colors: [
+                '#73879C',
+                '#832d1d',
+                '#1ABB9C',
+                '#E74C3C',
+                '#9B59B6',
+                '#f1b53d',
+                '#99cc00'],
+            series: [{
+                type: 'pie',
+                name: 'Contracts(%)',
+                data: @Html(Json.stringify(Json.toJson(rs.overall._1.map(x=> ("Vung "+x._1, x._2)))))
+            }]
+        });
+
+        var churn9 = Highcharts.chart('chart-pie9', {
+            chart: {
+                type: 'pie',
+                options3d: {
+                    enabled: false,
+                    alpha: 45
+                }
+            },
+            title: {
+                text: 'Number of Contracts by Age Group'
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b>'
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: false,
+                    cursor: 'pointer',
+                    innerSize: 80,
+                    depth: 45,
+                    dataLabels: {
+                        enabled: false,
+                        format: '{point.name}'
+                    },
+                    showInLegend: true
+                },
+                series: {
+                    cursor: 'pointer',
+                    point: {
+                        events: {
+                            click: function () {
+                                if(this.name == $('#age').val()){
+                                    $('#age').val("*")
+                                    $('.otherFilt').hide()
+                                    $('#groupCont').text("")
+                                    $('#groupTit').text("")
+                                }
+                                else {
+                                    $('#age').val(this.name)
+                                    $('.otherFilt').show()
+                                    $('#groupCont').text(this.name)
+                                    $('#groupTit').text("Group Age")
+                                }
+                                $('#region').val("*")
+                                $('#complain').val("*")
+                                $('#package').val("*")
+                                $('#contractGrp').val("*")
+                                $('#cause').val("")
+                                $('#maintain').val("")
+                                $('#cate').val("")
+                                ajaxGetChurnDetect("churn9")
+                            }
+                        }
+                    }
+                }
+            },
+            colors: [
+                '#1ABB9C',
+                '#832d1d',
+                '#E74C3C',
+                '#9B59B6',
+                '#f1b53d',
+                '#09006d',
+                '#cccccc',
+                '#669999',
+                '#f2ccff',
+                '#666633',
+                '#73879C',
+                '#132639',
+                '#99cc00',
+                '#466d6d',
+                '#ffc6b3',
+                '#ffff00'],
+            series: [{
+                type: 'pie',
+                name: 'Contracts(%)',
+                data: @Html(Json.stringify(Json.toJson(rs.overall._2)))
+            }]
+        });
+
+        var churn10 = Highcharts.chart('chart-pie10', {
+            chart: {
+                type: 'pie',
+                options3d: {
+                    enabled: false,
+                    alpha: 85
+                }
+            },
+            title: {
+                text: 'Number of Contracts by Package'
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b>'
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: false,
+                    cursor: 'pointer',
+                    innerSize: 80,
+                    depth: 85,
+                    dataLabels: {
+                        enabled: false,
+                        format: '{point.name}'
+                    },
+                    showInLegend: true
+                },
+                series: {
+                    cursor: 'pointer',
+                    point: {
+                        events: {
+                            click: function () {
+                                if(this.name == $('#package').val()){
+                                    $('#package').val("*")
+                                    $('.otherFilt').hide()
+                                    $('#groupCont').text("")
+                                    $('#groupTit').text("")
+                                }
+                                else {
+                                    $('#package').val(this.name)
+                                    $('.otherFilt').show()
+                                    $('#groupCont').text(this.name)
+                                    $('#groupTit').text("Group Package")
+                                }
+                                $('#region').val("*")
+                                $('#age').val("*")
+                                $('#complain').val("*")
+                                $('#contractGrp').val("*")
+                                $('#cause').val("")
+                                $('#maintain').val("")
+                                $('#cate').val("")
+                                ajaxGetChurnDetect("churn10")
+                            }
+                        }
+                    }
+                }
+            },
+            colors: [
+                '#1ABB9C',
+                '#832d1d',
+                '#E74C3C',
+                '#9B59B6',
+                '#f1b53d',
+                '#09006d',
+                '#cccccc',
+                '#669999',
+                '#f2ccff',
+                '#666633',
+                '#73879C',
+                '#132639',
+                '#99cc00',
+                '#466d6d',
+                '#ffc6b3',
+                '#ffff00'],
+            series: [{
+                type: 'pie',
+                name: 'Contracts(%)',
+                data: @Html(Json.stringify(Json.toJson(rs.overall._3)))
+            }]
+        });
+
+        var splot_1 = Highcharts.chart('splot-line1', {
+
+            title: {
+                text: ''
+            },
+            xAxis: {
+                categories: @Html(Json.stringify(Json.toJson(rs.indicators.infErrors.map(x=> x._1).slice(0, rs.indicators.infErrors.length-1)))),
+                labels: {
+                    enabled: false
+                }
+            },
+            yAxis: {
+                title: {
+                    text: 'Median contract'
+                }
+            },
+            legend: {
+                layout: 'horizontal',
+                align: 'center',
+                verticalAlign: 'center'
+            },
+
+            tooltip : {
+                shared: true
+            },
+            series: [{
+                name: 'Churn contracts',
+                data: @Html(Json.stringify(Json.toJson(rs.indicators.infErrors.map(x=> x._3).slice(0, rs.indicators.infErrors.length-1))))
+            }, {
+                name: 'All contracts',
+                data: @Html(Json.stringify(Json.toJson(rs.indicators.infErrors.map(x=> x._2).slice(0, rs.indicators.infErrors.length-1))))
+            }],
+
+            colors: [
+                '#E74C3C',
+                '#669999'],
+
+            responsive: {
+                rules: [{
+                    condition: {
+                        maxWidth: 500
+                    },
+                    chartOptions: {
+                        legend: {
+                            layout: 'horizontal',
+                            align: 'center',
+                            verticalAlign: 'bottom'
+                        }
+                    }
+                }]
+            }
+
+        });
+
+        var splot_2 = Highcharts.chart('splot-line2', {
+
+            title: {
+                text: ''
+            },
+
+            xAxis: {
+                categories: @Html(Json.stringify(Json.toJson(rs.indicators.signin.map(x=> x._1).slice(0, rs.indicators.signin.length-1)))),
+                labels: {
+                    enabled: false
+                }
+            },
+            yAxis: {
+                title: {
+                    text: 'Median contract'
+                }
+            },
+
+            tooltip : {
+                shared: true
+            },
+            legend: {
+                enabled: false
+            },
+
+            series: [{
+                name: 'Churn contracts',
+                data: @Html(Json.stringify(Json.toJson(rs.indicators.signin.map(x=> x._3).slice(0, rs.indicators.signin.length-1))))
+            }, {
+                name: 'All contracts',
+                data: @Html(Json.stringify(Json.toJson(rs.indicators.signin.map(x=> x._2).slice(0, rs.indicators.signin.length-1))))
+            }],
+            colors: [
+                '#E74C3C',
+                '#669999'],
+
+            responsive: {
+                rules: [{
+                    condition: {
+                        maxWidth: 500
+                    },
+                    chartOptions: {
+                        legend: {
+                            layout: 'horizontal',
+                            align: 'center',
+                            verticalAlign: 'bottom'
+                        }
+                    }
+                }]
+            }
+
+        });
+
+        var splot_3 = Highcharts.chart('splot-line3', {
+
+            title: {
+                text: ''
+            },
+
+            yAxis: {
+                title: {
+                    text: 'Median contract'
+                }
+            },
+            xAxis: {
+                categories: @Html(Json.stringify(Json.toJson(rs.indicators.suyhao.map(x=> x._1).slice(0, rs.indicators.suyhao.length-1)))),
+                labels: {
+                    enabled: false
+                }
+            },
+
+            tooltip : {
+                shared: true
+            },
+            legend: {
+                enabled: false
+            },
+            series: [{
+                name: 'Churn contracts',
+                data: @Html(Json.stringify(Json.toJson(rs.indicators.suyhao.map(x=> x._3).slice(0, rs.indicators.suyhao.length-1))))
+            }, {
+                name: 'All contracts',
+                data: @Html(Json.stringify(Json.toJson(rs.indicators.suyhao.map(x=> x._2).slice(0, rs.indicators.suyhao.length-1))))
+            }],
+
+            colors: [
+                '#E74C3C',
+                '#669999'],
+
+            responsive: {
+                rules: [{
+                    condition: {
+                        maxWidth: 500
+                    },
+                    chartOptions: {
+                        legend: {
+                            layout: 'horizontal',
+                            align: 'center',
+                            verticalAlign: 'bottom'
+                        }
+                    }
+                }]
+            }
+
+        });
+
+        var splot_4 = Highcharts.chart('splot-line4', {
+
+            title: {
+                text: ''
+            },
+
+            yAxis: {
+                title: {
+                    text: 'Median(GB)'
+                }
+            },
+
+            xAxis: {
+                categories: @Html(Json.stringify(Json.toJson(rs.indicators.download.map(x=> x._1).slice(0, rs.indicators.download.length-1)))),
+                labels: {
+                    enabled: false
+                }
+            },
+
+            legend: {
+                enabled: false
+            },
+
+            tooltip : {
+                shared: true
+            },
+
+            series: [{
+                name: 'Churn contracts',
+                data: @Html(Json.stringify(Json.toJson(rs.indicators.download.map(x=> x._3).slice(0, rs.indicators.download.length-1))))
+            }, {
+                name: 'All contracts',
+                data: @Html(Json.stringify(Json.toJson(rs.indicators.download.map(x=> x._2).slice(0, rs.indicators.download.length-1))))
+            }],
+
+            colors: [
+                '#E74C3C',
+                '#669999'],
+
+            responsive: {
+                rules: [{
+                    condition: {
+                        maxWidth: 500
+                    },
+                    chartOptions: {
+                        legend: {
+                            layout: 'horizontal',
+                            align: 'center',
+                            verticalAlign: 'bottom'
+                        }
+                    }
+                }]
+            }
+
+        });
+
+        var splot_5 = Highcharts.chart('splot-line5', {
+
+            title: {
+                text: ''
+            },
+
+            yAxis: {
+                title: {
+                    text: 'Median contract'
+                }
+            },
+
+            xAxis: {
+                categories: @Html(Json.stringify(Json.toJson(rs.indicators.fee.map(x=> x._1).slice(0, rs.indicators.fee.length-1)))),
+                labels: {
+                    enabled: false
+                }
+            },
+
+            legend: {
+                enabled: false
+            },
+            tooltip : {
+                shared: true
+            },
+
+            series: [{
+                name: 'Churn contracts',
+                data: @Html(Json.stringify(Json.toJson(rs.indicators.fee.map(x=> x._3).slice(0, rs.indicators.fee.length-1))))
+            }, {
+                name: 'All contracts',
+                data: @Html(Json.stringify(Json.toJson(rs.indicators.fee.map(x=> x._2).slice(0, rs.indicators.fee.length-1))))
+            }],
+
+            colors: [
+                '#E74C3C',
+                '#669999'],
+
+            responsive: {
+                rules: [{
+                    condition: {
+                        maxWidth: 500
+                    },
+                    chartOptions: {
+                        legend: {
+                            layout: 'horizontal',
+                            align: 'center',
+                            verticalAlign: 'bottom'
+                        }
+                    }
+                }]
+            }
+
+        });
+
+        // click group contract
+        $(".groupCt").click(function () {
+            if($('#contractGrp').val() != $(this).closest("tr").find(".parent").text()+"_"+$(this).closest("tr").find(".child").text().trim()) {
+                $('#contractGrp').val($(this).closest("tr").find(".parent").text() + "_" + $(this).closest("tr").find(".child").text().trim())
+                $('#region').val("*")
+                $('#age').val("*")
+                $('#package').val("*")
+                $('#cause').val("")
+                $('#cate').val("")
+                $('#maintain').val("")
+                $('#complain').val("*")
+
+                $('.otherFilt').show()
+                $('#groupTit').text("Group Contract")
+                var titContract = $('#contractGrp').val()
+                if(titContract.indexOf("_") == 0)
+                    titContract = titContract.substring(1, titContract.length)
+                $('#groupCont').text(titContract)
+                ajaxGetChurnDetect("churn2")
+            }
+        })
+
+        // click apply fitler
+        $('#apply').click(function () {
+            $('#contractGrp').val("*")
+            $('#region').val("*")
+            $('#age').val("*")
+            $('#package').val("*")
+            $('#cause').val("")
+            $('#cate').val("")
+            $('#maintain').val("")
+            $('#complain').val("*")
+            $('.otherFilt').hide()
+            $('#groupTit').text("")
+            $('#groupCont').text("")
+            ajaxGetChurnDetect("*")
+        })
+
+        // click refresh fitler
+        $('#refresh').click(function () {
+            $("#monthGrp").datepicker("update", $('#monthCurr').val())
+            $('#slStatus').val("*")
+            $('#contractGrp').val("*")
+            $('#region').val("*")
+            $('#age').val("*")
+            $('#package').val("*")
+            $('#cause').val("")
+            $('#cate').val("")
+            $('#maintain').val("")
+            $('#complain').val("*")
+            $('.otherFilt').hide()
+            $('#groupTit').text("")
+            $('#groupCont').text("")
+            ajaxGetChurnDetect("*")
+        })
+
+        function ajaxGetChurnDetect(_type){
+            var fields = getParamFields(document.querySelector('input[name=csrfToken]').value)
+            $.ajax({
+                url: "/internet/detect/getJsonChurn",
+                cache: false,
+                data:  fields,
+                type:"POST",
+                beforeSend: function () {
+                    $('.divGroup').waitMe({
+                        effect: 'progressBar',
+                        text: 'Please wait...',
+                        bg: 'rgba(255,255,255,0.7)',
+                        color: '#000',
+                        textPos: 'vertical'
+                    });
+                },
+                success: function (dta) {
+                    if(dta != "Error"){
+                        // update char 1
+                        $('#numCt').text(dta.churn1.numCt)
+                        $('#churnCt').text(dta.churn1.churnCt)
+                        $('#churnRate').text(dta.churn1.churnRate + ' %')
+                        $('#churnPert').text(dta.churn1.churnPert + ' %')
+                        $('#f1score').text(dta.churn1.f1score)
+                        $('#numCall').text(dta.churn1.numCall)
+                        $('#numCheck').text(dta.churn1.numCheck)
+                        // update chart 2
+                        if(_type != "churn2"){
+                            var groupHtml = '<li>' +
+                                    '<em><b class="child">Total</b> <br>'+ dta.churn2.total +'</em>' +
+                                    '  <ul>' +
+                                    '    <li>' +
+                                    '      <b class="child">Call Yes</b><br>' +
+                                              dta.churn2.CallYes +
+                                    '          <ul>' +
+                                    '             <li><span class="parent" style="display: none">Call Yes</span><b class="child">Checklist Yes</b> <br>'+dta.churn2.CheckYesCallYes+'</li>' +
+                                    '             <li><span class="parent" style="display: none">Call Yes</span><b class="child">Checklist No</b> <br>'+dta.churn2.CheckNoCallYes+'</li>' +
+                                    '          </ul>' +
+                                    '    </li>' +
+                                    '    <li>' +
+                                    '      <b class="child">Call No</b><br>' +
+                                             dta.churn2.CallNo +
+                                    '         <ul>' +
+                                    '            <li><span class="parent" style="display: none">Call No</span><b class="child">Checklist Yes</b> <br>'+dta.churn2.CheckYesCallNo+'</li>' +
+                                    '            <li><span class="parent" style="display: none">Call No</span><b class="child">Checklist No</b> <br>'+dta.churn2.CheckNoCallNo+'</li>' +
+                                    '         </ul>' +
+                                    '    </li>' +
+                                    '  </ul>' +
+                                    '</li>'
+                            $('#basic-interaction').html("")
+                            $('#basic-interaction').append(groupHtml)
+                            $("#basic-interaction").orgChart({
+                                container: $("#chart"),
+                                interactive: true,
+                                showLevels: 3
+                            });
+                            $(".groupCt").click(function () {
+                                if($('#contractGrp').val() != $(this).closest("tr").find(".parent").text()+"_"+$(this).closest("tr").find(".child").text().trim()) {
+                                    $('#contractGrp').val($(this).closest("tr").find(".parent").text() + "_" + $(this).closest("tr").find(".child").text().trim())
+                                    $('#region').val("*")
+                                    $('#age').val("*")
+                                    $('#package').val("*")
+                                    $('#cause').val("")
+                                    $('#cate').val("")
+                                    $('#maintain').val("")
+                                    $('#complain').val("*")
+
+                                    $('.otherFilt').show()
+                                    $('#groupTit').text("Group Contract")
+                                    var titContract = $('#contractGrp').val()
+                                    if(titContract.indexOf("_") == 0)
+                                        titContract = titContract.substring(1, titContract.length)
+                                    $('#groupCont').text(titContract)
+                                    ajaxGetChurnDetect("churn2")
+                                }
+                            })
+                        }
+                        // update chart 3
+                        if(_type != "churn3") {
+                            Highcharts.chart('chart-pie3', {
+                                chart: {
+                                    type: 'pie',
+                                    options3d: {
+                                        enabled: true,
+                                        alpha: 45
+                                    }
+                                },
+                                title: {
+                                    text: 'Number of Contracts by Customers’ Complain'
+                                },
+                                tooltip: {
+                                    pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b>'
+                                },
+                                plotOptions: {
+                                    series: {
+                                        cursor: 'pointer',
+                                        point: {
+                                            events: {
+                                                click: function () {
+                                                    if(this.name != null) {
+                                                        if (this.name == $('#complain').val()) {
+                                                            $('#complain').val("*")
+                                                            $('.otherFilt').hide()
+                                                            $('#groupCont').text("")
+                                                            $('#groupTit').text("")
+                                                        }
+                                                        else {
+                                                            $('#complain').val(this.name)
+                                                            $('.otherFilt').show()
+                                                            $('#groupCont').text(this.name)
+                                                            $('#groupTit').text("Group Complain")
+                                                        }
+                                                        $('#region').val("*")
+                                                        $('#age').val("*")
+                                                        $('#package').val("*")
+                                                        $('#contractGrp').val("*")
+                                                        $('#cause').val("")
+                                                        $('#maintain').val("")
+                                                        $('#cate').val("")
+                                                        ajaxGetChurnDetect("churn3")
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    pie: {
+                                        allowPointSelect: false,
+                                        cursor: 'pointer',
+                                        innerSize: 100,
+                                        depth: 45,
+                                        dataLabels: {
+                                            enabled: false,
+                                            format: '{point.name}'
+                                        },
+                                        showInLegend: true
+                                    }
+                                },
+                                colors: [
+                                    '#1ABB9C',
+                                    '#832d1d',
+                                    '#E74C3C',
+                                    '#9B59B6',
+                                    '#f1b53d',
+                                    '#09006d',
+                                    '#cccccc',
+                                    '#669999',
+                                    '#f2ccff',
+                                    '#666633',
+                                    '#73879C',
+                                    '#132639',
+                                    '#99cc00',
+                                    '#466d6d',
+                                    '#ffc6b3',
+                                    '#ffff00'],
+                                series: [{
+                                    type: 'pie',
+                                    name: 'Contracts(%)',
+                                    data: getTopSeriesPieChart(dta.churn3.data)
+                                }],
+                                drilldown:{
+                                    drillUpButton: {
+                                        theme: {
+                                            fill: 'white',
+                                            'stroke-width': 1,
+                                            stroke: 'silver',
+                                            r: 0,
+                                            states: {
+                                                hover: {
+                                                    fill: '#1ABB9C'
+                                                },
+                                                select: {
+                                                    stroke: '#039',
+                                                    fill: '#1ABB9C'
+                                                }
+                                            }
+                                        }
+
+                                    },
+                                    series: getDrillDownOthersPiechart(dta.churn3.drilldown, "others")
+                                }
+                            });
+                        }
+                        // update chart 4
+                        if(_type != "churn4") {
+                            churn4.series[0].setData(dta.churn4.data, true)
+                        }
+                        // update chart 5
+                        if(_type != "churn5") {
+                            churn5.xAxis[0].update({categories: dta.churn5.xAxis})
+                            churn5.series[0].setData(dta.churn5.data, true)
+                        }
+                        // update chart 6
+                        if(_type != "churn6") {
+                            churn6.xAxis[0].update({categories: dta.churn6.xAxis})
+                            churn6.series[0].setData(dta.churn6.data, true)
+                        }
+                        // update chart 7
+                        if(_type != "churn7") {
+                            churn7.xAxis[0].update({categories: dta.churn7.xAxis})
+                            churn7.series[0].setData(dta.churn7.contract, true)
+                            churn7.series[1].setData(dta.churn7.median, true)
+                        }
+                        // update chart 8
+                        if(_type != "churn8") {
+                            churn8.series[0].setData(dta.churn8.data, true)
+                        }
+                        // update chart 9
+                        if(_type != "churn9") {
+                            churn9.series[0].setData(dta.churn9.data, true)
+                        }
+                        // update chart 10
+                        if(_type != "churn10") {
+                            churn10.series[0].setData(dta.churn10.data, true)
+                        }
+                        // update table Checklist 13
+                        var tb13 = $('#tb13').dataTable( {
+                            dom: 'Bfrtip',
+                            "scrollY":        "310px",
+                            "scrollCollapse": true,
+                            "paging":         false,
+                            "info":     false,
+                            "searching":     false,
+                            "sort":     false,
+                            destroy: true
+                        })
+                        tb13.fnClearTable()
+                        for(var i=0;i< dta.tb13.data.length;i++) {
+                            tb13.fnAddData([dta.tb13.data[i][0], dta.tb13.data[i][1], dta.tb13.data[i][2], dta.tb13.data[i][3]])
+                        }
+                        //update table Callog 12
+                        var tb12 = $('#tb12').dataTable( {
+                            dom: 'Bfrtip',
+                            "scrollY":        "310px",
+                            "scrollCollapse": true,
+                            "paging":         false,
+                            "info":     false,
+                            "searching":     false,
+                            "sort":     false,
+                            destroy: true
+                        });
+                        tb12.fnClearTable()
+                        for(var i=0;i< dta.tb12.data.length;i++) {
+                            tb12.fnAddData([dta.tb12.data[i][0], dta.tb12.data[i][1], dta.tb12.data[i][2]])
+                        }
+                        // update splot 1
+                        splot_1.xAxis[0].update({categories: dta.splot1.xAxis})
+                        splot_1.series[0].setData(dta.splot1.churn, true)
+                        splot_1.series[1].setData(dta.splot1.all, true)
+                        // update splot 2
+                        splot_2.xAxis[0].update({categories: dta.splot2.xAxis})
+                        splot_2.series[0].setData(dta.splot2.churn, true)
+                        splot_2.series[1].setData(dta.splot2.all, true)
+                        // update splot 3
+                        splot_3.xAxis[0].update({categories: dta.splot3.xAxis})
+                        splot_3.series[0].setData(dta.splot3.churn, true)
+                        splot_3.series[1].setData(dta.splot3.all, true)
+                        // update splot 4
+                        splot_4.xAxis[0].update({categories: dta.splot4.xAxis})
+                        splot_4.series[0].setData(dta.splot4.churn, true)
+                        splot_4.series[1].setData(dta.splot4.all, true)
+                        // update splot 5
+                        splot_5.xAxis[0].update({categories: dta.splot5.xAxis})
+                        splot_5.series[0].setData(dta.splot5.churn, true)
+                        splot_5.series[1].setData(dta.splot5.all, true)
+
+                        // update indicators tab
+                        $('#errChurn').text(dta.indicators.errChurn)
+                        $('#errAll').text(dta.indicators.errAll)
+                        $('#signinChurn').text(dta.indicators.signinChurn)
+                        $('#signinAll').text(dta.indicators.signinAll)
+                        $('#suyhaoChurn').text(dta.indicators.suyhaoChurn)
+                        $('#suyhaoAll').text(dta.indicators.suyhaoAll)
+                        $('#downChurn').text(dta.indicators.downChurn+" GB")
+                        $('#downAll').text(dta.indicators.downAll+" GB")
+                        $('#feeChurn').text(dta.indicators.feeChurn)
+                        $('#feeAll').text(dta.indicators.feeAll)
+                        //$('#downChurn').text(dta.indicators.downChurn)
+                        //$('#downAll').text(dta.indicators.downAll)
+                    }
+                    else{
+                        alert("Error when execute query. Please check again your system!")
+                    }
+
+                },
+                complete: function () {
+                    $('.divGroup').waitMe("hide");
+                }
+            });
+        }
+    })
+
+    function getParamFields(token){
+        var obj = {
+            "csrfToken"   : token,
+            "groupCt"     : $('#contractGrp').val(),
+            "month"       : $('#monthGrp').val(),
+            "status"      : $('#slStatus').val(),
+            "cate"        : $('#cate').val(),
+            "maintain"    : $('#maintain').val(),
+            "cause"       : $('#cause').val(),
+            "complain"    : $('#complain').val(),
+            "age"         : $('#age').val(),
+            "region"      : $('#region').val(),
+            "package"     : $('#package').val(),
+            "_typeCsv"    : $('#_typeCsv').val()
+        }
+        //console.log(obj)
+        return obj
+    }
+
+    function getTopSeriesPieChart(arrs) {
+        var rs = [], others = 0
+        for(var i=0; i< arrs.length; i++){
+            if(i< 10){
+                rs.push([arrs[i][0], arrs[i][1]])
+            }
+            else{
+             others += arrs[i][1]
+            }
+        }
+        if(arrs.length > 10){
+            rs.push({
+                name: "Others",
+                y   : others,
+                drilldown: "others"
+            })
+        }
+        return rs
+    }
+
+    function exportCsv(_type){
+        $('#_typeCsv').val(_type)
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth()+1; //January is 0!
+        var yyyy = today.getFullYear();
+        if(dd<10) {
+            dd = '0'+dd
+        }
+        if(mm<10) {
+            mm = '0'+mm
+        }
+        today = yyyy+''+mm+''+dd
+        var fields = getParamFields(document.querySelector('input[name=csrfToken]').value)
+        $.ajax({
+            url: "/internet/detect/exportCSV",
+            cache: false,
+            data: fields,
+            type: 'POST',
+            beforeSend: function () {
+                $('.divTbcsv').waitMe({
+                    effect: 'roundBounce',
+                    text: 'Please wait...',
+                    bg: 'rgba(255,255,255,0.7)',
+                    color: '#000',
+                    textPos: 'vertical'
+                });
+            },
+            success: function (dta) {
+                if(dta != "Error"){
+                    if(dta.limit == 1){
+                        alert("You can only export top 3000 records because data is truncated")
+                    }
+                    exportToCsv('export-'+_type+'-'+today+'.csv', addHeaderToArray(dta.data))
+                }
+                else{
+                    alert("Error export query.")
+                }
+            },
+            complete: function () {
+                $('.divTbcsv').waitMe("hide");
+            }
+        });
+    }
+
+    function addHeaderToArray(dta){
+        var rs = []
+        rs.push(["Contract", "Time", "Content"])
+        for(var i=0;i<dta.length;i++){
+            var arr = []
+            arr[0]= dta[i][0]
+            arr[1]=dta[i][1]
+            arr[2]=dta[i][2]
+            rs.push(arr)
+        }
+        return rs
+    }
+
+    function exportToCsv(filename, rows) {
+        var processRow = function (row) {
+            var finalVal = '';
+            for (var j = 0; j < row.length; j++) {
+                var innerValue = row[j] === null ? '' : row[j].toString();
+                if (row[j] instanceof Date) {
+                    innerValue = row[j].toLocaleString();
+                };
+                var result = innerValue.replace(/"/g, '""');
+                if (result.search(/("|,|\n)/g) >= 0)
+                    result = '"' + result + '"';
+                if (j > 0)
+                    finalVal += ',';
+                finalVal += result;
+            }
+            return finalVal + '\n';
+        };
+
+        var csvFile = '';
+        for (var i = 0; i < rows.length; i++) {
+            csvFile += processRow(rows[i]);
+        }
+
+        var blob = new Blob([csvFile], { type: 'text/csv;charset=utf-8;' });
+        if (navigator.msSaveBlob) { // IE 10+
+            navigator.msSaveBlob(blob, filename);
+        } else {
+            var link = document.createElement("a");
+            if (link.download !== undefined) { // feature detection
+                // Browsers that support HTML5 download attribute
+                var url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", filename);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+    }
+
+    function getDrillDownOthersPiechart(arrs, ids) {
+        var id_drilldown = ids
+        var rs = [], data = [], sizeArr = 10
+        var pageSize = arrs.length / 10 + 1
+        for(var page=1; page <= pageSize; page++){
+            data = []
+            sizeArr = 10*page
+            if(arrs.length <= 10*page) sizeArr = arrs.length
+            for(var i=10*(page -1); i< sizeArr; i++){
+                data.push([arrs[i][0], arrs[i][1]])
+            }
+            // set others data
+            if(arrs.length > 10*page){
+                var others = 0, indexs = "others"+Math.random()
+                for(var k= sizeArr; k< arrs.length; k++){
+                    others += arrs[k][1]
+                }
+                data.push({
+                    name:  "Others",
+                    drilldown: indexs,
+                    y: others
+                })
+            }
+            rs.push({
+                id: id_drilldown,
+                name: "Contract(%)",
+                data: data
+            })
+            id_drilldown = indexs
+        }
+        //console.log(rs)
+        return rs
+    }
+
+</script>

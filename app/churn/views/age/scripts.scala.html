@@ -82,6 +82,7 @@
                                 if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444')) {
                                         if(text.innerHTML == 0 || text.innerHTML == 8)
                                             text.setAttribute('fill-opacity',0)
+                                        text.innerHTML = "Vung "+text.innerHTML
                                 }
                                 // change label age
                                 if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#444444')) {
@@ -351,6 +352,7 @@
                                                                     if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444')) {
                                                                             if(text.innerHTML == 0 || text.innerHTML == 8)
                                                                                     text.setAttribute('fill-opacity',0)
+                                                                            text.innerHTML = "Vung "+text.innerHTML
                                                                     }
                                                                     // change label age
                                                                     if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#444444')) {

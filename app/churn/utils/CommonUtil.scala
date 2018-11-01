@@ -21,4 +21,349 @@ object CommonUtil {
     "VUNG 6" -> 6,
     "VUNG 7" -> 7
   )
+
+  def getFullQueryHaveNested(queries: String, groupContract: String, maintainParam: String, cateParam: String, causeParam: String) = {
+    var cate = ""
+    var maintain = ""
+    var cause = ""
+    cate = if (cateParam == "") "" else
+      s"""
+                                 ,{
+                                   "nested": {
+                                      "path": "calllog",
+                                      "query": {
+                                        "query_string": {
+                                            "query": "calllog.cate:${cateParam.replace("\"", "\\\"")}"
+                                        }
+                                      }
+                                   }
+                                 }
+      """
+    cause = if (causeParam == "") "" else
+      s"""
+                                ,{
+                                   "nested": {
+                                      "path": "checklist",
+                                      "query": {
+                                        "query_string": {
+                                            "query": "checklist.lydo:${causeParam.replace("\"", "\\\"")}"
+                                        }
+                                      }
+                                   }
+                                 }
+      """
+    maintain = if (maintainParam == "") "" else
+      s"""
+                                 ,{
+                                   "nested": {
+                                      "path": "checklist",
+                                      "query": {
+                                        "query_string": {
+                                            "query": "checklist.tobaotri:${maintainParam.replace("\"", "\\\"")}"
+                                        }
+                                      }
+                                   }
+                                 }
+      """
+
+    val full_queries = groupContract match {
+      case "_Call Yes" =>
+        s"""
+          "query": {
+                               "bool": {
+                                    "filter": [
+                                        {
+                                           "query_string" : {
+                                                "query": "${queries.replace("\"", "\\\"")}"
+                                           }
+                                        }
+                                        ${cate}
+                                        ${maintain}
+                                        ${cause}
+                                    ],
+                                    "must": [
+                                        {
+                                          "nested": {
+                                              "path": "calllog",
+                                              "query": {
+                                                   "bool": {
+                                                      "must": [
+                                                          {
+                                                            "exists": {
+                                                               "field": "calllog"
+                                                            }
+                                                          }
+                                                      ]
+                                                   }
+                                              }
+                                          }
+                                        }
+                                    ]
+                               }
+                       }
+        """
+      case "Call Yes_Checklist Yes" =>
+        s"""
+             "query": {
+                     "bool": {
+                          "filter": [
+                              {
+                                 "query_string" : {
+                                      "query": "${queries.replace("\"", "\\\"")}"
+                                 }
+                              }
+                              ${cate}
+                              ${maintain}
+                              ${cause}
+                          ],
+                          "must": [
+                              {
+                                "nested": {
+                                    "path": "calllog",
+                                    "query": {
+                                         "bool": {
+                                            "must": [
+                                                {
+                                                  "exists": {
+                                                     "field": "calllog"
+                                                  }
+                                                }
+                                            ]
+                                         }
+                                    }
+                                }
+                              },
+                              {
+                                "nested": {
+                                    "path": "checklist",
+                                    "query": {
+                                         "bool": {
+                                            "must": [
+                                                {
+                                                  "exists": {
+                                                      "field": "checklist"
+                                                  }
+                                                }
+                                            ]
+                                         }
+                                    }
+                                }
+                              }
+                          ]
+                     }
+             }
+        """
+      case "Call Yes_Checklist No" =>
+        s"""
+             "query": {
+                     "bool": {
+                          "filter": [
+                              {
+                                 "query_string" : {
+                                      "query": "${queries.replace("\"", "\\\"")}"
+                                 }
+                              }
+                              ${cate}
+                              ${maintain}
+                              ${cause}
+                          ],
+                          "must": [
+                              {
+                                "nested": {
+                                    "path": "calllog",
+                                    "query": {
+                                         "bool": {
+                                            "must": [
+                                                {
+                                                  "exists": {
+                                                     "field": "calllog"
+                                                  }
+                                                }
+                                            ]
+                                         }
+                                    }
+                                }
+                              }
+                          ],
+                          "must_not": [
+                             {
+                               "nested": {
+                                   "path": "checklist",
+                                   "query": {
+                                       "bool": {
+                                           "must": [
+                                              {
+                                               "exists": {
+                                                  "field": "checklist"
+                                               }
+                                              }
+                                           ]
+                                       }
+                                   }
+                               }
+                             }
+                          ]
+                     }
+             }
+        """
+      case "_Call No" =>
+        s"""
+          "query": {
+                               "bool": {
+                                    "filter": [
+                                        {
+                                           "query_string" : {
+                                                "query": "${queries.replace("\"", "\\\"")}"
+                                           }
+                                        }
+                                        ${cate}
+                                        ${maintain}
+                                        ${cause}
+                                    ],
+                                    "must_not": [
+                                        {
+                                          "nested": {
+                                              "path": "calllog",
+                                              "query": {
+                                                   "bool": {
+                                                      "must": [
+                                                          {
+                                                            "exists": {
+                                                               "field": "calllog"
+                                                            }
+                                                          }
+                                                      ]
+                                                   }
+                                              }
+                                          }
+                                        }
+                                    ]
+                               }
+                       }
+        """
+      case "Call No_Checklist Yes" =>
+        s"""
+             "query": {
+                     "bool": {
+                          "filter": [
+                              {
+                                 "query_string" : {
+                                      "query": "${queries.replace("\"", "\\\"")}"
+                                 }
+                              }
+                             ${cate}
+                             ${maintain}
+                             ${cause}
+                          ],
+                          "must": [
+                              {
+                                "nested": {
+                                    "path": "checklist",
+                                    "query": {
+                                         "bool": {
+                                            "must": [
+                                                {
+                                                  "exists": {
+                                                     "field": "checklist"
+                                                  }
+                                                }
+                                            ]
+                                         }
+                                    }
+                                }
+                              }
+                          ],
+                          "must_not": [
+                             {
+                               "nested": {
+                                   "path": "calllog",
+                                   "query": {
+                                       "bool": {
+                                           "must": [
+                                              {
+                                               "exists": {
+                                                  "field": "calllog"
+                                               }
+                                              }
+                                           ]
+                                       }
+                                   }
+                               }
+                             }
+                          ]
+                     }
+             }
+        """
+      case "Call No_Checklist No" =>
+        s"""
+             "query": {
+                     "bool": {
+                          "filter": [
+                              {
+                                 "query_string" : {
+                                      "query": "${queries.replace("\"", "\\\"")}"
+                                 }
+                              }
+                              ${cate}
+                              ${maintain}
+                              ${cause}
+                          ],
+                          "must_not": [
+                              {
+                                "nested": {
+                                    "path": "calllog",
+                                    "query": {
+                                         "bool": {
+                                            "must": [
+                                                {
+                                                  "exists": {
+                                                     "field": "calllog"
+                                                  }
+                                                }
+                                            ]
+                                         }
+                                    }
+                                }
+                              },
+                              {
+                                "nested": {
+                                    "path": "checklist",
+                                    "query": {
+                                         "bool": {
+                                            "must": [
+                                                {
+                                                  "exists": {
+                                                      "field": "checklist"
+                                                  }
+                                                }
+                                            ]
+                                         }
+                                    }
+                                }
+                              }
+                          ]
+                     }
+             }
+        """
+      case _ =>
+        s"""
+          "query": {
+                               "bool": {
+                                    "filter": [
+                                        {
+                                           "query_string" : {
+                                                "query": "${queries.replace("\"", "\\\"")}"
+                                           }
+                                        }
+                                        ${cate}
+                                        ${maintain}
+                                        ${cause}
+                                    ]
+                               }
+                       }
+        """
+    }
+    full_queries
+  }
+
 }
