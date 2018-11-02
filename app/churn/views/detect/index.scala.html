@@ -464,7 +464,7 @@
                                             <div class="animated flipInY col-lg-3 col-md-12 col-sm-12 col-xs-12" style="padding: 30px">
                                                 <h2 class="hvr-pulse txtHead" style="margin-bottom: 20px; color: #832d1d"><i class="fa fa-credit-card-alt" aria-hidden="true"></i> CARD METRICS</h2>
                                                 <div class="tile-stats boxCss" style="padding: 10px;height: 150px;background-color: #73879C">
-                                                    <div class="count"> <span id="numCt"> @formatPattern(rs.cardMetrics._1)</span> <i class="fa fa-book ibox" aria-hidden="true"></i></div>
+                                                    <div class="count"> <span id="numCt" class="counter"> @formatPattern(rs.cardMetrics._1)</span> <i class="fa fa-book ibox" aria-hidden="true"></i></div>
                                                     <div class="titLb">Number of Contracts</div>
                                                 </div>
                                             </div>
@@ -473,19 +473,19 @@
                                                 <div class="row top_tiles">
                                                     <div class="boxCss col-lg-4 col-md-4 col-sm-12 col-xs-12">
                                                         <div class="tile-stats boxText2" style="background-color: #fec44f">
-                                                            <div class="count"><span id="churnCt"> @formatPattern(rs.cardMetrics._2)</span> <i class="fa fa-book ibox" aria-hidden="true"></i></div>
+                                                            <div class="count"><span id="churnCt" class="counter"> @formatPattern(rs.cardMetrics._2)</span> <i class="fa fa-book ibox" aria-hidden="true"></i></div>
                                                             <div class="titLb">Number of Churn Contracts</div>
                                                         </div>
                                                     </div>
                                                     <div class="boxCss col-lg-4 col-md-4 col-sm-12 col-xs-12">
                                                         <div class="tile-stats boxText2" style="background-color: #fec44f">
-                                                            <div class="count"><span id="churnRate"> @format3Decimal(rs.cardMetrics._2 * 100.0 / rs.cardMetrics._1) %</span> <i class="fa fa-bolt ibox" aria-hidden="true"></i></div>
+                                                            <div class="count"><span id="churnRate" class="counter">@format3Decimal(rs.cardMetrics._2 * 100.0 / rs.cardMetrics._1)</span> %<i class="fa fa-bolt ibox" aria-hidden="true"></i></div>
                                                             <div class="titLb">Churn Rate</div>
                                                         </div>
                                                     </div>
                                                     <div class="boxCss col-lg-4 col-md-4 col-sm-12 col-xs-12">
                                                         <div class="tile-stats boxText2" style="background-color: #fec44f">
-                                                            <div class="count"><span id="churnPert"> @format3Decimal(rs.cardMetrics._3 * 100.0 / rs.cardMetrics._2) %</span> <i class="fa fa-bolt ibox" aria-hidden="true"></i></div>
+                                                            <div class="count"><span id="churnPert" class="counter"> @format3Decimal(rs.cardMetrics._3 * 100.0 / rs.cardMetrics._2)</span> %<i class="fa fa-bolt ibox" aria-hidden="true"></i></div>
                                                             <div class="titLb">Churn Percentage</div>
                                                         </div>
                                                     </div>
@@ -493,19 +493,19 @@
                                                 <div class="row top_tiles">
                                                     <div class="boxCss col-lg-4 col-md-4 col-sm-12 col-xs-12">
                                                         <div class="tile-stats boxText2" style="background-color: #66c2a4">
-                                                            <div class="count"><span id="f1score"> @format3Decimal(2.00 * (rs.cardMetrics._2 * 100.0 / rs.cardMetrics._1 * rs.cardMetrics._3 * 100.0 / rs.cardMetrics._2) / (rs.cardMetrics._2 * 100.0 / rs.cardMetrics._1 + rs.cardMetrics._3 * 100.0 / rs.cardMetrics._2))</span> <i class="fa fa-star-o ibox" aria-hidden="true"></i></div>
+                                                            <div class="count"><span id="f1score" class="counter">@format3Decimal(2.00 * (rs.cardMetrics._2 * 100.0 / rs.cardMetrics._1 * rs.cardMetrics._3 * 100.0 / rs.cardMetrics._2) / (rs.cardMetrics._2 * 100.0 / rs.cardMetrics._1 + rs.cardMetrics._3 * 100.0 / rs.cardMetrics._2))</span> <i class="fa fa-star-o ibox" aria-hidden="true"></i></div>
                                                             <div class="titLb">F1 Score</div>
                                                         </div>
                                                     </div>
                                                     <div class="boxCss col-lg-4 col-md-4 col-sm-12 col-xs-12">
                                                         <div class="tile-stats boxText2" style="background-color: #66c2a4">
-                                                            <div class="count"><span id="numCall"> @formatPattern(rs.cardMetrics._4)</span> <i class="fa fa-phone ibox" aria-hidden="true"></i></div>
+                                                            <div class="count"><span id="numCall" class="counter"> @formatPattern(rs.cardMetrics._4)</span> <i class="fa fa-phone ibox" aria-hidden="true"></i></div>
                                                             <div class="titLb">Have Call</div>
                                                         </div>
                                                     </div>
                                                     <div class="boxCss col-lg-4 col-md-4 col-sm-12 col-xs-12">
                                                         <div class="tile-stats boxText2" style="background-color: #66c2a4">
-                                                            <div class="count"><span id="numCheck"> @formatPattern(rs.cardMetrics._5)</span> <i class="fa fa-check ibox" aria-hidden="true"></i></div>
+                                                            <div class="count"><span id="numCheck" class="counter"> @formatPattern(rs.cardMetrics._5)</span> <i class="fa fa-check ibox" aria-hidden="true"></i></div>
                                                             <div class="titLb">Have Checklist</div>
                                                         </div>
                                                     </div>
@@ -778,6 +778,8 @@
         <script src="/assets/javascripts/exporting.js"></script>
         <script src="/assets/javascripts/jquery.counterup.min.js"></script>
         <script src="/assets/javascripts/waitMe.js"></script>
+        <script src="/assets/javascripts/waypoint.min.js"></script>
+        <script src="/assets/javascripts/counterUp.min.js"></script>
         <script src="/assets/javascripts/common_churn.js"></script>
         <script src="/assets/javascripts/orgChart.js"></script>
         <script src="/assets/javascripts/drilldown.js"></script>
@@ -795,6 +797,11 @@
                         container: $("#chart"),
                         interactive: true,
                         showLevels: 3
+                    });
+
+                    $('.counter').counterUp({
+                        delay: 10,
+                        time: 1000
                     });
 
                     // tab click
