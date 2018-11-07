@@ -8,478 +8,445 @@
 
 <!DOCTYPE html>
 
-    <html lang="en">
-        <head>
-            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-                <!-- Meta, title, CSS, favicons, etc. -->
-            <meta charset="utf-8">
-            <meta http-equiv="X-UA-Compatible" content="IE=edge">
-            <meta name="viewport" content="width=device-width, initial-scale=1">
+<html class="no-js" lang="en">
 
-            <title>Dashboard Admin </title>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>Churn Dashboard</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+        <link rel="stylesheet" href="/assets/otherLayout/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/assets/otherLayout/css/font-awesome.min.css">
+        <link rel="stylesheet" href="/assets/otherLayout/css/owl.carousel.css">
+        <link rel="stylesheet" href="/assets/otherLayout/css/owl.theme.css">
+        <link rel="stylesheet" href="/assets/otherLayout/css/owl.transitions.css">
+        <link rel="stylesheet" href="/assets/otherLayout/css/animate.css">
+        <link rel="stylesheet" href="/assets/otherLayout/css/normalize.css">
+        <link rel="stylesheet" href="/assets/otherLayout/css/meanmenu.min.css">
+        <link rel="stylesheet" href="/assets/otherLayout/css/main.css">
+        <link rel="stylesheet" href="/assets/otherLayout/css/educate-custon-icon.css">
+        <link rel="stylesheet" href="/assets/otherLayout/css/scrollbar/jquery.mCustomScrollbar.min.css">
+        <link rel="stylesheet" href="/assets/otherLayout/css/metisMenu/metisMenu.min.css">
+        <link rel="stylesheet" href="/assets/otherLayout/css/metisMenu/metisMenu-vertical.css">
+        <link rel="stylesheet" href="/assets/otherLayout/style.css">
+        <link rel="stylesheet" href="/assets/otherLayout/css/responsive.css">
+        <link rel="stylesheet" href="/assets/custom/css/waitMe.css">
+            <!-- bootstrap-daterangepicker -->
+        <link href="/assets/datepicker/css/bootstrap-datepicker.css" rel="stylesheet">
+        <script src="/assets/otherLayout/js/vendor/modernizr-2.8.3.min.js"></script>
+        <style>
+            .aHeader{
+                font-size: 24px;
+                color: #4292c6!important;
+                font-weight: 600;
+            }
+            .txtFilter{
+                color: #fff; background: #16a085;padding: 2px
+            }
+            .txtInput{
+                text-align: center;cursor: pointer;background-color: white!important;height: 20px
+            }
 
-                <!-- Bootstrap -->
-            <link href="/assets/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-                <!-- Font Awesome -->
-            <link href="/assets/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-                <!-- Custom Theme Style -->
-            <link href="/assets/custom/css/custom.min.css" rel="stylesheet">
-            <link href="/assets/custom/css/hover-min.css" rel="stylesheet">
-            <link href="/assets/custom/css/animate.min.css" rel="stylesheet">
-            <link href="/assets/custom/css/waitMe.css" rel="stylesheet">
-                <!-- bootstrap-daterangepicker -->
-            <link href="/assets/datepicker/css/bootstrap-datepicker.css" rel="stylesheet">
-            <style type="text/css">
-                .top_nav .navbar-right {
-                    width: auto;
-                }
-                .divLeft{
-                    width: 230px
-                }
-                .custom_tooltip{
-                    position: absolute;
-                    z-index: 1000;
-                    opacity: 1!important;
-                    color: #0D3349;
-                    border: 1px solid #ddd;
-                    background: white;
-                    padding: 10px;
-                }
-                .table-condensed{
-                    font-size: 13px!important;
-                }
-                .circle {
-                    margin-bottom: 5px;
-                    display: inline-block;
-                    border-radius: 50%;
-                    min-width: 13px;
-                    min-height: 13px;
-                    color: white;
-                    text-align: center;
-                    line-height: 1;
-                    box-sizing: content-box;
-                    white-space: nowrap;
-                }
-                .circle:before {
-                    content: "";
-                    display: inline-block;
-                    vertical-align: middle;
-                    padding-top: 100%;
-                    height: 0;
-                }
-                .circle span {
-                    display: inline-block;
-                    vertical-align: middle;
-                }
-                .highcharts-tooltip>span {
-                    border: 1px solid silver;
-                    border-radius: 3px;
-                    box-shadow: 1px 1px 2px #888;
-                    z-index: 9999!important;
-                }
-                .panel-heading {
-                    padding: 10px 10px 0px!important;
-                    border-bottom: 0px solid transparent!important;
-                    border-top-left-radius: 3px;
-                    border-top-right-radius: 3px;}
-                .highcharts-credits{display: none;}
-                .downTopMenu{
-                    font-size: 16px;float: right;margin-top: 20px;margin-right: 13px;
-                }
-                .curSor{
-                    cursor: pointer;
-                }
-                .dropdown-menu li {
-                    width:229px;
-                }
-                .navTop{
-                    margin-left: -41px;
-                }
-                .hight-light{    color: #26B99A;font-weight: 600;}
-                .fa.pull-right {
-                    margin-left: .3em;
-                    margin-top: 1px;
-                }
-                .dropdown-menu li a{
-                    font-size: 20px;
-                    padding-top: 12px;
-                }
-                .nav-sm .navbar.nav_title a i{
-                    margin:0px!important;
-                }
+            .activeLi{
+                background: #16a085;
+            }
+            .txtControl{
+                margin-top: 5px;
+                padding: 6px 12px;
+                font-size: 14px;
+                line-height: 1.42857143;
+                color: #fff;
+                background-color: #16a085;
+            }
+            .custom_tooltip{
+                position: absolute;
+                z-index: 1000;
+                opacity: 1!important;
+                color: #0D3349;
+                border: 1px solid #ddd;
+                background: white;
+                padding: 10px;
+            }
+            .custom_tooltip p{
+                margin-bottom: 0px!important;
+            }
+            .circle {
+                margin-bottom: 5px;
+                display: inline-block;
+                border-radius: 50%;
+                min-width: 13px;
+                min-height: 13px;
+                color: white;
+                text-align: center;
+                line-height: 1;
+                box-sizing: content-box;
+                white-space: nowrap;
+            }
+            .circle:before {
+                content: "";
+                display: inline-block;
+                vertical-align: middle;
+                padding-top: 100%;
+                height: 0;
+            }
+            .circle span {
+                display: inline-block;
+                vertical-align: middle;
+            }
+            .highcharts-tooltip>span {
+                border: 1px solid silver;
+                border-radius: 3px;
+                box-shadow: 1px 1px 2px #888;
+                z-index: 9999!important;
+            }
+            .highcharts-credits{display: none}
+            .highcharts-contextbutton{display: none}
 
-                section{
-                    margin:100px auto;
-                    height:1000px;
-                }
-
-                .dropdown-menu>li>a{
-                    white-space: inherit!important;
-                }
-                .noData-title {
-                    margin-bottom: 13px;
-                    text-align: center;
-                    text-transform: uppercase;
-                    font-weight: 300;
-                    font-size: 40px;
-                    color: #f60;
-                    font-size: 2.5rem;
-                }
-                .title{
-                    color: #fff;
-                    background-color: #30827e;
-                    border-bottom: 1px solid rgba(111,111,111,.13);
-                    padding: .75rem 0.15rem;
-                    font-size: 18px;
-                }
-                .title select{
-                    float:right;cursor: pointer;width: 200px
-                }
-                .title span{
-                    padding-left: 20px;
-                }
-                .disInline{
-                    display: -webkit-inline-flex;
-                    display: -ms-inline-flexbox;
-                    display: inline-flex;
-                    width: 100%;
-                }
-                ul.bar_tabs>li.active{
-                    font-weight: 700;
-                }
-                .highcharts-contextbutton{display: none}
-                .titFilter{
-                    font-size: 18px;color: #16a085;
-                    font-weight: 600;
-                }
-                .nav.navbar-nav>li>a{
-                    color: #fff!important;
-                }
-                .nav.navbar-nav>li>a:hover,.top_nav .dropdown-menu li a:hover,.top_nav .nav .open>a, .top_nav .nav .open>a:focus, .top_nav .nav .open>a:hover, .top_nav .nav>li>a:focus, .top_nav .nav>li>a:hover{
-                    color: #fff!important;
-                    background: #16a085 !important;
-                }
-                .top_nav .dropdown-menu li a{
-                    background: #2A3F54!important;
-                    color: #fff!important;
-                }
-                .nav_title{
-                    background: #2A3F54!important;
-                }
-                .left_col{
-                    background: #e4e3e3;
-                }
-                #region{
-                    max-height: 400px;
-                    overflow-y: auto;
-                }
-                body{
-                    background: #F7F7F7;
-                    overflow:hidden;
-                }
-                .lineDiv{
-                    border: 1px solid #eee;
-                    margin: 10px 0px 10px 0px
-                }
-                .filter{
-                    padding: 5px 0px 0px 10px;
-                    margin-bottom: 20px;
-                    color: #f90;
-                    font-size: 18px;
-                    background: #F7F7F7;
-                }
-                .btn-custom{
-                    background: #fff;
-                    border: transparent;
-                    color: #555;
-                }
-                .activeLi{
-                    background: #1ABB9C;
-                    color: #fff;
-                }
-
-                .chartWithOverlay svg g g g rect:last-child{
-                    fill: none;
-                }
-                .chartWithOverlay svg g g g rect:first-child{
-                    fill: black;
-                }
-
-                @@media only screen and (max-width: 767px) {
-                    .navbar-nav{
-                        width: 100%;
-                    }
-                }
-
-                /* Medium devices (landscape tablets, 768px and up) */
-                @@media only screen and (min-width: 992px) {
-                    .divRight{
-                        margin-left: 0!important
-                    }
-                }
-
-                @@media only screen and (max-width: 991px) {
-                    .barIcon{
-                        display: block!important;
-                    }
-                }
-
-                @@media screen and (-webkit-min-device-pixel-ratio:0)  {
-                    /* Safari and Chrome */
-                    .site_title {
-                        margin-top: -15px;
-                    }
-                }
-
-                @@media only screen and (max-width: 600px) {
-                    .right_col{
-                        min-height: 0px!important;
-                        max-height: 600px;
-                        overflow-y: auto;
-                    }
-                    .overlay {
-                        width: 80px;
-                        padding: 2px;
-                        position: absolute;
-                        border: 1px solid #73879C;
-                        top: 65px;   /* chartArea top  */
-                        left: auto;
-                    }
-                }
-
-                @@media only screen and (min-width: 601px) and (max-width: 1023px) {
-                    .overlay {
-                        width: 120px;
-                        height: 155px;
-                        padding: 2px;
-                        position: absolute;
-                        border: 1px solid #73879C;
-                        top: 65px;   /* chartArea top  */
-                        left: 70px;
-                    }
-                }
-
-                @@media only screen and (min-width: 1024px) and (max-width: 1599px) {
-                    .right_col{
-                        min-height: 0px!important;
-                        max-height: 750px;
-                        overflow-y: auto;
-                    }
-                    .overlay {
-                        width: 120px;
-                        height: 155px;
-                        padding: 2px;
-                        position: absolute;
-                        border: 1px solid #73879C;
-                        top: 65px;   /* chartArea top  */
-                        left: 130px;
-                    }
-                }
-                @@media only screen and (min-width: 1600px) {
-                    .overlay {
-                        width: 120px;
-                        height: 155px;
-                        padding: 2px;
-                        position: absolute;
-                        border: 1px solid #73879C;
-                        top: 65px;   /* chartArea top  */
-                        left: 180px;
-                    }
-                }
+            .overlay {
+                width: 96px;
+                height: 155px;
+                padding: 2px;
+                position: absolute;
+                border: 1px solid #73879C;
+                top: 65px;   /* chartArea top  */
+                left: 180px;
+            }
+            .btnRefresh{
+                background: #6c757d;
+                color: #fff!important;
+                margin-right: 5px;
+                float:right
+            }
+            .lineDivWhite{
+                margin: 0px 0px 10px 0px;
+            }
+            .lineDivBlack{
+                border: 1px solid #f7f5f5;
+                margin: 10px 0px 10px 0px;
+            }
+            .date{
+                margin-top: 10px;
+                width: 180px;
+                margin-left: 10px;
+                color: #2A3F54;
+            }
+            .titFilter{
+                font-size: 18px;
+                color: #16a085;
+                font-weight: 600;
+                margin-left: 10px;
+            }
+            .selectBox{
+                cursor: pointer;
+                margin-top: 10px;
+                width: 177px;
+                margin-left: 10px;
+                color: #555!important;
+            }
+            .filter{
+                padding: 5px 0px 0px 10px;
+                margin: 30px 0px 15px 0px;
+                color: #f90;
+                font-size: 18px;
+                background: #F7F7F7;
+            }
+            .titBox{
+                font-family: "Helvetica Neue", Roboto, Arial, "Droid Sans", sans-serif;
+                font-size: 14px;
+                color: #0D3349;
+            }
         </style>
+    </head>
 
-        </head>
-
-
-        <body class="nav-md">
-            <div class="container body">
-                <div class="main_container">
-                    <div class="col-md-3 left_col sidenav divLeft">
-                        <div class="left_col scroll-view">
-                            <div class="navbar nav_title" style="border: 0;width: 100%!important;">
-
-                                <ul class="navTop">
-                                    <li class="dropdown">
-                                        <a href="/internet/age" class="site_title curSor dropdown-toggle">
-                                            <i class="fa fa-home" aria-hidden="true"></i> INTERNET
-                                        </a>
-                                    </li>
-                                </ul>
+    <body>
+            <!-- Start Left menu area -->
+        <div class="left-sidebar-pro">
+            <nav id="sidebar" class="">
+                <div class="sidebar-header" style="margin-top: 10px;height: 50px">
+                    <a href="/internet/age" class="aHeader"><img class="main-logo" width="38" height="35" src="/assets/images/home.jpg" alt=""> INTERNET</a>
+                </div>
+                <div class="left-custom-menu-adp-wrap comment-scrollbar">
+                    <nav class="sidebar-nav left-sidebar-menu-pro divLeft">
+                        <div class="col-xs-12 filter"><i class="fa fa-filter"></i> FILTERING </div>
+                        <div class="ageDiv" style="padding-top: 15px;display: none;margin-bottom: 15px">
+                            <span class="titFilter"><i class="fa fa-bell"></i> Group Age</span></i>
+                            <span class="txtControl txtAge"></span>
+                        </div>
+                        <div class="regionDiv" style="padding-top: 15px;display: none;margin-bottom: 15px">
+                            <span class="titFilter"><i class="fa fa-bell"></i> Group Region</span></i>
+                            <span class="txtControl txtRegion"></span>
+                        </div>
+                        <div class="divStatus" style="height: 170px;padding-top: 15px">
+                            <span class="titFilter"><i class="fa fa-bell"></i> Group Status</span></i>
+                            <select class="form-control selectBox slStatus" style="height: 35px">
+                            @for( (k,v) <- CommonUtil.STATUS_MAP){
+                                @if(v == 1){
+                                    <option value="@v" selected>@k</option>
+                                }else{
+                                    <option value="@v">@k</option>
+                                }
+                            }
+                            </select>
+                        </div>
+                        <div class="col-xs-12 lineDivBlack"></div>
+                        <div style="height: 140px;padding-top: 15px">
+                            <span class="titFilter"><i class="fa fa-bell"></i> Group Month</span></i>
+                            <div class="input-group date monthPicker">
+                                <input type="text" class="form-control txtInput" value="@month" readonly="true" style="height: 35px">
+                                <span class="input-group-addon" style="background-color: #5A738E!important;"><i class="fa fa-calendar" aria-hidden="true" style="color:white"></i>
+                                </span>
                             </div>
-                            <div class="clearfix"></div>
-                            <br />
-                                <!-- sidebar menu -->
-                            <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
-                                <div class="col-xs-12 filter"><i class="fa fa-filter"></i> FILTERING </div>
-                                <div class="menu_section divGroup col-xs-12" style="padding:0;">
-                                    <div class="col-xs-12" id="divStatus" style="height: 100px">
-                                        <span class="titFilter"><i class="fa fa-bell"></i> Group Status</span></i>
-                                        <select class="form-control" id="slStatus" style="cursor: pointer;margin-top: 10px">
-                                        @for( (k,v) <- CommonUtil.STATUS_MAP){
-                                            @if(v == 1){
-                                                <option value="@v" selected>@k</option>
-                                            }else{
-                                                <option value="@v">@k</option>
-                                            }
-                                        }
-                                        </select>
-                                    </div>
-                                    <div class="col-xs-12 lineDiv"></div>
-                                    <div class="col-xs-12" id="divStatus" style="height: 125px">
-                                        <span class="titFilter"><i class="fa fa-bell"></i> Group Month</span></i>
-                                        <div class="input-group date" id="monthPicker" style="margin-top: 10px">
-                                            <input type="text" id="monthGrp" class="form-control" value="@month" readonly="true" style="text-align: center;cursor: pointer;background-color: white" >
-                                            <span class="input-group-addon" style="background-color: #5A738E!important;"><i class="fa fa-calendar" aria-hidden="true" style="color:white"></i>
-                                            </span>
+                        </div>
+                        <div class="col-xs-12 lineDivWhite"></div>
+                        <div style="padding:0px 5px">
+                            <a class="apply btn btn-xs btn-success" style="float: right;"><i class="fa fa-check-circle"></i> Apply</a>
+                            <a href="/internet/age" class="btn btn-xs btn-secondary btnRefresh"><i class="fa fa-refresh"></i> Refresh</a>
+                        </div>
+                    </nav>
+                </div>
+            </nav>
+        </div>
+            <!-- End Left menu area -->
+            <!-- Start Welcome area -->
+        <div class="all-content-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="logo-pro" style="margin-top: 10px;height: 50px">
+                            <a href="/internet/age" class="aHeader"><img class="main-logo" width="38" height="35" src="/assets/images/home.jpg" alt=""> INTERNET</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="header-advance-area">
+                <div class="header-top-area">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <div class="header-top-wraper">
+                                    <div class="row">
+                                        <div class="col-lg-1 col-md-0 col-sm-1 col-xs-12">
+                                            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#menuTop" aria-expanded="true" style="color: #4292c6">
+                                                <span class="sr-only">Toggle navigation</span>
+                                                <i class="fa fa-bars" aria-hidden="true" style="font-size: 26px"></i>
+                                            </button>
                                         </div>
-                                    </div>
-                                    <div class="col-xs-12 filter">
-                                        <a id="apply" class="btn btn-xs btn-success" style="float: right;"><i class="fa fa-check-circle"></i> Apply</a>
-                                        <a href="/internet/age" class="btn btn-xs btn-secondary" style="float: right;background: #6c757d;color: #fff"><i class="fa fa-refresh"></i> Refresh</a>
-                                    </div>
-                                </div>
 
-                            </div>
-                                <!-- /sidebar menu -->
-                        </div>
-                    </div>
-
-                        <!-- top navigation -->
-                    <div class="top_nav">
-                        <div class="nav_menu" style="background: #2A3F54">
-                            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="true">
-                                <span class="sr-only">Toggle navigation</span>
-                                <i class="fa fa-bars" aria-hidden="true" style="font-size: 26px"></i>
-                            </button>
-                            <nav class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                                <ul class="nav navbar-nav" style="float: right">
-                                    <li class="activeLi"><a href="/internet/age"><i class="fa fa-user"></i> AGE </a>
-                                    </li>
-                                    <li><a href="/internet/region"><i class="fa fa-map-marker"></i> REGION PROFILE </a>
-                                    </li>
-                                    <li><a href="/internet/calllog"><i class="fa fa-bug"></i> CALLLOG </a>
-                                    </li>
-                                    <li><a href="/internet/checklist"><i class="fa fa-building"></i> CHECKLIST </a>
-                                    </li>
-                                    <li><a href="#"><i class="fa fa-exclamation"></i> PROBLEM DETECT </a>
-                                    </li>
-                                    <li>
-                                        <a  href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                            <span class="user-profile dropdown-toggle" style="padding:13px 15px 12px;">
-                                                <img src="../assets/images/user-default-white.png" alt="">@email
-                                                <span class=" fa fa-angle-down"></span>
-                                            </span>
-                                        </a>
-                                        <ul class="dropdown-menu dropdown-usermenu">
-                                           <li><a href="/logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </nav>
-
-                        </div>
-                    </div>
-                        <!-- /top navigation -->
-                        <!-- page content -->
-                    <div class="right_col" role="main">
-                        <div class="divRight">
-                            <div class="row top_tiles"> <div class="col-xs-12"><a class="barIcon" style="display: none;cursor: pointer;font-size: 26px;" onclick="triggerNavleft(this)"><i class="fa fa-bars"></i></a></div></div>
-
-                    @if(rs != null) {
-                        @helper.CSRF.formField
-                        <input type="hidden" value="@month" id="month">
-                        <input type="hidden" id="age">
-                        <input type="hidden" id="region">
-                        <div class="row top_tiles">
-                            <div class="col-lg-6 col-sm-6 col-md-6 col-xs-12">
-                                <div class="x_panel tile" style="padding: 0px">
-                                    <div class="title disInline">
-                                        <span style="width: 90%">Churn Rate and Percentage by Contract Age <b id="monthAge" style="color: #f1b53d">(@month)</b></span>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    <div class="x_content">
-                                        <div id="churn1" style="width: auto; height: 300px;"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 col-sm-6 col-md-6 col-xs-12">
-                                <div class="x_panel tile" style="padding: 0px">
-                                    <div class="title disInline">
-                                        <span style="width: 90%">Trends in Churn Rate and Churn Percentage <b id="ageTitle" style="color: #f1b53d"></b> </span>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    <div class="x_content">
-                                        <div id="churn2" style="width: auto; height: 300px;"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row top_tiles">
-                            <div class="col-lg-12 col-sm-12 col-md-12 col-xs-12">
-                                <div class="x_panel tile" style="padding: 0px">
-                                    <div class="title disInline">
-                                        <span style="width: 90%">Churn Rate and Churn Percentage by Contract Age by Region <b id="monthRegion" style="color: #f1b53d">(@month)</b></span>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    <div class="x_content">
-                                        <div class="chartWithOverlay" id="chartWithOverlay">
-                                            <div id="churn_tooltip" class="custom_tooltip" style="display: none"></div>
-                                            <div id="container" style="width: auto; height: 450px;"></div>
-                                            <div class="overlay">
-                                                <span style="font-size: 16px;color: #0D3349">ChurnPert (%)</span>
-                                                <div style="margin: 4px 0px 2px 7px"><div class="circle" style="background: black;margin-right: 11px"><span style="opacity: 0"></span></div><span id="txtMin" style="color:#0D3349 ">@format3Decimal(rs._1.toSeq.map(x=>x._4).min)</span></div>
-                                                <div style="margin: 0px 0px 2px 5px"><div class="circle" style="background: black;margin-right: 8px"><span style="width: 17px;opacity: 0">11</span></div><span id="circle2" style="color:#0D3349 ">@format3Decimal((rs._1.toSeq.map(x=>x._4).max -rs._1.toSeq.map(x=>x._4).min)/5*2)</span></div>
-                                                <div style="margin: 0px 0px 2px 3px"><div class="circle" style="background: black;margin-right: 6px"><span style="opacity: 0">111</span></div><span id="circle3" style="color:#0D3349 ">@format3Decimal((rs._1.toSeq.map(x=>x._4).max -rs._1.toSeq.map(x=>x._4).min)/5*3)</span></div>
-                                                <div><div class="circle" style="margin-right: 4px;background: black"><span style="opacity: 0">1111</span></div><span id="txtMax" style="color:#0D3349 ">@format3Decimal(rs._1.toSeq.map(x=>x._4).max)</span></div>
+                                        <div class="col-lg-11 col-md-11 col-sm-12 col-xs-12 menu-top" id="menuTop">
+                                            <div class="header-top-menu tabl-d-n">
+                                                <ul class="nav navbar-nav mai-top-nav">
+                                                    <li class="nav-item activeLi"><a href="/internet/age" class="nav-link"><i class="fa fa-user"></i> AGE</a>
+                                                    </li>
+                                                    <li class="nav-item"><a href="/internet/region" class="nav-link"><i class="fa fa-map-marker"></i> REGION</a>
+                                                    </li>
+                                                    <li class="nav-item"><a href="/internet/calllog" class="nav-link"><i class="fa fa-bug"></i> CALLLOG</a>
+                                                    </li>
+                                                    <li class="nav-item"><a href="/internet/checklist" class="nav-link"><i class="fa fa-building"></i> CHECKLIST</a>
+                                                    </li>
+                                                    <li class="nav-item"><a href="/internet/detect" class="nav-link"><i class="fa fa-exclamation-triangle"></i> DETECT PROBLEM</a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <div class="header-right-info">
+                                                <ul class="nav navbar-nav mai-top-nav header-right-menu">
+                                                    <li class="nav-item">
+                                                        <a href="#" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
+                                                            <img src="/assets/images/user-default-white.png" alt="">
+                                                            <span class="admin-name">@email</span>
+                                                            <i class="fa fa-angle-down edu-icon edu-down-arrow"></i>
+                                                        </a>
+                                                        <ul role="menu" class="dropdown-header-top author-log dropdown-menu animated zoomIn" style="left: -70px">
+                                                            <li><a href="/logout"><i class="fa fa-sign-out pull-right mg-tb-5"></i>Log Out</a>
+                                                            </li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+                    <!-- Mobile Menu start -->
+                <div class="mobile-menu-area">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <div class="mobile-menu">
+                                    <nav id="dropdown">
+                                        <ul class="mobile-menu-nav">
+                                            <div class="disInline">
+                                                <div class="col-sm-6 col-xs-12 ageDiv" style="padding-top: 15px;display: none">
+                                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Age</span></i>
+                                                    <span class="txtAge txtFilter"></span>
+                                                </div>
+                                                <div class="col-sm-6 col-xs-12 regionDiv" style="padding-top: 15px;display: none">
+                                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Region</span></i>
+                                                    <span class="txtRegion txtFilter"></span>
+                                                </div>
+                                            </div>
+                                            <div class="disInline">
+                                                <div class="col-sm-6 col-xs-12" style="height: 70px;padding-top: 15px;">
+                                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Status</span></i>
+                                                    <select class="form-control selectBox slStatus" style="width: 75%;height: 20px">
+                                                    @for( (k,v) <- CommonUtil.STATUS_MAP){
+                                                        @if(v == 1){
+                                                            <option value="@v" selected>@k</option>
+                                                        }else{
+                                                            <option value="@v">@k</option>
+                                                        }
+                                                    }
+                                                    </select>
+                                                </div>
+                                                <div class="col-sm-6 col-xs-12" style="height: 70px;padding-top: 15px;">
+                                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Month</span></i>
+                                                    <div class="input-group date monthPicker">
+                                                        <input type="text" class="form-control txtInput" value="@month" readonly="true">
+                                                        <span class="input-group-addon" style="background-color: #5A738E!important;width: 40px"><i class="fa fa-calendar" aria-hidden="true" style="color:white;margin-left: 25px"></i>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-12 lineDivWhite"></div>
+                                            <div style="padding:0px 15px">
+                                                <a class="apply btn btn-xs btn-success" style="float: right;margin-bottom: 15px"><i class="fa fa-check-circle"></i> Apply</a>
+                                                <a href="/internet/age" class="btn btn-xs btn-secondary btnRefresh"><i class="fa fa-refresh"></i> Refresh</a>
+                                            </div>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                    <!-- Mobile Menu end -->
+            </div>
+            @if(rs != null) {
+                @helper.CSRF.formField
+                <input type="hidden" value="@month" id="month">
+                <input type="hidden" id="age">
+                <input type="hidden" id="region">
+                <input type="hidden" id="status" value="1">
 
-                    } else{
-                        <div class="row"><h2 class="noData-title">
-                            Sorry, This page is under construction, please come back later...</h2></div>
-                    }
+                <div class="rate-percent-area mg-t-15">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                <div class="product-sales-chart">
+                                    <div class="portlet-title" style="height: 35px">
+                                        <div class="row">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                <div class="caption pro-sl-hd">
+                                                    <span class="caption-subject">Churn Rate and Percentage by Contract Age</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="churn1" style="width: auto; height: 300px;"></div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                <div class="product-sales-chart">
+                                    <div class="portlet-title" style="height: 35px">
+                                        <div class="row">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                <div class="caption pro-sl-hd">
+                                                    <span class="caption-subject">Trends in Churn Rate and Churn Percentage</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="churn2" style="width: auto; height: 300px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bubble-chart-area mg-tb-15">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-lg-12 col-sm-12 col-md-12 col-xs-12">
+                                <div class="product-sales-chart">
+                                    <div class="portlet-title" style="height: 50px">
+                                        <div class="row">
+                                            <div class="col-lg-1 col-md-6 col-sm-6 col-xs-12"></div>
+                                            <div class="col-lg-11 col-md-11 col-sm-11 col-xs-12">
+                                                <div class="caption pro-sl-hd">
+                                                    <span class="caption-subject"><b>Churn Rate and Churn Percentage by Contract Age by Region</b></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="chartWithOverlay" id="chartWithOverlay">
+                                        <div id="churn_tooltip" class="custom_tooltip" style="display: none"></div>
+                                        <div id="container" style="width: auto; height: 450px;"></div>
+                                        <div class="overlay">
+                                            <span class="titBox">ChurnPert (%)</span>
+                                            <div style="margin: 4px 0px 2px 7px"><div class="circle" style="background: black;margin-right: 11px"><span style="opacity: 0"></span></div><span id="txtMin" style="color:#0D3349 ">@format3Decimal(rs._1.toSeq.map(x=>x._4).min)</span></div>
+                                            <div style="margin: 0px 0px 2px 5px"><div class="circle" style="background: black;margin-right: 8px"><span style="width: 17px;opacity: 0">11</span></div><span id="circle2" style="color:#0D3349 ">@format3Decimal((rs._1.toSeq.map(x=>x._4).max -rs._1.toSeq.map(x=>x._4).min)/5*2)</span></div>
+                                            <div style="margin: 0px 0px 2px 3px"><div class="circle" style="background: black;margin-right: 6px"><span style="opacity: 0">111</span></div><span id="circle3" style="color:#0D3349 ">@format3Decimal((rs._1.toSeq.map(x=>x._4).max -rs._1.toSeq.map(x=>x._4).min)/5*3)</span></div>
+                                            <div><div class="circle" style="margin-right: 4px;background: black"><span style="opacity: 0">1111</span></div><span id="txtMax" style="color:#0D3349 ">@format3Decimal(rs._1.toSeq.map(x=>x._4).max)</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            } else{
+                <div class="row"><h2 class="noData-title">
+                    Sorry, This page is under construction, please come back later...</h2></div>
+            }
+            <div class="footer-copyright-area">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="footer-copy-right">
+                                <p>Copyright © 2018. All rights reserved.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-                <!-- jQuery -->
-            <script src="/assets/vendors/jquery/dist/jquery.min.js"></script>
-            <script src="/assets/javascripts/jsTree.js"></script>
-                <!-- Bootstrap -->
-            <script src="/assets/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
-                <!-- Custom Theme Scripts -->
-            <script src="/assets/custom/js/custom.min.js"></script>
-            <script type="text/javascript" src="../assets/javascripts/jsapi.js"></script>
-                <!-- Hight chart -->
-            <script src="/assets/javascripts/highcharts.js"></script>
-            <script src="/assets/javascripts/exporting.js"></script>
-            <script src="/assets/javascripts/jquery.counterup.min.js"></script>
-            <script src="/assets/javascripts/waitMe.js"></script>
-            <script src="/assets/javascripts/common_churn.js"></script>
-                <!--  Datepicker -->
-            <script src="/assets/datepicker/js/bootstrap-datepicker.js"></script>
-            <script type="text/javascript">
-                    function triggerNavleft(el) {
-                        if($(el).hasClass('openLeft')){
-                            $('.divLeft').attr('style','width: 0')
-                            $('.divRight').removeAttr('style')
-                            $(el).removeClass('openLeft')
-                        }
-                        else{
-                            $(el).addClass('openLeft')
-                            $('.divLeft').attr('style','width: 230px;display: block')
-                            $('.divRight').attr('style','margin-left: 230px;')
-                        }
-                    }
-            </script>
-            @if(rs != null) {
-                @scripts(rs)
-            }
-        </body>
-    </html>
+        <script src="/assets/otherLayout/js/vendor/jquery-1.12.4.min.js"></script>
+        <script src="/assets/otherLayout/js/bootstrap.min.js"></script>
+        <script src="/assets/otherLayout/js/wow.min.js"></script>
+        <script src="/assets/otherLayout/js/jquery-price-slider.js"></script>
+        <script src="/assets/otherLayout/js/jquery.meanmenu.js"></script>
+        <script src="/assets/otherLayout/js/owl.carousel.min.js"></script>
+        <script src="/assets/otherLayout/js/jquery.sticky.js"></script>
+        <script src="/assets/otherLayout/js/jquery.scrollUp.min.js"></script>
+        <script src="/assets/otherLayout/js/counterup/jquery.counterup.min.js"></script>
+        <script src="/assets/otherLayout/js/counterup/waypoints.min.js"></script>
+        <script src="/assets/otherLayout/js/counterup/counterup-active.js"></script>
+        <script src="/assets/otherLayout/js/scrollbar/jquery.mCustomScrollbar.concat.min.js"></script>
+        <script src="/assets/otherLayout/js/scrollbar/mCustomScrollbar-active.js"></script>
+        <script src="/assets/otherLayout/js/metisMenu/metisMenu.min.js"></script>
+        <script src="/assets/otherLayout/js/metisMenu/metisMenu-active.js"></script>
+        <script src="/assets/otherLayout/js/plugins.js"></script>
+        <script src="/assets/otherLayout/js/main.js"></script>
+
+
+        <script src="/assets/javascripts/waitMe.js"></script>
+        <script src="/assets/javascripts/common_churn.js"></script>
+            <!--  Datepicker -->
+        <script src="/assets/datepicker/js/bootstrap-datepicker.js"></script>
+        <script src="/assets/javascripts/jsapi.js"></script>
+            <!-- High chart -->
+        <script src="/assets/javascripts/highcharts.js"></script>
+
+        @if(rs != null) {
+            @scripts(rs)
+        }
+    </body>
+
+</html>

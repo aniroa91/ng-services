@@ -409,7 +409,7 @@ object  ChurnDetectService{
     val json = Json.parse(body)
     val array = json.\("aggregations").\(s"${indexs}").\("buckets").get.asInstanceOf[JsArray].value.toArray
     val rss = array.map(y=> (if(indexs == "region") y.\("key").get.asInstanceOf[JsNumber] else y.\("key").get.asInstanceOf[JsString], y.\("doc_count").get.asInstanceOf[JsNumber]))
-    rss.map(x=> (x._1.toString().replace("\"", ""), x._2.toString().toLong))
+    rss.map(x=> (x._1.toString().replace("\"", ""), x._2.toString().toLong)).sorted
   }
 
   def getTopCategory(queryStr: String, month: String, contractGrp: String, maintain: String, cate: String, cause: String) = {

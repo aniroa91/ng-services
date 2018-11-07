@@ -12,6 +12,16 @@
             right = 0
             width = '70%'
         }
+        else if($(window).width() > 600 && $(window).width() <= 800) {
+                left = 'auto'
+                right = 10
+                width = '70%'
+        }
+        else if($(window).width() > 800 && $(window).width() <= 1024) {
+                left = 'auto'
+                right = 10
+                width = '70%'
+        }
         var options = {
                 title: 'Churn Rate (%)',
                 hAxis: {
@@ -58,7 +68,7 @@
         google.setOnLoadCallback(drawChart);
 
         function drawChart() {
-                $('#monthPicker').datepicker({
+                $('.monthPicker').datepicker({
                         autoclose: true,
                         minViewMode: 1,
                         startDate: '-12m',
@@ -126,24 +136,37 @@
                                 var age = dataHuyDv.getValue(row, 1)
                                 $('#age').val(age)
                                 $('#region').val(region)
+                                $('.regionDiv').show()
+                                $('.ageDiv').show()
+                                $('.txtAge').text(getNameByIdAge(Number(age)))
+                                $('.txtRegion').text(region)
+                                $('.divStatus').attr('style','height:110px;padding-top: 15px')
                         }
                         else{
                                 $('#age').val("")
                                 $('#region').val("")
+                                $('.regionDiv').hide()
+                                $('.ageDiv').hide()
+                                $('.txtAge').text("")
+                                $('.txtRegion').text("")
+                                $('.divStatus').attr('style','height:170px;padding-top: 15px')
                         }
-                        $('#ageTitle').text("")
                         ajaxGetChurn("regionAge")
                 });
                 var mouseX;
                 var mouseY;
                 $(document).mousemove(function(e) {
-                    if($(window).width() <=600){
+                    if($(window).width() < 992){
                             mouseX = e.pageX +115;
-                            mouseY = e.pageY -50;
+                            mouseY = -85
+                    }
+                    else if($(window).width() >= 992 && $(window).width() < 1024){
+                            mouseX = e.pageX -125;
+                            mouseY = -85
                     }
                     else{
-                            mouseX = e.pageX;
-                            mouseY = e.pageY -150;
+                            mouseX = e.pageX +80;
+                            mouseY = e.pageY -620;
                     }
                 });
 
@@ -157,7 +180,7 @@
                         var percent = dataHuyDv.getValue(event.row, 4);
                         var contracts = dataHuyDv.getValue(event.row, 5);
                         var x = mouseX - 225;
-                        var y = mouseY - 450;
+                        var y = mouseY ;
                         $('#churn_tooltip').html('<div><p><b>Age:</b> ' + keyByValue( catesAge, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
                                 '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
                                 'top': y,
@@ -224,13 +247,19 @@
                                                                 }
                                                                 this.update({ color: '#ECB631' }, true, false)*/
                                                                 $('#region').val("")
+                                                                $('.txtRegion').text("")
+                                                                $('.regionDiv').hide()
                                                                 if(getIdBynameAge(this.category) == $('#age').val()){
                                                                         $('#age').val("")
-                                                                        $('#ageTitle').text("")
+                                                                        $('.ageDiv').hide()
+                                                                        $('.txtAge').text("")
+                                                                        $('.divStatus').attr('style','height:170px;padding-top: 15px')
                                                                 }
                                                                 else{
                                                                         $('#age').val(getIdBynameAge(this.category))
-                                                                        $('#ageTitle').text("(Age: "+this.category+")")
+                                                                        $('.ageDiv').show()
+                                                                        $('.txtAge').text(this.category)
+                                                                        $('.divStatus').attr('style','height:110px;padding-top: 15px')
                                                                 }
                                                                 ajaxGetChurn("age")
                                                         }
@@ -304,12 +333,19 @@
                 });
 
                 // click apply fitler
-                $('#apply').click(function () {
+                $('.apply').click(function () {
                       $('#region').val("")
                       $('#age').val("")
-                      $('#profile').val("")
-                      $('#ageTitle').text("")
+                      $('.txtRegion').text("")
+                      $('.txtAge').text("")
+                      $('.regionDiv').hide()
+                      $('.ageDiv').hide()
+                      $('.divStatus').attr('style','height:170px;padding-top: 15px')
                       ajaxGetChurn("*")
+                })
+                // onchange status selectbox
+                $('.slStatus').on('change', function () {
+                        $('#status').val($(this).val())
                 })
 
                 function ajaxGetChurn(_type){
@@ -320,7 +356,7 @@
                                 data:  fields,
                                 type:"POST",
                                 beforeSend: function () {
-                                        $('.divGroup').waitMe({
+                                        $('.divLeft').waitMe({
                                                 effect: 'progressBar',
                                                 text: 'Please wait...',
                                                 bg: 'rgba(255,255,255,0.7)',
@@ -330,8 +366,8 @@
                                 },
                                 success: function (dta) {
                                         if(dta != "Error"){
-                                            $('#monthAge').text("("+$('#month').val()+")")
-                                            $('#monthRegion').text("("+$('#month').val()+")")
+                                            $('#monthAge').text($('#month').val())
+                                            $('#monthRegion').text($('#month').val())
                                             // update chart Age
                                             if(_type != "age") {
                                                 updateCharts(churn_age, getJsonChurnMonth(dta.churnAge.churnRate, dta.churnAge.churnPercent))
@@ -396,12 +432,21 @@
                                                                     var age = dataStatus.getValue(row, 1)
                                                                     $('#age').val(age)
                                                                     $('#region').val(region)
+                                                                    $('.regionDiv').show()
+                                                                    $('.ageDiv').show()
+                                                                    $('.txtAge').text(getNameByIdAge(Number(age)))
+                                                                    $('.txtRegion').text(region)
+                                                                    $('.divStatus').attr('style','height:110px;padding-top: 15px')
                                                             }
                                                             else{
                                                                     $('#age').val("")
                                                                     $('#region').val("")
+                                                                    $('.regionDiv').hide()
+                                                                    $('.ageDiv').hide()
+                                                                    $('.txtAge').text("")
+                                                                    $('.txtRegion').text("")
+                                                                    $('.divStatus').attr('style','height:170px;padding-top: 15px')
                                                             }
-                                                            $('#ageTitle').text("")
                                                             ajaxGetChurn("regionAge")
                                                     });
                                                     google.visualization.events.addListener(chartStatus, 'onmouseover', function (event) {
@@ -411,7 +456,7 @@
                                                             var percent = dataStatus.getValue(event.row, 4);
                                                             var contracts = dataStatus.getValue(event.row, 5);
                                                             var x = mouseX - 225;
-                                                            var y = mouseY - 450;
+                                                            var y = mouseY ;
                                                             $('#churn_tooltip').html('<div><p><b>Age:</b> ' + keyByValue( catesAge, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
                                                                     '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
                                                                     'top': y,
@@ -426,7 +471,7 @@
                                         }
                                 },
                                 complete: function () {
-                                        $('.divGroup').waitMe("hide");
+                                        $('.divLeft').waitMe("hide");
                                 }
                         });
                 }
@@ -438,8 +483,9 @@
                         "region" : $('#region').val(),
                         "age"    : $('#age').val(),
                         "month"  : $('#month').val(),
-                        "status" : $('#slStatus').val()
+                        "status" : $('#status').val()
                 }
+                //console.log(obj)
                 return obj
         }
 

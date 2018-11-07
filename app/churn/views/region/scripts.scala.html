@@ -4,12 +4,9 @@
 @import churn.utils.AgeGroupUtil
 
 <script type="text/javascript">
-        var widthChart  = $(window).width()
-        var heightChart = $(window).height() * 0.46
+        var widthChart  = $(window).height() * 0.75
+        var heightChart = $(window).height() * 0.42
         var spaceText = 20
-        if($(window).width() > 991){
-            widthChart = $(window).width()*0.4
-        }
         if($(window).width() >= 600){
             spaceText = 40
         }
@@ -72,7 +69,7 @@
                 }
             },
             chartArea: {
-                height: "70%",
+                height: "67%",
                 width: "73%",
                 left: 150,
                 right: 30
@@ -111,14 +108,14 @@
                 },
             },
             vAxis: {
-                title: '',
+                title: 'Region',
                 gridlines: {
                     count: 9,
                     color: '#f0f0f0'
                 }
             },
             chartArea: {
-                height: "73%",
+                height: "74%",
                 width: "73%",
                 left: 120,
                 right: 20
@@ -146,7 +143,7 @@
         google.setOnLoadCallback(drawChart);
 
         function drawChart() {
-            $('#monthPicker').datepicker({
+            $('.monthPicker').datepicker({
                 autoclose: true,
                 minViewMode: 1,
                 startDate: '-15m',
@@ -236,28 +233,33 @@
                     var row = selection[0].row;
                     var profile = dataHuyDv.getValue(row, 2)
                     var month = dataHuyDv.getValue(row, 1)
-                    $("#monthPicker").datepicker("update", keyByValue(catesMonth, month));
+                    $(".monthPicker").datepicker("update", keyByValue(catesMonth, month));
                     $('#profile').val(keyByValue(catesProfile, profile))
-                    $('#churn1_profile').text("(Profile: " + keyByValue(catesProfile, profile) + ")")
-                    $('#churn3_profile').text("(Profile: " + keyByValue(catesProfile, profile) + ")")
+                    $('.txtProfile').text(keyByValue(catesProfile, profile))
+                    $('.profileDiv').show()
                 }
                 else{
-                    $("#monthPicker").datepicker("update", $('#month').val());
+                    $(".monthPicker").datepicker("update", $('#month').val());
                     $('#profile').val("")
-                    $('#churn1_profile').text("")
-                    $('#churn3_profile').text("")
+                    $('.txtProfile').text("")
+                    $('.profileDiv').hide()
                 }
                 $('#slRegion').val("*")
                 $('#age').val("")
-                $('#churn2_profile').text("")
-                $('#churn4_profile').text("")
+                $('.txtAge').text("")
+                $('.ageDiv').hide()
                 ajaxGetChurn("profileMonth")
             });
 
             var mouseX;
             var mouseY;
             $(document).mousemove(function(e) {
-                mouseY = e.pageY -290;
+                if($(window).width() < 992){
+                    mouseY = e.pageY - 790
+                }
+                else{
+                    mouseY = e.pageY -290;
+                }
             });
 
             function handlerOut() {
@@ -271,7 +273,13 @@
                 var percent = dataHuyDv.getValue(event.row, 4);
                 var contracts = dataHuyDv.getValue(event.row, 5);
                 var x = mouseX - 225;
-                var y = mouseY - 400;
+                if($(window).width() < 992){
+                    mouseY = mouseY - 870
+                }
+                else{
+                    mouseY = mouseY -450
+                }
+                var y = mouseY
                 $('#churn4_tooltip').html('<div><p><b>Month:</b> ' + keyByValue(catesMonth, xAxis) +'</p><p><b>Profile:</b> '+ keyByValue( catesProfile, yAxis) +
                         '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
                     'top': y,
@@ -355,21 +363,21 @@
                     var age = keyByValue(catesAge, dataAgeProfHuyDv.getValue(row, 1))
                     $('#profile').val(profile)
                     $('#age').val(age)
-                    $('#churn1_profile').text("(Profile: " + profile + " & Age: "+age+")")
-                    $('#churn3_profile').text("(Profile: " + profile + " & Age: "+age+")")
-                    $('#churn2_profile').text("(Age: "+age+")")
-                    $('#churn4_profile').text("(Age: "+age+")")
+                    $('.txtProfile').text(profile)
+                    $('.profileDiv').show()
+                    $('.txtAge').text(age)
+                    $('.ageDiv').show()
                 }
                 else{
                     $('#profile').val("")
                     $('#age').val("")
-                    $('#churn1_profile').text("")
-                    $('#churn2_profile').text("")
-                    $('#churn3_profile').text("")
-                    $('#churn4_profile').text("")
+                    $('.txtProfile').text("")
+                    $('.profileDiv').hide()
+                    $('.txtAge').text("")
+                    $('.ageDiv').hide()
                 }
-                $('#slRegion').val("*")
-                $("#monthPicker").datepicker("update", $('#month').val());
+                $('.slRegion').val("*")
+                $(".monthPicker").datepicker("update", $('#month').val());
                 ajaxGetChurn("profileAge")
             });
             google.visualization.events.addListener(chartAgeProfHuyDv, 'onmouseover', function (event) {
@@ -379,7 +387,13 @@
                 var percent = dataAgeProfHuyDv.getValue(event.row, 4);
                 var contracts = dataAgeProfHuyDv.getValue(event.row, 5);
                 var x = mouseX - 225;
-                var y = mouseY - 400;
+                if($(window).width() < 992){
+                    mouseY = mouseY - 870
+                }
+                else{
+                    mouseY = mouseY -450
+                }
+                var y = mouseY
                 $('#churn5_tooltip').html('<div><p><b>Age:</b> ' + keyByValue( catesAge, xAxis) +'</p><p><b>Profile:</b> '+ keyByValue( catesProfAge, yAxis) +
                         '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
                     'top': y,
@@ -399,6 +413,9 @@
                     if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444')) {
                         if(text.innerHTML == 0 || text.innerHTML == 8)
                             text.setAttribute('fill-opacity',0)
+                    }
+                    if((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#222222')){
+                        text.setAttribute('x', 22.55)
                     }
                     // change label month
                     if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#1c2752')) {
@@ -442,19 +459,19 @@
                     var row = selection[0].row;
                     var region = dataRegionHuyDv.getValue(row, 2)
                     var month = dataRegionHuyDv.getValue(row, 1)
-                    $("#monthPicker").datepicker("update", keyByValue(catesMonthRegion, month));
-                    $('#slRegion').val(region)
+                    $(".monthPicker").datepicker("update", keyByValue(catesMonthRegion, month));
+                    $('.slRegion').val(region)
                 }
                 else{
-                    $("#monthPicker").datepicker("update", $('#month').val());
-                    $('#slRegion').val("*")
+                    $(".monthPicker").datepicker("update", $('#month').val());
+                    $('.slRegion').val("*")
                 }
                 $('#profile').val("")
                 $('#age').val("")
-                $('#churn1_profile').text("")
-                $('#churn2_profile').text("")
-                $('#churn3_profile').text("")
-                $('#churn4_profile').text("")
+                $('.txtProfile').text("")
+                $('.profileDiv').hide()
+                $('.txtAge').text("")
+                $('.ageDiv').hide()
                 ajaxGetChurn("regionMonth")
             });
             google.visualization.events.addListener(chartRegionHuyDv, 'onmouseover', function (event) {
@@ -577,19 +594,19 @@
                             events: {
                                 click: function () {
                                     $('#age').val("")
-                                    $('#slRegion').val("*")
-                                    $("#monthPicker").datepicker("update", $('#month').val());
-                                    $('#churn2_profile').text("")
-                                    $('#churn4_profile').text("")
+                                    $('.slRegion').val("*")
+                                    $(".monthPicker").datepicker("update", $('#month').val());
+                                    $('.txtAge').text("")
+                                    $('.ageDiv').hide()
                                     if(this.category == $('#profile').val()){
                                         $('#profile').val("")
-                                        $('#churn1_profile').text("")
-                                        $('#churn3_profile').text("")
+                                        $('.txtProfile').text("")
+                                        $('.profileDiv').hide()
                                     }
                                     else {
                                         $('#profile').val(this.category)
-                                        $('#churn1_profile').text("(Profile: " + this.category + ")")
-                                        $('#churn3_profile').text("(Profile: " + this.category + ")")
+                                        $('.txtProfile').text(this.category)
+                                        $('.profileDiv').show()
                                     }
                                     ajaxGetChurn("profile")
                                 }
@@ -608,8 +625,8 @@
             var churn_heatmap = Highcharts.chart('churn-heatmap', {
                 chart: {
                     type: 'heatmap',
-                    marginTop: 40,
-                    marginBottom: 70,
+                    marginTop: 20,
+                    marginBottom: 50,
                     plotBorderWidth: 1
                 },
 
@@ -662,21 +679,22 @@
                                 if(age == $('#age').val() && profile == $('#profile').val()){
                                     $('#profile').val("")
                                     $('#age').val("")
-                                    $('#churn1_profile').text("")
-                                    $('#churn2_profile').text("")
-                                    $('#churn3_profile').text("")
-                                    $('#churn4_profile').text("")
+                                    $('.txtAge').text("")
+                                    $('.ageDiv').hide()
+                                    $('.txtProfile').text("")
+                                    $('.profileDiv').hide()
                                 }
                                 else{
                                     $('#profile').val(profile)
                                     $('#age').val(age)
-                                    $('#churn1_profile').text("(Profile: " + profile + " & Age: "+age+")")
-                                    $('#churn3_profile').text("(Profile: " + profile + " & Age: "+age+")")
-                                    $('#churn2_profile').text("(Age: "+age+")")
-                                    $('#churn4_profile').text("(Age: "+age+")")
+                                    $('.txtAge').text(age)
+                                    $('.ageDiv').show()
+                                    $('.txtProfile').text(profile)
+                                    $('.profileDiv').show()
+
                                 }
-                                $('#slRegion').val("*")
-                                $("#monthPicker").datepicker("update", $('#month').val());
+                                $('.slRegion').val("*")
+                                $(".monthPicker").datepicker("update", $('#month').val());
                                 ajaxGetChurn("churn5_heatmap")
                             }
                         },
@@ -715,13 +733,13 @@
                 }
             })
             // click apply fitler
-            $('#apply').click(function () {
+            $('.apply').click(function () {
                 $('#profile').val("")
                 $('#age').val("")
-                $('#churn1_profile').text("")
-                $('#churn2_profile').text("")
-                $('#churn3_profile').text("")
-                $('#churn4_profile').text("")
+                $('.txtAge').text("")
+                $('.ageDiv').hide()
+                $('.txtProfile').text("")
+                $('.profileDiv').hide()
                 ajaxGetChurn("*")
             })
 
@@ -733,7 +751,7 @@
                     data:  fields,
                     type:"POST",
                     beforeSend: function () {
-                        $('.divGroup').waitMe({
+                        $('.divLeft').waitMe({
                             effect: 'progressBar',
                             text: 'Please wait...',
                             bg: 'rgba(255,255,255,0.7)',
@@ -779,6 +797,9 @@
                                         if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444')) {
                                             if(text.innerHTML == 0 || text.innerHTML == 8)
                                                 text.setAttribute('fill-opacity',0)
+                                        }
+                                        if((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#222222')){
+                                            text.setAttribute('x', 22.55)
                                         }
                                         // change label month
                                         if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#1c2752')) {
@@ -851,19 +872,19 @@
                                         var row = selection[0].row;
                                         var region = dataRegionMonth.getValue(row, 2)
                                         var month = dataRegionMonth.getValue(row, 1)
-                                        $("#monthPicker").datepicker("update", keyByValue(dta.churn3.cates, month));
-                                        $('#slRegion').val(region)
+                                        $(".monthPicker").datepicker("update", keyByValue(dta.churn3.cates, month));
+                                        $('.slRegion').val(region)
                                     }
                                     else{
-                                        $("#monthPicker").datepicker("update", $('#month').val());
-                                        $('#slRegion').val("*")
+                                        $(".monthPicker").datepicker("update", $('#month').val());
+                                        $('.slRegion').val("*")
                                     }
                                     $('#profile').val("")
                                     $('#age').val("")
-                                    $('#churn1_profile').text("")
-                                    $('#churn2_profile').text("")
-                                    $('#churn3_profile').text("")
-                                    $('#churn4_profile').text("")
+                                    $('.txtProfile').text("")
+                                    $('.profileDiv').hide()
+                                    $('.txtAge').text("")
+                                    $('.ageDiv').hide()
                                     ajaxGetChurn("regionMonth")
                                 });
                                 google.visualization.events.addListener(chartRegionMonth, 'onmouseover', function (event) {
@@ -968,21 +989,21 @@
                                         var row = selection[0].row;
                                         var profile = dataProfileMonth.getValue(row, 2)
                                         var month = dataProfileMonth.getValue(row, 1)
-                                        $("#monthPicker").datepicker("update", keyByValue(dta.churn4.catesMonth, month));
+                                        $(".monthPicker").datepicker("update", keyByValue(dta.churn4.catesMonth, month));
                                         $('#profile').val(keyByValue(dta.churn4.catesProfile, profile))
-                                        $('#churn1_profile').text("(Profile: " + keyByValue(dta.churn4.catesProfile, profile) + ")")
-                                        $('#churn3_profile').text("(Profile: " + keyByValue(dta.churn4.catesProfile, profile) + ")")
+                                        $('.txtProfile').text(keyByValue(dta.churn4.catesProfile, profile))
+                                        $('.profileDiv').show()
                                     }
                                     else{
-                                        $("#monthPicker").datepicker("update", $('#month').val());
+                                        $(".monthPicker").datepicker("update", $('#month').val());
                                         $('#profile').val("")
-                                        $('#churn1_profile').text("")
-                                        $('#churn3_profile').text("")
+                                        $('.txtProfile').text("")
+                                        $('.profileDiv').hide()
                                     }
-                                    $('#slRegion').val("*")
+                                    $('.slRegion').val("*")
                                     $('#age').val("")
-                                    $('#churn3_profile').text("")
-                                    $('#churn4_profile').text("")
+                                    $('.txtAge').text("")
+                                    $('.ageDiv').hide()
                                     ajaxGetChurn("profileMonth")
                                 })
                                 google.visualization.events.addListener(chartProfileMonth, 'onmouseover', function (event) {
@@ -992,7 +1013,13 @@
                                     var percent = dataProfileMonth.getValue(event.row, 4);
                                     var contracts = dataProfileMonth.getValue(event.row, 5);
                                     var x = mouseX - 225;
-                                    var y = mouseY - 400;
+                                    if($(window).width() < 992){
+                                        mouseY = mouseY - 870
+                                    }
+                                    else{
+                                        mouseY = mouseY -450
+                                    }
+                                    var y = mouseY
                                     $('#churn4_tooltip').html('<div><p><b>Month:</b> ' + keyByValue(dta.churn4.catesMonth, xAxis) +'</p><p><b>Profile:</b> '+ keyByValue( dta.churn4.catesProfile, yAxis) +
                                             '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
                                         'top': y,
@@ -1085,7 +1112,13 @@
                                     var percent = dataAgeProfile.getValue(event.row, 4);
                                     var contracts = dataAgeProfile.getValue(event.row, 5);
                                     var x = mouseX - 225;
-                                    var y = mouseY - 400;
+                                    if($(window).width() < 992){
+                                        mouseY = mouseY - 870
+                                    }
+                                    else{
+                                        mouseY = mouseY -450
+                                    }
+                                    var y = mouseY
                                     $('#churn5_tooltip').html('<div><p><b>Age:</b> ' + keyByValue( catesAge, xAxis) +'</p><p><b>Profile:</b> '+ keyByValue( dta.churn5.catesProfile, yAxis) +
                                             '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
                                         'top': y,
@@ -1100,21 +1133,21 @@
                                         var age = keyByValue(catesAge, dataAgeProfile.getValue(row, 1))
                                         $('#profile').val(profile)
                                         $('#age').val(age)
-                                        $('#churn1_profile').text("(Profile: " + profile + " & Age: "+age+")")
-                                        $('#churn3_profile').text("(Profile: " + profile + " & Age: "+age+")")
-                                        $('#churn2_profile').text("(Age: "+age+")")
-                                        $('#churn4_profile').text("(Age: "+age+")")
+                                        $('.txtProfile').text(profile)
+                                        $('.profileDiv').show()
+                                        $('.txtAge').text(age)
+                                        $('.ageDiv').show()
                                     }
                                     else{
                                         $('#profile').val("")
                                         $('#age').val("")
-                                        $('#churn1_profile').text("")
-                                        $('#churn2_profile').text("")
-                                        $('#churn3_profile').text("")
-                                        $('#churn4_profile').text("")
+                                        $('.txtProfile').text("")
+                                        $('.profileDiv').hide()
+                                        $('.txtAge').text("")
+                                        $('.ageDiv').hide()
                                     }
-                                    $('#slRegion').val("*")
-                                    $("#monthPicker").datepicker("update", $('#month').val());
+                                    $('.slRegion').val("*")
+                                    $(".monthPicker").datepicker("update", $('#month').val());
                                     ajaxGetChurn("profileAge")
                                 })
                                 google.visualization.events.addListener(chartAgeProfile, 'onmouseout', handlerOut);
@@ -1125,7 +1158,7 @@
                         }
                     },
                     complete: function () {
-                        $('.divGroup').waitMe("hide");
+                        $('.divLeft').waitMe("hide");
                     }
                 });
             }
@@ -1134,12 +1167,13 @@
         function getParamFields(token){
             var obj = {
                 "csrfToken" : token,
-                "region" : $('#slRegion').val(),
+                "region" : $('.slRegion').val(),
                 "age"    : $('#age').val(),
                 "profile": $('#profile').val(),
                 "month"  : $('#monthGrp').val(),
-                "status" : $('#slStatus').val()
+                "status" : $('.slStatus').val()
             }
+            console.log(obj)
             return obj
         }
 

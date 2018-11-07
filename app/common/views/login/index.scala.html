@@ -1,105 +1,82 @@
 @(form: Form[(String,String)])(implicit flash: Flash)
 
 <!DOCTYPE html>
-<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
-<!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->
-<!--[if !IE]><!--> <html lang="en"> <!--<![endif]-->
-    <!-- BEGIN HEAD -->
-    <head>
-        <meta charset="utf-8" />
-        <title>Login Churn Internet</title>
-        <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-        <meta content="" name="description" />
-        <meta content="" name="author" />
-            <!-- BEGIN GLOBAL MANDATORY STYLES -->
-        <link href="/assets/login/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
-        <link href="/assets/login/css/bootstrap-responsive.min.css" rel="stylesheet" type="text/css"/>
-        <link href="/assets/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-        <link href="/assets/login/css/style-metro.css" rel="stylesheet" type="text/css"/>
-        <link href="/assets/login/css/style.css" rel="stylesheet" type="text/css"/>
-            <!-- END GLOBAL MANDATORY STYLES -->
-            <!-- BEGIN PAGE LEVEL STYLES -->
-        <link href="/assets/login/css/pages/login-soft.css" rel="stylesheet" type="text/css"/>
-            <!-- END PAGE LEVEL STYLES -->
-        <link rel="shortcut icon" href="favicon.ico" />
-    </head>
-        <!-- END HEAD -->
-        <!-- BEGIN BODY -->
-    <body class="login">
-            <!-- BEGIN LOGO -->
-        <div class="logo">
-                <!-- PUT YOUR LOGO HERE -->
-        </div>
-            <!-- END LOGO -->
-            <!-- BEGIN LOGIN -->
-        <div class="content">
-                <!-- BEGIN LOGIN FORM -->
-            <form class="form-vertical login-form" action="/login" method="GET">
-                <h3 class="form-title">Login to your account</h3>
-                <div class="alert alert-error hide">
-                    <button class="close" data-dismiss="alert"></button>
-                    <span>Enter any username and password.</span>
-                </div>
-                <div class="control-group">
-                        <!--ie8, ie9 does not support html5 placeholder, so we just show field title for that-->
-                    <label class="control-label visible-ie8 visible-ie9">Email</label>
-                    <div class="controls">
-                        <div class="input-icon left">
-                            <i class="fa fa-user"></i>
-                            <input class="m-wrap placeholder-no-fix submit_on_enter" type="text" autocomplete="off" placeholder="Email"  name="email"/>
-                        </div>
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label visible-ie8 visible-ie9">Password</label>
-                    <div class="controls">
-                        <div class="input-icon left">
-                            <i class="fa fa-lock"></i>
-                            <input class="m-wrap placeholder-no-fix submit_on_enter" type="password" autocomplete="off" placeholder="Password" name="password"/>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-actions">
-                    <button type="submit" class="btn green pull-right">
-                        Login <i class="m-icon-swapright m-icon-white"></i>
-                    </button>
-                </div>
 
-            </form>
-                <!-- END LOGIN FORM -->
+<html class="no-js" lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>Login | Churn Dashboard</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+        <link href="https://fonts.googleapis.com/css?family=Play:400,700" rel="stylesheet">
+        <link rel="stylesheet" href="/assets/otherLayout/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/assets/otherLayout/css/font-awesome.min.css">
+        <link rel="stylesheet" href="/assets/otherLayout/css/owl.carousel.css">
+        <link rel="stylesheet" href="/assets/otherLayout/css/owl.theme.css">
+        <link rel="stylesheet" href="/assets/otherLayout/css/owl.transitions.css">
+        <link rel="stylesheet" href="/assets/otherLayout/css/animate.css">
+        <link rel="stylesheet" href="/assets/otherLayout/css/normalize.css">
+        <link rel="stylesheet" href="/assets/otherLayout/css/main.css">
+        <link rel="stylesheet" href="/assets/otherLayout/css/morrisjs/morris.css">
+        <link rel="stylesheet" href="/assets/otherLayout/css/scrollbar/jquery.mCustomScrollbar.min.css">
+        <link rel="stylesheet" href="/assets/otherLayout/css/metisMenu/metisMenu.min.css">
+        <link rel="stylesheet" href="/assets/otherLayout/css/metisMenu/metisMenu-vertical.css">
+        <link rel="stylesheet" href="/assets/otherLayout/css/form/all-type-forms.css">
+        <link rel="stylesheet" href="/assets/otherLayout/style.css">
+        <link rel="stylesheet" href="/assets/otherLayout/css/responsive.css">
+        <script src="/assets/otherLayout/js/vendor/modernizr-2.8.3.min.js"></script>
+    </head>
+
+    <body>
+        <div class="error-pagewrap" style="background: url(/assets/images/bras-bg.jpg)">
+            <div class="error-page-int">
+                <div class="text-center m-b-md custom-login">
+                    <h3 style="color: #fff">PLEASE LOGIN TO DASHBOARD</h3>
+                </div>
+                <div class="content-error">
+                    <div class="hpanel">
+                        <div class="panel-body">
+                            <form action="/login" method="GET">
+                                <div class="form-group">
+                                    <label class="control-label" for="username">Username</label>
+                                    <input type="text" title="Please enter you username" required="" autocomplete="off" placeholder="Username"  name="email" class="form-control submit_on_enter">
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label" for="password">Password</label>
+                                    <input type="password" title="Please enter your password" required="" autocomplete="off" placeholder="Password" name="password" class="form-control submit_on_enter">
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block loginbtn">Login</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center login-footer" style="color: #fff">
+                    <p>Copyright © 2018. Login Admin System</p>
+                </div>
+            </div>
         </div>
-            <!-- END LOGIN -->
-            <!-- BEGIN COPYRIGHT -->
-        <div class="copyright">
-            2017 &copy; Login Admin System
-        </div>
-            <!-- END COPYRIGHT -->
-            <!-- BEGIN JAVASCRIPTS(Load javascripts at bottom, this will reduce page load time) -->
-            <!-- BEGIN CORE PLUGINS -->
-        <script src="/assets/login/js/jquery-1.10.1.min.js" type="text/javascript"></script>
-        <script src="/assets/login/js/jquery-migrate-1.2.1.min.js" type="text/javascript"></script>
-            <!-- IMPORTANT! Load jquery-ui-1.10.1.custom.min.js before bootstrap.min.js to fix bootstrap tooltip conflict with jquery ui tooltip -->
-        <script src="/assets/login/js/jquery-ui-1.10.1.custom.min.js" type="text/javascript"></script>
-        <script src="/assets/login/js/bootstrap.min.js" type="text/javascript"></script>
-            <!--[if lt IE 9]>
-	    <script src="/assets/login/js/excanvas.min.js"></script>
-        <script src="/assets/login/js/respond.min.js"></script>
-        <![endif]-->
-        <script src="/assets/login/js/jquery.cookie.min.js" type="text/javascript"></script>
-        <script src="/assets/login/js/select2.min.js" type="text/javascript"></script>
-            <!-- END CORE PLUGINS -->
-            <!-- BEGIN PAGE LEVEL PLUGINS -->
-        <script src="/assets/login/js/jquery.validate.min.js" type="text/javascript"></script>
-        <script src="/assets/login/js/jquery.backstretch.min.js" type="text/javascript"></script>
-            <!-- END PAGE LEVEL PLUGINS -->
-            <!-- BEGIN PAGE LEVEL SCRIPTS -->
-        <script src="/assets/login/scripts/app.js" type="text/javascript"></script>
-        <script src="/assets/login/scripts/login-soft.js" type="text/javascript"></script>
-            <!-- END PAGE LEVEL SCRIPTS -->
+            <!-- jquery
+		============================================ -->
+        <script src="/assets/otherLayout/js/vendor/jquery-1.12.4.min.js"></script>
+        <script src="/assets/otherLayout/js/bootstrap.min.js"></script>
+        <script src="/assets/otherLayout/js/wow.min.js"></script>
+        <script src="/assets/otherLayout/js/jquery-price-slider.js"></script>
+        <script src="/assets/otherLayout/js/jquery.meanmenu.js"></script>
+        <script src="/assets/otherLayout/js/owl.carousel.min.js"></script>
+        <script src="/assets/otherLayout/js/jquery.sticky.js"></script>
+        <script src="/assets/otherLayout/js/jquery.scrollUp.min.js"></script>
+        <script src="/assets/otherLayout/js/scrollbar/jquery.mCustomScrollbar.concat.min.js"></script>
+        <script src="/assets/otherLayout/js/scrollbar/mCustomScrollbar-active.js"></script>
+        <script src="/assets/otherLayout/js/metisMenu/metisMenu.min.js"></script>
+        <script src="/assets/otherLayout/js/metisMenu/metisMenu-active.js"></script>
+        <script src="/assets/otherLayout/js/tab.js"></script>
+        <script src="/assets/otherLayout/js/plugins.js"></script>
+        <script src="/assets/otherLayout/js/main.js"></script>
         <script>
                 jQuery(document).ready(function() {
-                    App.init();
-                    Login.init();
                     $('.submit_on_enter').keydown(function(event) {
                         // enter has keyCode = 13, change it if you want to use another button
                         if (event.keyCode == 13) {
@@ -109,7 +86,6 @@
                     });
                 });
         </script>
-            <!-- END JAVASCRIPTS -->
     </body>
-        <!-- END BODY -->
+
 </html>

@@ -40,14 +40,14 @@
                                     if (this.name == $('#complain').val()) {
                                         $('#complain').val("*")
                                         $('.otherFilt').hide()
-                                        $('#groupCont').text("")
-                                        $('#groupTit').text("")
+                                        $('.groupCont').text("")
+                                        $('.groupTit').text("")
                                     }
                                     else {
                                         $('#complain').val(this.name)
                                         $('.otherFilt').show()
-                                        $('#groupCont').text(this.name)
-                                        $('#groupTit').text("Group Complain")
+                                        $('.groupCont').text(this.name)
+                                        $('.groupTit').text("Group Complain")
                                     }
                                     $('#region').val("*")
                                     $('#age').val("*")
@@ -142,14 +142,14 @@
                                 if(this.name == $('#cate').val()){
                                     $('#cate').val("")
                                     $('.otherFilt').hide()
-                                    $('#groupCont').text("")
-                                    $('#groupTit').text("")
+                                    $('.groupCont').text("")
+                                    $('.groupTit').text("")
                                 }
                                 else {
                                     $('#cate').val(this.name)
                                     $('.otherFilt').show()
-                                    $('#groupCont').text(this.name)
-                                    $('#groupTit').text("Group Category")
+                                    $('.groupCont').text(this.name)
+                                    $('.groupTit').text("Group Category")
                                 }
                                 $('#region').val("*")
                                 $('#age').val("*")
@@ -280,14 +280,14 @@
                                 if(this.category == $('#cause').val()){
                                     $('#cause').val("")
                                     $('.otherFilt').hide()
-                                    $('#groupCont').text("")
-                                    $('#groupTit').text("")
+                                    $('.groupCont').text("")
+                                    $('.groupTit').text("")
                                 }
                                 else {
                                     $('#cause').val(this.category)
                                     $('.otherFilt').show()
-                                    $('#groupCont').text(this.category)
-                                    $('#groupTit').text("Group Root Cause")
+                                    $('.groupCont').text(this.category)
+                                    $('.groupTit').text("Group Root Cause")
                                 }
                                 $('#region').val("*")
                                 $('#age').val("*")
@@ -385,14 +385,14 @@
                                 if(this.category == $('#maintain').val()){
                                     $('#maintain').val("")
                                     $('.otherFilt').hide()
-                                    $('#groupCont').text("")
-                                    $('#groupTit').text("")
+                                    $('.groupCont').text("")
+                                    $('.groupTit').text("")
                                 }
                                 else {
                                     $('#maintain').val(this.category)
                                     $('.otherFilt').show()
-                                    $('#groupCont').text(this.category)
-                                    $('#groupTit').text("Maintainance Unit")
+                                    $('.groupCont').text(this.category)
+                                    $('.groupTit').text("Maintainance Unit")
                                 }
                                 $('#region').val("*")
                                 $('#age').val("*")
@@ -456,14 +456,14 @@
                                 if(this.name.split(" ")[1] == $('#region').val()){
                                     $('#region').val("*")
                                     $('.otherFilt').hide()
-                                    $('#groupCont').text("")
-                                    $('#groupTit').text("")
+                                    $('.groupCont').text("")
+                                    $('.groupTit').text("")
                                 }
                                 else {
                                     $('#region').val(this.name.split(" ")[1])
                                     $('.otherFilt').show()
-                                    $('#groupCont').text(this.name)
-                                    $('#groupTit').text("Group Region")
+                                    $('.groupCont').text(this.name)
+                                    $('.groupTit').text("Group Region")
                                 }
                                 $('#complain').val("*")
                                 $('#age').val("*")
@@ -527,14 +527,14 @@
                                 if(this.name == $('#age').val()){
                                     $('#age').val("*")
                                     $('.otherFilt').hide()
-                                    $('#groupCont').text("")
-                                    $('#groupTit').text("")
+                                    $('.groupCont').text("")
+                                    $('.groupTit').text("")
                                 }
                                 else {
                                     $('#age').val(this.name)
                                     $('.otherFilt').show()
-                                    $('#groupCont').text(this.name)
-                                    $('#groupTit').text("Group Age")
+                                    $('.groupCont').text(this.name)
+                                    $('.groupTit').text("Group Age")
                                 }
                                 $('#region').val("*")
                                 $('#complain').val("*")
@@ -607,14 +607,14 @@
                                 if(this.name == $('#package').val()){
                                     $('#package').val("*")
                                     $('.otherFilt').hide()
-                                    $('#groupCont').text("")
-                                    $('#groupTit').text("")
+                                    $('.groupCont').text("")
+                                    $('.groupTit').text("")
                                 }
                                 else {
                                     $('#package').val(this.name)
                                     $('.otherFilt').show()
-                                    $('#groupCont').text(this.name)
-                                    $('#groupTit').text("Group Package")
+                                    $('.groupCont').text(this.name)
+                                    $('.groupTit').text("Group Package")
                                 }
                                 $('#region').val("*")
                                 $('#age').val("*")
@@ -937,17 +937,17 @@
                 $('#complain').val("*")
 
                 $('.otherFilt').show()
-                $('#groupTit').text("Group Contract")
+                $('.groupTit').text("Group Contract")
                 var titContract = $('#contractGrp').val()
                 if(titContract.indexOf("_") == 0)
                     titContract = titContract.substring(1, titContract.length)
-                $('#groupCont').text(titContract)
+                $('.groupCont').text(titContract)
                 ajaxGetChurnDetect("churn2")
             }
         })
 
         // click apply fitler
-        $('#apply').click(function () {
+        $('.apply').click(function () {
             $('#contractGrp').val("*")
             $('#region').val("*")
             $('#age').val("*")
@@ -957,13 +957,13 @@
             $('#maintain').val("")
             $('#complain').val("*")
             $('.otherFilt').hide()
-            $('#groupTit').text("")
-            $('#groupCont').text("")
+            $('.groupTit').text("")
+            $('.groupCont').text("")
             ajaxGetChurnDetect("*")
         })
 
         // click refresh fitler
-        $('#refresh').click(function () {
+        $('.refresh').click(function () {
             $("#monthGrp").datepicker("update", $('#monthCurr').val())
             $('#slStatus').val("*")
             $('#contractGrp').val("*")
@@ -975,8 +975,8 @@
             $('#maintain').val("")
             $('#complain').val("*")
             $('.otherFilt').hide()
-            $('#groupTit').text("")
-            $('#groupCont').text("")
+            $('.groupTit').text("")
+            $('.groupCont').text("")
             ajaxGetChurnDetect("*")
         })
 
@@ -988,7 +988,7 @@
                 data:  fields,
                 type:"POST",
                 beforeSend: function () {
-                    $('.divGroup').waitMe({
+                    $('.divLeft').waitMe({
                         effect: 'progressBar',
                         text: 'Please wait...',
                         bg: 'rgba(255,255,255,0.7)',
@@ -1048,11 +1048,11 @@
                                     $('#complain').val("*")
 
                                     $('.otherFilt').show()
-                                    $('#groupTit').text("Group Contract")
+                                    $('.groupTit').text("Group Contract")
                                     var titContract = $('#contractGrp').val()
                                     if(titContract.indexOf("_") == 0)
                                         titContract = titContract.substring(1, titContract.length)
-                                    $('#groupCont').text(titContract)
+                                    $('.groupCont').text(titContract)
                                     ajaxGetChurnDetect("churn2")
                                 }
                             })
@@ -1083,14 +1083,14 @@
                                                         if (this.name == $('#complain').val()) {
                                                             $('#complain').val("*")
                                                             $('.otherFilt').hide()
-                                                            $('#groupCont').text("")
-                                                            $('#groupTit').text("")
+                                                            $('.groupCont').text("")
+                                                            $('.groupTit').text("")
                                                         }
                                                         else {
                                                             $('#complain').val(this.name)
                                                             $('.otherFilt').show()
-                                                            $('#groupCont').text(this.name)
-                                                            $('#groupTit').text("Group Complain")
+                                                            $('.groupCont').text(this.name)
+                                                            $('.groupTit').text("Group Complain")
                                                         }
                                                         $('#region').val("*")
                                                         $('#age').val("*")
@@ -1265,7 +1265,7 @@
 
                 },
                 complete: function () {
-                    $('.divGroup').waitMe("hide");
+                    $('.divLeft').waitMe("hide");
                 }
             });
         }
@@ -1276,7 +1276,7 @@
             "csrfToken"   : token,
             "groupCt"     : $('#contractGrp').val(),
             "month"       : $('#monthGrp').val(),
-            "status"      : $('#slStatus').val(),
+            "status"      : $('.slStatus').val(),
             "cate"        : $('#cate').val(),
             "maintain"    : $('#maintain').val(),
             "cause"       : $('#cause').val(),

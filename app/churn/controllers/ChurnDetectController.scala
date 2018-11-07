@@ -29,19 +29,19 @@ import services.domain.CommonService
 @Singleton
 class ChurnDetectController @Inject() (cc: ControllerComponents) extends AbstractController(cc) with Secured{
 
-  def index() = Action { implicit request =>
+  def index() = withAuth {username => implicit request: Request[AnyContent] =>
     val month = CommonService.getPrevMonth()
-    //try {
+    try {
       val rs = ChurnDetectService.getInternet(null)
-      Ok(churn.views.html.detect.index(rs, month, "admin", churn.controllers.routes.ChurnDetectController.index()))
-    /*}
+      Ok(churn.views.html.detect.index(rs, month, username, churn.controllers.routes.ChurnDetectController.index()))
+    }
     catch {
-      case e: Exception => Ok(churn.views.html.detect.index(null, month, "", churn.controllers.routes.ChurnDetectController.index()))
-    }*/
+      case e: Exception => Ok(churn.views.html.detect.index(null, month, username, churn.controllers.routes.ChurnDetectController.index()))
+    }
   }
 
   def exportCSV() = withAuth {username => implicit request: Request[AnyContent] =>
-    //try{
+    try{
      /* val contractGrp = request.body.asFormUrlEncoded.get("groupCt").head
       val maintain = request.body.asFormUrlEncoded.get("maintain").head
       val cate = if(request.body.asFormUrlEncoded.get("cate").head == "") "" else "\"" + request.body.asFormUrlEncoded.get("cate").head + "\""
@@ -61,14 +61,14 @@ class ChurnDetectController @Inject() (cc: ControllerComponents) extends Abstrac
         "limit" -> isLimit
       )
       Ok(Json.toJson(rs))
-    /*}
+    }
     catch{
       case e: Exception => Ok("Error")
-    }*/
+    }
   }
 
   def getJsonChurn() = withAuth {username => implicit request: Request[AnyContent] =>
-    //try{
+    try{
       val rs = ChurnDetectService.getInternet(request)
       val churn1 = Json.obj(
         "numCt"     -> CommonService.formatPattern(rs.cardMetrics._1),
@@ -183,10 +183,10 @@ class ChurnDetectController @Inject() (cc: ControllerComponents) extends Abstrac
         "splot5"       -> splot5
       )
       Ok(Json.toJson(json))
-    /*}
+    }
     catch{
       case e: Exception => Ok("Error")
-    }*/
+    }
 
   }
 

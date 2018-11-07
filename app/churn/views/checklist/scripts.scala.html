@@ -4,12 +4,22 @@
 @import churn.utils.AgeGroupUtil
 
 <script type="text/javascript">
-        var widthChart  = $(window).width()
-        var heightChart_region = $(window).height() * 0.46
-        var heightChart_type   = $(window).height() * 0.67
-        if($(window).width() > 991){
-            widthChart = $(window).width()*0.4
+
+        var heightChart_type   = $(window).height() * 0.80
+        var widthChart  = $(window).width() * 0.8
+        var heightChart_region = $(window).height() * 0.41
+        var textSpace = 40
+        // small desktop
+        if($(window).width() >= 991 && $(window).width()<= 1169){
+            widthChart = $(window).width() * 0.6
+            heightChart_region = $(window).height() * 0.52
         }
+        // large desktop
+        if($(window).width() > 1169){
+            widthChart = $(window).width() * 0.4
+            textSpace = 20
+        }
+
         var options = {
             title: 'Churn Rate (%)',
             hAxis: {title: '',gridlines: {count: 13, color: 'transparent'}},
@@ -92,7 +102,10 @@
                 textStyle : {
                     color:'#1c2752',
                     fontSize: 11
-                }
+                },
+                maxAlternation: 2, // use a maximum of 1 line of labels
+                showTextEvery: 1, // show every label if possible
+                minTextSpacing: textSpace // minimum spacing between adjacent labels, in pixels
             },
             vAxis: {
                 title: 'Region',
@@ -130,7 +143,7 @@
         google.setOnLoadCallback(drawChart);
 
         function drawChart() {
-            $('#monthPicker').datepicker({
+            $('.monthPicker').datepicker({
                 autoclose: true,
                 minViewMode: 1,
                 endDate: '-1m',
@@ -319,7 +332,17 @@
             var mouseX;
             var mouseY;
             $(document).mousemove(function(e) {
-                mouseY = e.pageY - 290;
+                if($(window).width() < 992){
+                    mouseX = e.pageX +115
+                    mouseY = 800
+                }
+                else if($(window).width() >= 992 && $(window).width() < 1024){
+                    mouseX = e.pageX -125
+                    mouseY = 380
+                }
+                else{
+                    mouseY = e.pageY -290
+                }
             });
 
             function handlerOut() {
@@ -362,19 +385,25 @@
                             click: function (event) {
                                 var age = getIdBynameAge(event.point.series.xAxis.categories[event.point.x])
                                 var region = event.point.series.yAxis.categories[event.point.y].split(" ")[1]
-                                $('#txtTime').text("").hide()
-                                $('#txtType').text("").hide()
+                                $('.txtTime').text("")
+                                $('.timeDiv').hide()
+                                $('.txtType').text("")
+                                $('.typeDiv').hide()
                                 if(age == $('#age').val() && region == $('#region').val()){
                                     $('#region').val("")
                                     $('#age').val("")
-                                    $('#txtAge').text("").hide()
-                                    $('#txtRegion').text("").hide()
+                                    $('.txtRegion').text("")
+                                    $('.regionDiv').hide()
+                                    $('.txtAge').text("")
+                                    $('.ageDiv').hide()
                                 }
                                 else{
                                     $('#region').val(region)
                                     $('#age').val(age)
-                                    $('#txtAge').text(getNameByIdAge(age)).show()
-                                    $('#txtRegion').text('Vung '+region).show()
+                                    $('.txtRegion').text("Vung "+region)
+                                    $('.regionDiv').show()
+                                    $('.txtAge').text(getNameByIdAge(age))
+                                    $('.ageDiv').show()
                                 }
                                 $('#typeCurr').val("")
                                 $('#time').val("")
@@ -462,19 +491,25 @@
                             click: function (event) {
                                 var time = event.point.series.xAxis.categories[event.point.x].split(" ")[0]
                                 var region = event.point.series.yAxis.categories[event.point.y].split(" ")[1]
-                                $('#txtType').text("").hide()
-                                $('#txtAge').text("").hide()
+                                $('.txtAge').text("")
+                                $('.ageDiv').hide()
+                                $('.txtType').text("")
+                                $('.typeDiv').hide()
                                 if(time == $('#time').val() && region == $('#region').val()){
                                     $('#region').val("")
                                     $('#time').val("")
-                                    $('#txtTime').text("").hide()
-                                    $('#txtRegion').text("").hide()
+                                    $('.txtTime').text("")
+                                    $('.timeDiv').hide()
+                                    $('.txtRegion').text("")
+                                    $('.regionDiv').hide()
                                 }
                                 else{
                                     $('#region').val(region)
                                     $('#time').val(time)
-                                    $('#txtTime').text(time+" hours").show()
-                                    $('#txtRegion').text('Vung '+region).show()
+                                    $('.txtTime').text(time+" hours")
+                                    $('.timeDiv').show()
+                                    $('.txtRegion').text("Vung "+region)
+                                    $('.regionDiv').show()
                                 }
                                 $('#typeCurr').val("")
                                 $('#age').val("")
@@ -567,19 +602,25 @@
                             click: function (event) {
                                 var _type = event.point.series.xAxis.categories[event.point.x]
                                 var region = event.point.series.yAxis.categories[event.point.y].split(" ")[1]
-                                $('#txtTime').text("").hide()
-                                $('#txtAge').text("").hide()
+                                $('.txtAge').text("")
+                                $('.ageDiv').hide()
+                                $('.txtTime').text("")
+                                $('.timeDiv').hide()
                                 if(_type == $('#typeCurr').val() && region == $('#region').val()){
                                     $('#region').val("")
                                     $('#typeCurr').val("")
-                                    $('#txtType').text("").hide()
-                                    $('#txtRegion').text("").hide()
+                                    $('.txtRegion').text("")
+                                    $('.regionDiv').hide()
+                                    $('.txtType').text("")
+                                    $('.typeDiv').hide()
                                 }
                                 else{
                                     $('#region').val(region)
                                     $('#typeCurr').val(_type)
-                                    $('#txtType').text(_type).show()
-                                    $('#txtRegion').text('Vung '+region).show()
+                                    $('.txtRegion').text("Vung "+region)
+                                    $('.regionDiv').show()
+                                    $('.txtType').text(_type)
+                                    $('.typeDiv').show()
                                 }
                                 $('#time').val("")
                                 $('#age').val("")
@@ -686,7 +727,13 @@
                     var percent = dataRegionHuyDv.getValue(event.row, 4);
                     var contracts = dataRegionHuyDv.getValue(event.row, 5);
                     var x = mouseX - 225;
-                    var y = mouseY - 350;
+                    if($(window).width() < 992){
+                        mouseY = mouseY - 870
+                    }
+                    else{
+                        mouseY = mouseY -450
+                    }
+                    var y = mouseY
                     $('#churn4_tooltip').html('<div><p><b>Month:</b> ' + keyByValue(catesMonthRegion, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
                             '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contract:</b> '+contracts+'</p></div>').css({
                         'top': y,
@@ -742,22 +789,28 @@
                 chartHuyDv.draw(dataHuyDv, options);
                 google.visualization.events.addListener(chartHuyDv, 'select', function () {
                     var selection = chartHuyDv.getSelection()
-                    $('#txtType').text("").hide()
-                    $('#txtTime').text("").hide()
+                    $('.txtType').text("")
+                    $('.typeDiv').hide()
+                    $('.txtTime').text("")
+                    $('.timeDiv').hide()
                     if(selection.length >0) {
                         var row = selection[0].row;
                         var region = dataHuyDv.getValue(row, 2)
                         var age = dataHuyDv.getValue(row, 1)
                         $('#age').val(age)
                         $('#region').val(region)
-                        $('#txtAge').text(getNameByIdAge(age)).show()
-                        $('#txtRegion').text('Vung ' +region).show()
+                        $('.txtAge').text(getNameByIdAge(age))
+                        $('.ageDiv').show()
+                        $('.txtRegion').text("Vung "+region)
+                        $('.regionDiv').show()
                     }
                     else{
                         $('#age').val("")
                         $('#region').val("")
-                        $('#txtAge').text("").hide()
-                        $('#txtRegion').text("").hide()
+                        $('.txtAge').text("")
+                        $('.ageDiv').hide()
+                        $('.txtRegion').text("")
+                        $('.regionDiv').hide()
                     }
                     $('#time').val("")
                     $('#typeCurr').val("")
@@ -770,7 +823,13 @@
                     var percent = dataHuyDv.getValue(event.row, 4);
                     var contracts = dataHuyDv.getValue(event.row, 5);
                     var x = mouseX - 225;
-                    var y = mouseY - 350;
+                    if($(window).width() < 992){
+                        mouseY = mouseY - 870
+                    }
+                    else{
+                        mouseY = mouseY -450
+                    }
+                    var y = mouseY
                     $('#churn6_tooltip').html('<div><p><b>Age:</b> ' + keyByValue( catesAge, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
                             '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contract:</b> '+contracts+'</p></div>').css({
                         'top': y,
@@ -821,22 +880,28 @@
                 chartTypeHuyDv.draw(dataTypeHuyDv, optionsType);
                 google.visualization.events.addListener(chartTypeHuyDv, 'select', function () {
                     var selection = chartTypeHuyDv.getSelection()
-                    $('#txtAge').text("").hide()
-                    $('#txtTime').text("").hide()
+                    $('.txtAge').text("")
+                    $('.ageDiv').hide()
+                    $('.txtTime').text("")
+                    $('.timeDiv').hide()
                     if(selection.length >0) {
                         var row = selection[0].row;
                         var region = dataTypeHuyDv.getValue(row, 2)
                         var _type = keyByValue(catesType, dataTypeHuyDv.getValue(row, 1))
                         $('#typeCurr').val(_type)
                         $('#region').val(region)
-                        $('#txtType').text(_type).show()
-                        $('#txtRegion').text('Vung ' +region).show()
+                        $('.txtType').text(_type)
+                        $('.typeDiv').show()
+                        $('.txtRegion').text("Vung "+region)
+                        $('.regionDiv').show()
                     }
                     else{
                         $('#typeCurr').val("")
                         $('#region').val("")
-                        $('#txtType').text("").hide()
-                        $('#txtRegion').text("").hide()
+                        $('.txtType').text("")
+                        $('.typeDiv').hide()
+                        $('.txtRegion').text("")
+                        $('.regionDiv').hide()
                     }
                     $('#time').val("")
                     $('#age').val("")
@@ -849,7 +914,13 @@
                     var percent = dataTypeHuyDv.getValue(event.row, 4);
                     var contracts = dataTypeHuyDv.getValue(event.row, 5);
                     var x = mouseX - 225;
-                    var y = mouseY - 350;
+                    if($(window).width() < 992){
+                        mouseY = mouseY - 870
+                    }
+                    else{
+                        mouseY = mouseY -450
+                    }
+                    var y = mouseY
                     $('#churn9_tooltip').html('<div><p><b>Type:</b> ' + keyByValue(catesType, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
                             '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contract:</b> '+contracts+'</p></div>').css({
                         'top': y,
@@ -868,10 +939,14 @@
                 $('#region').val("")
                 $('#age').val("")
                 $('#typeCurr').val("")
-                $('#txtAge').text("").hide()
-                $('#txtRegion').text("").hide()
-                $('#txtTime').text("").hide()
-                $('#txtType').text("").hide()
+                $('.txtType').text("")
+                $('.typeDiv').hide()
+                $('.txtRegion').text("")
+                $('.regionDiv').hide()
+                $('.txtAge').text("")
+                $('.ageDiv').hide()
+                $('.txtTime').text("")
+                $('.timeDiv').hide()
                 ajaxGetChurnChecklist("*")
             })
 
@@ -880,14 +955,17 @@
                 $('#region').val("")
                 $('#age').val("")
                 $('#typeCurr').val("")
-                $("#monthPicker").datepicker("update", $('#monthCurr').val())
+                $(".monthPicker").datepicker("update", $('#monthCurr').val())
                 $('#month').val($('#monthCurr').val())
-                $('#slStatus').val("1")
-
-                $('#txtAge').text("").hide()
-                $('#txtRegion').text("").hide()
-                $('#txtTime').text("").hide()
-                $('#txtType').text("").hide()
+                $('.slStatus').val("1")
+                $('.txtType').text("")
+                $('.typeDiv').hide()
+                $('.txtRegion').text("")
+                $('.regionDiv').hide()
+                $('.txtAge').text("")
+                $('.ageDiv').hide()
+                $('.txtTime').text("")
+                $('.timeDiv').hide()
                 ajaxGetChurnChecklist("*")
             })
 
@@ -899,7 +977,7 @@
                     data:  fields,
                     type:"POST",
                     beforeSend: function () {
-                        $('.divGroup').waitMe({
+                        $('.divLeft').waitMe({
                             effect: 'progressBar',
                             text: 'Please wait...',
                             bg: 'rgba(255,255,255,0.7)',
@@ -997,7 +1075,13 @@
                                 var percent = dataRegionMonth.getValue(event.row, 4);
                                 var contracts = dataRegionMonth.getValue(event.row, 5);
                                 var x = mouseX - 225;
-                                var y = mouseY - 350;
+                                if($(window).width() < 992){
+                                    mouseY = mouseY - 870
+                                }
+                                else{
+                                    mouseY = mouseY -450
+                                }
+                                var y = mouseY
                                 $('#churn4_tooltip').html('<div><p><b>Month:</b> ' + keyByValue(dta.churn4.catesMonth, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
                                         '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contract:</b> '+contracts+'</p></div>').css({
                                     'top': y,
@@ -1064,22 +1148,28 @@
                                 chartRegionAge.draw(dataRegionAge, options);
                                 google.visualization.events.addListener(chartRegionAge, 'select', function () {
                                     var selection = chartRegionAge.getSelection()
-                                    $('#txtType').text("").hide()
-                                    $('#txtTime').text("").hide()
+                                    $('.txtType').text("")
+                                    $('.txtTime').text("")
+                                    $('.timeDiv').hide()
+                                    $('.typeDiv').hide()
                                     if(selection.length >0) {
                                         var row = selection[0].row;
                                         var region = dataRegionAge.getValue(row, 2)
                                         var age = dataRegionAge.getValue(row, 1)
                                         $('#age').val(age)
                                         $('#region').val(region)
-                                        $('#txtAge').text(getNameByIdAge(age)).show()
-                                        $('#txtRegion').text('Vung ' +region).show()
+                                        $('.txtAge').text(getNameByIdAge(age))
+                                        $('.ageDiv').show()
+                                        $('.txtRegion').text("Vung "+region)
+                                        $('.regionDiv').show()
                                     }
-                                    else{
+                                    else {
                                         $('#age').val("")
                                         $('#region').val("")
-                                        $('#txtAge').text("").hide()
-                                        $('#txtRegion').text("").hide()
+                                        $('.txtAge').text("")
+                                        $('.ageDiv').hide()
+                                        $('.txtRegion').text("")
+                                        $('.regionDiv').hide()
                                     }
                                     $('#time').val("")
                                     $('#typeCurr').val("")
@@ -1092,7 +1182,13 @@
                                     var percent = dataRegionAge.getValue(event.row, 4);
                                     var contracts = dataRegionAge.getValue(event.row, 5);
                                     var x = mouseX - 225;
-                                    var y = mouseY - 350;
+                                    if($(window).width() < 992){
+                                        mouseY = mouseY - 870
+                                    }
+                                    else{
+                                        mouseY = mouseY -450
+                                    }
+                                    var y = mouseY
                                     $('#churn6_tooltip').html('<div><p><b>Age:</b> ' + keyByValue( catesAge, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
                                             '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contract:</b> '+contracts+'</p></div>').css({
                                         'top': y,
@@ -1154,22 +1250,28 @@
                                 chartRegionType.draw(dataRegionType, optionsType);
                                 google.visualization.events.addListener(chartRegionType, 'select', function () {
                                     var selection = chartRegionType.getSelection()
-                                    $('#txtAge').text("").hide()
-                                    $('#txtTime').text("").hide()
+                                    $('.txtAge').text("")
+                                    $('.ageDiv').hide()
+                                    $('.txtTime').text("")
+                                    $('.timeDiv').hide()
                                     if (selection.length > 0) {
                                         var row = selection[0].row;
                                         var region = dataRegionType.getValue(row, 2)
                                         var _type = keyByValue(dta.churn9.catesType, dataRegionType.getValue(row, 1))
                                         $('#typeCurr').val(_type)
                                         $('#region').val(region)
-                                        $('#txtType').text(_type).show()
-                                        $('#txtRegion').text('Vung ' + region).show()
+                                        $('.txtType').text(_type)
+                                        $('.typeDiv').show()
+                                        $('.txtRegion').text("Vung "+region)
+                                        $('.regionDiv').show()
                                     }
                                     else {
                                         $('#typeCurr').val("")
                                         $('#region').val("")
-                                        $('#txtType').text("").hide()
-                                        $('#txtRegion').text("").hide()
+                                        $('.txtType').text("")
+                                        $('.typeDiv').hide()
+                                        $('.txtRegion').text("")
+                                        $('.regionDiv').hide()
                                     }
                                     $('#time').val("")
                                     $('#age').val("")
@@ -1182,7 +1284,13 @@
                                     var percent = dataRegionType.getValue(event.row, 4);
                                     var contracts = dataRegionType.getValue(event.row, 5);
                                     var x = mouseX - 225;
-                                    var y = mouseY - 350;
+                                    if($(window).width() < 992){
+                                        mouseY = mouseY - 870
+                                    }
+                                    else{
+                                        mouseY = mouseY -450
+                                    }
+                                    var y = mouseY
                                     $('#churn9_tooltip').html('<div><p><b>Type:</b> ' + keyByValue(dta.churn9.catesType, xAxis) + '</p><p><b>Region:</b> ' + yAxis +
                                             '</p><p><b>Rate:</b> ' + rate + ' %</p><p><b>Percent:</b> ' + percent + ' %</p><p><b>Number of contract:</b> ' + contracts + '</p></div>').css({
                                         'top': y,
@@ -1198,7 +1306,7 @@
 
                     },
                     complete: function () {
-                        $('.divGroup').waitMe("hide");
+                        $('.divLeft').waitMe("hide");
                     }
                 });
             }
@@ -1213,7 +1321,7 @@
                 "topType"     : $('#typeArr').val(),
                 "processTime" : $('#time').val(),
                 "month"       : $('#month').val(),
-                "status"      : $('#slStatus').val()
+                "status"      : $('.slStatus').val()
             }
             //console.log(obj)
             return obj
