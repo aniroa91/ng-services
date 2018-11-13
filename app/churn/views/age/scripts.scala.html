@@ -128,7 +128,7 @@
                         });
                 });
                 chartHuyDv.draw(dataHuyDv, options);
-                google.visualization.events.addListener(chartHuyDv, 'select', function () {
+                google.visualization.events.addListener(chartHuyDv, 'select', function (e) {
                         var selection = chartHuyDv.getSelection();
                         if(selection.length >0) {
                                 var row = selection[0].row;
@@ -173,6 +173,15 @@
                 function handlerOut() {
                         $('.custom_tooltip').hide();
                 }
+                google.visualization.events.addListener(chartHuyDv, 'onmousedown', function (event) {
+                        document.oncontextmenu = function() {
+                                var age = dataHuyDv.getValue(Number(event.targetID.split('#')[2]), 1)
+                                var region = dataHuyDv.getValue(Number(event.targetID.split('#')[2]), 2)
+                                var ageGroup = getNameByIdAge(Number(age))
+                                if(ageGroup == "06-12") ageGroup = "6-12"
+                                window.location.href = "/churn/search?contract=Age:"+ageGroup+"_Region:"+region
+                        };
+                });
                 google.visualization.events.addListener(chartHuyDv, 'onmouseover', function (event) {
                         var rate = dataHuyDv.getValue(event.row, 3);
                         var xAxis = dataHuyDv.getValue(event.row, 1);
@@ -242,10 +251,6 @@
                                         point: {
                                                 events: {
                                                         click: function () {
-                                                              /*  for (var i = 0; i < this.series.data.length; i++) {
-                                                                        this.series.data[i].update({ color: '#73879C' }, true, false);
-                                                                }
-                                                                this.update({ color: '#ECB631' }, true, false)*/
                                                                 $('#region').val("")
                                                                 $('.txtRegion').text("")
                                                                 $('.regionDiv').hide()
@@ -262,6 +267,11 @@
                                                                         $('.divStatus').attr('style','height:110px;padding-top: 15px')
                                                                 }
                                                                 ajaxGetChurn("age")
+                                                        },
+                                                        contextmenu: function () {
+                                                                var ageGroup = this.category
+                                                                if(ageGroup == "06-12") ageGroup = "6-12"
+                                                                window.location.href = "/churn/search?contract=Age:"+ageGroup
                                                         }
                                                 }
                                         }
@@ -287,7 +297,7 @@
                         colors : ['#149c7f','#dc5a78'],
 
                         xAxis: {
-                                categories: @Html(Json.stringify(Json.toJson(rs._3.map(x=>x._1)))),
+                            categories: @Html(Json.stringify(Json.toJson(rs._3.map(x=>x._1)))),
                             labels: {
                                 useHTML: true,//set to true
                                 style: {
@@ -324,6 +334,18 @@
                                 },
                                 opposite: true
                         }],
+                        plotOptions: {
+                                series: {
+                                        cursor: 'pointer',
+                                        point: {
+                                                events: {
+                                                        contextmenu: function () {
+                                                                window.location.href = "/churn/search?contract=Month:"+this.category
+                                                        }
+                                                }
+                                        }
+                                }
+                        },
                         tooltip: {
                                 shared: true
                         },
@@ -449,6 +471,15 @@
                                                             }
                                                             ajaxGetChurn("regionAge")
                                                     });
+                                                    google.visualization.events.addListener(chartStatus, 'onmousedown', function (event) {
+                                                            document.oncontextmenu = function() {
+                                                                    var age = dataStatus.getValue(Number(event.targetID.split('#')[2]), 1)
+                                                                    var region = dataStatus.getValue(Number(event.targetID.split('#')[2]), 2)
+                                                                    var ageGroup = getNameByIdAge(Number(age))
+                                                                    if(ageGroup == "06-12") ageGroup = "6-12"
+                                                                    window.location.href = "/churn/search?contract=Age:"+ageGroup+"_Region:"+region
+                                                            };
+                                                    });
                                                     google.visualization.events.addListener(chartStatus, 'onmouseover', function (event) {
                                                             var rate = dataStatus.getValue(event.row, 3);
                                                             var xAxis = dataStatus.getValue(event.row, 1);
@@ -467,7 +498,7 @@
                                             }
                                         }
                                         else{
-                                                alert("Error when excute query. Please check again your system!")
+                                                alert("Error when execute query. Please check again your system!")
                                         }
                                 },
                                 complete: function () {

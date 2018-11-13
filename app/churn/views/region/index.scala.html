@@ -126,6 +126,17 @@
                     display: inline-block;
                     vertical-align: middle;
                 }
+                .noData-title{
+                    margin-top: 21px;
+                    margin-bottom: 13px;
+                    text-align: center;
+                    text-transform: uppercase;
+                    font-weight: 300;
+                    background: #fff;
+                    font-size: 30px;
+                    color: #f60;
+                    padding: 20px;
+                }
                 .highcharts-tooltip>span {
                     border: 1px solid silver;
                     border-radius: 3px;
@@ -574,6 +585,7 @@
         <script src="/assets/javascripts/highcharts.js"></script>
         <script src="/assets/javascripts/heatmap.js"></script>
         <script src="/assets/javascripts/exporting.js"></script>
+        <script src="/assets/javascripts/highcharts-customEvent.js"></script>
 
         @if(rs != null) {
             @scripts(rs)

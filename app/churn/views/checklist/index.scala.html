@@ -134,7 +134,17 @@
                 }
                 .highcharts-credits{display: none}
                 .highcharts-contextbutton{display: none}
-
+                .noData-title{
+                    margin-top: 21px;
+                    margin-bottom: 13px;
+                    text-align: center;
+                    text-transform: uppercase;
+                    font-weight: 300;
+                    background: #fff;
+                    font-size: 30px;
+                    color: #f60;
+                    padding: 20px;
+                }
                 .overlay {
                     width: 98px;
                     height: 155px;
@@ -631,6 +641,7 @@
             <script src="/assets/javascripts/highcharts.js"></script>
             <script src="/assets/javascripts/heatmap.js"></script>
             <script src="/assets/javascripts/exporting.js"></script>
+            <script src="/assets/javascripts/highcharts-customEvent.js"></script>
 
             @if(rs != null) {
                 @scripts(rs)

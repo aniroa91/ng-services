@@ -39,7 +39,6 @@ class ChurnAgeController @Inject() (cc: ControllerComponents) extends AbstractCo
     }
   }
 
-
   def getJsonChurn() = withAuth {username => implicit request: Request[AnyContent] =>
    try{
       val rs = ChurnAgeService.getInternet(request)

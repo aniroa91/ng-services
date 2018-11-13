@@ -45,6 +45,17 @@
             .txtFilter{
                 color: #fff; background: #16a085;padding: 2px
             }
+            .noData-title{
+                margin-top: 21px;
+                margin-bottom: 13px;
+                text-align: center;
+                text-transform: uppercase;
+                font-weight: 300;
+                background: #fff;
+                font-size: 30px;
+                color: #f60;
+                padding: 20px;
+            }
             .txtInput{
                 text-align: center;cursor: pointer;background-color: white!important;height: 20px
             }
@@ -443,7 +454,7 @@
         <script src="/assets/javascripts/jsapi.js"></script>
             <!-- High chart -->
         <script src="/assets/javascripts/highcharts.js"></script>
-
+        <script src="/assets/javascripts/highcharts-customEvent.js"></script>
         @if(rs != null) {
             @scripts(rs)
         }

@@ -453,18 +453,19 @@ object  ChurnDetectService{
     rss.map(x=> (x._1.toString().replace("\"", ""), x._2.toString().toLong))
   }
 
-  def getInternet(request: Request[AnyContent]) = {
+  def getInternet(request: Request[AnyContent], isFwd: Int) = {
     var status = "status:*"
     var contractGrp = "*"
-    var region = "*"
-    var packages = "*"
-    var age = "*"
+    var region = request.flash.get("Region").getOrElse("*")
+    var packages = request.flash.get("TenGoi").getOrElse("*")
+    if(packages != "*") packages = "\"" + packages + "\""
+    var age = request.flash.get("Age").getOrElse("*")
     var complain = "*"
     var cause = ""
     var maintain = ""
     var cate = ""
-    var month = CommonService.getPrevMonth()
-    if(request != null) {
+    var month = request.flash.get("Month").getOrElse(CommonService.getPrevMonth())
+    if(isFwd == 1) {
       contractGrp = request.body.asFormUrlEncoded.get("groupCt").head
       status = "status:"+request.body.asFormUrlEncoded.get("status").head
       month = request.body.asFormUrlEncoded.get("month").head
@@ -476,6 +477,7 @@ object  ChurnDetectService{
       region = request.body.asFormUrlEncoded.get("region").head
       age = request.body.asFormUrlEncoded.get("age").head
     }
+    println(age + " vs "+region)
     val time = System.currentTimeMillis()
     // chart 1
     val numContract  = getContractByMonth("churn-detect-problem-*", s"month:2018-07 AND $complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", contractGrp, maintain, cate, cause)

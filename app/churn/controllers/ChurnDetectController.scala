@@ -32,7 +32,7 @@ class ChurnDetectController @Inject() (cc: ControllerComponents) extends Abstrac
   def index() = withAuth {username => implicit request: Request[AnyContent] =>
     val month = CommonService.getPrevMonth()
     try {
-      val rs = ChurnDetectService.getInternet(null)
+      val rs = ChurnDetectService.getInternet(request, 0)
       Ok(churn.views.html.detect.index(rs, month, username, churn.controllers.routes.ChurnDetectController.index()))
     }
     catch {
@@ -69,7 +69,7 @@ class ChurnDetectController @Inject() (cc: ControllerComponents) extends Abstrac
 
   def getJsonChurn() = withAuth {username => implicit request: Request[AnyContent] =>
     try{
-      val rs = ChurnDetectService.getInternet(request)
+      val rs = ChurnDetectService.getInternet(request, 1)
       val churn1 = Json.obj(
         "numCt"     -> CommonService.formatPattern(rs.cardMetrics._1),
         "churnCt"   -> CommonService.formatPattern(rs.cardMetrics._2),
@@ -190,5 +190,12 @@ class ChurnDetectController @Inject() (cc: ControllerComponents) extends Abstrac
 
   }
 
-
+  def getFormContract(contract: String) = withAuth {username => implicit request: Request[AnyContent] =>
+    val key1    = if(contract.indexOf("_")>=0) contract.split("_")(0).split(":")(0) else contract.split(":")(0)
+    val values1 = if(contract.indexOf("_")>=0) contract.split("_")(0).split(":")(1) else contract.split(":")(1)
+    val key2    = if(contract.indexOf("_")>=0) contract.split("_")(1).split(":")(0) else ""
+    val values2 = if(contract.indexOf("_")>=0) contract.split("_")(1).split(":")(1) else ""
+    println(key1 +" vs "+ key2)
+    Redirect(churn.controllers.routes.ChurnDetectController.index()).flashing( key1 -> values1, key2 -> values2)
+  }
 }

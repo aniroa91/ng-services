@@ -26,7 +26,7 @@
                 }
             },
             vAxis: {
-                title: 'Profile',
+                title: 'Package',
                 gridlines: {
                     count: 10,
                     color: '#f0f0f0'
@@ -62,7 +62,7 @@
             title: 'Churn Rate (%)',
             hAxis: {title: 'Age',gridlines: {count: 13,color: 'transparent'}},
             vAxis: {
-                title: 'Profile',
+                title: 'Package',
                 gridlines: {count: 10,color: '#f0f0f0'},
                 textStyle : {
                     fontSize: 9
@@ -250,7 +250,13 @@
                 $('.ageDiv').hide()
                 ajaxGetChurn("profileMonth")
             });
-
+            google.visualization.events.addListener(chartHuyDv, 'onmousedown', function (event) {
+                document.oncontextmenu = function() {
+                    var month = dataHuyDv.getValue(Number(event.targetID.split('#')[2]), 1)
+                    var profile = dataHuyDv.getValue(Number(event.targetID.split('#')[2]), 2)
+                    window.location.href = "/churn/search?contract=Month:"+keyByValue(catesMonth, month)+"_TenGoi:"+keyByValue( catesProfile, profile)
+                };
+            });
             var mouseX;
             var mouseY;
             $(document).mousemove(function(e) {
@@ -380,6 +386,15 @@
                 $(".monthPicker").datepicker("update", $('#month').val());
                 ajaxGetChurn("profileAge")
             });
+            google.visualization.events.addListener(chartAgeProfHuyDv, 'onmousedown', function (event) {
+                document.oncontextmenu = function() {
+                    var age = dataAgeProfHuyDv.getValue(Number(event.targetID.split('#')[2]), 1)
+                    var profile = dataAgeProfHuyDv.getValue(Number(event.targetID.split('#')[2]), 2)
+                    var ageGroup = keyByValue( catesAge, age)
+                    if(ageGroup == "06-12") ageGroup = "6-12"
+                    window.location.href = "/churn/search?contract=Age:"+ageGroup+"_TenGoi:"+keyByValue( catesProfAge, profile)
+                };
+            });
             google.visualization.events.addListener(chartAgeProfHuyDv, 'onmouseover', function (event) {
                 var rate = dataAgeProfHuyDv.getValue(event.row, 3);
                 var xAxis = dataAgeProfHuyDv.getValue(event.row, 1);
@@ -474,6 +489,13 @@
                 $('.ageDiv').hide()
                 ajaxGetChurn("regionMonth")
             });
+            google.visualization.events.addListener(chartRegionHuyDv, 'onmousedown', function (event) {
+                document.oncontextmenu = function() {
+                    var month = dataRegionHuyDv.getValue(Number(event.targetID.split('#')[2]), 1)
+                    var region = dataRegionHuyDv.getValue(Number(event.targetID.split('#')[2]), 2)
+                    window.location.href = "/churn/search?contract=Month:"+keyByValue(catesMonthRegion, month)+"_Region:"+region
+                };
+            });
             google.visualization.events.addListener(chartRegionHuyDv, 'onmouseover', function (event) {
                 var rate = dataRegionHuyDv.getValue(event.row, 3);
                 var xAxis = dataRegionHuyDv.getValue(event.row, 1);
@@ -539,6 +561,18 @@
 
                 tooltip: {
                     shared: true
+                },
+                plotOptions: {
+                    series: {
+                        cursor: 'pointer',
+                        point: {
+                            events: {
+                                contextmenu: function () {
+                                    window.location.href = "/churn/search?contract=Region:"+this.category.split(" ")[1]
+                                }
+                            }
+                        }
+                    }
                 },
 
                 series: getJsonChurnMonth(@Html(Json.stringify(Json.toJson(rs.churnRegion.map(x=> x._2)))),@Html(Json.stringify(Json.toJson(rs.churnRegion.map(x=> x._3)))))
@@ -609,6 +643,9 @@
                                         $('.profileDiv').show()
                                     }
                                     ajaxGetChurn("profile")
+                                },
+                                contextmenu: function () {
+                                    window.location.href = "/churn/search?contract=TenGoi:"+this.category
                                 }
                             }
                         }
@@ -672,30 +709,37 @@
 
                 plotOptions: {
                     series: {
-                        events: {
-                            click: function (event) {
-                                var age = event.point.series.xAxis.categories[event.point.x]
-                                var profile = event.point.series.yAxis.categories[event.point.y]
-                                if(age == $('#age').val() && profile == $('#profile').val()){
-                                    $('#profile').val("")
-                                    $('#age').val("")
-                                    $('.txtAge').text("")
-                                    $('.ageDiv').hide()
-                                    $('.txtProfile').text("")
-                                    $('.profileDiv').hide()
-                                }
-                                else{
-                                    $('#profile').val(profile)
-                                    $('#age').val(age)
-                                    $('.txtAge').text(age)
-                                    $('.ageDiv').show()
-                                    $('.txtProfile').text(profile)
-                                    $('.profileDiv').show()
+                        point: {
+                            events: {
+                                click: function (event) {
+                                    var age = event.point.series.xAxis.categories[event.point.x]
+                                    var profile = event.point.series.yAxis.categories[event.point.y]
+                                    if(age == $('#age').val() && profile == $('#profile').val()){
+                                        $('#profile').val("")
+                                        $('#age').val("")
+                                        $('.txtAge').text("")
+                                        $('.ageDiv').hide()
+                                        $('.txtProfile').text("")
+                                        $('.profileDiv').hide()
+                                    }
+                                    else{
+                                        $('#profile').val(profile)
+                                        $('#age').val(age)
+                                        $('.txtAge').text(age)
+                                        $('.ageDiv').show()
+                                        $('.txtProfile').text(profile)
+                                        $('.profileDiv').show()
 
+                                    }
+                                    $('.slRegion').val("*")
+                                    $(".monthPicker").datepicker("update", $('#month').val());
+                                    ajaxGetChurn("churn5_heatmap")
+                                },
+                                contextmenu: function (event) {
+                                    var age = event.point.series.xAxis.categories[event.point.x]
+                                    var profile = event.point.series.yAxis.categories[event.point.y]
+                                    window.location.href = "/churn/search?contract=Age:"+age +"_TenGoi:"+profile
                                 }
-                                $('.slRegion').val("*")
-                                $(".monthPicker").datepicker("update", $('#month').val());
-                                ajaxGetChurn("churn5_heatmap")
                             }
                         },
                         dataLabels:{
@@ -887,6 +931,13 @@
                                     $('.ageDiv').hide()
                                     ajaxGetChurn("regionMonth")
                                 });
+                                google.visualization.events.addListener(chartRegionMonth, 'onmousedown', function (event) {
+                                    document.oncontextmenu = function() {
+                                        var month = dataRegionMonth.getValue(Number(event.targetID.split('#')[2]), 1)
+                                        var region = dataRegionMonth.getValue(Number(event.targetID.split('#')[2]), 2)
+                                        window.location.href = "/churn/search?contract=Month:"+keyByValue(dta.churn3.cates, month)+"_Region:"+region
+                                    };
+                                });
                                 google.visualization.events.addListener(chartRegionMonth, 'onmouseover', function (event) {
                                     var rate = dataRegionMonth.getValue(event.row, 3);
                                     var xAxis = dataRegionMonth.getValue(event.row, 1);
@@ -1006,6 +1057,13 @@
                                     $('.ageDiv').hide()
                                     ajaxGetChurn("profileMonth")
                                 })
+                                google.visualization.events.addListener(chartProfileMonth, 'onmousedown', function (event) {
+                                    document.oncontextmenu = function() {
+                                        var month = dataProfileMonth.getValue(Number(event.targetID.split('#')[2]), 1)
+                                        var profile = dataProfileMonth.getValue(Number(event.targetID.split('#')[2]), 2)
+                                        window.location.href = "/churn/search?contract=Month:"+keyByValue(dta.churn4.catesMonth, month)+"_TenGoi:"+keyByValue( dta.churn4.catesProfile, profile)
+                                    };
+                                });
                                 google.visualization.events.addListener(chartProfileMonth, 'onmouseover', function (event) {
                                     var rate = dataProfileMonth.getValue(event.row, 3);
                                     var xAxis = dataProfileMonth.getValue(event.row, 1);
@@ -1125,6 +1183,15 @@
                                         'left': x
                                     }).fadeIn('slow');
                                 })
+                                google.visualization.events.addListener(chartAgeProfile, 'onmousedown', function (event) {
+                                    document.oncontextmenu = function() {
+                                        var age = dataAgeProfile.getValue(Number(event.targetID.split('#')[2]), 1)
+                                        var profile = dataAgeProfile.getValue(Number(event.targetID.split('#')[2]), 2)
+                                        var ageGroup = keyByValue( catesAge, age)
+                                        if(ageGroup == "06-12") ageGroup = "6-12"
+                                        window.location.href = "/churn/search?contract=Age:"+ageGroup+"_TenGoi:"+keyByValue( dta.churn5.catesProfile, profile)
+                                    };
+                                });
                                 google.visualization.events.addListener(chartAgeProfile, 'select', function () {
                                     var selection = chartAgeProfile.getSelection();
                                     if(selection.length >0) {
