@@ -1,20 +1,11 @@
 package service
 
 import scala.collection.immutable.Map
-import com.sksamuel.elastic4s.ElasticsearchClientUri
-import com.sksamuel.elastic4s.TcpClient
 import com.sksamuel.elastic4s.http.ElasticDsl.{RichFuture, RichString, SearchHttpExecutable, SearchShow, percentilesAggregation, query, rangeAggregation, search, termsAgg, termsAggregation, _}
 import com.sksamuel.elastic4s.http.search.SearchResponse
-import play.api.libs.json.JsArray
-import play.api.libs.json.JsNumber
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsString
-import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import churn.utils.{AgeGroupUtil, CommonUtil}
+import play.api.Logger
 import play.api.mvc.{AnyContent, Request}
-
-import scalaj.http.Http
 import services.Configure
 import services.domain.CommonService
 
@@ -24,16 +15,18 @@ object  ChurnAgeService{
 
   val client = Configure.client
 
+  val logger = Logger(this.getClass())
+
   def getChurnGroupMonth(queryString: String) ={
-    val request = search(s"profile-internet-contract-*" / "docs") query(queryString+" AND !(Region:0) AND !(TenGoi: \"FTTH - TV ONLY\") AND !(TenGoi: \"ADSL - TV ONLY\") AND !(TenGoi: \"ADSL - TV GOLD\") AND !(TenGoi: \"FTTH - TV GOLD\") ") aggregations (
+    val request = search(s"churn-contract-info-*" / "docs") query(queryString+" AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\") ") aggregations (
       termsAggregation("month")
         .field("month")
         .subaggs(
-          termsAggregation("Status")
-            .field("Status")
+          termsAggregation("status")
+            .field("status")
             .subaggs(
-              rangeAggregation("Age")
-                .field("Age")
+              rangeAggregation("age")
+                .field("age")
                 .range("6", 0, 6.0001)
                 .range("12", 6.001, 12.001)
                 .range("18", 12.001, 18.001)
@@ -49,19 +42,19 @@ object  ChurnAgeService{
         ) size 13
       ) size 0
     val rs = client.execute(request).await
-    CommonService.getMultiAggregations(rs.aggregations.get("month"),"Status" ,"Age").flatMap(x => x._2.map(y => x._1 -> y))
+    CommonService.getMultiAggregations(rs.aggregations.get("month"),"status" ,"age").flatMap(x => x._2.map(y => x._1 -> y))
       .map(x => (x._1 , x._2._1) -> x._2._2)
       .flatMap(x => x._2.map(y => x._1 -> y))
       .map(x => (x._1._1, x._1._2 , x._2._1, x._2._2))
   }
 
   def getChurnGroupAge(queryString: String) ={
-    val request = search(s"profile-internet-contract-*" / "docs") query(queryString+" AND !(Region:0) AND !(TenGoi: \"FTTH - TV ONLY\") AND !(TenGoi: \"ADSL - TV ONLY\") AND !(TenGoi: \"ADSL - TV GOLD\") AND !(TenGoi: \"FTTH - TV GOLD\") ") aggregations (
-      termsAggregation("Status")
-        .field("Status")
+    val request = search(s"churn-contract-info-*" / "docs") query(queryString+" AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\") ") aggregations (
+      termsAggregation("status")
+        .field("status")
         .subaggs(
-          rangeAggregation("Age")
-            .field("Age")
+          rangeAggregation("age")
+            .field("age")
             .range("6", 0, 6.0001)
             .range("12", 6.001, 12.001)
             .range("18", 12.001, 18.001)
@@ -76,19 +69,19 @@ object  ChurnAgeService{
         ) size 1000
       ) size 0
     val rs = client.execute(request).await
-    CommonService.getTerm1(rs, "Status", "Age").map(x => (x._1, x._2, x._3))
+    CommonService.getTerm1(rs, "status", "age").map(x => (x._1, x._2, x._3))
   }
 
   def getChurn(month: String) ={
-    val request = search(s"profile-internet-contract-${month}" / "docs") query("!(region:0) AND !(TenGoi: \"FTTH - TV ONLY\") AND !(TenGoi: \"ADSL - TV ONLY\") AND !(TenGoi: \"ADSL - TV GOLD\") AND !(TenGoi: \"FTTH - TV GOLD\") ") aggregations (
-      termsAggregation("Region")
-        .field("Region")
+    val request = search(s"churn-contract-info-${month}" / "docs") query("!(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\") ") aggregations (
+      termsAggregation("region")
+        .field("region")
         .subaggs(
-          termsAggregation("Status")
-            .field("Status")
+          termsAggregation("status")
+            .field("status")
             .subaggs(
-              rangeAggregation("Age")
-                .field("Age")
+              rangeAggregation("age")
+                .field("age")
                 .range("6", 0, 6.0001)
                 .range("12", 6.001, 12.001)
                 .range("18", 12.001, 18.001)
@@ -105,7 +98,7 @@ object  ChurnAgeService{
       )
 
     val rs = client.execute(request).await
-    getChurnRateAndPercentage(rs,"Region","Status" ,"Age").map(x=> (x._1, x._2, x._3, x._5, x._6))
+    getChurnRateAndPercentage(rs,"region","status" ,"age").map(x=> (x._1, x._2, x._3, x._5, x._6))
   }
 
   def getChurnRateAndPercentage(response: SearchResponse, term1: String, term2: String, term3: String): Array[(String, String, String, Int, Int, Int)] = {
@@ -175,6 +168,8 @@ object  ChurnAgeService{
   }
 
   def getInternet(request: Request[AnyContent]) = {
+    logger.info("========START AGE SERVICE=========")
+    val t0 = System.currentTimeMillis()
     var status = 1 // Huy dich vu default
     var age = "*"
     var region = "*"
@@ -201,10 +196,13 @@ object  ChurnAgeService{
       .flatMap(x=> x._3.map(y=> (x._1, x._2) -> y))
       .map(x=> (x._1._1, x._1._2, x._2._1, x._2._2, x._2._3))
 
-    //println(s"month:$month AND Region:$region")
-    val churnAge = calChurnRateAndPercentageByAge(getChurnGroupAge(s"month:$month AND Region:$region"), status)
-    val churnMonth = calChurnRateAndPercentageByMonth(getChurnGroupMonth(s"Region:$region"), status, age)
-
+    val churnAge = calChurnRateAndPercentageByAge(getChurnGroupAge(s"month:$month AND region:$region"), status)
+    logger.info("t0: "+(System.currentTimeMillis() - t0))
+    val t1 = System.currentTimeMillis()
+    val churnMonth = calChurnRateAndPercentageByMonth(getChurnGroupMonth(s"region:$region"), status, age)
+    logger.info("t1: "+(System.currentTimeMillis() - t1))
+    logger.info("Time: "+(System.currentTimeMillis() - t0))
+    logger.info("========END AGE SERVICE=========")
     (churnStatus, churnAge, churnMonth)
   }
 }

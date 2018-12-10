@@ -15,6 +15,7 @@ import churn.utils.{AgeGroupUtil, CommonUtil, ProcessTimeUtil}
 import org.elasticsearch.search.sort.SortOrder
 import play.api.mvc.{AnyContent, Request}
 import churn.models.{CallogResponse, ChecklistResponse}
+import play.api.Logger
 
 import scalaj.http.Http
 import services.Configure
@@ -23,6 +24,8 @@ import services.domain.CommonService
 object  ChurnChecklistService{
 
   val client = Configure.client
+
+  val logger = Logger(this.getClass())
 
   def getNumberOfContractChecklist(region:String, age: String, _type: String, time: String) ={
     val queries = "region:"+region+" AND lifeGroup:"+age+" AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\")"
@@ -184,7 +187,7 @@ object  ChurnChecklistService{
                "month": {
                   "terms": {
                      "field": "month",
-                     "size": 24
+                     "size": 15
                   },
                   "aggs": {
                      "region": {
@@ -773,13 +776,14 @@ object  ChurnChecklistService{
   }
 
   def getInternet(request: Request[AnyContent]) = {
+    logger.info("========START CHECKLIST SERVICE=========")
     var status = 1 // Huy dich vu default
     var ageChecklist = "*"
     var ageAll = "*"
     var region = "*"
     var _type = "*"
     var processTime = "*"
-    var month = "2018-07"
+    var month = CommonService.getPrevMonth()
     if(request != null) {
       status = request.body.asFormUrlEncoded.get("status").head.toInt
       if(request.body.asFormUrlEncoded.get("age").head != "" && request.body.asFormUrlEncoded.get("age").head == "12"){
@@ -805,21 +809,23 @@ object  ChurnChecklistService{
         }
       }
     }
-    println(s"Status:$status \n Month:$month \n Age:$ageAll \n AgeChecklist: $ageChecklist \n Time: $processTime \n Region:$region \n Type: "+_type)
-    println("===")
+    val t0 = System.currentTimeMillis()
     // Chart 1: Number of Contracts That Have Checklist(s)
-    val contractAll   = ChurnCallogService.getNumberOfContractAll(s"Region:$region AND $ageAll").slice(0,12).sorted
+    val contractAll   = ChurnCallogService.getNumberOfContractAll(s"region:$region AND $ageAll").slice(0,12).sorted
     val ctCheckList   = getNumberOfContractChecklist(region, ageChecklist, _type, processTime).filter(x=> contractAll.map(y=> y._1).indexOf(x._1) >=0)
       .map(x=> (x._1, x._2, CommonService.format2Decimal(x._2 * 100.00 / contractAll.toMap.get(x._1).get), x._3)).sorted
-
+    logger.info("t0: "+(System.currentTimeMillis() -t0))
+    val t1 = System.currentTimeMillis()
     // Chart 2: Number of Contracts That Have Checklist(s)
-    val allChurn_count  = ChurnCallogService.getNumberOfContractAll(s"Status:$status AND $ageAll AND Region:$region")
+    val allChurn_count  = ChurnCallogService.getNumberOfContractAll(s"status:$status AND $ageAll AND region:$region")
     val trendChecklist  = ChurnCallogService.calTrendCallinRateAndPercentage(getChurnContractbyStatus(region, ageChecklist, _type, processTime), allChurn_count , status)
-
+    logger.info("t1: "+(System.currentTimeMillis() -t1))
+    val t2 = System.currentTimeMillis()
     // Chart 3: Number of Contracts That Have Checklist(s) by Region (%) 2-3 sai
-    val ctAllRegion     = ChurnCallogService.getChurnCallInbyRegionAll(s"$ageAll AND !(Region:0)")
+    val ctAllRegion     = ChurnCallogService.getChurnCallInbyRegionAll(s"$ageAll AND !(region:0)")
     val checklistRegion = ChurnCallogService.calChurnCallinRateAndPercentagebyRegion(getChurnCallInbyRegionChecklist(ageChecklist, _type, processTime), ctAllRegion)
-
+    logger.info("t2: "+(System.currentTimeMillis() -t2))
+    val t3 = System.currentTimeMillis()
     // Chart 4: For Contracts That Have Checklist(s): Churn Rate and Churn Percentage by Region 2-3 sai
     val trendRegionMonth = ChurnRegionService.calChurnRateAndPercentageForRegionMonth(getChecklistRegionMonth(ageChecklist, _type, processTime), status).filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
     val top12monthRegion = trendRegionMonth.map(x=> x._2).distinct.sortWith((x, y) => x > y).filter(x=> x != CommonService.getCurrentMonth()).slice(0,12).sorted
@@ -839,12 +845,14 @@ object  ChurnChecklistService{
     val checklistRegionMonth = arrGroup.map(x=> (x._1, x._2, if(rsRegionMonth.filter(y=> y._1 == x._1).filter(y=> y._2 == x._2).length ==0) arrEmpty else rsRegionMonth.filter(y=> y._1 == x._1).filter(y=> y._2 == x._2)
       .map(x=> (x._3, x._4, x._5)))).flatMap(x=> x._3.map(y=> (x._1, x._2) -> y))
       .map(x=> (x._1._1, x._1._2, x._2._1, x._2._2, x._2._3))
-
+    logger.info("t3: "+(System.currentTimeMillis() -t3))
+    val t4 = System.currentTimeMillis()
     // Chart 5: Number of Contracts Who Have Checklist(s) by Region by Contract Age (%)
     val numOfChecklist     = getChurnByRegionAgeChecklist(month, _type, processTime)
     val numOfContract      = ChurnCallogService.getChurnByRegionAgeAll(month)
     val checklistRegionAge = numOfChecklist.map(x=> (x._1, x._2, CommonService.format2Decimal(x._3 * 100.00 / numOfContract.filter(y=> y._1 == x._1).filter(y=> y._2 == x._2).map(y=> y._3).sum), x._3))
-
+    logger.info("t4: "+(System.currentTimeMillis() -t4))
+    val t5 = System.currentTimeMillis()
     // Chart 6: For Contracts Who Have Checklist(s): Churn Rate and Churn Percentage by Region by Contract Age
     val trendRegionAge = ChurnCallogService.calCallInRateAndPercentageRegionAge(getChecklistRegionAge(month, _type), status)
     val mapAge = AgeGroupUtil.AGE.map(y=> y._2).toArray
@@ -860,13 +868,15 @@ object  ChurnChecklistService{
       .filter(y=> x._2 == AgeGroupUtil.getAgeIdByName(y._2)).map(x=> (x._3, x._4, x._5))))
       .flatMap(x=> x._3.map(y=> (x._1, x._2) -> y))
       .map(x=> (x._1._1, x._1._2, x._2._1, x._2._2, x._2._3))
-
+    logger.info("t5: "+(System.currentTimeMillis() -t5))
+    val t6 = System.currentTimeMillis()
     // Chart 7: Number of Checklist(s) by Checklist Processing Time by Region
     val numOfProcessTime   = getChurnByRegionProcessTime(month, ageChecklist, _type)
     val time_X     = numOfProcessTime.map(x=> x._1).distinct.sorted.map(x=> ProcessTimeUtil.getNameById(x))
     val region_Y   = numOfProcessTime.map(x=> x._2).distinct.sorted
     val dataChurn7 = numOfProcessTime.map(x=> (ProcessTimeUtil.getIndexById(x._1), x._2 -1, x._3))
-
+    logger.info("t6: "+(System.currentTimeMillis() -t6))
+    val t7 = System.currentTimeMillis()
     // Chart 8: Number of Checklist(s) by Checklist Types by Region
     val numOfTypeRegion = getChurnByRegionType(month, ageChecklist, processTime)
     val top12Types = numOfTypeRegion.groupBy(x=> x._1).map(x=> x._1 -> x._2.map(y=> y._3).sum).toArray.sortWith((x, y)=> x._2> y._2).slice(0,12).map(x=> x._1)
@@ -877,7 +887,8 @@ object  ChurnChecklistService{
     val mapTopTypes = numOfTypeRegion.filter(x=> top12Types.indexOf(x._1) >= 0).map(x=> (types_X.find(y=> y._2 == x._1).get._1, x._2 -1, x._3))
     val othersType  = numOfTypeRegion.filter(x=> top12Types.indexOf(x._1) < 0).groupBy(x=> x._2).map(x=> (12, x._1 -1, x._2.map(y=> y._3).sum))
     val rsTypes = mapTopTypes ++ othersType
-
+    logger.info("t7: "+(System.currentTimeMillis() -t7))
+    val t8 = System.currentTimeMillis()
     // Chart 9: Churn Rate and Churn Percentage by Checklist Type by Region
     val top12trendTypes = getChecklistRegionType(month, ageChecklist, processTime).filter(x=> top12Types.indexOf(x._1) >= 0)
     val otherTrends     = getOtherTypeRegion(month,ageChecklist, processTime, top12Types.map(x=> "!(checklist.type:\""+x+"\")").mkString(" AND "))
@@ -897,7 +908,9 @@ object  ChurnChecklistService{
       .filter(y=> x._2 == y._2).map(x=> (x._3, x._4, x._5))))
       .flatMap(x=> x._3.map(y=> (x._1, x._2) -> y))
       .map(x=> (x._1._1, x._1._2, x._2._1, x._2._2, x._2._3))
-
+    logger.info("t8: "+(System.currentTimeMillis() -t8))
+    logger.info("Time: "+(System.currentTimeMillis() -t0))
+    logger.info("========END CHECKLIST SERVICE=========")
     ChecklistResponse(ctCheckList, trendChecklist, checklistRegion, (mapMonthRegion, checklistRegionMonth), rsTrendRegionAge, checklistRegionAge,
       (time_X, region_Y, dataChurn7), (types_X.toArray, types_Y, rsTypes), (trendType_X.toMap, rsTypeBubble))
 

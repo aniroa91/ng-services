@@ -9,8 +9,6 @@ abstract class AbstractService {
 
   val client = Configure.client // HttpClient(ElasticsearchClientUri(Configure.ES_HOST, Configure.ES_PORT))
   
-  val redis: RedisClient = Configure.redis // HttpClient(ElasticsearchClientUri(Configure.ES_HOST, Configure.ES_PORT))
-  
   def getValueAsString(map: Map[String, Any], key: String, default: String): String = {
     val result = map.getOrElse(key, default)
     if (result != null) result.toString() else default

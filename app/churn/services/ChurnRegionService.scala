@@ -16,6 +16,7 @@ import play.api.libs.json.JsString
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import churn.utils.{AgeGroupUtil, CommonUtil}
+import play.api.Logger
 import play.api.mvc.{AnyContent, Request}
 
 import scalaj.http.Http
@@ -26,16 +27,18 @@ object  ChurnRegionService{
 
   val client = Configure.client
 
+  val logger = Logger(this.getClass())
+
   def getChurnGroupMonth(queryString: String) ={
-    val request = search(s"profile-internet-contract-*" / "docs") query(queryString +" AND !(Region:0) AND !(TenGoi: \"FTTH - TV ONLY\") AND !(TenGoi: \"ADSL - TV ONLY\") AND !(TenGoi: \"ADSL - TV GOLD\") AND !(TenGoi: \"FTTH - TV GOLD\") ") aggregations (
+    val request = search(s"churn-contract-info-*" / "docs") query(queryString +" AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\") ") aggregations (
       termsAggregation("month")
         .field("month")
         .subaggs(
-          termsAggregation("Status")
-            .field("Status")
+          termsAggregation("status")
+            .field("status")
             .subaggs(
-              rangeAggregation("Age")
-                .field("Age")
+              rangeAggregation("age")
+                .field("age")
                 .range("6", 0, 6.0001)
                 .range("12", 6.001, 12.001)
                 .range("18", 12.001, 18.001)
@@ -51,81 +54,81 @@ object  ChurnRegionService{
         ) size 13
       )
     val rs = client.execute(request).await
-    CommonService.getMultiAggregations(rs.aggregations.get("month"),"Status" ,"Age").flatMap(x => x._2.map(y => x._1 -> y))
+    CommonService.getMultiAggregations(rs.aggregations.get("month"),"status" ,"age").flatMap(x => x._2.map(y => x._1 -> y))
       .map(x => (x._1 , x._2._1) -> x._2._2)
       .flatMap(x => x._2.map(y => x._1 -> y))
       .map(x => (x._1._1, x._1._2 , x._2._1, x._2._2))
   }
 
   def getChurnGroupbyStatusRegion(queryString: String, profile: String) ={
-    val profileQuery = if(profile == "*") "" else s" AND TenGoi: $profile"
-    val request = search(s"profile-internet-contract-*" / "docs") query(queryString + profileQuery +" AND !(Region:0) AND !(TenGoi: \"FTTH - TV ONLY\") AND !(TenGoi: \"ADSL - TV ONLY\") AND !(TenGoi: \"ADSL - TV GOLD\") AND !(TenGoi: \"FTTH - TV GOLD\") ") aggregations (
-      termsAggregation("Status")
-        .field("Status")
+    val profileQuery = if(profile == "*") "" else s" AND tenGoi: $profile"
+    val request = search(s"churn-contract-info-*" / "docs") query(queryString + profileQuery +" AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\") ") aggregations (
+      termsAggregation("status")
+        .field("status")
         .subaggs(
-          termsAggregation("Region")
-            .field("Region") size 1000
+          termsAggregation("region")
+            .field("region") size 1000
         ) size 1000
       ) size 0
     val rs = client.execute(request).await
-    getSecondAggregations(rs.aggregations.get("Status"), "Region").flatMap(x=> x._3.map(y=> (x._1,x._2) -> y))
+    getSecondAggregations(rs.aggregations.get("status"), "region").flatMap(x=> x._3.map(y=> (x._1,x._2) -> y))
       .map(x=> (x._1._1, x._2._1, x._2._2, x._1._2))
   }
 
   def getChurnGroupbyStatusProfile(queryString: String) ={
-    val request = search(s"profile-internet-contract-*" / "docs") query(queryString + " AND !(Region:0) AND !(TenGoi: \"FTTH - TV ONLY\") AND !(TenGoi: \"ADSL - TV ONLY\") AND !(TenGoi: \"ADSL - TV GOLD\") AND !(TenGoi: \"FTTH - TV GOLD\") ") aggregations (
-      termsAggregation("Status")
-        .field("Status")
+    val request = search(s"churn-contract-info-*" / "docs") query(queryString + " AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\") ") aggregations (
+      termsAggregation("status")
+        .field("status")
         .subaggs(
-          termsAggregation("TenGoi")
-            .field("TenGoi") size 1000
+          termsAggregation("tenGoi")
+            .field("tenGoi") size 1000
         ) size 1000
       ) size 0
     val rs = client.execute(request).await
-    getSecondAggregations(rs.aggregations.get("Status"), "TenGoi").flatMap(x=> x._3.map(y=> (x._1,x._2) -> y))
+    getSecondAggregations(rs.aggregations.get("status"), "tenGoi").flatMap(x=> x._3.map(y=> (x._1,x._2) -> y))
       .map(x=> (x._1._1, x._2._1, x._2._2, x._1._2))
   }
 
   def getTrendProfileMonth(queryString: String) ={
-    val request = search(s"profile-internet-contract-*" / "docs") query(queryString + " AND !(Region:0) AND !(TenGoi: \"FTTH - TV ONLY\") AND !(TenGoi: \"ADSL - TV ONLY\") AND !(TenGoi: \"ADSL - TV GOLD\") AND !(TenGoi: \"FTTH - TV GOLD\") ") aggregations (
+    val request = search(s"churn-contract-info-*" / "docs") query(queryString + " AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\") ") aggregations (
       termsAggregation("month")
         .field("month")
         .subaggs(
-          termsAggregation("Status")
-            .field("Status")
+          termsAggregation("status")
+            .field("status")
             .subaggs(
-              termsAggregation("TenGoi")
-                .field("TenGoi") size 1000
+              termsAggregation("tenGoi")
+                .field("tenGoi") size 1000
             ) size 1000
         ) size 13
       ) size 0
     val rs = client.execute(request).await
-    getChurnRateAndPercentage(rs, "month", "Status" , "TenGoi").map(x=> (x._1, x._2, x._3, x._5, x._6))
+    getChurnRateAndPercentage(rs, "month", "status" , "tenGoi").map(x=> (x._1, x._2, x._3, x._5, x._6))
   }
 
   def getTrendRegionMonth(queryString: String, profile: String) ={
-    val profileQuery = if(profile == "*") "" else s" AND TenGoi: $profile"
-    val request = search(s"profile-internet-contract-*" / "docs") query(queryString + profileQuery + " AND !(Region:0) AND !(TenGoi: \"FTTH - TV ONLY\") AND !(TenGoi: \"ADSL - TV ONLY\") AND !(TenGoi: \"ADSL - TV GOLD\") AND !(TenGoi: \"FTTH - TV GOLD\") ") aggregations (
+    val profileQuery = if(profile == "*") "" else s" AND tenGoi: $profile"
+    val request = search(s"churn-contract-info-*" / "docs") query(queryString + profileQuery + " AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\") ") aggregations (
       termsAggregation("month")
         .field("month")
         .subaggs(
-          termsAggregation("Status")
-            .field("Status")
+          termsAggregation("status")
+            .field("status")
             .subaggs(
-              termsAggregation("Region")
-                .field("Region") size 1000
+              termsAggregation("region")
+                .field("region") size 1000
             ) size 1000
         ) size 13
       ) size 0
 
     val rs = client.execute(request).await
-    getChurnRateAndPercentage(rs,"month","Status" , "Region").map(x=> (x._1, x._2, x._3, x._5, x._6))
+    getChurnRateAndPercentage(rs,"month","status" , "region").map(x=> (x._1, x._2, x._3, x._5, x._6))
   }
 
   def getTrendAgeProfile(month: String, region: String) = {
-    val request = search(s"profile-internet-contract-${month}" / "docs") query(region +" AND !(Region:0) AND !(TenGoi: \"FTTH - TV ONLY\") AND !(TenGoi: \"ADSL - TV ONLY\") AND !(TenGoi: \"ADSL - TV GOLD\") AND !(TenGoi: \"FTTH - TV GOLD\") ") aggregations (
-      rangeAggregation("Age")
-        .field("Age")
+    val request = search(s"churn-contract-info-${month}" / "docs") query(region +" AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\") ") aggregations (
+      rangeAggregation("age")
+        .field("age")
         .range("6", 0, 6.0001)
         .range("12", 6.001, 12.001)
         .range("18", 12.001, 18.001)
@@ -138,16 +141,16 @@ object  ChurnRegionService{
         .range("60", 54.001, 60.001)
         .range("66", 60.001, Double.MaxValue)
         .subaggs(
-          termsAggregation("Status")
-            .field("Status")
+          termsAggregation("status")
+            .field("status")
             .subaggs(
-              termsAggregation("TenGoi")
-                .field("TenGoi") size 1000
+              termsAggregation("tenGoi")
+                .field("tenGoi") size 1000
             ) size 1000
         )
       ) size 0
     val rs = client.execute(request).await
-    getChurnRateAndPercentage(rs,"Age", "Status" , "TenGoi").map(x=> (x._1, x._2, x._3, x._5, x._6))
+    getChurnRateAndPercentage(rs,"age", "status" , "tenGoi").map(x=> (x._1, x._2, x._3, x._5, x._6))
   }
 
   def getSecondAggregations(aggr: Option[AnyRef],secondField: String):  Array[(String,Long, Array[(String, Long)])] = {
@@ -202,7 +205,7 @@ object  ChurnRegionService{
 
   def calChurnRateAndPercentageByStatus(array: Array[(String, String, Long, Long)], status: Int, _type: String) = {
     var sumAll = array.filter(x=> x._1.toInt == status).map(x=> x._3).sum
-    if(_type.equals("Profile")) sumAll =  array.filter(x=> x._1.toInt == status).slice(0,1).map(x=> x._4).sum
+    if(_type.equals("profile")) sumAll =  array.filter(x=> x._1.toInt == status).slice(0,1).map(x=> x._4).sum
     val sumByStatus    = array.filter(x=> x._1.toInt == status).groupBy(x=> x._2).map(x=> x._1 -> x._2.map(y=> y._3).sum)
     val sumByStatusAll = array.groupBy(x=> x._2).map(x=>x._1 -> x._2.map(y=> y._3).sum)
 
@@ -252,18 +255,20 @@ object  ChurnRegionService{
   }
 
   def getInternet(request: Request[AnyContent]) = {
+    logger.info("========START REGION SERVICE=========")
     var status = 1 // Huy dich vu default
-    var age = "Age:*"
+    var age = "age:*"
     var region = "*"
     var profile = "*"
     var month = CommonService.getPrevMonth()
     if(request != null) {
       status = request.body.asFormUrlEncoded.get("status").head.toInt
-      age = if(request.body.asFormUrlEncoded.get("age").head != "") AgeGroupUtil.getCalAgeByName(request.body.asFormUrlEncoded.get("age").head) else "Age:*"
+      age = if(request.body.asFormUrlEncoded.get("age").head != "") AgeGroupUtil.getCalAgeByName(request.body.asFormUrlEncoded.get("age").head) else "age:*"
       region = if(request.body.asFormUrlEncoded.get("region").head != "") request.body.asFormUrlEncoded.get("region").head else "*"
       profile = if(request.body.asFormUrlEncoded.get("profile").head != "") "\""+request.body.asFormUrlEncoded.get("profile").head +"\"" else "*"
       month = request.body.asFormUrlEncoded.get("month").head
     }
+    val t0 = System.currentTimeMillis()
     // region and month trends
     val trendRegionMonth = calChurnRateAndPercentageForRegionMonth(getTrendRegionMonth(s"$age", profile), status).filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
     val top12monthRegion = trendRegionMonth.map(x=> x._2).distinct.sortWith((x, y) => x > y).filter(x=> x != CommonService.getCurrentMonth()).slice(0,12).sorted
@@ -283,25 +288,30 @@ object  ChurnRegionService{
     val rsRegion = arrGroup.map(x=> (x._1, x._2, if(rsRegionMonth.filter(y=> y._1 == x._1).filter(y=> y._2 == x._2).length ==0) arrEmpty else rsRegionMonth.filter(y=> y._1 == x._1).filter(y=> y._2 == x._2)
       .map(x=> (x._3, x._4, x._5)))).flatMap(x=> x._3.map(y=> (x._1, x._2) -> y))
       .map(x=> (x._1._1, x._1._2, x._2._1, x._2._2, x._2._3))
-
+    logger.info("t0: "+(System.currentTimeMillis()- t0))
+    val t1 = System.currentTimeMillis()
     // churn region
-    val churnRegion      = calChurnRateAndPercentageByStatus(getChurnGroupbyStatusRegion(s"month:$month AND $age", profile), status, "Region")
+    val churnRegion      = calChurnRateAndPercentageByStatus(getChurnGroupbyStatusRegion(s"month:$month AND $age", profile), status, "region")
+    logger.info("t1: "+(System.currentTimeMillis()- t1))
+    val t2 = System.currentTimeMillis()
     // churn profile
-    val churnProfile     = calChurnRateAndPercentageByStatus(getChurnGroupbyStatusProfile(s"month:$month AND $age AND Region:$region"), status, "Profile")
+    val churnProfile     = calChurnRateAndPercentageByStatus(getChurnGroupbyStatusProfile(s"month:$month AND $age AND region:$region"), status, "profile")
       .map(x=> (x._1, x._2, x._3, 2 * x._2 * x._3 * 0.01/(x._2 + x._3))).sortWith((x, y) => x._4 > y._4)
       .slice(0, 8).map(x=> (x._1, x._2, x._3))
-
+    logger.info("t2: "+(System.currentTimeMillis()- t2))
+    val t3 = System.currentTimeMillis()
     // profile and month trends
-    val trendProfileMonth = calChurnRateAndPercentageForProfileMonth(getTrendProfileMonth(s"$age AND Region:$region"), status).filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
+    val trendProfileMonth = calChurnRateAndPercentageForProfileMonth(getTrendProfileMonth(s"$age AND region:$region"), status).filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
     val topProfiles = if(trendProfileMonth.map(x=> x._1).distinct.length >= 8 ) 9 else trendProfileMonth.map(x=> x._1).distinct.length +1
     val mapProfileMonth = (1 until topProfiles).map(x=> trendProfileMonth.map(x=> x._1).distinct(topProfiles-x-1) -> x).toMap
     val topLast12month = trendProfileMonth.map(x=> x._2).distinct.sortWith((x, y) => x > y).filter(x=> x != CommonService.getCurrentMonth()).slice(0,12).sorted
     val topMonthProf = if(topLast12month.length >= 12) 13 else topLast12month.length+1
     val mapMonth   = (1 until topMonthProf).map(x=> topLast12month(x-1) -> x).toMap
     val rsProfileMonth = trendProfileMonth.filter(x=> topLast12month.indexOf(x._2) >=0).map(x=> (mapProfileMonth.get(x._1).get, mapMonth.get(x._2).get, x._3, x._4, x._5))
-
+    logger.info("t3: "+(System.currentTimeMillis()- t3))
+    val t4 = System.currentTimeMillis()
     // profile and age trends
-    val trendAgeProfile = calChurnRateAndPercentageForProfileAge(getTrendAgeProfile(month, s"Region:$region"), status, mapProfileMonth.map(x=> x._1).toArray)
+    val trendAgeProfile = calChurnRateAndPercentageForProfileAge(getTrendAgeProfile(month, s"region:$region"), status, mapProfileMonth.map(x=> x._1).toArray)
     val topProfilesAge  = if(trendAgeProfile.map(x=> x._1).distinct.length >= 8) 9 else trendAgeProfile.map(x=> x._1).distinct.length +1
     val mapProfileAge   = (1 until topProfilesAge).map(x=> trendAgeProfile.map(x=> x._1).distinct(topProfilesAge-x-1) -> x).toMap
     val rsProfileAge    = trendAgeProfile.map(x=> (mapProfileAge.get(x._1).get, x._2.toInt, x._3, x._4, x._5))
@@ -317,12 +327,15 @@ object  ChurnRegionService{
     val arrProfileAge = arrGroup.map(x=> (x._1, x._2, if(rsProfileAge.filter(y=> y._1 == x._1).filter(y=> y._2 == x._2).length ==0) arrEmptyProf else rsProfileAge.filter(y=> y._1 == x._1).filter(y=> y._2 == x._2)
       .map(x=> (x._3, x._4, x._5)))).flatMap(x=> x._3.map(y=> (x._1, x._2) -> y))
       .map(x=> (x._1._1, x._1._2, x._2._1, x._2._2,x._2._3))
-
+    logger.info("t4: "+(System.currentTimeMillis()- t4))
+    val t5 = System.currentTimeMillis()
     // number of contracts top8 profile
-    val contractProfiles = calNumberofContractTopProfile(getTrendAgeProfile(month, s"Region:$region"), trendAgeProfile.map(x=> x._1).distinct)
+    val contractProfiles = calNumberofContractTopProfile(getTrendAgeProfile(month, s"region:$region"), trendAgeProfile.map(x=> x._1).distinct)
     val xAxisAgeGroup    = AgeGroupUtil.AGE_INDEX.map(x=> AgeGroupUtil.getAgeById(x._1)).toArray.sorted
     val yAxisProfile     = (0 until trendAgeProfile.map(x=> x._1).distinct.length).map(x=> trendAgeProfile.map(x=> x._1).distinct(x) -> x).sortWith((x,y) => x._2 < y._2).toArray
-
+    logger.info("t5: "+(System.currentTimeMillis()- t5))
+    logger.info("Time: "+(System.currentTimeMillis()- t0))
+    logger.info("========END REGION SERVICE=========")
     RegionResponse(churnRegion, (mapMonthRegion, rsRegion), churnProfile, (mapProfileMonth, mapMonth, rsProfileMonth), (mapProfileAge, arrProfileAge), (xAxisAgeGroup, yAxisProfile, contractProfiles))
   }
 }

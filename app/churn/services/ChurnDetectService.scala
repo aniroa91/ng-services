@@ -1,6 +1,6 @@
 package service
 
-import churn.models.{Indicator ,DetectResponse}
+import churn.models.{DetectResponse, Indicator}
 
 import scala.collection.immutable.Map
 import com.sksamuel.elastic4s.ElasticsearchClientUri
@@ -14,6 +14,7 @@ import play.api.libs.json.JsString
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import churn.utils.{BytesUtil, CommonUtil}
+import play.api.Logger
 import play.api.mvc.{AnyContent, Request}
 
 import scalaj.http.Http
@@ -23,6 +24,8 @@ import services.domain.CommonService
 object  ChurnDetectService{
 
   val client = Configure.client
+
+  val logger = Logger(this.getClass())
 
   def getContractByMonth(indexes: String, queryString: String, contractGrp: String, maintain: String, cate: String, cause: String) ={
     val queries = queryString + " AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\")"
@@ -340,7 +343,7 @@ object  ChurnDetectService{
         "query": {
                              "bool": {
                                  "filter": [
-                                     {
+                                      {
                                          "query_string" : {
                                               "query": "${queries.replace("\"", "\\\"")}"
                                          }
@@ -454,6 +457,7 @@ object  ChurnDetectService{
   }
 
   def getInternet(request: Request[AnyContent], isFwd: Int) = {
+    logger.info("========START DETECT SERVICE=========")
     var status = "status:*"
     var contractGrp = "*"
     var region = request.flash.get("Region").getOrElse("*")
@@ -477,39 +481,50 @@ object  ChurnDetectService{
       region = request.body.asFormUrlEncoded.get("region").head
       age = request.body.asFormUrlEncoded.get("age").head
     }
-    println(age + " vs "+region)
     val time = System.currentTimeMillis()
     // chart 1
-    val numContract  = getContractByMonth("churn-detect-problem-*", s"month:2018-07 AND $complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", contractGrp, maintain, cate, cause)
-    val numChurnCt   = getContractByMonth("churn-detect-problem-*", s"month:2018-07 AND status:1 AND $complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", contractGrp, maintain, cate, cause)
-    val numChurnbyRegion = getContractByMonth("churn-detect-problem-*", s"month:2018-07 AND status:1 AND region:$region AND $complain", contractGrp, maintain, cate, cause)
-    val numCall      = getContractByMonth("churn-calllog-*", s"month:2018-07 AND lifeGroup:$age AND region:$region AND tenGoi:$packages", "*", "", "", "")
-    val numChecklist = getContractByMonth("churn-checklist-*", s"month:2018-07 AND lifeGroup:$age AND region:$region AND tenGoi:$packages", "*", "", "", "")
+    val numContract  = getContractByMonth("churn-detect-problem-*", s"month:$month AND $complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", contractGrp, maintain, cate, cause)
+    val numChurnCt   = getContractByMonth("churn-detect-problem-*", s"month:$month AND status:1 AND $complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", contractGrp, maintain, cate, cause)
+    val numChurnbyRegion = getContractByMonth("churn-detect-problem-*", s"month:$month AND status:1 AND region:$region AND $complain", contractGrp, maintain, cate, cause)
+    val numCall      = getContractByMonth("churn-calllog-*", s"month:$month AND lifeGroup:$age AND region:$region AND tenGoi:$packages", "*", "", "", "")
+    val numChecklist = getContractByMonth("churn-checklist-*", s"month:$month AND lifeGroup:$age AND region:$region AND tenGoi:$packages", "*", "", "", "")
+
+    logger.info("t1: "+(System.currentTimeMillis() -time))
+    val t2 = System.currentTimeMillis()
 
     /* OVERALL*/
       // chart 2
-      val callYesCtYes = getNumCallChecklist(s"month:2018-07 AND status:1 AND $complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", "Call Yes_Checklist Yes", maintain, cate, cause)
-      val callYesCtNo  = getNumCallChecklist(s"month:2018-07 AND status:1 AND $complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", "Call Yes_Checklist No",  maintain, cate, cause)
-      val callNoCtYes  = getNumCallChecklist(s"month:2018-07 AND status:1 AND $complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", "Call No_Checklist Yes", maintain, cate, cause)
-      val callNoCtNo   = getNumCallChecklist(s"month:2018-07 AND status:1 AND $complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", "Call No_Checklist No", maintain, cate, cause)
+      val callYesCtYes = getNumCallChecklist(s"month:$month AND status:1 AND $complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", "Call Yes_Checklist Yes", maintain, cate, cause)
+      val callYesCtNo  = getNumCallChecklist(s"month:$month AND status:1 AND $complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", "Call Yes_Checklist No",  maintain, cate, cause)
+      val callNoCtYes  = getNumCallChecklist(s"month:$month AND status:1 AND $complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", "Call No_Checklist Yes", maintain, cate, cause)
+      val callNoCtNo   = getNumCallChecklist(s"month:$month AND status:1 AND $complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", "Call No_Checklist No", maintain, cate, cause)
+
+    logger.info("t2: "+(System.currentTimeMillis() -t2))
+    val t3 = System.currentTimeMillis()
 
       // chart 8
-      val numCtByRegion = getContractByRegion(s"$complain AND lifeGroup:$age AND tenGoi:$packages", "2018-07", "region", contractGrp, maintain, cate, cause)
+      val numCtByRegion = getContractByRegion(s"$complain AND lifeGroup:$age AND tenGoi:$packages", month, "region", contractGrp, maintain, cate, cause)
       // chart 9
-      val numCtByAge = getContractByRegion(s"$complain AND region:$region AND tenGoi:$packages", "2018-07", "lifeGroup", contractGrp, maintain, cate, cause)
+      val numCtByAge = getContractByRegion(s"$complain AND region:$region AND tenGoi:$packages", month, "lifeGroup", contractGrp, maintain, cate, cause)
       // chart 10
-      val arrTengoi = getContractByRegion(s"$complain AND lifeGroup:$age AND region:$region", "2018-07", "tenGoi", contractGrp, maintain, cate, cause).sortWith((x, y) => x._2 > y._2)
+      val arrTengoi = getContractByRegion(s"$complain AND lifeGroup:$age AND region:$region", month, "tenGoi", contractGrp, maintain, cate, cause).sortWith((x, y) => x._2 > y._2)
       val numCtByTengoi = arrTengoi.slice(0,10) :+ ("Others", arrTengoi.slice(11, arrTengoi.length).map(x=> x._2).sum)
+
+    logger.info("t3: "+(System.currentTimeMillis() -t3))
+    val t4 = System.currentTimeMillis()
 
     /* CHECKLIST */
       //chart 5
-      val medianHours = getTrendHoursbyRegion(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", "2018-07", "*", maintain, "", "")
+      val medianHours = getTrendHoursbyRegion(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", month, "*", maintain, "", "")
       //chart 6
-      val medianMaintain = getMedicanByTobaotri(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", "2018-07", "*", "", "", "")
+      val medianMaintain = getMedicanByTobaotri(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", month, "*", "", "", "")
       //chart 7
-      val numCauses   = getNumCtbyCause(s"$complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", "2018-07", contractGrp, maintain, cate, "")
+      val numCauses   = getNumCtbyCause(s"$complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", month, contractGrp, maintain, cate, "")
       // chart 12
-      val topChecklistContent = getTopChecklistContent(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", "2018-07", 100, "*", "", "", "").sortWith((x, y) => x._2 > y._2).slice(0,100)
+      val topChecklistContent = getTopChecklistContent(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", month, 100, "*", "", "", "").sortWith((x, y) => x._2 > y._2).slice(0,100)
+
+    logger.info("t4: "+(System.currentTimeMillis() -t4))
+    val t5 = System.currentTimeMillis()
 
     /* COMPLAIN */
       // chart 3
@@ -519,28 +534,42 @@ object  ChurnDetectService{
       // chart 4
       val topCates       = getTopCategory(s"$complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", month, contractGrp, maintain, "", cause).sortWith((x,y) => x._2 > y._2).slice(0,10)
       // chart 12
-      val topCallContent = getTopCallContent(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", "2018-07", 100, "*", "", "", "").sortWith((x, y) => x._2 > y._2).slice(0,100)
+      val topCallContent = getTopCallContent(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", month, 100, "*", "", "", "").sortWith((x, y) => x._2 > y._2).slice(0,100)
+
+    logger.info("t5: "+(System.currentTimeMillis() -t5))
+    val t6 = System.currentTimeMillis()
 
     /* INDICATOR*/
     // chart 11
       // splot 1
-      val errorsChurn = getInfErrors(s"status:1 AND $complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", "2018-08", "inf", contractGrp, maintain, cate, cause).toMap
-      val rsErrors = getInfErrors(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", "2018-08", "inf", "-1", "", "", "").map(x=> (x._1, CommonService.format2Decimal(x._2), CommonService.format2Decimal(errorsChurn.get(x._1).getOrElse(0))))
-      // splot 2
-      val signinChurn = getInfErrors(s"status:1 AND $complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", "2018-08", "signin", contractGrp, maintain, cate, cause).toMap
-      val rsSignin = getInfErrors(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", "2018-08", "signin", "-1", "", "", "").map(x=> (x._1, CommonService.format2Decimal(x._2), CommonService.format2Decimal(signinChurn.get(x._1).getOrElse(0))))
-      // splot 3
-      val suyhaoChurn = getInfErrors(s"status:1 AND $complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", "2018-08", "suyhao", contractGrp, maintain, cate, cause).toMap
-      val rsSuyhao = getInfErrors(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", "2018-08", "suyhao", "-1", "", "", "").map(x=> (x._1, CommonService.format2Decimal(x._2), CommonService.format2Decimal(suyhaoChurn.get(x._1).getOrElse(0))))
-      // splot 4
-      val downChurn = getInfErrors(s"status:1 AND $complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", "2018-08", "usage", contractGrp, maintain, cate, cause).toMap
-      val rsDownload = getInfErrors(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", "2018-08", "usage", "-1", "", "", "")
+      val errorsChurn = getInfErrors(s"status:1 AND $complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", month, "inf", contractGrp, maintain, cate, cause).toMap
+      val rsErrors = getInfErrors(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", month, "inf", "-1", "", "", "").map(x=> (x._1, CommonService.format2Decimal(x._2), CommonService.format2Decimal(errorsChurn.get(x._1).getOrElse(0))))
+    logger.info("--tt1--: "+(System.currentTimeMillis() -t6))
+    val tt2 = System.currentTimeMillis()
+    // splot 2
+      val signinChurn = getInfErrors(s"status:1 AND $complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", month, "signin", contractGrp, maintain, cate, cause).toMap
+      val rsSignin = getInfErrors(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", month, "signin", "-1", "", "", "").map(x=> (x._1, CommonService.format2Decimal(x._2), CommonService.format2Decimal(signinChurn.get(x._1).getOrElse(0))))
+    logger.info("--tt2--: "+(System.currentTimeMillis() -tt2))
+    val tt3 = System.currentTimeMillis()
+    // splot 3
+      val suyhaoChurn = getInfErrors(s"status:1 AND $complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", month, "suyhao", contractGrp, maintain, cate, cause).toMap
+      val rsSuyhao = getInfErrors(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", month, "suyhao", "-1", "", "", "").map(x=> (x._1, CommonService.format2Decimal(x._2), CommonService.format2Decimal(suyhaoChurn.get(x._1).getOrElse(0))))
+    logger.info("--tt3--: "+(System.currentTimeMillis() -tt3))
+    val tt4 = System.currentTimeMillis()
+    // splot 4
+      val downChurn = getInfErrors(s"status:1 AND $complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", month, "usage", contractGrp, maintain, cate, cause).toMap
+      val rsDownload = getInfErrors(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", month, "usage", "-1", "", "", "")
         .map(x=> (x._1, CommonService.format2Decimal(BytesUtil.bytesToGigabytes(x._2.toLong)),CommonService.format2Decimal(BytesUtil.bytesToGigabytes(downChurn.get(x._1).getOrElse(0.0).toLong))))
-      // splot 5
-      val feeChurn = getInfErrors(s"status:1 AND $complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", "2018-08", "fee", contractGrp, maintain, cate, cause).toMap
-      val rsFee = getInfErrors(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", "2018-08", "fee", "-1", "", "", "").map(x=> (x._1, CommonService.format2Decimal(x._2), CommonService.format2Decimal(feeChurn.get(x._1).getOrElse(0))))
+    logger.info("--tt4--: "+(System.currentTimeMillis() -tt4))
+    val tt5 = System.currentTimeMillis()
+    // splot 5
+      val feeChurn = getInfErrors(s"status:1 AND $complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", month, "fee", contractGrp, maintain, cate, cause).toMap
+      val rsFee = getInfErrors(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", month, "fee", "-1", "", "", "").map(x=> (x._1, CommonService.format2Decimal(x._2), CommonService.format2Decimal(feeChurn.get(x._1).getOrElse(0))))
 
-    println("Time: "+(System.currentTimeMillis() -time))
+    logger.info("--tt5--: "+(System.currentTimeMillis() -tt5))
+
+    logger.info("Time: "+(System.currentTimeMillis() -time))
+    logger.info("========END DETECT SERVICE=========")
     DetectResponse((numContract, numChurnCt, numChurnbyRegion, numCall, numChecklist), (callYesCtYes, callYesCtNo, callNoCtYes, callNoCtNo),(numCtByRegion, numCtByAge, numCtByTengoi),
       arrProblem, topCates, topCallContent, medianHours, numCauses, topChecklistContent, medianMaintain, Indicator(rsErrors, rsSignin, rsSuyhao, rsDownload, rsFee))
   }

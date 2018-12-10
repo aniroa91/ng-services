@@ -59,7 +59,11 @@
             .txtInput{
                 text-align: center;cursor: pointer;background-color: white!important;height: 20px
             }
-
+            .txtCmt{
+                color: #16a085;
+                max-width: 200px;
+                padding: 0px 10px 0px 10px;
+            }
             .activeLi{
                 background: #16a085;
             }
@@ -156,12 +160,20 @@
                 margin-left: 10px;
                 color: #555!important;
             }
+            .areaXs{
+                margin-left: 10px;width:93%;color: #5A738E
+            }
             .filter{
                 padding: 5px 0px 0px 10px;
                 margin: 30px 0px 15px 0px;
                 color: #f90;
                 font-size: 18px;
                 background: #F7F7F7;
+            }
+            .lineDivXs {
+                margin: 0px 0px 10px 0px;
+                background: white;
+                width: 95%;
             }
             .titBox{
                 font-family: "Helvetica Neue", Roboto, Arial, "Droid Sans", sans-serif;
@@ -211,9 +223,15 @@
                             </div>
                         </div>
                         <div class="col-xs-12 lineDivWhite"></div>
-                        <div style="padding:0px 5px">
+                        <div style="padding:0px 10px">
                             <a class="apply btn btn-xs btn-success" style="float: right;"><i class="fa fa-check-circle"></i> Apply</a>
                             <a href="/internet/age" class="btn btn-xs btn-secondary btnRefresh"><i class="fa fa-refresh"></i> Refresh</a>
+                        </div>
+                        <div class="col-xs-12 lineDivBlack"></div>
+                        <div style="margin-top: 60px">
+                            <label class="txtCmt">Data is pending 2018-10</label>
+                            <textarea class="form-control" placeholder="Your comment report..." id="cmt" rows="3" style="color: #5A738E"></textarea>
+                            <a class="btn btn-xs btn-primary" style="margin: 10px 0px 20px 0px;float: right">Comment</a>
                         </div>
                     </nav>
                 </div>
@@ -322,10 +340,15 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-xs-12 lineDivWhite"></div>
-                                            <div style="padding:0px 15px">
+                                            <div style="margin:15px 0px 0px 0px;padding:0px 15px">
                                                 <a class="apply btn btn-xs btn-success" style="float: right;margin-bottom: 15px"><i class="fa fa-check-circle"></i> Apply</a>
                                                 <a href="/internet/age" class="btn btn-xs btn-secondary btnRefresh"><i class="fa fa-refresh"></i> Refresh</a>
+                                            </div>
+                                            <div class="col-xs-12 lineDivXs"></div>
+                                            <div style="margin-top: 60px">
+                                                <label class="txtCmt">Data is pending 2018-10</label>
+                                                <textarea class="form-control areaXs" placeholder="Your comment report..." id="cmt" rows="3"></textarea>
+                                                <a class="btn btn-xs btn-primary" style="margin: 10px 15px 20px 0px;float: right">Comment</a>
                                             </div>
                                         </ul>
                                     </nav>

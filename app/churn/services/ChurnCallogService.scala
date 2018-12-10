@@ -15,6 +15,8 @@ import churn.utils.{AgeGroupUtil, CommonUtil}
 import org.elasticsearch.search.sort.SortOrder
 import play.api.mvc.{AnyContent, Request}
 import churn.models.CallogResponse
+import play.api.Logger
+
 import scalaj.http.Http
 import services.Configure
 import services.domain.CommonService
@@ -22,6 +24,8 @@ import services.domain.CommonService
 object  ChurnCallogService{
 
   val client = Configure.client
+
+  val logger = Logger(this.getClass())
 
   def getNumberOfContractCallIn(region:String, age: String, category: String) ={
     val queries = "region:"+region+" AND lifeGroup:"+age+" AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\")"
@@ -169,8 +173,8 @@ object  ChurnCallogService{
   }*/
 
   def getNumberOfContractAll(queryString: String) ={
-    val queries = queryString + " AND !(Region:0) AND !(TenGoi: \"FTTH - TV ONLY\") AND !(TenGoi: \"ADSL - TV ONLY\") AND !(TenGoi: \"ADSL - TV GOLD\") AND !(TenGoi: \"FTTH - TV GOLD\") "
-    val request = search("profile-internet-contract-*" / "docs") query(queries) aggregations (
+    val queries = queryString + " AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\") "
+    val request = search("churn-contract-info-*" / "docs") query(queries) aggregations (
       termsAggregation("month")
         .field("month") size 24
       )  size 0 sortBy( fieldSort("month") order SortOrder.DESC)
@@ -377,16 +381,16 @@ object  ChurnCallogService{
   }*/
 
   def getChurnCallInbyRegionAll(queryString: String) ={
-    val request = search("profile-internet-contract-*" / "docs") query(queryString + " AND !(TenGoi: \"FTTH - TV ONLY\") AND !(TenGoi: \"ADSL - TV ONLY\") AND !(TenGoi: \"ADSL - TV GOLD\") AND !(TenGoi: \"FTTH - TV GOLD\") ") aggregations (
+    val request = search("churn-contract-info-*" / "docs") query(queryString + " AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\") ") aggregations (
       termsAggregation("month")
         .field("month")
         .subaggs(
-          termsAggregation("Region")
-            .field("Region") size 1000
-        ) size 24
-      ) sortBy( fieldSort("month") order SortOrder.DESC)
+          termsAggregation("region")
+            .field("region") size 1000
+        ) size 15
+      ) size 0 sortBy( fieldSort("month") order SortOrder.DESC)
     val rs = client.execute(request).await
-    CommonService.getSecondAggregations(rs.aggregations.get("month"), "Region")
+    CommonService.getSecondAggregations(rs.aggregations.get("month"), "region")
       .flatMap(x=> x._2.map(y=> x._1 -> y))
       .map(x=> (x._1, x._2._1, x._2._2)).filter(x=> x._1 != CommonService.getCurrentMonth()).sortWith((x, y) => x._1 > y._1)
   }
@@ -473,9 +477,9 @@ object  ChurnCallogService{
 
 
   def getChurnByRegionAgeAll(month: String) ={
-    val request = search(s"profile-internet-contract-${month}" / "docs") query("!(Region:0) AND !(TenGoi: \"FTTH - TV ONLY\") AND !(TenGoi: \"ADSL - TV ONLY\") AND !(TenGoi: \"ADSL - TV GOLD\") AND !(TenGoi: \"FTTH - TV GOLD\") ") aggregations (
+    val request = search(s"churn-contract-info-${month}" / "docs") query("!(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\") ") aggregations (
       rangeAggregation("age")
-        .field("Age")
+        .field("age")
         .range("6", 0, 6.0001)
         .range("12", 6.001, 12.001)
         .range("18", 12.001, 18.001)
@@ -489,7 +493,7 @@ object  ChurnCallogService{
         .range("66", 60.001, Double.MaxValue)
         .subaggs(
           termsAggregation("region")
-            .field("Region") size 1000
+            .field("region") size 1000
         )
       )
     val rs = client.execute(request).await
@@ -845,16 +849,15 @@ object  ChurnCallogService{
   }
 
   def calChurnCallinRateAndPercentagebyRegion(callInRegion: Array[(String, String, Long)], allRegion: Array[(String, String, Long)]) = {
-    val catesMonth  = callInRegion.map(x=> x._1).distinct.sortWith((x, y) => x > y).slice(0,12)
+    val catesMonth  = allRegion.map(x=> x._1).distinct.sortWith((x, y) => x > y).slice(0,12)
     val rs = callInRegion.filter(x=> catesMonth.indexOf(x._1) >= 0).map(x=> (x._1, x._2, x._3, allRegion.filter(y=> y._1 == x._1).filter(y=> y._2 == x._2).map(y=> y._3).sum))
         .map(x=> (x._1, x._2, CommonService.format2Decimal(x._3 * 100.00 / x._4), x._3)).sorted
 
-    (catesMonth.sorted, rs)
+    (rs.map(x=>x._1).distinct.sorted, rs)
   }
 
   def calCallInRateAndPercentageRegionAge(array: Array[(String, String, String, Int, Int)], status: Int) = {
     val rs = array.filter(x => x._2.toInt == status)
-    //rs.foreach(println)
     val sumByRegionAge       = rs.map(x=> (x._1, x._3, x._5, CommonService.format2Decimal(x._5 * 100.0 / x._4)))
     val sumByRegionAgeStatus = array.groupBy(x=> x._1-> x._3).map(x=> (x._1._1,x._1._2, x._2.map(y=> y._5).sum))
     sumByRegionAge.map(x=> (x._1.toInt, if(x._2 == "6-12") "06-12" else x._2, CommonService.format2Decimal(x._3 * 100.0 / sumByRegionAgeStatus.filter(y=> y._1 == x._1).filter(y=> y._2 == x._2)
@@ -862,12 +865,13 @@ object  ChurnCallogService{
   }
 
   def getInternet(request: Request[AnyContent]) = {
+    logger.info("========START CALLOG SERVICE=========")
     var status = 1 // Huy dich vu default
     var ageCallIn = "*"
     var ageAll = "*"
     var region = "*"
     var cate = "*"
-    var month = "2018-07"
+    var month = CommonService.getPrevMonth()
     if(request != null) {
       status = request.body.asFormUrlEncoded.get("status").head.toInt
       if(request.body.asFormUrlEncoded.get("age").head != "" && request.body.asFormUrlEncoded.get("age").head == "12"){
@@ -892,30 +896,33 @@ object  ChurnCallogService{
         }
       }
     }
-    /*println(s"month:$month \n status:$status \n ageCallIn:$ageCallIn \n ageAll:$ageAll")
-    println(s"region:$region \n cate:$cate")
-    println("*********")*/
+    val t0 = System.currentTimeMillis()
     // Number of Contracts Who Call in and Number of Inbound Calls
-    val contractAll = getNumberOfContractAll(s"Region:$region AND $ageAll").slice(0,12).sorted
+    val contractAll = getNumberOfContractAll(s"region:$region AND $ageAll").slice(0,12).sorted
     val whoCallIn   = getNumberOfContractCallIn(region, ageCallIn, cate).filter(x=> contractAll.map(y=> y._1).indexOf(x._1) >=0)
       .map(x=> (x._1, x._2, CommonService.format2Decimal(x._2 * 100.00 / contractAll.toMap.get(x._1).get), x._3)).sorted
-
+    logger.info("t0: "+(System.currentTimeMillis() - t0))
+    val t1 = System.currentTimeMillis()
     // Churn Rate and Churn Percentage by Call Category
     val churnCates = calChurnRateAndPercentageCategory(getChurnByCates(s"month:$month AND region:$region AND lifeGroup:$ageCallIn"), status, s"month:$month AND region:$region AND lifeGroup:$ageCallIn")
-
+    logger.info("t1: "+(System.currentTimeMillis() - t1))
+    val t2 = System.currentTimeMillis()
     // Number of Contracts Who Call in by Region by Contract Age
     val numOfCallIn   = getChurnByRegionAgeCallIn(month, cate)
     val numOfContract = getChurnByRegionAgeAll(month)
     val callInRegionAge = numOfCallIn.map(x=> (x._1, x._2, CommonService.format2Decimal(x._3 * 100.00 / numOfContract.filter(y=> y._1 == x._1).filter(y=> y._2 == x._2).map(y=> y._3).sum), x._3))
-
+    logger.info("t2: "+(System.currentTimeMillis() - t2))
+    val t3 = System.currentTimeMillis()
     // For Contracts Who Call in: Trend in Churn Rate and Churn Percentage
-    val allChurn_count  = getNumberOfContractAll(s"Status:$status AND $ageAll AND Region:$region")
+    val allChurn_count  = getNumberOfContractAll(s"status:$status AND $ageAll AND region:$region")
     val trendCallIn = calTrendCallinRateAndPercentage(getTrendCallIn(region, ageCallIn, cate), allChurn_count , status)
-
+    logger.info("t3: "+(System.currentTimeMillis() - t3))
+    val t4 = System.currentTimeMillis()
     //  Number of Contracts Who Call In by Region
-    val ctAllRegion  = getChurnCallInbyRegionAll(s"$ageAll AND !(Region:0)")
+    val ctAllRegion  = getChurnCallInbyRegionAll(s"$ageAll AND !(region:0)")
     val callInRegion = calChurnCallinRateAndPercentagebyRegion(getChurnCallInbyRegionCallIn(ageCallIn, cate), ctAllRegion)
-
+    logger.info("t4: "+(System.currentTimeMillis() - t4))
+    val t5 = System.currentTimeMillis()
     // region and month trends
     val trendRegionMonth = ChurnRegionService.calChurnRateAndPercentageForRegionMonth(getCallInRegionMonth(ageCallIn, cate), status).filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
     val top12monthRegion = trendRegionMonth.map(x=> x._2).distinct.sortWith((x, y) => x > y).filter(x=> x != CommonService.getCurrentMonth()).slice(0,12).sorted
@@ -935,7 +942,8 @@ object  ChurnCallogService{
     val callRegionMonth = arrGroup.map(x=> (x._1, x._2, if(rsRegionMonth.filter(y=> y._1 == x._1).filter(y=> y._2 == x._2).length ==0) arrEmpty else rsRegionMonth.filter(y=> y._1 == x._1).filter(y=> y._2 == x._2)
       .map(x=> (x._3, x._4, x._5)))).flatMap(x=> x._3.map(y=> (x._1, x._2) -> y))
       .map(x=> (x._1._1, x._1._2, x._2._1, x._2._2, x._2._3))
-
+    logger.info("t5: "+(System.currentTimeMillis() - t5))
+    val t6 = System.currentTimeMillis()
     // region and age trends
     val trendRegionAge = calCallInRateAndPercentageRegionAge(getCallInRegionAge(month, "*"), status)
     val mapAge = AgeGroupUtil.AGE.map(y=> y._2).toArray
@@ -951,7 +959,9 @@ object  ChurnCallogService{
       .filter(y=> x._2 == AgeGroupUtil.getAgeIdByName(y._2)).map(x=> (x._3, x._4, x._5))))
       .flatMap(x=> x._3.map(y=> (x._1, x._2) -> y))
       .map(x=> (x._1._1, x._1._2, x._2._1, x._2._2, x._2._3))
-
+    logger.info("t6: "+(System.currentTimeMillis() - t6))
+    logger.info("Time: "+(System.currentTimeMillis() - t0))
+    logger.info("========END CALLOG SERVICE=========")
     CallogResponse(whoCallIn, churnCates, callInRegionAge, trendCallIn, callInRegion, (mapMonthRegion, callRegionMonth), callRegionAge)
   }
 }
