@@ -30,17 +30,17 @@ object AgeGroupUtil {
   )
 
    val AGE_CALCULATE = Map(
-      "0-6"   -> "Age:<=6",
-      "06-12" -> "Age:>6 AND Age:<=12",
-      "12-18" -> "Age:>12 AND Age:<=18",
-      "18-24" -> "Age:>18 AND Age:<=24",
-      "24-30" -> "Age:>24 AND Age:<=30",
-      "30-36" -> "Age:>30 AND Age:<=36",
-      "36-42" -> "Age:>36 AND Age:<=42",
-      "42-48" -> "Age:>42 AND Age:<=48",
-      "48-54" -> "Age:>48 AND Age:<=54",
-      "54-60" -> "Age:>54 AND Age:<=60",
-      ">60"   -> "Age:>60"
+      "0-6"   -> "age:<=6",
+      "06-12" -> "age:>6 AND age:<=12",
+      "12-18" -> "age:>12 AND age:<=18",
+      "18-24" -> "age:>18 AND age:<=24",
+      "24-30" -> "age:>24 AND age:<=30",
+      "30-36" -> "age:>30 AND age:<=36",
+      "36-42" -> "age:>36 AND age:<=42",
+      "42-48" -> "age:>42 AND age:<=48",
+      "48-54" -> "age:>48 AND age:<=54",
+      "54-60" -> "age:>54 AND age:<=60",
+      ">60"   -> "age:>60"
    )
 
   def getAgeById(id: Int): String = AGE.find(x=> x._2 == id).get._1
