@@ -146,7 +146,7 @@
             $('.monthPicker').datepicker({
                 autoclose: true,
                 minViewMode: 1,
-                startDate: '-15m',
+                startDate: '-12m',
                 endDate: '-1m',
                 format: 'yyyy-mm'
             }).on('changeDate', function (selected) {
@@ -193,39 +193,18 @@
                     }
                     // change label month
                     if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#444444')) {
-                        if(text.innerHTML == 0 || text.innerHTML == 13)
+                        if(text.innerHTML == 0 || text.innerHTML == Object.keys(catesMonth).length + 1)
                             text.setAttribute('fill-opacity',0)
                         else{
-                            switch ( text.innerHTML){
-                                case "1" :
-                                    text.innerHTML = keyByValue(catesMonth, 1) ;break;
-                                case "2" :
-                                    text.innerHTML = keyByValue(catesMonth, 2) ;break;
-                                case "3" :
-                                    text.innerHTML = keyByValue(catesMonth, 3) ;break;
-                                case "4" :
-                                    text.innerHTML = keyByValue(catesMonth, 4) ;break;
-                                case "5" :
-                                    text.innerHTML = keyByValue(catesMonth, 5) ;break;
-                                case "6" :
-                                    text.innerHTML = keyByValue(catesMonth, 6) ;break;
-                                case "7" :
-                                    text.innerHTML = keyByValue(catesMonth, 7) ;break;
-                                case "8" :
-                                    text.innerHTML = keyByValue(catesMonth, 8) ;break;
-                                case "9" :
-                                    text.innerHTML = keyByValue(catesMonth, 9) ;break;
-                                case "10" :
-                                    text.innerHTML = keyByValue(catesMonth, 10) ;break;
-                                case "11" :
-                                    text.innerHTML = keyByValue(catesMonth, 11) ;break;
-                                case "12" :
-                                    text.innerHTML = keyByValue(catesMonth, 12) ;break;
-                            }
+                            text.innerHTML = keyByValue(catesMonth, Number(text.innerHTML))
                         }
                     }
                 });
             });
+            if(Object.keys(catesMonth).length == 1)
+                optionsProfile.hAxis.gridlines.count = 4
+            else
+                optionsProfile.hAxis.gridlines.count = Object.keys(catesMonth).length+2
             chartHuyDv.draw(dataHuyDv, optionsProfile);
             google.visualization.events.addListener(chartHuyDv, 'select', function () {
                 var selection = chartHuyDv.getSelection();
@@ -434,39 +413,18 @@
                     }
                     // change label month
                     if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#1c2752')) {
-                        if(text.innerHTML == 0 || text.innerHTML == 13)
+                        if(text.innerHTML == 0 || text.innerHTML == Object.keys(catesMonthRegion).length + 1)
                             text.setAttribute('fill-opacity',0)
                         else{
-                            switch ( text.innerHTML){
-                                case "1" :
-                                    text.innerHTML = keyByValue(catesMonthRegion, 1) ;break;
-                                case "2" :
-                                    text.innerHTML = keyByValue(catesMonthRegion, 2) ;break;
-                                case "3" :
-                                    text.innerHTML = keyByValue(catesMonthRegion, 3) ;break;
-                                case "4" :
-                                    text.innerHTML = keyByValue(catesMonthRegion, 4) ;break;
-                                case "5" :
-                                    text.innerHTML = keyByValue(catesMonthRegion, 5) ;break;
-                                case "6" :
-                                    text.innerHTML = keyByValue(catesMonthRegion, 6) ;break;
-                                case "7" :
-                                    text.innerHTML = keyByValue(catesMonthRegion, 7) ;break;
-                                case "8" :
-                                    text.innerHTML = keyByValue(catesMonthRegion, 8) ;break;
-                                case "9" :
-                                    text.innerHTML = keyByValue(catesMonthRegion, 9) ;break;
-                                case "10" :
-                                    text.innerHTML = keyByValue(catesMonthRegion, 10) ;break;
-                                case "11" :
-                                    text.innerHTML = keyByValue(catesMonthRegion, 11) ;break;
-                                case "12" :
-                                    text.innerHTML = keyByValue(catesMonthRegion, 12) ;break;
-                            }
+                            text.innerHTML = keyByValue(catesMonthRegion, Number(text.innerHTML))
                         }
                     }
                 });
             });
+            if(Object.keys(catesMonthRegion).length == 1)
+                optionsRegion.hAxis.gridlines.count = 4
+            else
+                optionsRegion.hAxis.gridlines.count = Object.keys(catesMonthRegion).length+2
             chartRegionHuyDv.draw(dataRegionHuyDv, optionsRegion);
             google.visualization.events.addListener(chartRegionHuyDv, 'select', function () {
                 var selection = chartRegionHuyDv.getSelection();
@@ -858,47 +816,10 @@
                                                 }
                                             }
                                             else {
-                                                if (text.innerHTML == 0 || text.innerHTML == Object.keys(dta.churn3.cates).length + 1)
+                                                if (text.innerHTML == 0 || text.innerHTML >= Object.keys(dta.churn3.cates).length + 1)
                                                     text.setAttribute('fill-opacity', 0)
                                                 else {
-                                                    switch (text.innerHTML) {
-                                                        case "1" :
-                                                            text.innerHTML = keyByValue(dta.churn3.cates, 1) ;
-                                                            break;
-                                                        case "2" :
-                                                            text.innerHTML = keyByValue(dta.churn3.cates, 2) ;
-                                                            break;
-                                                        case "3" :
-                                                            text.innerHTML = keyByValue(dta.churn3.cates, 3) ;
-                                                            break;
-                                                        case "4" :
-                                                            text.innerHTML = keyByValue(dta.churn3.cates, 4) ;
-                                                            break;
-                                                        case "5" :
-                                                            text.innerHTML = keyByValue(dta.churn3.cates, 5) ;
-                                                            break;
-                                                        case "6" :
-                                                            text.innerHTML = keyByValue(dta.churn3.cates, 6) ;
-                                                            break;
-                                                        case "7" :
-                                                            text.innerHTML = keyByValue(dta.churn3.cates, 7) ;
-                                                            break;
-                                                        case "8" :
-                                                            text.innerHTML = keyByValue(dta.churn3.cates, 8) ;
-                                                            break;
-                                                        case "9" :
-                                                            text.innerHTML = keyByValue(dta.churn3.cates, 9) ;
-                                                            break;
-                                                        case "10" :
-                                                            text.innerHTML = keyByValue(dta.churn3.cates, 10) ;
-                                                            break;
-                                                        case "11" :
-                                                            text.innerHTML = keyByValue(dta.churn3.cates, 11) ;
-                                                            break;
-                                                        case "12" :
-                                                            text.innerHTML = keyByValue(dta.churn3.cates, 12) ;
-                                                            break;
-                                                    }
+                                                    text.innerHTML = keyByValue(dta.churn3.cates, Number(text.innerHTML))
                                                 }
                                             }
                                         }
@@ -997,35 +918,10 @@
                                         }
                                         // change label month
                                         if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#444444')) {
-                                            if(text.innerHTML == 0 || text.innerHTML == Object.keys(dta.churn4.catesMonth).length+1)
+                                            if(text.innerHTML == 0 || text.innerHTML >= Object.keys(dta.churn4.catesMonth).length+1)
                                                 text.setAttribute('fill-opacity',0)
                                             else{
-                                                switch ( text.innerHTML){
-                                                    case "1" :
-                                                        text.innerHTML = keyByValue(dta.churn4.catesMonth, 1) ;break;
-                                                    case "2" :
-                                                        text.innerHTML = keyByValue(dta.churn4.catesMonth, 2) ;break;
-                                                    case "3" :
-                                                        text.innerHTML = keyByValue(dta.churn4.catesMonth, 3) ;break;
-                                                    case "4" :
-                                                        text.innerHTML = keyByValue(dta.churn4.catesMonth, 4) ;break;
-                                                    case "5" :
-                                                        text.innerHTML = keyByValue(dta.churn4.catesMonth, 5) ;break;
-                                                    case "6" :
-                                                        text.innerHTML = keyByValue(dta.churn4.catesMonth, 6) ;break;
-                                                    case "7" :
-                                                        text.innerHTML = keyByValue(dta.churn4.catesMonth, 7) ;break;
-                                                    case "8" :
-                                                        text.innerHTML = keyByValue(dta.churn4.catesMonth, 8) ;break;
-                                                    case "9" :
-                                                        text.innerHTML = keyByValue(dta.churn4.catesMonth, 9) ;break;
-                                                    case "10" :
-                                                        text.innerHTML = keyByValue(dta.churn4.catesMonth, 10) ;break;
-                                                    case "11" :
-                                                        text.innerHTML = keyByValue(dta.churn4.catesMonth, 11) ;break;
-                                                    case "12" :
-                                                        text.innerHTML = keyByValue(dta.churn4.catesMonth, 12) ;break;
-                                                }
+                                                text.innerHTML = keyByValue(dta.churn4.catesMonth, Number(text.innerHTML))
                                             }
                                         }
                                     });
