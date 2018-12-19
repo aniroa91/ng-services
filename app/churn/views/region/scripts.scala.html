@@ -26,7 +26,7 @@
                 }
             },
             vAxis: {
-                title: 'Package',
+                title: '',
                 gridlines: {
                     count: 10,
                     color: '#f0f0f0'
@@ -62,7 +62,7 @@
             title: 'Churn Rate (%)',
             hAxis: {title: 'Age',gridlines: {count: 13,color: 'transparent'}},
             vAxis: {
-                title: 'Package',
+                title: '',
                 gridlines: {count: 10,color: '#f0f0f0'},
                 textStyle : {
                     fontSize: 9
@@ -108,7 +108,7 @@
                 },
             },
             vAxis: {
-                title: 'Region',
+                title: '',
                 gridlines: {
                     count: 9,
                     color: '#f0f0f0'
@@ -117,7 +117,7 @@
             chartArea: {
                 height: "74%",
                 width: "73%",
-                left: 120,
+                left: 150,
                 right: 20
             },
             width: '100%',
@@ -155,6 +155,8 @@
                 var month = startDate.getMonth() < 9 ? ('0' + Number(startDate.getMonth() + 1)) : (Number(startDate.getMonth() + 1));
                 var newDate = yr + '-' + month;
                 $('#month').val(newDate)
+                // change highlight filters
+                $('.monthGrp').removeAttr('style')
             });
 
             // trend profile and month charts bubble
@@ -223,10 +225,10 @@
                     $('.txtProfile').text("")
                     $('.profileDiv').hide()
                 }
-                $('#slRegion').val("*")
-                $('#age').val("")
-                $('.txtAge').text("")
-                $('.ageDiv').hide()
+                //$('.slRegion').val("*")
+                //$('#age').val("")
+                //$('.txtAge').text("")
+                //$('.ageDiv').hide()
                 ajaxGetChurn("profileMonth")
             });
             google.visualization.events.addListener(chartHuyDv, 'onmousedown', function (event) {
@@ -361,7 +363,7 @@
                     $('.txtAge').text("")
                     $('.ageDiv').hide()
                 }
-                $('.slRegion').val("*")
+                //$('.slRegion').val("*")
                 $(".monthPicker").datepicker("update", $('#month').val());
                 ajaxGetChurn("profileAge")
             });
@@ -407,6 +409,7 @@
                     if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444')) {
                         if(text.innerHTML == 0 || text.innerHTML == 8)
                             text.setAttribute('fill-opacity',0)
+                        text.innerHTML = "Vung "+text.innerHTML
                     }
                     if((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#222222')){
                         text.setAttribute('x', 22.55)
@@ -425,6 +428,7 @@
                 optionsRegion.hAxis.gridlines.count = 4
             else
                 optionsRegion.hAxis.gridlines.count = Object.keys(catesMonthRegion).length+2
+            optionsRegion.vAxis.gridlines.count = Number(@Html(Json.stringify(Json.toJson(rs.trendRegionMonth._2.map(x=> x._1).max))))+2
             chartRegionHuyDv.draw(dataRegionHuyDv, optionsRegion);
             google.visualization.events.addListener(chartRegionHuyDv, 'select', function () {
                 var selection = chartRegionHuyDv.getSelection();
@@ -439,12 +443,12 @@
                     $(".monthPicker").datepicker("update", $('#month').val());
                     $('.slRegion').val("*")
                 }
-                $('#profile').val("")
-                $('#age').val("")
-                $('.txtProfile').text("")
-                $('.profileDiv').hide()
-                $('.txtAge').text("")
-                $('.ageDiv').hide()
+                //$('#profile').val("")
+                //$('#age').val("")
+                //$('.txtProfile').text("")
+                //$('.profileDiv').hide()
+                //$('.txtAge').text("")
+                //$('.ageDiv').hide()
                 ajaxGetChurn("regionMonth")
             });
             google.visualization.events.addListener(chartRegionHuyDv, 'onmousedown', function (event) {
@@ -585,11 +589,11 @@
                         point: {
                             events: {
                                 click: function () {
-                                    $('#age').val("")
-                                    $('.slRegion').val("*")
+                                    //$('#age').val("")
+                                    //$('.slRegion').val("*")
                                     $(".monthPicker").datepicker("update", $('#month').val());
-                                    $('.txtAge').text("")
-                                    $('.ageDiv').hide()
+                                    //$('.txtAge').text("")
+                                    //$('.ageDiv').hide()
                                     if(this.category == $('#profile').val()){
                                         $('#profile').val("")
                                         $('.txtProfile').text("")
@@ -689,7 +693,7 @@
                                         $('.profileDiv').show()
 
                                     }
-                                    $('.slRegion').val("*")
+                                    //$('.slRegion').val("*")
                                     $(".monthPicker").datepicker("update", $('#month').val());
                                     ajaxGetChurn("churn5_heatmap")
                                 },
@@ -734,14 +738,24 @@
                     $(this).addClass('in').addClass('active')
                 }
             })
+            // click filter Status
+            $('.slStatus').on('change',function () {
+                // remove highlight filters
+                $('.slStatus').removeAttr('style')
+            })
+            // click filter Region
+            $('.slRegion').on('change',function () {
+                // remove highlight filters
+                $('.slRegion').removeAttr('style')
+            })
             // click apply fitler
             $('.apply').click(function () {
-                $('#profile').val("")
-                $('#age').val("")
-                $('.txtAge').text("")
-                $('.ageDiv').hide()
-                $('.txtProfile').text("")
-                $('.profileDiv').hide()
+                //$('#profile').val("")
+                //$('#age').val("")
+                //$('.txtAge').text("")
+                //$('.ageDiv').hide()
+                //$('.txtProfile').text("")
+                //$('.profileDiv').hide()
                 ajaxGetChurn("*")
             })
 
@@ -763,7 +777,12 @@
                     },
                     success: function (dta) {
                         if(dta != "Error"){
+                            // change highlight filters
+                            $('.slStatus').attr('style','border:1px solid #16a085!important')
+                            $('.slRegion').attr('style','border:1px solid #16a085!important')
+                            $('.monthGrp').attr('style','background-color: #16a085!important;color: #fff')
                             // update chart Region
+                               churn_region.xAxis[0].update({categories: dta.churn1.cates});
                                updateCharts(churn_region, getJsonChurnMonth(dta.churn1.churnRate, dta.churn1.churnPercent))
 
                             // update chart Profile
@@ -799,6 +818,7 @@
                                         if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444')) {
                                             if(text.innerHTML == 0 || text.innerHTML == 8)
                                                 text.setAttribute('fill-opacity',0)
+                                            text.innerHTML = "Vung "+text.innerHTML
                                         }
                                         if((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#222222')){
                                             text.setAttribute('x', 22.55)
@@ -830,6 +850,7 @@
                                     optionsRegion.hAxis.gridlines.count = 4
                                 else
                                     optionsRegion.hAxis.gridlines.count = Object.keys(dta.churn3.cates).length+2
+                                optionsRegion.vAxis.gridlines.count = Number(dta.churn3.numRegion)+2
                                 chartRegionMonth.draw(dataRegionMonth, optionsRegion)
                                 google.visualization.events.addListener(chartRegionMonth, 'select', function () {
                                     var selection = chartRegionMonth.getSelection();
@@ -844,12 +865,12 @@
                                         $(".monthPicker").datepicker("update", $('#month').val());
                                         $('.slRegion').val("*")
                                     }
-                                    $('#profile').val("")
+                                    /*$('#profile').val("")
                                     $('#age').val("")
                                     $('.txtProfile').text("")
                                     $('.profileDiv').hide()
                                     $('.txtAge').text("")
-                                    $('.ageDiv').hide()
+                                    $('.ageDiv').hide()*/
                                     ajaxGetChurn("regionMonth")
                                 });
                                 google.visualization.events.addListener(chartRegionMonth, 'onmousedown', function (event) {
@@ -947,10 +968,10 @@
                                         $('.txtProfile').text("")
                                         $('.profileDiv').hide()
                                     }
-                                    $('.slRegion').val("*")
-                                    $('#age').val("")
-                                    $('.txtAge').text("")
-                                    $('.ageDiv').hide()
+                                    //$('.slRegion').val("*")
+                                    //$('#age').val("")
+                                    //$('.txtAge').text("")
+                                    //$('.ageDiv').hide()
                                     ajaxGetChurn("profileMonth")
                                 })
                                 google.visualization.events.addListener(chartProfileMonth, 'onmousedown', function (event) {
@@ -1109,7 +1130,7 @@
                                         $('.txtAge').text("")
                                         $('.ageDiv').hide()
                                     }
-                                    $('.slRegion').val("*")
+                                    //$('.slRegion').val("*")
                                     $(".monthPicker").datepicker("update", $('#month').val());
                                     ajaxGetChurn("profileAge")
                                 })
@@ -1133,10 +1154,10 @@
                 "region" : $('.slRegion').val(),
                 "age"    : $('#age').val(),
                 "profile": $('#profile').val(),
-                "month"  : $('#monthGrp').val(),
+                "month"  : $('.monthGrp').val(),
                 "status" : $('.slStatus').val()
             }
-            console.log(obj)
+            //console.log(obj)
             return obj
         }
 

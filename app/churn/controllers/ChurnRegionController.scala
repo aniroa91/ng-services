@@ -54,8 +54,10 @@ class ChurnRegionController @Inject() (cc: ControllerComponents) extends Abstrac
       )
       val minPerc3 = if(rs.trendRegionMonth._2.length > 0) CommonService.format3Decimal(rs.trendRegionMonth._2.map(x=>x._4).min) else 0
       val maxPerc3 = if(rs.trendRegionMonth._2.length > 0) CommonService.format3Decimal(rs.trendRegionMonth._2.map(x=>x._4).max) else 0
+      val numRegion = if(rs.trendRegionMonth._2.length > 0) rs.trendRegionMonth._2.map(x=> x._1).max else 0
       val churn3 = Json.obj(
-        "cates" -> rs.trendRegionMonth._1,
+        "cates"      -> rs.trendRegionMonth._1,
+        "numRegion"  -> numRegion,
         "data"       -> rs.trendRegionMonth._2,
         "minPercent" -> minPerc3,
         "maxPercent" -> maxPerc3

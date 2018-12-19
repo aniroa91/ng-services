@@ -22,6 +22,8 @@ object CommonUtil {
     "VUNG 7" -> 7
   )
 
+  val filterCommon = "!(region:0) AND !(package_name: \"FTTH - TV ONLY\") AND !(package_name: \"ADSL - TV ONLY\") AND !(package_name: \"ADSL - TV GOLD\") AND !(package_name: \"FTTH - TV GOLD\")"
+
   def getFullQueryHaveNested(queries: String, groupContract: String, maintainParam: String, cateParam: String, causeParam: String) = {
     var cate = ""
     var maintain = ""

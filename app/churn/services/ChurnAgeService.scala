@@ -18,7 +18,7 @@ object  ChurnAgeService{
   val logger = Logger(this.getClass())
 
   def getChurnGroupMonth(queryString: String) ={
-    val request = search(s"churn-contract-info-*" / "docs") query(queryString+" AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\") ") aggregations (
+    val request = search(s"churn-contract-info-*" / "docs") query(queryString+" AND "+CommonUtil.filterCommon) aggregations (
       termsAggregation("month")
         .field("month")
         .subaggs(
@@ -49,7 +49,7 @@ object  ChurnAgeService{
   }
 
   def getChurnGroupAge(queryString: String) ={
-    val request = search(s"churn-contract-info-*" / "docs") query(queryString+" AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\") ") aggregations (
+    val request = search(s"churn-contract-info-*" / "docs") query(queryString+" AND "+ CommonUtil.filterCommon) aggregations (
       termsAggregation("status")
         .field("status")
         .subaggs(
@@ -73,7 +73,7 @@ object  ChurnAgeService{
   }
 
   def getChurn(month: String) ={
-    val request = search(s"churn-contract-info-${month}" / "docs") query("!(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\") ") aggregations (
+    val request = search(s"churn-contract-info-${month}" / "docs") query("!(region:0) AND "+CommonUtil.filterCommon) aggregations (
       termsAggregation("region")
         .field("region")
         .subaggs(

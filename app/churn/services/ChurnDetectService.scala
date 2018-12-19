@@ -529,14 +529,17 @@ object  ChurnDetectService{
     /* COMPLAIN */
       // chart 3
       val arrProblem   = getnumByProblem(s"$complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", month, contractGrp, maintain, cate, cause).sortWith((x,y) => x._2 > y._2)
-
+    logger.info("t51: "+(System.currentTimeMillis() -t5))
+    val t52 = System.currentTimeMillis()
     /* CALLOG GROUP*/
       // chart 4
       val topCates       = getTopCategory(s"$complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", month, contractGrp, maintain, "", cause).sortWith((x,y) => x._2 > y._2).slice(0,10)
-      // chart 12
+    logger.info("t52: "+(System.currentTimeMillis() -t52))
+    val t53 = System.currentTimeMillis()
+    // chart 12
       val topCallContent = getTopCallContent(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", month, 100, "*", "", "", "").sortWith((x, y) => x._2 > y._2).slice(0,100)
 
-    logger.info("t5: "+(System.currentTimeMillis() -t5))
+    logger.info("t53: "+(System.currentTimeMillis() -t53))
     val t6 = System.currentTimeMillis()
 
     /* INDICATOR*/
