@@ -32,7 +32,7 @@
                 }
             },
             vAxis: {
-                title: 'Region',
+                title: '',
                 gridlines: {
                     count: 9,
                     color: '#f0f0f0'
@@ -41,7 +41,7 @@
             chartArea: {
                 height: "73%",
                 width: "73%",
-                left: 120,
+                left: 150,
                 right: 30
             },
             width: widthChart,
@@ -78,7 +78,7 @@
                 }
             },
             vAxis: {
-                title: 'Region',
+                title: '',
                 gridlines: {
                     count: 9,
                     color: '#f0f0f0'
@@ -87,7 +87,7 @@
             chartArea: {
                 height: "70%",
                 width: "73%",
-                left: 120,
+                left: 150,
                 right: 20
             },
             width: widthChart,
@@ -125,6 +125,8 @@
                 var month = startDate.getMonth() < 9 ? ('0' + Number(startDate.getMonth() + 1)) : (Number(startDate.getMonth() + 1));
                 var newDate = yr + '-' + month;
                 $('#month').val(newDate)
+                // change highlight filters
+                $('.monthGrp').removeAttr('style')
             });
 
             var churn1 = Highcharts.chart('churn1', {
@@ -253,7 +255,7 @@
                     }
                 },
 
-                series: getJsonChurnMonth(@Html(Json.stringify(Json.toJson(rs.trendCallIn.map(x=> x._2)))),@Html(Json.stringify(Json.toJson(rs.trendCallIn.map(x=> x._3)))))
+                series: getJsonChurnMonthByStatus(@Html(Json.stringify(Json.toJson(rs.trendCallIn.map(x=> x._2)))),@Html(Json.stringify(Json.toJson(rs.trendCallIn.map(x=> x._3)))))
 
             });
 
@@ -361,6 +363,7 @@
                     if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444')) {
                         if(text.innerHTML == 0 || text.innerHTML == 8)
                             text.setAttribute('fill-opacity',0)
+                        text.innerHTML = "Vung "+text.innerHTML
                     }
                     // change label month
                     if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#1c2752')) {
@@ -450,8 +453,8 @@
                                 click: function (event) {
                                     var age = getIdBynameAge(event.point.series.xAxis.categories[event.point.x])
                                     var region = event.point.series.yAxis.categories[event.point.y].split(" ")[1]
-                                    $('.txtCate').text("")
-                                    $('.cateDiv').hide()
+                                    //$('.txtCate').text("")
+                                    //$('.cateDiv').hide()
                                     if(age == $('#age').val() && region == $('#region').val()){
                                         $('#region').val("")
                                         $('#age').val("")
@@ -468,7 +471,7 @@
                                         $('.txtRegion').text("Vung "+region)
                                         $('.regionDiv').show()
                                     }
-                                    $('#cateCurr').val("")
+                                    //$('#cateCurr').val("")
                                     ajaxGetChurnCallIn("churn5")
                                 },
                                 contextmenu: function (event) {
@@ -509,7 +512,7 @@
                     name: 'total contracts',
                     borderWidth: '0.03px',
                     borderColor:'#6495ED',
-                    data: getdataHeatMapRegionMonth(@Html(Json.stringify(Json.toJson(rs.callInRegionAge))), @Html(Json.stringify(Json.toJson(rs.callInRegionAge.map(x=>x._1).distinct.sorted))),@Html(Json.stringify(Json.toJson(rs.callInRegionAge.map(x=>x._2).distinct.sorted)))),
+                    data: getdataHeatMapRegionMonth(@Html(Json.stringify(Json.toJson(rs.callInRegionAge))), @Html(Json.stringify(Json.toJson(rs.callInRegionAge.map(x=>x._1.toInt).distinct.sorted))),@Html(Json.stringify(Json.toJson(rs.callInRegionAge.map(x=>x._2).distinct.sorted)))),
                     dataLabels: {
                         enabled: true,
                         style: {
@@ -531,6 +534,7 @@
                     if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444')) {
                         if(text.innerHTML == 0 || text.innerHTML == 8)
                             text.setAttribute('fill-opacity',0)
+                        text.innerHTML = "Vung "+text.innerHTML
                     }
                     // change label age
                     if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#1c2752')) {
@@ -568,8 +572,8 @@
             chartHuyDv.draw(dataHuyDv, options);
             google.visualization.events.addListener(chartHuyDv, 'select', function () {
                 var selection = chartHuyDv.getSelection()
-                $('.txtCate').text("")
-                $('.cateDiv').hide()
+                //$('.txtCate').text("")
+                //$('.cateDiv').hide()
                 if(selection.length >0) {
                     var row = selection[0].row;
                     var region = dataHuyDv.getValue(row, 2)
@@ -589,7 +593,7 @@
                     $('.txtRegion').text("")
                     $('.regionDiv').hide()
                 }
-                $('#cateCurr').val("")
+                //$('#cateCurr').val("")
                 ajaxGetChurnCallIn("churn6")
             });
             google.visualization.events.addListener(chartHuyDv, 'onmousedown', function (event) {
@@ -673,14 +677,14 @@
                         point: {
                             events: {
                                 click: function () {
-                                    $('#age').val("")
-                                    $('#region').val("")
+                                    //$('#age').val("")
+                                    //$('#region').val("")
                                     //$(".monthPicker").datepicker("update", $('#monthCurr').val())
                                     //$('#month').val($('#monthCurr').val())
-                                    $('.txtAge').text("")
+                                    /*$('.txtAge').text("")
                                     $('.ageDiv').hide()
                                     $('.txtRegion').text("")
-                                    $('.regionDiv').hide()
+                                    $('.regionDiv').hide()*/
                                     if(this.category == $('#cateCurr').val()){
                                         $('#cateCurr').val("")
                                         $('.cateDiv').hide()
@@ -716,9 +720,14 @@
                     $(this).addClass('in').addClass('active')
                 }
             })
+            // click filter Status
+            $('.slStatus').on('change',function () {
+                // remove highlight filters
+                $('.slStatus').removeAttr('style')
+            })
             // click apply fitler
             $('.apply').click(function () {
-                $('#region').val("")
+                /*$('#region').val("")
                 $('#age').val("")
                 $('#cateCurr').val("")
                 $('.txtAge').text("")
@@ -726,7 +735,7 @@
                 $('.txtRegion').text("")
                 $('.regionDiv').hide()
                 $('.txtCate').text("")
-                $('.cateDiv').hide()
+                $('.cateDiv').hide()*/
                 ajaxGetChurnCallIn("*")
             })
 
@@ -765,13 +774,18 @@
                     },
                     success: function (dta) {
                         if(dta != "Error"){
+                            $('#cateArr').val(dta.categories)
+                            // change highlight filters
+                            $('.slStatus').attr('style','border:1px solid #16a085!important')
+                            $('.slRegion').attr('style','border:1px solid #16a085!important')
+                            $('.monthGrp').attr('style','background-color: #16a085!important;color: #fff')
                             // update chart 1
                             churn1.xAxis[0].update({categories: dta.churn1.cates})
                             updateCharts(churn1, getJson2Column1Line(dta.churn1.count_ct, dta.churn1.churnPercent, dta.churn1.count_all, "Count Call"))
 
                             // update chart 2
                             churn2.xAxis[0].update({categories: dta.churn2.cates});
-                            updateCharts(churn2, getJsonChurnMonth(dta.churn2.churnRate, dta.churn2.churnPercent))
+                            updateCharts(churn2, getJsonChurnMonthByStatus(dta.churn2.churnRate, dta.churn2.churnPercent))
 
                             // update chart Heatmap 3
                             churn3.xAxis[0].update({categories: dta.churn3.xAxis})
@@ -782,7 +796,7 @@
                             if(_type != "churn5") {
                                 churn5.xAxis[0].update({categories: dta.churn5.xAxis})
                                 churn5.yAxis[0].update({categories: dta.churn5.yAxis})
-                                churn5.series[0].setData(getdataHeatMapRegionMonth(dta.churn5.data, dta.churn5.arrMonth, dta.churn5.arrRegion), true, true, false)
+                                churn5.series[0].setData(getdataHeatMapRegionMonth(dta.churn5.data, dta.churn5.arrAge, dta.churn5.arrRegion), true, true, false)
                             }
                             // update chart 7
                             if(_type != "churn7") {
@@ -809,6 +823,7 @@
                                     if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444')) {
                                         if(text.innerHTML == 0 || text.innerHTML == 8)
                                             text.setAttribute('fill-opacity',0)
+                                        text.innerHTML = "Vung "+text.innerHTML
                                     }
                                     // change label month
                                     if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#1c2752')) {
@@ -886,6 +901,7 @@
                                         if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444')) {
                                             if (text.innerHTML == 0 || text.innerHTML == 8)
                                                 text.setAttribute('fill-opacity', 0)
+                                            text.innerHTML = "Vung "+text.innerHTML
                                         }
                                         // change label age
                                         if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#1c2752')) {
@@ -1032,6 +1048,25 @@
                     }
                 }
             }
+            //console.log(rs)
+            return rs
+        }
+
+        function getJsonChurnMonthByStatus(churnRate, churnPercent){
+            var rs = []
+            rs.push({
+                name: ($('.slStatus').val() == 0? "Percent":"Churn Percent"),
+                type: 'column',
+                yAxis: 0,
+                data: churnPercent
+            })
+            rs.push({
+                name: ($('.slStatus').val() == 0? "Rate":"Churn Rate"),
+                type: 'spline',
+                yAxis: 1,
+                data: churnRate
+            });
+
             return rs
         }
 

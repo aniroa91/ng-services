@@ -9,19 +9,13 @@ import com.sksamuel.elastic4s.ElasticsearchClientUri
 import com.sksamuel.elastic4s.TcpClient
 import com.sksamuel.elastic4s.http.ElasticDsl.{RichFuture, RichString, SearchHttpExecutable, SearchShow, percentilesAggregation, query, rangeAggregation, search, termsAgg, termsAggregation, _}
 import com.sksamuel.elastic4s.http.search.SearchResponse
-import play.api.libs.json.JsArray
-import play.api.libs.json.JsNumber
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsString
-import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import churn.utils.{AgeGroupUtil, CommonUtil}
 import play.api.Logger
 import play.api.mvc.{AnyContent, Request}
-
-import scalaj.http.Http
 import services.Configure
 import services.domain.CommonService
+import org.joda.time.format.DateTimeFormat
+import org.joda.time.DateTime
 
 object  ChurnRegionService{
 
@@ -30,7 +24,7 @@ object  ChurnRegionService{
   val logger = Logger(this.getClass())
 
   def getChurnGroupMonth(queryString: String) ={
-    val request = search(s"churn-contract-info-*" / "docs") query(queryString +" AND "+CommonUtil.filterCommon) aggregations (
+    val request = search(s"churn-contract-info-*" / "docs") query(queryString +" AND "+CommonUtil.filterCommon("package_name")) aggregations (
       termsAggregation("month")
         .field("month")
         .subaggs(
@@ -62,7 +56,7 @@ object  ChurnRegionService{
 
   def getChurnGroupbyStatusRegion(queryString: String, profile: String) ={
     val profileQuery = if(profile == "*") "" else s" AND package_name: $profile"
-    val request = search(s"churn-contract-info-*" / "docs") query(queryString + profileQuery +" AND "+CommonUtil.filterCommon) aggregations (
+    val request = search(s"churn-contract-info-*" / "docs") query(queryString + profileQuery +" AND "+CommonUtil.filterCommon("package_name")) aggregations (
       termsAggregation("status")
         .field("status")
         .subaggs(
@@ -76,7 +70,7 @@ object  ChurnRegionService{
   }
 
   def getChurnGroupbyStatusProfile(queryString: String) ={
-    val request = search(s"churn-contract-info-*" / "docs") query(queryString + " AND "+CommonUtil.filterCommon) aggregations (
+    val request = search(s"churn-contract-info-*" / "docs") query(queryString + " AND "+CommonUtil.filterCommon("package_name")) aggregations (
       termsAggregation("status")
         .field("status")
         .subaggs(
@@ -90,7 +84,7 @@ object  ChurnRegionService{
   }
 
   def getTrendProfileMonth(queryString: String) ={
-    val request = search(s"churn-contract-info-*" / "docs") query(queryString + " AND "+CommonUtil.filterCommon) aggregations (
+    val request = search(s"churn-contract-info-*" / "docs") query(queryString + " AND "+CommonUtil.filterCommon("package_name")) aggregations (
       termsAggregation("month")
         .field("month")
         .subaggs(
@@ -108,7 +102,7 @@ object  ChurnRegionService{
 
   def getTrendRegionMonth(queryString: String, profile: String) ={
     val profileQuery = if(profile == "*") "" else s" AND package_name: $profile"
-    val request = search(s"churn-contract-info-*" / "docs") query(queryString + profileQuery + " AND "+CommonUtil.filterCommon) aggregations (
+    val request = search(s"churn-contract-info-*" / "docs") query(queryString + profileQuery + " AND "+CommonUtil.filterCommon("package_name")) aggregations (
       termsAggregation("month")
         .field("month")
         .subaggs(
@@ -125,7 +119,7 @@ object  ChurnRegionService{
   }
 
   def getTrendAgeProfile(month: String, region: String) = {
-    val request = search(s"churn-contract-info-${month}" / "docs") query(region +" AND "+CommonUtil.filterCommon) aggregations (
+    val request = search(s"churn-contract-info-${month}" / "docs") query(region +" AND "+CommonUtil.filterCommon("package_name")) aggregations (
       rangeAggregation("age")
         .field("age")
         .range("6", 0, 6.0001)
@@ -278,7 +272,9 @@ object  ChurnRegionService{
       profile = if(request.body.asFormUrlEncoded.get("profile").head != "") "\""+request.body.asFormUrlEncoded.get("profile").head +"\"" else "*"
       month = request.body.asFormUrlEncoded.get("month").head
     }
-    if(status == 4 || status == 4 || status == 6) changeDate = s"change_date:$month"
+    val stpChangeDate = "["+new DateTime(month+"-01").getMillis+" TO "+new DateTime(CommonService.getCurrentMonth()+"-01").getMillis+"]"
+    println("timestamp:"+stpChangeDate)
+    if(status == 4 || status == 4 || status == 6) changeDate = s"change_date:$stpChangeDate"
     val t0 = System.currentTimeMillis()
     // region and month trends
     val trendRegionMonth = calChurnRateAndPercentageForRegionMonth(getTrendRegionMonth(s"$age AND $changeDate", profile), status).filter(x=> x._2 != CommonService.getCurrentMonth()).sorted

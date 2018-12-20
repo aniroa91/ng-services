@@ -57,7 +57,10 @@
                 padding: 20px;
             }
             .txtInput{
-                text-align: center;cursor: pointer;background-color: white!important;height: 20px
+                text-align: center;cursor: pointer;background-color: #fff!important;height: 35px
+            }
+            .txtInputMb {
+                text-align: center;cursor: pointer;background-color: #fff!important;height: 20px
             }
             .txtCmt{
                 color: #16a085;
@@ -159,6 +162,16 @@
                 width: 177px;
                 margin-left: 10px;
                 color: #555!important;
+                height: 35px;
+            }
+            .selectBoxMb{
+                width: 75%;
+                height: 20px;
+                cursor: pointer;
+                margin-top: 10px;
+                width: 177px;
+                margin-left: 10px;
+                color: #555!important;
             }
             .areaXs{
                 margin-left: 10px;width:93%;color: #5A738E
@@ -203,7 +216,7 @@
                         </div>
                         <div class="divStatus" style="height: 170px;padding-top: 15px">
                             <span class="titFilter"><i class="fa fa-bell"></i> Group Status</span></i>
-                            <select class="form-control selectBox slStatus" style="height: 35px">
+                            <select class="form-control selectBox slStatus" style="border: 1px solid #16a085!important">
                             @for( (k,v) <- CommonUtil.STATUS_MAP){
                                 @if(v == 1){
                                     <option value="@v" selected>@k</option>
@@ -217,7 +230,7 @@
                         <div style="height: 140px;padding-top: 15px">
                             <span class="titFilter"><i class="fa fa-bell"></i> Group Month</span></i>
                             <div class="input-group date monthPicker">
-                                <input type="text" class="form-control txtInput" value="@month" readonly="true" style="height: 35px">
+                                <input type="text" class="monthGrp form-control txtInput" value="@month" readonly="true" style="background-color:#16a085!important;color: #fff">
                                 <span class="input-group-addon" style="background-color: #5A738E!important;"><i class="fa fa-calendar" aria-hidden="true" style="color:white"></i>
                                 </span>
                             </div>
@@ -321,7 +334,7 @@
                                             <div class="disInline">
                                                 <div class="col-sm-6 col-xs-12" style="height: 70px;padding-top: 15px;">
                                                     <span class="titFilter"><i class="fa fa-bell"></i> Group Status</span></i>
-                                                    <select class="form-control selectBox slStatus" style="width: 75%;height: 20px">
+                                                    <select class="form-control selectBoxMb slStatus" style="border: 1px solid #16a085!important">
                                                     @for( (k,v) <- CommonUtil.STATUS_MAP){
                                                         @if(v == 1){
                                                             <option value="@v" selected>@k</option>
@@ -334,7 +347,7 @@
                                                 <div class="col-sm-6 col-xs-12" style="height: 70px;padding-top: 15px;">
                                                     <span class="titFilter"><i class="fa fa-bell"></i> Group Month</span></i>
                                                     <div class="input-group date monthPicker">
-                                                        <input type="text" class="form-control txtInput" value="@month" readonly="true">
+                                                        <input type="text" class="monthGrp form-control txtInputMb" value="@month" readonly="true" style="background-color:#16a085!important;color: #fff">
                                                         <span class="input-group-addon" style="background-color: #5A738E!important;width: 40px"><i class="fa fa-calendar" aria-hidden="true" style="color:white;margin-left: 25px"></i>
                                                         </span>
                                                     </div>

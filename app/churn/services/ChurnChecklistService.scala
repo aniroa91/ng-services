@@ -811,13 +811,13 @@ object  ChurnChecklistService{
     }
     val t0 = System.currentTimeMillis()
     // Chart 1: Number of Contracts That Have Checklist(s)
-    val contractAll   = ChurnCallogService.getNumberOfContractAll(s"region:$region AND $ageAll").slice(0,12).sorted
+    val contractAll   = ChurnCallogService.getNumberOfContractAll(s"region:$region AND $ageAll", "churn-contract-info-*").slice(0,12).sorted
     val ctCheckList   = getNumberOfContractChecklist(region, ageChecklist, _type, processTime).filter(x=> contractAll.map(y=> y._1).indexOf(x._1) >=0)
       .map(x=> (x._1, x._2, CommonService.format2Decimal(x._2 * 100.00 / contractAll.toMap.get(x._1).get), x._3)).sorted
     logger.info("t0: "+(System.currentTimeMillis() -t0))
     val t1 = System.currentTimeMillis()
     // Chart 2: Number of Contracts That Have Checklist(s)
-    val allChurn_count  = ChurnCallogService.getNumberOfContractAll(s"status:$status AND $ageAll AND region:$region")
+    val allChurn_count  = ChurnCallogService.getNumberOfContractAll(s"status:$status AND $ageAll AND region:$region", "churn-contract-info-*")
     val trendChecklist  = ChurnCallogService.calTrendCallinRateAndPercentage(getChurnContractbyStatus(region, ageChecklist, _type, processTime), allChurn_count , status)
     logger.info("t1: "+(System.currentTimeMillis() -t1))
     val t2 = System.currentTimeMillis()

@@ -80,6 +80,8 @@
                         var month = startDate.getMonth() < 9 ? ('0' + Number(startDate.getMonth() + 1)) : (Number(startDate.getMonth() + 1));
                         var newDate = yr + '-' + month;
                         $('#month').val(newDate)
+                        // change highlight filters
+                        $('.monthGrp').removeAttr('style')
                 });
                 // bubble charts
                 var container = document.getElementById('container')
@@ -368,6 +370,8 @@
                 // onchange status selectbox
                 $('.slStatus').on('change', function () {
                         $('#status').val($(this).val())
+                        // remove highlight filters
+                        $('.slStatus').removeAttr('style')
                 })
 
                 function ajaxGetChurn(_type){
@@ -388,6 +392,9 @@
                                 },
                                 success: function (dta) {
                                         if(dta != "Error"){
+                                            // change highlight filters
+                                            $('.slStatus').attr('style','border:1px solid #16a085!important')
+                                            $('.monthGrp').attr('style','background-color: #16a085!important;color: #fff')
                                             $('#monthAge').text($('#month').val())
                                             $('#monthRegion').text($('#month').val())
                                             // update chart Age

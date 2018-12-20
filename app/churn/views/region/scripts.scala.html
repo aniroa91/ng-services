@@ -939,17 +939,31 @@
                                         }
                                         // change label month
                                         if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#444444')) {
-                                            if(text.innerHTML == 0 || text.innerHTML >= Object.keys(dta.churn4.catesMonth).length+1)
-                                                text.setAttribute('fill-opacity',0)
+                                            if(Object.keys(dta.churn4.catesMonth).length == 1){
+                                                if (text.innerHTML == 0.5 || text.innerHTML == 0.0 || text.innerHTML == 1.5)
+                                                    text.setAttribute('fill-opacity', 0)
+                                                else {
+                                                    if(text.innerHTML == 1.0){
+                                                        text.innerHTML = keyByValue(dta.churn4.catesMonth, 1)
+                                                    }
+                                                }
+                                            }
                                             else{
-                                                text.innerHTML = keyByValue(dta.churn4.catesMonth, Number(text.innerHTML))
+                                                if(text.innerHTML == 0 || text.innerHTML >= Object.keys(dta.churn4.catesMonth).length+1)
+                                                    text.setAttribute('fill-opacity',0)
+                                                else{
+                                                    text.innerHTML = keyByValue(dta.churn4.catesMonth, Number(text.innerHTML))
+                                                }
                                             }
                                         }
                                     });
                                 })
                                 var dataProfileMonth = google.visualization.arrayToDataTable(getDataChurn(dta.churn4.data,  "Month", "Profile"))
+                                if(Object.keys(dta.churn4.catesMonth).length == 1)
+                                    optionsProfile.hAxis.gridlines.count = 4
+                                else
+                                    optionsProfile.hAxis.gridlines.count = Object.keys(dta.churn4.catesMonth).length+2
                                 optionsProfile.vAxis.gridlines.count = Object.keys(dta.churn4.catesProfile).length+2
-                                optionsProfile.hAxis.gridlines.count = Object.keys(dta.churn4.catesMonth).length+2
                                 chartProfileMonth.draw(dataProfileMonth, optionsProfile)
                                 google.visualization.events.addListener(chartProfileMonth, 'select', function () {
                                     var selection = chartProfileMonth.getSelection();

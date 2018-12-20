@@ -72,7 +72,7 @@ class ChurnCallogController @Inject() (cc: ControllerComponents) extends Abstrac
         "data"   -> rs.callInRegionAge,
         "xAxis"  -> rs.callInRegionAge.map(x=> x._1.toInt).distinct.sorted.map(x=> AgeGroupUtil.getAgeById(x)),
         "yAxis"  -> rs.callInRegionAge.map(x=>x._2).distinct.sorted.map(x=> "Vung " + x),
-        "arrMonth" -> rs.callInRegionAge.map(x=>x._1).distinct.sorted,
+        "arrAge" -> rs.callInRegionAge.map(x=>x._1.toInt).distinct.sorted,
         "arrRegion" -> rs.callInRegionAge.map(x=>x._2).distinct.sorted
       )
       val minPerc6 = if(rs.callRegionAge.length > 0) CommonService.format3Decimal(rs.callRegionAge.map(x=>x._4).min) else 0
@@ -94,7 +94,8 @@ class ChurnCallogController @Inject() (cc: ControllerComponents) extends Abstrac
         "churn4" -> churn4,
         "churn5" -> churn5,
         "churn6" -> churn6,
-        "churn7" -> churn7
+        "churn7" -> churn7,
+        "categories" -> rs.churnCates.map(x=> x._1).mkString(",")
       )
       Ok(Json.toJson(json))
     }
