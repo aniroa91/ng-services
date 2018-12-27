@@ -27,8 +27,27 @@ object  ChurnDetectService{
 
   val logger = Logger(this.getClass())
 
+  def getCtCallorChecklist(month: String, queryString: String, contractGrp: String, maintain: String, cate: String, cause: String, complain: String, _type: String) ={
+    val indexes = if(contractGrp == "*" && maintain == "" && cate == "" && cause == "" && complain == "*") s"churn-${_type}-$month" else s"churn-detect-problem-$month"
+    val queries = queryString + s" AND $complain AND "+CommonUtil.filterCommon("tenGoi")
+    val full_queries = CommonUtil.getFullQueryHaveNested(queries, contractGrp, maintain, cate, cause)
+    val query =
+      s"""
+      {
+         ${full_queries},
+         "size": 0
+      }
+      """
+    //println(query)
+    val body = Http(s"http://172.27.11.151:9200/${indexes}/docs/_search")
+      .postData(query)
+      .header("content-type", "application/JSON")
+      .asString.body
+    Json.parse(body).\("hits").\("total").get.asInstanceOf[JsNumber].toString().toInt
+  }
+
   def getContractByMonth(indexes: String, queryString: String, contractGrp: String, maintain: String, cate: String, cause: String) ={
-    val queries = queryString + " AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\")"
+    val queries = queryString + " AND "+CommonUtil.filterCommon("tenGoi")
     val full_queries = CommonUtil.getFullQueryHaveNested(queries, contractGrp, maintain, cate, cause)
     val query =
       s"""
@@ -46,7 +65,7 @@ object  ChurnDetectService{
   }
 
   def getNumCallChecklist(queryStr : String, fieldNested: String, maintain: String, cate: String, cause: String) = {
-    val queries = queryStr + " AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\")"
+    val queries = queryStr + " AND "+CommonUtil.filterCommon("tenGoi")
     val full_queries = CommonUtil.getFullQueryHaveNested(queries, fieldNested, maintain, cate, cause)
     val query = s"""
         {
@@ -64,7 +83,8 @@ object  ChurnDetectService{
 
   def getnumByProblem(queryStr: String, month: String, contractGrp: String, maintain: String, cate: String, cause: String) = {
     val last6Month = CommonService.getLast6Month()
-    val queries = queryStr + " AND month:>="+last6Month+" AND month:<=" + month + " AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\")"
+    //val queries = queryStr + " AND month:>="+last6Month+" AND month:<=" + month + " AND "+CommonUtil.filterCommon("tenGoi")
+    val queries = queryStr + " AND "+CommonUtil.filterCommon("tenGoi")
     val full_queries = CommonUtil.getFullQueryHaveNested(queries, contractGrp, maintain, cate, cause)
     val query =
       s"""
@@ -82,7 +102,7 @@ object  ChurnDetectService{
       }
       """
     //println(query)
-    val body = Http("http://172.27.11.151:9200/churn-detect-problem-*/docs/_search")
+    val body = Http(s"http://172.27.11.151:9200/churn-detect-problem-${month}/docs/_search")
       .postData(query)
       .header("content-type", "application/JSON")
       .asString.body
@@ -93,8 +113,9 @@ object  ChurnDetectService{
   }
 
   def getNumCtbyCause(queryStr: String, month: String, contractGrp: String, maintain: String, cate: String, cause: String) = {
-    val last6Month = CommonService.getLast6Month()
-    val queries = queryStr + " AND month:>="+last6Month+" AND month:<=" + month + " AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\")"
+    //val last6Month = CommonService.getLast6Month()
+    //val queries = queryStr + " AND month:>="+last6Month+" AND month:<=" + month + " AND "+CommonUtil.filterCommon("tenGoi")
+    val queries = queryStr + " AND "+CommonUtil.filterCommon("tenGoi")
     val full_queries = CommonUtil.getFullQueryHaveNested(queries, contractGrp,maintain, cate, cause)
     val query = s"""
         {
@@ -126,7 +147,7 @@ object  ChurnDetectService{
         }
         """
     //println(query)
-    val body = Http("http://172.27.11.151:9200/churn-detect-problem-*/docs/_search")
+    val body = Http(s"http://172.27.11.151:9200/churn-detect-problem-${month}/docs/_search")
       .postData(query)
       .header("content-type", "application/JSON")
       .asString.body
@@ -137,8 +158,9 @@ object  ChurnDetectService{
   }
 
   def getMedicanByTobaotri(queryStr: String, month: String, contractGrp: String, maintain: String, cate: String, cause: String) = {
-    val last6Month = CommonService.getLast6Month()
-    val queries = queryStr + " AND month:>="+last6Month+" AND month:<=" + month + " AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\")"
+    //val last6Month = CommonService.getLast6Month()
+    //val queries = queryStr + " AND month:>="+last6Month+" AND month:<=" + month + " AND "+CommonUtil.filterCommon("tenGoi")
+    val queries = queryStr + " AND "+CommonUtil.filterCommon("tenGoi")
     val full_queries = CommonUtil.getFullQueryHaveNested(queries, contractGrp, maintain, cate, cause)
     val request =
       s"""
@@ -177,7 +199,7 @@ object  ChurnDetectService{
         }
         """
     //println(request)
-    val body = Http(s"http://172.27.11.151:9200/churn-checklist-*/docs/_search")
+    val body = Http(s"http://172.27.11.151:9200/churn-detect-problem-${month}/docs/_search")
       .postData(request)
       .header("content-type", "application/JSON")
       .asString.body
@@ -189,7 +211,7 @@ object  ChurnDetectService{
 
   def getTrendHoursbyRegion(queryStr: String, month: String, contractGrp: String, maintain: String, cate: String, cause: String) = {
     val last6Month = CommonService.getLast6Month()
-    val queries = queryStr + " AND month:>="+last6Month+" AND month:<=" + month + " AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\")"
+    val queries = queryStr + " AND month:>="+last6Month+" AND month:<=" + month + " AND "+CommonUtil.filterCommon("tenGoi")
     val full_queries = CommonUtil.getFullQueryHaveNested(queries, contractGrp, maintain, cate, cause)
     val request =
       s"""
@@ -223,7 +245,7 @@ object  ChurnDetectService{
         }
         """
     //println(request)
-    val body = Http(s"http://172.27.11.151:9200/churn-checklist-*/docs/_search")
+    val body = Http(s"http://172.27.11.151:9200/churn-full-*/docs/_search")
       .postData(request)
       .header("content-type", "application/JSON")
       .asString.body
@@ -235,7 +257,7 @@ object  ChurnDetectService{
 
   def getInfErrors(queryStr: String, month: String, _type: String, contractGrp: String, maintain: String, cate: String, cause: String) = {
     val last6Month = CommonService.getLast6Month()
-    val queries = queryStr+" AND month:>="+last6Month+" AND month:<="+month+" AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\")"
+    val queries = queryStr+" AND month:>="+last6Month+" AND month:<="+month+" AND "+CommonUtil.filterCommon("tenGoi")
     val full_queries = if(contractGrp.equals("-1"))
       s"""
         "query": {
@@ -285,9 +307,10 @@ object  ChurnDetectService{
   }
 
   def getTopCallContent(queryStr: String, month: String, numRecords: Long, contractGrp: String, maintain: String, cate: String, cause: String) = {
-    val last6Month = CommonService.getLast6Month()
+    /*val last6Month = CommonService.getLast6Month()
     val monthQueries = if(numRecords == 100) s"month:$month" else s"month:>=$last6Month AND month:<=$month"
-    val queries = queryStr+" AND "+monthQueries+" AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\")"
+    val queries = queryStr+" AND "+monthQueries+" AND "+CommonUtil.filterCommon("tenGoi")*/
+    val queries = queryStr+" AND "+CommonUtil.filterCommon("tenGoi")
     val full_queries = if(contractGrp.equals("*"))
       s"""
         "query": {
@@ -323,7 +346,7 @@ object  ChurnDetectService{
         }
         """
     //println(request)
-    val body = Http(s"http://172.27.11.151:9200/churn-calllog-*/docs/_search")
+    val body = Http(s"http://172.27.11.151:9200/churn-detect-problem-${month}/docs/_search")
       .postData(request)
       .header("content-type", "application/JSON")
       .asString.body
@@ -335,9 +358,10 @@ object  ChurnDetectService{
   }
 
   def getTopChecklistContent(queryStr: String, month: String, numRecords: Long, contractGrp: String, maintain: String, cate: String, cause: String) = {
-    val last6Month = CommonService.getLast6Month()
-    val monthQueries = if(numRecords == 100) s"month:$month" else s"month:>=$last6Month AND month:<=$month"
-    val queries = queryStr+" AND "+monthQueries+" AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\")"
+    //val last6Month = CommonService.getLast6Month()
+    //val monthQueries = if(numRecords == 100) s"month:$month" else s"month:>=$last6Month AND month:<=$month"
+    //val queries = queryStr+" AND "+monthQueries+" AND "+CommonUtil.filterCommon("tenGoi")
+    val queries = queryStr+" AND "+CommonUtil.filterCommon("tenGoi")
     val full_queries = if(contractGrp.equals("*"))
       s"""
         "query": {
@@ -373,7 +397,7 @@ object  ChurnDetectService{
         }
         """
     //println(request)
-    val body = Http(s"http://172.27.11.151:9200/churn-checklist-*/docs/_search")
+    val body = Http(s"http://172.27.11.151:9200/churn-detect-problem-${month}/docs/_search")
       .postData(request)
       .header("content-type", "application/JSON")
       .asString.body
@@ -388,7 +412,7 @@ object  ChurnDetectService{
   }
 
   def getContractByRegion(queryStr: String, month: String, indexs: String, groupContract: String, maintain: String, cate: String, cause: String) = {
-    val queries = queryStr+" AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\")"
+    val queries = queryStr+" AND "+CommonUtil.filterCommon("tenGoi")
     val full_queries = CommonUtil.getFullQueryHaveNested(queries, groupContract, maintain, cate, cause)
     val request = s"""
         {
@@ -417,7 +441,8 @@ object  ChurnDetectService{
 
   def getTopCategory(queryStr: String, month: String, contractGrp: String, maintain: String, cate: String, cause: String) = {
     val last6Month = CommonService.getLast6Month()
-    val queries = queryStr + " AND month:>="+last6Month+" AND month:<="+month+" AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\")"
+    //val queries = queryStr + " AND month:>="+last6Month+" AND month:<="+month+" AND "+CommonUtil.filterCommon("tenGoi")
+    val queries = queryStr + " AND "+CommonUtil.filterCommon("tenGoi")
     val full_queries = CommonUtil.getFullQueryHaveNested(queries, contractGrp, maintain, cate, cause)
     val query = s"""
         {
@@ -446,7 +471,7 @@ object  ChurnDetectService{
         }
         """
     //println(query)
-    val body = Http("http://172.27.11.151:9200/churn-detect-problem-*/docs/_search")
+    val body = Http(s"http://172.27.11.151:9200/churn-detect-problem-${month}/docs/_search")
       .postData(query)
       .header("content-type", "application/JSON")
       .asString.body
@@ -462,7 +487,7 @@ object  ChurnDetectService{
     var contractGrp = "*"
     var region = request.flash.get("Region").getOrElse("*")
     var packages = request.flash.get("TenGoi").getOrElse("*")
-    if(packages != "*") packages = "\"" + packages + "\""
+        if(packages != "*") packages = "\"" + packages + "\""
     var age = request.flash.get("Age").getOrElse("*")
     var complain = "*"
     var cause = ""
@@ -481,14 +506,15 @@ object  ChurnDetectService{
       region = request.body.asFormUrlEncoded.get("region").head
       age = request.body.asFormUrlEncoded.get("age").head
     }
+    println(s"Age:$age\nRegion:$region\nPackage:$packages")
     val time = System.currentTimeMillis()
     // chart 1
     val numContract  = getContractByMonth("churn-detect-problem-*", s"month:$month AND $complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", contractGrp, maintain, cate, cause)
     val numChurnCt   = getContractByMonth("churn-detect-problem-*", s"month:$month AND status:1 AND $complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", contractGrp, maintain, cate, cause)
-    val numChurnbyRegion = getContractByMonth("churn-detect-problem-*", s"month:$month AND status:1 AND region:$region AND $complain", contractGrp, maintain, cate, cause)
-    val numCall      = getContractByMonth("churn-calllog-*", s"month:$month AND lifeGroup:$age AND region:$region AND tenGoi:$packages", "*", "", "", "")
-    val numChecklist = getContractByMonth("churn-checklist-*", s"month:$month AND lifeGroup:$age AND region:$region AND tenGoi:$packages", "*", "", "", "")
-
+    //val numAllChurn = getContractByMonth("churn-detect-problem-*", s"month:$month AND status:1 AND region:$region AND $complain", contractGrp, maintain, cate, cause)
+    val numAllChurn = getContractByMonth("churn-detect-problem-*", s"month:$month AND status:1", "", "", "", "")
+    val numCall      = getCtCallorChecklist(month, s"lifeGroup:$age AND region:$region AND tenGoi:$packages", contractGrp, maintain, cate, cause, complain, "calllog")
+    val numChecklist = getCtCallorChecklist(month, s"lifeGroup:$age AND region:$region AND tenGoi:$packages", contractGrp, maintain, cate, cause, complain, "checklist")
     logger.info("t1: "+(System.currentTimeMillis() -time))
     val t2 = System.currentTimeMillis()
 
@@ -515,13 +541,13 @@ object  ChurnDetectService{
 
     /* CHECKLIST */
       //chart 5
-      val medianHours = getTrendHoursbyRegion(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", month, "*", maintain, "", "")
+      val medianHours = getTrendHoursbyRegion(s"$complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", month, contractGrp, maintain, cate, cause)
       //chart 6
-      val medianMaintain = getMedicanByTobaotri(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", month, "*", "", "", "")
+      val medianMaintain = getMedicanByTobaotri(s"$complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", month, contractGrp, "", cate, cause)
       //chart 7
       val numCauses   = getNumCtbyCause(s"$complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", month, contractGrp, maintain, cate, "")
       // chart 12
-      val topChecklistContent = getTopChecklistContent(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", month, 100, "*", "", "", "").sortWith((x, y) => x._2 > y._2).slice(0,100)
+      val topChecklistContent = getTopChecklistContent(s"$complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", month, 100, contractGrp, maintain, cate, cause).sortWith((x, y) => x._2 > y._2).slice(0,100)
 
     logger.info("t4: "+(System.currentTimeMillis() -t4))
     val t5 = System.currentTimeMillis()
@@ -537,7 +563,7 @@ object  ChurnDetectService{
     logger.info("t52: "+(System.currentTimeMillis() -t52))
     val t53 = System.currentTimeMillis()
     // chart 12
-      val topCallContent = getTopCallContent(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", month, 100, "*", "", "", "").sortWith((x, y) => x._2 > y._2).slice(0,100)
+      val topCallContent = getTopCallContent(s"$complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", month, 100, contractGrp, maintain, cate, cause).sortWith((x, y) => x._2 > y._2).slice(0,100)
 
     logger.info("t53: "+(System.currentTimeMillis() -t53))
     val t6 = System.currentTimeMillis()
@@ -572,8 +598,9 @@ object  ChurnDetectService{
     logger.info("--tt5--: "+(System.currentTimeMillis() -tt5))
 
     logger.info("Time: "+(System.currentTimeMillis() -time))
+    val linkFilters = Map("region"-> region, "age"-> age, "package"-> request.flash.get("TenGoi").getOrElse("*"))
     logger.info("========END DETECT SERVICE=========")
-    DetectResponse((numContract, numChurnCt, numChurnbyRegion, numCall, numChecklist), (callYesCtYes, callYesCtNo, callNoCtYes, callNoCtNo),(numCtByRegion, numCtByAge, numCtByTengoi),
-      arrProblem, topCates, topCallContent, medianHours, numCauses, topChecklistContent, medianMaintain, Indicator(rsErrors, rsSignin, rsSuyhao, rsDownload, rsFee))
+    DetectResponse((numContract, numChurnCt, numAllChurn, numCall, numChecklist), (callYesCtYes, callYesCtNo, callNoCtYes, callNoCtNo),(numCtByRegion, numCtByAge, numCtByTengoi),
+      arrProblem, topCates, topCallContent, medianHours, numCauses, topChecklistContent, medianMaintain, Indicator(rsErrors, rsSignin, rsSuyhao, rsDownload, rsFee), linkFilters)
   }
 }

@@ -6,7 +6,7 @@ object ProcessTimeUtil {
     "0-3 hours"   -> 3,
     "3-24 hours"  -> 24,
     "24-48 hours" -> 48,
-    ">48 hours"   -> 60
+    ">=48 hours"   -> 60
   )
 
   val PROCESS_TIME_INDEX = Map(

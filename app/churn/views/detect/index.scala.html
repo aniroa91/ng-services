@@ -307,7 +307,24 @@
                             <span class="titFilter"><i class="fa fa-bell"></i> <span class="groupTit"></span> </span></i>
                             <p class="txtControl groupCont"></p>
                         </div>
-
+                        @if(rs.linkFilters.get("region").getOrElse("*") != "*"){
+                            <div class="regionFilter" style="padding-top: 15px;margin-bottom: 15px">
+                                <span class="titFilter"><i class="fa fa-bell"></i> <span class="titRegion"></span>Group Region</span></i>
+                                <p class="txtControl contRegion">Vung @rs.linkFilters.get("region").get</p>
+                            </div>
+                        }
+                        @if(rs.linkFilters.get("age").getOrElse("*") != "*"){
+                            <div class="ageFilter" style="padding-top: 15px;margin-bottom: 15px">
+                                <span class="titFilter"><i class="fa fa-bell"></i> <span class="titAge"></span>Group Age</span></i>
+                                <p class="txtControl contAge">@rs.linkFilters.get("age").get</p>
+                            </div>
+                        }
+                        @if(rs.linkFilters.get("package").getOrElse("*") != "*"){
+                            <div class="packageFilter" style="padding-top: 15px;margin-bottom: 15px">
+                                <span class="titFilter"><i class="fa fa-bell"></i> <span class="titPackage"></span>Group Package</span></i>
+                                <p class="txtControl contPackage">@rs.linkFilters.get("package").get</p>
+                            </div>
+                        }
                         <div class="col-xs-12 lineDivBlack"></div>
                         <div class="divStatus" style="margin-bottom: 20px;padding-top: 15px">
                             <span class="titFilter"><i class="fa fa-bell"></i> Group Status</span></i>
@@ -333,11 +350,11 @@
                             <a class="refresh btn btn-xs btn-secondary btnRefresh"><i class="fa fa-refresh"></i> Refresh</a>
                         </div>
                         <div class="col-xs-12 lineDivBlack"></div>
-                        <div style="margin-top: 60px">
+                        @*<div style="margin-top: 60px">
                             <label class="txtCmt">Data is pending 2018-10</label>
                             <textarea class="form-control" placeholder="Your comment report..." id="cmt" rows="3" style="color: #13171b"></textarea>
                             <a class="btn btn-xs btn-primary" style="margin: 10px 0px 20px 0px;float: right">Comment</a>
-                        </div>
+                        </div>*@
                     </nav>
                 </div>
             </nav>
@@ -415,9 +432,27 @@
                                         <ul class="mobile-menu-nav">
                                             <div class="disInline">
                                                 <div class="col-sm-6 col-xs-12 otherFilt" style="padding-top: 15px;display: none">
-                                                    <span class="titFilter"><i class="fa fa-bell"></i> <span id="groupTit"></span> </span></i>
-                                                    <p class="txtControl" id="groupCont"></p>
+                                                    <span class="titFilter"><i class="fa fa-bell"></i> <span class="groupTit"></span> </span></i>
+                                                    <p class="txtControl groupCont"></p>
                                                 </div>
+                                                @if(rs.linkFilters.get("age").getOrElse("*") != "*"){
+                                                    <div class="col-sm-6 col-xs-12 ageFilter" style="padding-top: 15px">
+                                                        <span class="titFilter"><i class="fa fa-bell"></i> <span class="titAge"></span> </span></i>
+                                                        <p class="txtControl contAge">@rs.linkFilters.get("age").get</p>
+                                                    </div>
+                                                }
+                                                @if(rs.linkFilters.get("region").getOrElse("*") != "*"){
+                                                    <div class="col-sm-6 col-xs-12 regionFilter" style="padding-top: 15px">
+                                                        <span class="titFilter"><i class="fa fa-bell"></i> <span class="titRegion"></span> </span></i>
+                                                        <p class="txtControl contRegion">Vung @rs.linkFilters.get("region").get</p>
+                                                    </div>
+                                                }
+                                                @if(rs.linkFilters.get("package").getOrElse("*") != "*"){
+                                                    <div class="col-sm-6 col-xs-12 packageFilter" style="padding-top: 15px">
+                                                        <span class="titFilter"><i class="fa fa-bell"></i> <span class="titPackage"></span> </span></i>
+                                                        <p class="txtControl contPackage">@rs.linkFilters.get("package").get</p>
+                                                    </div>
+                                                }
                                             </div>
                                             <div class="disInline">
                                                 <div class="col-sm-6 col-xs-12" style="height: 70px;padding-top: 15px;">
@@ -443,11 +478,11 @@
                                                 <a class="refresh btn btn-xs btn-secondary btnRefresh"><i class="fa fa-refresh"></i> Refresh</a>
                                             </div>
                                             <div class="col-xs-12 lineDivXs"></div>
-                                            <div style="margin-top: 60px">
+                                            @*<div style="margin-top: 60px">
                                                 <label class="txtCmt">Data is pending 2018-10</label>
                                                 <textarea class="form-control areaXs" placeholder="Your comment report..." id="cmt" rows="3" style="color: #13171b"></textarea>
                                                 <a class="btn btn-xs btn-primary" style="margin: 10px 15px 20px 0px;float: right">Comment</a>
-                                            </div>
+                                            </div>*@
                                         </ul>
                                     </nav>
                                 </div>
@@ -465,9 +500,9 @@
                 <input type="hidden" id="cause">
                 <input type="hidden" id="complain" value="*">
                 <input type="hidden" id="maintain">
-                <input type="hidden" id="package" value="*">
-                <input type="hidden" id="region" value="*">
-                <input type="hidden" id="age" value="*">
+                <input type="hidden" id="package" value="@rs.linkFilters.get("package").getOrElse("*")">
+                <input type="hidden" id="region" value="@rs.linkFilters.get("region").getOrElse("*")">
+                <input type="hidden" id="age" value="@rs.linkFilters.get("age").getOrElse("*")">
                 <input type="hidden" id="_typeCsv">
 
                 <div class="rate-percent-area mg-t-15">
@@ -504,7 +539,7 @@
                                     <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
                                         <div class="reso-mg-b-30 box-area-2">
                                             <div class="analytics-content">
-                                                <h1 class="mg-b-10"><span id="churnPert" class="counter">@format3Decimal(rs.cardMetrics._3 * 100.0 / rs.cardMetrics._2)</span> %<i class="fa fa-bolt ibox" aria-hidden="true"></i></h1>
+                                                <h1 class="mg-b-10"><span id="churnPert" class="counter">@format3Decimal(rs.cardMetrics._2 * 100.0 / rs.cardMetrics._3)</span> %<i class="fa fa-bolt ibox" aria-hidden="true"></i></h1>
                                                 <h3>Churn Percentage</h3>
                                             </div>
                                         </div>

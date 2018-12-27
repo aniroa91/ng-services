@@ -76,6 +76,9 @@
                     color: #fff; background: #16a085;padding: 2px
                 }
                 .txtInput{
+                    text-align: center;cursor: pointer;background-color: white!important;height: 35px
+                }
+                .txtInputMb{
                     text-align: center;cursor: pointer;background-color: white!important;height: 20px
                 }
 
@@ -146,8 +149,10 @@
                     padding: 20px;
                 }
                 .overlay {
-                    width: 98px;
-                    height: 155px;
+                    font-size: 12px;
+                    color: #0D3349;
+                    width: 85px;
+                    height: 120px;
                     padding: 2px;
                     position: absolute;
                     border: 1px solid #73879C;
@@ -179,6 +184,15 @@
                     margin-left: 10px;
                 }
                 .selectBox{
+                    cursor: pointer;
+                    margin-top: 10px;
+                    width: 177px;
+                    margin-left: 10px;
+                    color: #555!important;
+                    height: 35px;
+                }
+                .selectBoxMb{
+                    height: 20px;
                     cursor: pointer;
                     margin-top: 10px;
                     width: 177px;
@@ -243,7 +257,7 @@
                             <div class="col-xs-12 lineDivBlack"></div>
                             <div class="divStatus" style="margin-bottom: 20px;padding-top: 15px">
                                 <span class="titFilter"><i class="fa fa-bell"></i> Group Status</span></i>
-                                <select class="form-control selectBox slStatus" style="height: 35px">
+                                <select class="form-control selectBox slStatus" style="border: 1px solid #16a085!important">
                                 @for( (k,v) <- CommonUtil.STATUS_MAP){
                                     @if(v == 1){
                                         <option value="@v" selected>@k</option>
@@ -257,7 +271,7 @@
                             <div style="height: 140px;padding-top: 15px">
                                 <span class="titFilter"><i class="fa fa-bell"></i> Group Month</span></i>
                                 <div class="input-group date monthPicker">
-                                    <input type="text" id="monthGrp" class="form-control txtInput" value="@month" readonly="true" style="height: 35px">
+                                    <input type="text" class="monthGrp form-control txtInput" value="@month" readonly="true" style="background-color: #16a085!important;color: #fff">
                                     <span class="input-group-addon" style="background-color: #5A738E!important;"><i class="fa fa-calendar" aria-hidden="true" style="color:white"></i>
                                     </span>
                                 </div>
@@ -268,11 +282,11 @@
                                 <a class="refresh btn btn-xs btn-secondary btnRefresh"><i class="fa fa-refresh"></i> Refresh</a>
                             </div>
                             <div class="col-xs-12 lineDivBlack"></div>
-                            <div style="margin-top: 60px">
+                            @*<div style="margin-top: 60px">
                                 <label class="txtCmt">Data is pending 2018-10</label>
                                 <textarea class="form-control" placeholder="Your comment report..." id="cmt" rows="3" style="color: #13171b"></textarea>
                                 <a class="btn btn-xs btn-primary" style="margin: 10px 0px 20px 0px;float: right">Comment</a>
-                            </div>
+                            </div>*@
                         </nav>
                     </div>
                 </nav>
@@ -369,7 +383,7 @@
                                                 <div class="disInline">
                                                     <div class="col-sm-6 col-xs-12" style="height: 70px;padding-top: 15px;">
                                                         <span class="titFilter"><i class="fa fa-bell"></i> Group Status</span></i>
-                                                        <select class="form-control selectBox slStatus" style="height: 20px">
+                                                        <select class="form-control selectBoxMb slStatus" style="border: 1px solid #16a085!important">
                                                         @for( (k,v) <- CommonUtil.STATUS_MAP){
                                                             @if(v == 1){
                                                                 <option value="@v" selected>@k</option>
@@ -382,7 +396,7 @@
                                                     <div class="col-sm-6 col-xs-12" style="height: 70px;padding-top: 15px;">
                                                         <span class="titFilter"><i class="fa fa-bell"></i> Group Month</span></i>
                                                         <div class="input-group date monthPicker">
-                                                            <input type="text" id="monthGrp" class="form-control txtInput" value="@month" readonly="true">
+                                                            <input type="text" class="monthGrp form-control txtInputMb" value="@month" readonly="true" style="background-color: #16a085!important;color: #fff">
                                                             <span class="input-group-addon" style="background-color: #5A738E!important;width: 40px"><i class="fa fa-calendar" aria-hidden="true" style="color:white;margin-left: 25px"></i>
                                                             </span>
                                                         </div>
@@ -393,11 +407,11 @@
                                                     <a class="refresh btn btn-xs btn-secondary btnRefresh"><i class="fa fa-refresh"></i> Refresh</a>
                                                 </div>
                                                 <div class="col-xs-12 lineDivXs"></div>
-                                                <div style="margin-top: 60px">
+                                                @*<div style="margin-top: 60px">
                                                     <label class="txtCmt">Data is pending 2018-10</label>
                                                     <textarea class="form-control areaXs" placeholder="Your comment report..." id="cmt" rows="3" style="color: #13171b"></textarea>
                                                     <a class="btn btn-xs btn-primary" style="margin: 10px 15px 20px 0px;float: right">Comment</a>
-                                                </div>
+                                                </div>*@
                                             </ul>
                                         </nav>
                                     </div>
@@ -498,11 +512,11 @@
                                                             <div id="churn4_tooltip" class="custom_tooltip" style="display: none"></div>
                                                             <div id="churn4" style="width: auto; height: 400px;"></div>
                                                             <div class="overlay">
-                                                                <span style="font-size: 14px;color: #0D3349">ChurnPert (%)</span>
-                                                                <div style="margin: 4px 0px 2px 7px"><div class="circle" style="background: black;margin-right: 11px"><span style="opacity: 0"></span></div><span id="churn4_txtMin" style="color:#0D3349 ">@format3Decimal(rs.trendRegionMonth._2.map(x=>x._4).min)</span></div>
-                                                                <div style="margin: 0px 0px 2px 5px"><div class="circle" style="background: black;margin-right: 8px"><span style="opacity: 0;width: 17px">11</span></div><span id="churn4_circle2" style="color:#0D3349 ">@format3Decimal((rs.trendRegionMonth._2.map(x=>x._4).max -rs.trendRegionMonth._2.map(x=>x._4).min)/5*2)</span></div>
-                                                                <div style="margin: 0px 0px 2px 3px"><div class="circle" style="background: black;margin-right: 6px"><span style="opacity: 0">111</span></div><span id="churn4_circle3" style="color:#0D3349 ">@format3Decimal((rs.trendRegionMonth._2.map(x=>x._4).max -rs.trendRegionMonth._2.map(x=>x._4).min)/5*3)</span></div>
-                                                                <div><div class="circle" style="background: black;margin-right: 4px"><span style="opacity: 0">1111</span></div><span id="churn4_txtMax" style="color:#0D3349 ">@format3Decimal(rs.trendRegionMonth._2.map(x=>x._4).max)</span></div>
+                                                                <span>ChurnPert (%)</span>
+                                                                <div style="margin: 4px 0px 2px 7px"><div class="circle" style="background: black;margin-right: 10px"><span style="opacity: 0"></span></div><span id="churn4_txtMin" style="color:#0D3349 ">@format3Decimal(rs.trendRegionMonth._2.map(x=>x._4).min)</span></div>
+                                                                <div style="margin: 0px 0px 2px 6px"><div class="circle" style="background: black;margin-right: 8px"><span style="opacity: 0;width: 15px">11</span></div><span id="churn4_circle2" style="color:#0D3349 ">@format3Decimal((rs.trendRegionMonth._2.map(x=>x._4).max -rs.trendRegionMonth._2.map(x=>x._4).min)/5*2)</span></div>
+                                                                <div style="margin: 0px 0px 2px 5px"><div class="circle" style="background: black;margin-right: 6px"><span style="width: 17px;opacity: 0">111</span></div><span id="churn4_circle3" style="color:#0D3349 ">@format3Decimal((rs.trendRegionMonth._2.map(x=>x._4).max -rs.trendRegionMonth._2.map(x=>x._4).min)/5*3)</span></div>
+                                                                <div style="margin-left: 4px"><div class="circle" style="background: black;margin-right: 4px"><span style="width: 20px;opacity: 0">1111</span></div><span id="churn4_txtMax" style="color:#0D3349 ">@format3Decimal(rs.trendRegionMonth._2.map(x=>x._4).max)</span></div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -542,11 +556,11 @@
                                                             <div id="churn6_tooltip" class="custom_tooltip" style="display: none"></div>
                                                             <div id="churn6" style="width: auto; height: 400px;"></div>
                                                             <div class="overlay">
-                                                                <span style="font-size: 14px;color: #0D3349">ChurnPert (%)</span>
-                                                                <div style="margin: 4px 0px 2px 7px"><div class="circle" style="background: black;margin-right: 11px"><span style="opacity: 0"></span></div><span id="churn6_txtMin" style="color:#0D3349 ">@format3Decimal(rs.checklistRegionAge.map(x=>x._4).min)</span></div>
-                                                                <div style="margin: 0px 0px 2px 5px"><div class="circle" style="background: black;margin-right: 8px"><span style="width: 17px;opacity: 0">11</span></div><span id="churn6_circle2" style="color:#0D3349 ">@format3Decimal((rs.checklistRegionAge.map(x=>x._4).max -rs.checklistRegionAge.map(x=>x._4).min)/5*2)</span></div>
-                                                                <div style="margin: 0px 0px 2px 3px"><div class="circle" style="background: black;margin-right: 6px"><span style="opacity: 0">111</span></div><span id="churn6_circle3" style="color:#0D3349 ">@format3Decimal((rs.checklistRegionAge.map(x=>x._4).max -rs.checklistRegionAge.map(x=>x._4).min)/5*3)</span></div>
-                                                                <div><div class="circle" style="background: black;margin-right: 4px"><span style="opacity: 0">1111</span></div><span id="churn6_txtMax" style="color:#0D3349 ">@format3Decimal(rs.checklistRegionAge.map(x=>x._4).max)</span></div>
+                                                                <span>ChurnPert (%)</span>
+                                                                <div style="margin: 4px 0px 2px 7px"><div class="circle" style="background: black;margin-right: 10px"><span style="opacity: 0"></span></div><span id="churn6_txtMin" style="color:#0D3349 ">@format3Decimal(rs.checklistRegionAge.map(x=>x._4).min)</span></div>
+                                                                <div style="margin: 0px 0px 2px 6px"><div class="circle" style="background: black;margin-right: 8px"><span style="width: 15px;opacity: 0">11</span></div><span id="churn6_circle2" style="color:#0D3349 ">@format3Decimal((rs.checklistRegionAge.map(x=>x._4).max -rs.checklistRegionAge.map(x=>x._4).min)/5*2)</span></div>
+                                                                <div style="margin: 0px 0px 2px 5px"><div class="circle" style="background: black;margin-right: 6px"><span style="width: 17px;opacity: 0">111</span></div><span id="churn6_circle3" style="color:#0D3349 ">@format3Decimal((rs.checklistRegionAge.map(x=>x._4).max -rs.checklistRegionAge.map(x=>x._4).min)/5*3)</span></div>
+                                                                <div style="margin-left: 4px"><div class="circle" style="background: black;margin-right: 4px"><span style="width: 20px;opacity: 0">1111</span></div><span id="churn6_txtMax" style="color:#0D3349 ">@format3Decimal(rs.checklistRegionAge.map(x=>x._4).max)</span></div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -605,11 +619,11 @@
                                                             <div id="churn9_tooltip" class="custom_tooltip" style="white-space: normal; max-width:200px;display: none"></div>
                                                             <div id="churn9" style="width: auto; max-height: 740px;"></div>
                                                             <div class="overlay">
-                                                                <span style="font-size: 14px;color: #0D3349">ChurnPert (%)</span>
-                                                                <div style="margin: 4px 0px 2px 7px"><div class="circle" style="background: black;margin-right: 11px"><span style="opacity: 0"></span></div><span id="churn9_txtMin" style="color:#0D3349 ">@format3Decimal(rs.trendTypeBubble._2.map(x=>x._4).min)</span></div>
-                                                                <div style="margin: 0px 0px 2px 5px"><div class="circle" style="background: black;margin-right: 8px"><span style="width: 17px;opacity: 0">11</span></div><span id="churn9_circle2" style="color:#0D3349 ">@format3Decimal((rs.trendTypeBubble._2.map(x=>x._4).max -rs.trendTypeBubble._2.map(x=>x._4).min)/5*2)</span></div>
-                                                                <div style="margin: 0px 0px 2px 3px"><div class="circle" style="background: black;margin-right: 6px"><span style="opacity: 0">111</span></div><span id="churn9_circle3" style="color:#0D3349 ">@format3Decimal((rs.trendTypeBubble._2.map(x=>x._4).max -rs.trendTypeBubble._2.map(x=>x._4).min)/5*3)</span></div>
-                                                                <div><div class="circle" style="background: black;margin-right: 4px"><span style="opacity: 0">1111</span></div><span id="churn9_txtMax" style="color:#0D3349 ">@format3Decimal(rs.trendTypeBubble._2.map(x=>x._4).max)</span></div>
+                                                                <span>ChurnPert (%)</span>
+                                                                <div style="margin: 4px 0px 2px 7px"><div class="circle" style="background: black;margin-right: 10px"><span style="opacity: 0"></span></div><span id="churn9_txtMin" style="color:#0D3349 ">@format3Decimal(rs.trendTypeBubble._2.map(x=>x._4).min)</span></div>
+                                                                <div style="margin: 0px 0px 2px 6px"><div class="circle" style="background: black;margin-right: 8px"><span style="width: 15px;opacity: 0">11</span></div><span id="churn9_circle2" style="color:#0D3349 ">@format3Decimal((rs.trendTypeBubble._2.map(x=>x._4).max -rs.trendTypeBubble._2.map(x=>x._4).min)/5*2)</span></div>
+                                                                <div style="margin: 0px 0px 2px 5px"><div class="circle" style="background: black;margin-right: 6px"><span style="width: 17px;opacity: 0">111</span></div><span id="churn9_circle3" style="color:#0D3349 ">@format3Decimal((rs.trendTypeBubble._2.map(x=>x._4).max -rs.trendTypeBubble._2.map(x=>x._4).min)/5*3)</span></div>
+                                                                <div style="margin-left: 4px"><div class="circle" style="background: black;margin-right: 4px"><span style="width: 20px;opacity: 0">1111</span></div><span id="churn9_txtMax" style="color:#0D3349 ">@format3Decimal(rs.trendTypeBubble._2.map(x=>x._4).max)</span></div>
                                                             </div>
                                                         </div>
                                                     </div>

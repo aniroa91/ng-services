@@ -28,9 +28,15 @@ object  ChurnChecklistService{
   val logger = Logger(this.getClass())
 
   def getNumberOfContractChecklist(region:String, age: String, _type: String, time: String) ={
-    val queries = "region:"+region+" AND lifeGroup:"+age+" AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\")"
-    val queryNested_type = if(_type == "*") "*" else _type
-    val queryNested_time = if(time == "*") "*" else "checklist.processTime:>="+time.split("-")(0)+" AND checklist.processTime:<"+time.split("-")(1)
+    val queries = "region:"+region+" AND lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
+    val queryNested_type = parseTypes(_type)
+    var queryNested_time = "*"
+    var queryRangeTime = ""
+    if(time != "*"){
+      queryNested_time = if(time.indexOf(">=") < 0) "checklist.processTime:>="+time.split("-")(0)+" AND checklist.processTime:<"+time.split("-")(1) else s"checklist.processTime:$time"
+      queryRangeTime = getRangeTimeNested(time)
+    }
+    val queryAggsType = if(_type == "*") "" else getTypeChecklist(_type)
     val query = s"""
         {
             "query": {
@@ -65,6 +71,8 @@ object  ChurnChecklistService{
                           "nested": {
                              "path": "checklist"
                           }
+                          $queryRangeTime
+                          $queryAggsType
                       }
                   }
               }
@@ -87,13 +95,15 @@ object  ChurnChecklistService{
     val json = Json.parse(body)
     val array = json.\("aggregations").\("month").\("buckets").get.asInstanceOf[JsArray].value.toArray
     array.map(x => (x.\("key").get.asInstanceOf[JsString].toString().replace("\"",""), x.\("doc_count").get.asInstanceOf[JsNumber].toString().toLong,
-      x.\("checklist").\("doc_count").get.asInstanceOf[JsNumber].toString().toLong))
+      if(time == "*" && _type == "*") x.\("checklist").\("doc_count").get.asInstanceOf[JsNumber].toString().toLong else x.\("checklist").\("countCt").\("doc_count").get.asInstanceOf[JsNumber].toString().toLong))
   }
 
   def getChurnContractbyStatus(region: String, age: String, _type: String, time: String) ={
-    val queries = "region:"+region+" AND lifeGroup:"+age+" AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\")"
-    val queryNested_type = if(_type == "*") "*" else _type
-    val queryNested_time = if(time == "*") "*" else "checklist.processTime:>="+time.split("-")(0)+" AND checklist.processTime:<"+time.split("-")(1)
+    val queries = "region:"+region+" AND lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
+    val queryNested_type = if(_type == "*") "*" else "checklist.type:\""+_type+"\""
+    var queryNested_time = "*"
+    if(time != "*" && time.indexOf(">=") <0) queryNested_time = "checklist.processTime:>="+time.split("-")(0)+" AND checklist.processTime:<"+time.split("-")(1)
+    else if(time != "*" && time.indexOf(">=") >= 0) queryNested_time = s"checklist.processTime:$time"
     val query = s"""
         {
             "query": {
@@ -157,9 +167,11 @@ object  ChurnChecklistService{
   }
 
   def getChurnCallInbyRegionChecklist(age: String, _type: String, time: String) ={
-    val queries = "lifeGroup:"+age+" AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\")"
-    val queryNested_type = if(_type == "*") "*" else _type
-    val queryNested_time = if(time == "*") "*" else "checklist.processTime:>="+time.split("-")(0)+" AND checklist.processTime:<"+time.split("-")(1)
+    val queries = "lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
+    val queryNested_type = if(_type == "*") "*" else "checklist.type:\""+_type+"\""
+    var queryNested_time = "*"
+    if(time != "*" && time.indexOf(">=") <0) queryNested_time = "checklist.processTime:>="+time.split("-")(0)+" AND checklist.processTime:<"+time.split("-")(1)
+    else if(time != "*" && time.indexOf(">=") >= 0) queryNested_time = s"checklist.processTime:$time"
     val query = s"""
         {
             "query": {
@@ -223,9 +235,11 @@ object  ChurnChecklistService{
   }
 
   def getChecklistRegionMonth(age: String, _type: String, time: String) = {
-    val queries = "lifeGroup:"+age+" AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\")"
-    val queryNested_type = if(_type == "*") "*" else _type
-    val queryNested_time = if(time == "*") "*" else "checklist.processTime:>="+time.split("-")(0)+" AND checklist.processTime:<"+time.split("-")(1)
+    val queries = "lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
+    val queryNested_type = if(_type == "*") "*" else "checklist.type:\""+_type+"\""
+    var queryNested_time = "*"
+    if(time != "*" && time.indexOf(">=") <0) queryNested_time = "checklist.processTime:>="+time.split("-")(0)+" AND checklist.processTime:<"+time.split("-")(1)
+    else if(time != "*" && time.indexOf(">=") >= 0) queryNested_time = s"checklist.processTime:$time"
     val query = s"""
         {
             "query": {
@@ -300,9 +314,11 @@ object  ChurnChecklistService{
   }
 
   def getChurnByRegionAgeChecklist(month: String, _type: String, time: String) ={
-    val queries = "!(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\")"
-    val queryNested_type = if(_type == "*") "*" else _type
-    val queryNested_time = if(time == "*") "*" else "checklist.processTime:>="+time.split("-")(0)+" AND checklist.processTime:<"+time.split("-")(1)
+    val queries = CommonUtil.filterCommon("tenGoi")
+    val queryNested_type = if(_type == "*") "*" else "checklist.type:\""+_type+"\""
+    var queryNested_time = "*"
+    if(time != "*" && time.indexOf(">=") <0) queryNested_time = "checklist.processTime:>="+time.split("-")(0)+" AND checklist.processTime:<"+time.split("-")(1)
+    else if(time != "*" && time.indexOf(">=") >= 0) queryNested_time = s"checklist.processTime:$time"
     val query = s"""
         {
             "query": {
@@ -416,8 +432,8 @@ object  ChurnChecklistService{
   }
 
   def getChecklistRegionAge(month: String, _type: String) = {
-    val queries = "!(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\")"
-    val queryNested = if(_type == "*") "*" else _type
+    val queries = CommonUtil.filterCommon("tenGoi")
+    val queryNested = if(_type == "*") "*" else "checklist.type:\""+_type+"\""
     val query = s"""
         {
             "query": {
@@ -484,8 +500,9 @@ object  ChurnChecklistService{
   }
 
   def getChurnByRegionProcessTime(month: String, age: String, _type: String) ={
-    val queries = "lifeGroup:"+age+" AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\")"
-    val queryNested = if(_type == "*") "*" else _type
+    val queries = "lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
+    val queryNested = if(_type == "*") "*" else "checklist.type:\""+_type+"\""
+    val queryAggsType = if(_type == "*") "" else getTypeChecklist(_type)
     val request = s"""
         {
              "query": {
@@ -547,6 +564,7 @@ object  ChurnChecklistService{
                                         }
                                       ]
                                  }
+                                 $queryAggsType
                                }
                              }
                            }
@@ -563,14 +581,17 @@ object  ChurnChecklistService{
     val json = Json.parse(body)
     val array = json.\("aggregations").\("region").\("buckets").get.asInstanceOf[JsArray].value.toArray
     val rss = array.map(x => (x.\("key").get.asInstanceOf[JsNumber], x.\("checklist").get.\("time").\("buckets").get.asInstanceOf[JsArray].value.toArray
-      .map(y=> (y.\("key").get.asInstanceOf[JsString], y.\("doc_count").get.asInstanceOf[JsNumber]))))
+      .map(y=> (y.\("key").get.asInstanceOf[JsString], if(_type == "*") y.\("doc_count").get.asInstanceOf[JsNumber] else y.\("countCt").\("doc_count").get.asInstanceOf[JsNumber]))))
     rss.flatMap(x=> x._2.map(y=> x._1.value -> y)).map(x=> (x._2._1.toString().replace("\"", "").toInt, x._1.toString().toLong, x._2._2.toString().toLong))
 
   }
 
   def getChurnByRegionType(month: String, age: String, time: String) ={
-    val queries = "lifeGroup:"+age+" AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\")"
-    val queryNested = if(time == "*") "*" else "checklist.processTime:\""+time+"\""
+    val queries = "lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
+    var queryNested = "*"
+    if(time != "*" && time.indexOf(">=") <0) queryNested = "checklist.processTime:>="+time.split("-")(0)+" AND checklist.processTime:<"+time.split("-")(1)
+    else if(time != "*" && time.indexOf(">=") >= 0) queryNested = s"checklist.processTime:$time"
+    val queryRangeTime = if(time == "*") "" else getRangeTimeNested(time)
     val request = s"""
         {
             "query": {
@@ -611,6 +632,7 @@ object  ChurnChecklistService{
                                       "field": "checklist.type",
                                       "size": 1000
                                  }
+                                 $queryRangeTime
                                }
                              }
                            }
@@ -627,14 +649,17 @@ object  ChurnChecklistService{
     val json = Json.parse(body)
     val array = json.\("aggregations").\("region").\("buckets").get.asInstanceOf[JsArray].value.toArray
     val rss = array.map(x => (x.\("key").get.asInstanceOf[JsNumber], x.\("checklist").get.\("type").\("buckets").get.asInstanceOf[JsArray].value.toArray
-      .map(y=> (y.\("key").get.asInstanceOf[JsString], y.\("doc_count").get.asInstanceOf[JsNumber]))))
+      .map(y=> (y.\("key").get.asInstanceOf[JsString], if(time == "*") y.\("doc_count").get.asInstanceOf[JsNumber] else y.\("countCt").\("doc_count").get.asInstanceOf[JsNumber]))))
     rss.flatMap(x=> x._2.map(y=> x._1.value -> y)).map(x=> (x._2._1.toString().replace("\"", ""), x._1.toString().toLong, x._2._2.toString().toLong))
 
   }
 
   def getChecklistRegionType(month: String, age: String, time: String) = {
-    val queries = "lifeGroup:"+age+" AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\")"
-    val queryNested = if(time == "*") "*" else "checklist.processTime:\""+time+"\""
+    val queries = "lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
+    var queryNested = "*"
+    if(time != "*" && time.indexOf(">=") <0) queryNested = "checklist.processTime:>="+time.split("-")(0)+" AND checklist.processTime:<"+time.split("-")(1)
+    else if(time != "*" && time.indexOf(">=") >= 0) queryNested = s"checklist.processTime:$time"
+    val queryRangeTime = if(time == "*") "" else getRangeTimeNested(time)
     val query = s"""
         {
             "query": {
@@ -682,6 +707,7 @@ object  ChurnChecklistService{
                                   "terms": {
                                     "field": "status"
                                   }
+                                  $queryRangeTime
                                 }
                               }
                             }
@@ -715,9 +741,12 @@ object  ChurnChecklistService{
   }
 
   def getOtherTypeRegion(month: String, age: String, time: String,  _type: String) = {
-    val queries = "lifeGroup:"+age+" AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\")"
-    val queryNested_type = if(_type == "") "checklist.type:*" else _type
-    val queryNested_time = if(time == "*") "*" else "checklist.processTime:\""+time+"\""
+    val queries = "lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
+    val queryNested_type = if(_type == "") "*" else _type
+    var queryNested_time = "*"
+    if(time != "*" && time.indexOf(">=") <0) queryNested_time = "checklist.processTime:>="+time.split("-")(0)+" AND checklist.processTime:<"+time.split("-")(1)
+    else if(time != "*" && time.indexOf(">=") >= 0) queryNested_time = s"checklist.processTime:$time"
+    val queryRangeTime = if(time == "*") "" else getRangeTimeNested(time)
     val query = s"""
         {
             "query": {
@@ -751,6 +780,7 @@ object  ChurnChecklistService{
                         "terms": {
                            "field": "status"
                         }
+                        $queryRangeTime
                      }
                   }
                }
@@ -765,14 +795,88 @@ object  ChurnChecklistService{
       .asString.body
     val json = Json.parse(body)
     val array = json.\("aggregations").\("region").\("buckets").get.asInstanceOf[JsArray].value.toArray
-      .map(x => (x.\("key").get.asInstanceOf[JsNumber].toString().toInt,x.\("doc_count").get.asInstanceOf[JsNumber].toString().toLong,
+      .map(x => (x.\("key").get.asInstanceOf[JsNumber].toString().toInt, x.\("doc_count").get.asInstanceOf[JsNumber].toString().toLong,
         x.\("status").\("buckets").get.asInstanceOf[JsArray].value.toArray.map(y=> (y.\("key").get.asInstanceOf[JsNumber].toString().toInt, y.\("doc_count").get.asInstanceOf[JsNumber].toString().toLong))))
     array.flatMap(x=> x._3.map(y=> (x._1,x._2) -> y)).map(x=> ("Others",x._1._1, x._2._1, x._2._2, x._1._2))
   }
 
+  def getAllContractHaveCt(status: String, _type: String) = {
+    val fieldQuery = if(_type == "*") "checklist.processTime:>=0" else "checklist.type:*"
+    val queries = status +" AND "+CommonUtil.filterCommon("tenGoi")
+    val query = s"""
+        {
+            "query": {
+                "bool": {
+                    "filter": [
+                         {
+                           "query_string" : {
+                              "query": "${queries.replace("\"", "\\\"")}"
+                           }
+                         },
+                         {
+                           "nested": {
+                              "path": "checklist",
+                              "query": {
+                                "query_string": {
+                                    "query": "${fieldQuery.replace("\"", "\\\"")}"
+                                }
+                              }
+                           }
+                         }
+                    ]
+                }
+            },
+            "aggs": {
+               "month": {
+                  "terms": {
+                     "field": "month",
+                     "size": 13
+                  }
+               }
+            },
+            "size": 0
+        }
+        """
+    println(query)
+    val body = Http(s"http://172.27.11.151:9200/churn-checklist-*/docs/_search")
+      .postData(query)
+      .header("content-type", "application/JSON")
+      .asString.body
+    val json = Json.parse(body)
+    val array = json.\("aggregations").\("month").\("buckets").get.asInstanceOf[JsArray].value.toArray
+      .map(x => (x.\("key").get.asInstanceOf[JsString].toString().replace("\"",""), x.\("doc_count").get.asInstanceOf[JsNumber].toString().toLong))
+    array.filter(x=> x._1 != CommonService.getCurrentMonth()).sortWith((x, y) => x._1 > y._1).slice(0,12).sorted
+  }
+
   def calTrendTypeRegion(array: Array[(String, Int, Int, Long, Long)], status: Int, sumAll_churn: Array[(Int, Long)]) = {
     val rsHuyDv = array.filter(x=> x._3 == status).map(x=> (x._1, x._2, x._4, x._5))
+    //rsHuyDv.foreach(println)
     rsHuyDv.map(x=> (x._1, x._2, CommonService.format2Decimal(x._3 * 100.00 / x._4), CommonService.format2Decimal(x._3 * 100.00 / sumAll_churn.find(y=> y._1 == x._2).get._2), x._3))
+  }
+
+  def calTrendCallinRateAndPercentage(callInArray: Array[(String, String, Long, Long)], allChurn: Array[(String, Long)], status: Int) ={
+    val rs  = callInArray.filter(x=> x._2.toInt == status).filter(x=> allChurn.map(y=> y._1).indexOf(x._1) >=0)
+    rs.map(x=> (x._1, x._3, x._4, allChurn.toMap.get(x._1).get)).map(x=>(x._1, CommonService.format3Decimal(x._2 * 100.00 / x._3), CommonService.format3Decimal(x._2 * 100.00 / x._4)))
+      .sortWith((x, y) => x._1 > y._1).slice(0, 12).sorted
+  }
+
+  def getRangeTimeNested(time : String) = {
+    if(time.indexOf(">=") < 0) ",\"aggs\":{\"countCt\":{\"filter\":{\"bool\":{\"must\":[{\"range\":{\"checklist.processTime\":{\"gte\":"+time.split("-")(0)+",\"lt\":"+time.split("-")(1)+"}}}]}}}}"
+    else ",\"aggs\":{\"countCt\":{\"filter\":{\"bool\":{\"must\":[{\"range\":{\"checklist.processTime\":{\"gte\":"+time.substring(time.indexOf("=")+1)+"}}}]}}}}"
+  }
+
+  def getTypeChecklist(_type : String) = {
+    ",\"aggs\":{\"countCt\":{\"filter\":{\"bool\":{\"must\":[{\"term\":{\"checklist.type\":\""+_type+"\"}}]}}}}"
+  }
+
+  // parse query type
+  def parseTypes(_types: String) = {
+    val queries = _types match {
+      case _types if(_types == "*")      => "*"
+      case _types if(_types == "Others") => _types.split(",").filter(!_.contains("Others")).map(x=> "!(checklist.type:\""+x+"\")").mkString(" AND ")
+      case _  => "checklist.type:\""+_types+"\""
+    }
+    queries
   }
 
   def getInternet(request: Request[AnyContent]) = {
@@ -796,7 +900,7 @@ object  ChurnChecklistService{
       region = if(request.body.asFormUrlEncoded.get("region").head != "") request.body.asFormUrlEncoded.get("region").head else "*"
       month = request.body.asFormUrlEncoded.get("month").head
       processTime = if(request.body.asFormUrlEncoded.get("processTime").head != "") request.body.asFormUrlEncoded.get("processTime").head else "*"
-      request.body.asFormUrlEncoded.get("typeCurr").head match {
+      /*request.body.asFormUrlEncoded.get("typeCurr").head match {
         case "" => {
           _type = "*"
         }
@@ -807,7 +911,8 @@ object  ChurnChecklistService{
         case _ => {
           _type = "checklist.type:\""+request.body.asFormUrlEncoded.get("typeCurr").head+"\""
         }
-      }
+      }*/
+      _type = if(request.body.asFormUrlEncoded.get("typeCurr").head != "") request.body.asFormUrlEncoded.get("typeCurr").head else "*"
     }
     val t0 = System.currentTimeMillis()
     // Chart 1: Number of Contracts That Have Checklist(s)
@@ -816,9 +921,10 @@ object  ChurnChecklistService{
       .map(x=> (x._1, x._2, CommonService.format2Decimal(x._2 * 100.00 / contractAll.toMap.get(x._1).get), x._3)).sorted
     logger.info("t0: "+(System.currentTimeMillis() -t0))
     val t1 = System.currentTimeMillis()
-    // Chart 2: Number of Contracts That Have Checklist(s)
-    val allChurn_count  = ChurnCallogService.getNumberOfContractAll(s"status:$status AND $ageAll AND region:$region", "churn-contract-info-*")
-    val trendChecklist  = ChurnCallogService.calTrendCallinRateAndPercentage(getChurnContractbyStatus(region, ageChecklist, _type, processTime), allChurn_count , status)
+    // Chart 2: Churn Rate & Percentage For Customers Who Have Checklist
+    val allChurn_count  = if(processTime == "*" && _type == "*") ChurnCallogService.getNumberOfContractAll(s"status:$status AND $ageAll AND region:$region", "churn-contract-info-*")
+                          else getAllContractHaveCt(s"status:$status", _type)
+    val trendChecklist  = calTrendCallinRateAndPercentage(getChurnContractbyStatus(region, ageChecklist, _type, processTime), allChurn_count , status)
     logger.info("t1: "+(System.currentTimeMillis() -t1))
     val t2 = System.currentTimeMillis()
     // Chart 3: Number of Contracts That Have Checklist(s) by Region (%) 2-3 sai
@@ -892,7 +998,7 @@ object  ChurnChecklistService{
     // Chart 9: Churn Rate and Churn Percentage by Checklist Type by Region
     val top12trendTypes = getChecklistRegionType(month, ageChecklist, processTime).filter(x=> top12Types.indexOf(x._1) >= 0)
     val otherTrends     = getOtherTypeRegion(month,ageChecklist, processTime, top12Types.map(x=> "!(checklist.type:\""+x+"\")").mkString(" AND "))
-    val rsTrendTypes    = calTrendTypeRegion(top12trendTypes ++ otherTrends, status, getOtherTypeRegion(month, ageChecklist, processTime,"").filter(x=> x._3 == status).map(x=> x._2 -> x._4))
+    val rsTrendTypes    = calTrendTypeRegion(top12trendTypes ++ otherTrends, status, getOtherTypeRegion(month, ageChecklist, processTime, "").filter(x=> x._3 == status).map(x=> x._2 -> x._4))
     val trendType_X = (0 until rsTrendTypes.map(x=> x._1).distinct.length).map(x=> rsTrendTypes.map(x=> x._1).distinct(x) -> (x+1))
     val trendTypeBubble = rsTrendTypes.map(x=> (x._2, trendType_X.find(y=> y._1 == x._1).get._2, x._3, x._4, x._5))
     /* sort array type and region have null value*/

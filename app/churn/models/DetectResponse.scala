@@ -19,5 +19,6 @@ case class DetectResponse(
                          numCauses: Array[(String, Long)],
                          topChecklistContent: Array[(String, String, String, String)],
                          medianMaintain: Array[(String, Double, Long)],
-                         indicators: Indicator
+                         indicators: Indicator,
+                         linkFilters: Map[String, String]
                          )

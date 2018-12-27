@@ -74,7 +74,7 @@ class ChurnDetectController @Inject() (cc: ControllerComponents) extends Abstrac
         "numCt"     -> CommonService.formatPattern(rs.cardMetrics._1),
         "churnCt"   -> CommonService.formatPattern(rs.cardMetrics._2),
         "churnRate" -> CommonService.format3Decimal(if(rs.cardMetrics._1 != 0) rs.cardMetrics._2 * 100.0 / rs.cardMetrics._1 else 0),
-        "churnPert" -> CommonService.format3Decimal(if(rs.cardMetrics._2 != 0) rs.cardMetrics._3 * 100.0 / rs.cardMetrics._2 else 0),
+        "churnPert" -> CommonService.format3Decimal(if(rs.cardMetrics._3 != 0) rs.cardMetrics._2 * 100.0 / rs.cardMetrics._3 else 0),
         "f1score"   -> CommonService.format3Decimal(if(rs.cardMetrics._1 !=0 && rs.cardMetrics._2 != 0) 2.00 * (rs.cardMetrics._2 * 100.0 / rs.cardMetrics._1 * rs.cardMetrics._3 * 100.0 / rs.cardMetrics._2) / (rs.cardMetrics._2 * 100.0 / rs.cardMetrics._1 + rs.cardMetrics._3 * 100.0 / rs.cardMetrics._2) else 0),
         "numCall"   -> CommonService.formatPattern(rs.cardMetrics._4),
         "numCheck"  -> CommonService.formatPattern(rs.cardMetrics._5)
@@ -195,7 +195,7 @@ class ChurnDetectController @Inject() (cc: ControllerComponents) extends Abstrac
     val values1 = if(contract.indexOf("_")>=0) contract.split("_")(0).split(":")(1) else contract.split(":")(1)
     val key2    = if(contract.indexOf("_")>=0) contract.split("_")(1).split(":")(0) else ""
     val values2 = if(contract.indexOf("_")>=0) contract.split("_")(1).split(":")(1) else ""
-    println(key1 +" vs "+ key2)
+    println(key1 +" vs "+ values1)
     Redirect(churn.controllers.routes.ChurnDetectController.index()).flashing( key1 -> values1, key2 -> values2)
   }
 }

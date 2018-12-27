@@ -190,6 +190,7 @@ object  ChurnCallogService{
       )  size 0 sortBy( fieldSort("month") order SortOrder.DESC)
     val rs = client.execute(request).await
     CommonService.getAggregationsSiglog(rs.aggregations.get("month")).filter(x=> x._1 != CommonService.getCurrentMonth()).sortWith((x, y) => x._1 > y._1).slice(0,12).sorted
+
   }
 
   def getCateOthers(queryString: String, cateOthers: Array[String]) = {
@@ -928,7 +929,7 @@ object  ChurnCallogService{
         }
       }
     }
-    println(cate)
+    //println(cate)
     val t0 = System.currentTimeMillis()
     // Number of Contracts Who Call in and Number of Inbound Calls
     val contractAll = getNumberOfContractAll(s"region:$region AND $ageAll", "churn-contract-info-*").slice(0,12).sorted

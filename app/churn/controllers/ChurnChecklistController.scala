@@ -30,18 +30,18 @@ class ChurnChecklistController @Inject() (cc: ControllerComponents) extends Abst
 
   def index() =  withAuth {username => implicit request: Request[AnyContent] =>
     val month = CommonService.getPrevMonth()
-    try {
+    //try {
       val rs = ChurnChecklistService.getInternet(null)
       Ok(churn.views.html.checklist.index(rs, month, username, churn.controllers.routes.ChurnChecklistController.index()))
-    }
+    /*}
     catch {
       case e: Exception => Ok(churn.views.html.checklist.index(null, month, username, churn.controllers.routes.ChurnChecklistController.index()))
-    }
+    }*/
   }
 
 
   def getJsonChurn() =  withAuth {username => implicit request: Request[AnyContent] =>
-    try{
+    //try{
         val rs = ChurnChecklistService.getInternet(request)
         val churn1 = Json.obj(
           "cates"        -> rs.ctCheckList.map(x=> x._1),
@@ -73,7 +73,7 @@ class ChurnChecklistController @Inject() (cc: ControllerComponents) extends Abst
           "data"   -> rs.numRegionAge,
           "xAxis"  -> rs.numRegionAge.map(x=> x._1.toInt).distinct.sorted.map(x=> AgeGroupUtil.getAgeById(x)),
           "yAxis"  -> rs.numRegionAge.map(x=>x._2).distinct.sorted.map(x=> "Vung " + x),
-          "arrAge" -> rs.numRegionAge.map(x=>x._1).distinct.sorted,
+          "arrAge" -> rs.numRegionAge.map(x=>x._1.toInt).distinct.sorted,
           "arrRegion" -> rs.numRegionAge.map(x=>x._2).distinct.sorted
         )
         val minPerc6 = if(rs.checklistRegionAge.length > 0) CommonService.format3Decimal(rs.checklistRegionAge.map(x=>x._4).min) else 0
@@ -113,10 +113,10 @@ class ChurnChecklistController @Inject() (cc: ControllerComponents) extends Abst
           "churn9" -> churn9
         )
         Ok(Json.toJson(json))
-    }
+    /*}
     catch{
       case e: Exception => Ok("Error")
-    }
+    }*/
 
   }
 

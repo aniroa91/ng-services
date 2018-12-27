@@ -29,7 +29,7 @@
                 text: 'Number of Contracts by Customers’ Complain'
             },
             tooltip: {
-                pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b>'
+                pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b><br>Contract: <b>{point.y}<b>'
             },
             plotOptions: {
                 series: {
@@ -132,7 +132,7 @@
                 text: 'Number of Contracts by Call Category'
             },
             tooltip: {
-                pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b>'
+                pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b><br>Contract: <b>{point.y}<b>'
             },
             plotOptions: {
                 series: {
@@ -435,19 +435,19 @@
                 text: 'Number of Contracts by Region'
             },
             tooltip: {
-                pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b>'
+                pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b><br>Contract: <b>{point.y}<b>'
             },
             plotOptions: {
                 pie: {
                     allowPointSelect: false,
                     cursor: 'pointer',
-                    innerSize: 80,
-                    depth: 45,
+                    /*innerSize: 80,
+                    depth: 45,*/
                     dataLabels: {
-                        enabled: false,
+                        enabled: true,
                         format: '{point.name}'
                     },
-                    showInLegend: true
+                    showInLegend: false
                 },
                 series: {
                     cursor: 'pointer',
@@ -459,16 +459,23 @@
                                     $('.otherFilt').hide()
                                     $('.groupCont').text("")
                                     $('.groupTit').text("")
+                                    $('.regionFilter').hide()
                                 }
                                 else {
                                     $('#region').val(this.name.split(" ")[1])
-                                    $('.otherFilt').show()
-                                    $('.groupCont').text(this.name)
-                                    $('.groupTit').text("Group Region")
+                                    if($('.ageFilter').length >0){
+                                        $('.contRegion').text(this.name)
+                                        $('.regionFilter').show()
+                                    }
+                                    else{
+                                        $('.otherFilt').show()
+                                        $('.groupCont').text(this.name)
+                                        $('.groupTit').text("Group Region")
+                                    }
                                 }
                                 $('#complain').val("*")
-                                $('#age').val("*")
-                                $('#package').val("*")
+                                if(!($('.ageFilter').is(':visible'))) $('#age').val("*")
+                                if(!($('.packageFilter').is(':visible'))) $('#package').val("*")
                                 $('#contractGrp').val("*")
                                 $('#cause').val("")
                                 $('#maintain').val("")
@@ -506,19 +513,19 @@
                 text: 'Number of Contracts by Age Group'
             },
             tooltip: {
-                pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b>'
+                pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b><br>Contract: <b>{point.y}<b>'
             },
             plotOptions: {
                 pie: {
                     allowPointSelect: false,
                     cursor: 'pointer',
-                    innerSize: 80,
-                    depth: 45,
+                    /*innerSize: 80,
+                    depth: 45,*/
                     dataLabels: {
-                        enabled: false,
+                        enabled: true,
                         format: '{point.name}'
                     },
-                    showInLegend: true
+                    showInLegend: false
                 },
                 series: {
                     cursor: 'pointer',
@@ -530,16 +537,23 @@
                                     $('.otherFilt').hide()
                                     $('.groupCont').text("")
                                     $('.groupTit').text("")
+                                    $('.ageFilter').hide()
                                 }
                                 else {
                                     $('#age').val(this.name)
-                                    $('.otherFilt').show()
-                                    $('.groupCont').text(this.name)
-                                    $('.groupTit').text("Group Age")
+                                    if($('.ageFilter').length >0) {
+                                        $('.contAge').text(this.name)
+                                        $('.ageFilter').show()
+                                    }
+                                    else{
+                                        $('.otherFilt').show()
+                                        $('.groupCont').text(this.name)
+                                        $('.groupTit').text("Group Age")
+                                    }
                                 }
-                                $('#region').val("*")
+                                if(!($('.regionFilter').is(':visible'))) $('#region').val("*")
                                 $('#complain').val("*")
-                                $('#package').val("*")
+                                if(!($('.packageFilter').is(':visible'))) $('#package').val("*")
                                 $('#contractGrp').val("*")
                                 $('#cause').val("")
                                 $('#maintain').val("")
@@ -586,13 +600,13 @@
                 text: 'Number of Contracts by Package'
             },
             tooltip: {
-                pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b>'
+                pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b><br>Contract: <b>{point.y}<b>'
             },
             plotOptions: {
                 pie: {
                     allowPointSelect: false,
                     cursor: 'pointer',
-                    innerSize: 80,
+                    innerSize: 50,
                     depth: 85,
                     dataLabels: {
                         enabled: false,
@@ -610,15 +624,22 @@
                                     $('.otherFilt').hide()
                                     $('.groupCont').text("")
                                     $('.groupTit').text("")
+                                    $('.packageFilter').hide()
                                 }
                                 else {
                                     $('#package').val(this.name)
-                                    $('.otherFilt').show()
-                                    $('.groupCont').text(this.name)
-                                    $('.groupTit').text("Group Package")
+                                    if($('.packageFilter').length >0) {
+                                        $('.contPackage').text(this.name)
+                                        $('.packageFilter').show()
+                                    }
+                                    else{
+                                        $('.otherFilt').show()
+                                        $('.groupCont').text(this.name)
+                                        $('.groupTit').text("Group Package")
+                                    }
                                 }
-                                $('#region').val("*")
-                                $('#age').val("*")
+                                if(!($('.regionFilter').is(':visible'))) $('#region').val("*")
+                                if(!($('.ageFilter').is(':visible'))) $('#age').val("*")
                                 $('#complain').val("*")
                                 $('#contractGrp').val("*")
                                 $('#cause').val("")
@@ -949,14 +970,14 @@
 
         // click apply fitler
         $('.apply').click(function () {
-            $('#contractGrp').val("*")
+            /*$('#contractGrp').val("*")
             $('#region').val("*")
             $('#age').val("*")
             $('#package').val("*")
             $('#cause').val("")
             $('#cate').val("")
             $('#maintain').val("")
-            $('#complain').val("*")
+            $('#complain').val("*")*/
             $('.otherFilt').hide()
             $('.groupTit').text("")
             $('.groupCont').text("")
@@ -978,6 +999,9 @@
             $('.otherFilt').hide()
             $('.groupTit').text("")
             $('.groupCont').text("")
+            $('.regionFilter').hide()
+            $('.packageFilter').hide()
+            $('.ageFilter').hide()
             ajaxGetChurnDetect("*")
         })
 
@@ -1072,7 +1096,7 @@
                                     text: 'Number of Contracts by Customers’ Complain'
                                 },
                                 tooltip: {
-                                    pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b>'
+                                    pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b><br> Contract: <b>{point.y}</b>'
                                 },
                                 plotOptions: {
                                     series: {
