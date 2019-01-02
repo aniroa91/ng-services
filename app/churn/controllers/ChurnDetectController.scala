@@ -33,7 +33,7 @@ class ChurnDetectController @Inject() (cc: ControllerComponents) extends Abstrac
     val month = CommonService.getPrevMonth()
     try {
       val rs = ChurnDetectService.getInternet(request, 0)
-      Ok(churn.views.html.detect.index(rs, month, username, churn.controllers.routes.ChurnDetectController.index()))
+      Ok(churn.views.html.detect.index(rs, rs.linkFilters.get("month").get, username, churn.controllers.routes.ChurnDetectController.index()))
     }
     catch {
       case e: Exception => Ok(churn.views.html.detect.index(null, month, username, churn.controllers.routes.ChurnDetectController.index()))

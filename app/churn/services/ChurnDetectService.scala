@@ -296,7 +296,7 @@ object  ChurnDetectService{
         }
         """
     //println(request)
-    val body = Http(s"http://172.27.11.151:9200/churn-detect-problem-*/docs/_search")
+    val body = Http(s"http://172.27.11.151:9200/churn-full-*/docs/_search")
       .postData(request)
       .header("content-type", "application/JSON")
       .asString.body
@@ -493,7 +493,7 @@ object  ChurnDetectService{
     var cause = ""
     var maintain = ""
     var cate = ""
-    var month = request.flash.get("Month").getOrElse(CommonService.getPrevMonth())
+    var month = request.flash.get("Month").getOrElse("2018-11")
     if(isFwd == 1) {
       contractGrp = request.body.asFormUrlEncoded.get("groupCt").head
       status = "status:"+request.body.asFormUrlEncoded.get("status").head
@@ -506,7 +506,7 @@ object  ChurnDetectService{
       region = request.body.asFormUrlEncoded.get("region").head
       age = request.body.asFormUrlEncoded.get("age").head
     }
-    println(s"Age:$age\nRegion:$region\nPackage:$packages")
+    println(s"Age:$age\nRegion:$region\nMonth:$month")
     val time = System.currentTimeMillis()
     // chart 1
     val numContract  = getContractByMonth("churn-detect-problem-*", s"month:$month AND $complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", contractGrp, maintain, cate, cause)
@@ -598,7 +598,8 @@ object  ChurnDetectService{
     logger.info("--tt5--: "+(System.currentTimeMillis() -tt5))
 
     logger.info("Time: "+(System.currentTimeMillis() -time))
-    val linkFilters = Map("region"-> region, "age"-> age, "package"-> request.flash.get("TenGoi").getOrElse("*"))
+    val linkFilters = Map("region"-> region, "age"-> age, "package"-> request.flash.get("TenGoi").getOrElse("*"), "month" -> month)
+    println(linkFilters)
     logger.info("========END DETECT SERVICE=========")
     DetectResponse((numContract, numChurnCt, numAllChurn, numCall, numChecklist), (callYesCtYes, callYesCtNo, callNoCtYes, callNoCtNo),(numCtByRegion, numCtByAge, numCtByTengoi),
       arrProblem, topCates, topCallContent, medianHours, numCauses, topChecklistContent, medianMaintain, Indicator(rsErrors, rsSignin, rsSuyhao, rsDownload, rsFee), linkFilters)

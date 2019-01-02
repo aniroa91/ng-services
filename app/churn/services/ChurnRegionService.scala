@@ -264,7 +264,7 @@ object  ChurnRegionService{
     var region = "*"
     var profile = "*"
     var changeDate = "*"
-    var month = CommonService.getPrevMonth()
+    var month = "2018-11"
     if(request != null) {
       status = request.body.asFormUrlEncoded.get("status").head.toInt
       age = if(request.body.asFormUrlEncoded.get("age").head != "") AgeGroupUtil.getCalAgeByName(request.body.asFormUrlEncoded.get("age").head) else "age:*"
@@ -273,7 +273,7 @@ object  ChurnRegionService{
       month = request.body.asFormUrlEncoded.get("month").head
     }
     val stpChangeDate = "["+new DateTime(month+"-01").getMillis+" TO "+new DateTime(CommonService.getCurrentMonth()+"-01").getMillis+"]"
-    println("timestamp:"+stpChangeDate)
+    //println("timestamp:"+stpChangeDate)
     if(status == 4 || status == 4 || status == 6) changeDate = s"change_date:$stpChangeDate"
     val t0 = System.currentTimeMillis()
     // region and month trends

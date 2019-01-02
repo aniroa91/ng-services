@@ -905,7 +905,7 @@ object  ChurnCallogService{
     var ageAll = "*"
     var region = "*"
     var cate = "*"
-    var month = CommonService.getPrevMonth()
+    var month = "2018-11"
     if(request != null) {
       status = request.body.asFormUrlEncoded.get("status").head.toInt
       if(request.body.asFormUrlEncoded.get("age").head != "" && request.body.asFormUrlEncoded.get("age").head == "12"){

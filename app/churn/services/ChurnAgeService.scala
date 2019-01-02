@@ -173,7 +173,7 @@ object  ChurnAgeService{
     var status = 1 // Huy dich vu default
     var age = "*"
     var region = "*"
-    var month = CommonService.getPrevMonth()
+    var month = "2018-11"
     if(request != null) {
        status = request.body.asFormUrlEncoded.get("status").head.toInt
        age = if(request.body.asFormUrlEncoded.get("age").head != "") request.body.asFormUrlEncoded.get("age").head else "*"

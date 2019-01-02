@@ -11,6 +11,8 @@
             format: 'yyyy-mm'
         })
 
+        $("#monthGrp").datepicker("update", $('#monthCurr').val())
+
         Highcharts.setOptions({
             lang: {
                 drillUpText: '◁ Back to Previous'
