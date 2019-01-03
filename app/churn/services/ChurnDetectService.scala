@@ -157,9 +157,11 @@ object  ChurnDetectService{
   def getNumCtbyCause(queryStr: String, month: String, contractGrp: String, maintain: String, cate: String, cause: String) = {
     //val last6Month = CommonService.getLast6Month()
     //val queries = queryStr + " AND month:>="+last6Month+" AND month:<=" + month + " AND "+CommonUtil.filterCommon("tenGoi")
-    val queries = queryStr + " AND "+CommonUtil.filterCommon("tenGoi")
-    val full_queries = CommonUtil.getFullQueryHaveNested(queries, contractGrp,maintain, cate, cause)
-    val query = s"""
+    if(contractGrp.indexOf("Checklist No") < 0) {
+      val queries = queryStr + " AND " + CommonUtil.filterCommon("tenGoi")
+      val full_queries = CommonUtil.getFullQueryHaveNested(queries, contractGrp, maintain, cate, cause)
+      val query =
+        s"""
         {
             ${full_queries},
             "aggs": {
@@ -188,24 +190,27 @@ object  ChurnDetectService{
             "size": 0
         }
         """
-    //println(query)
-    val body = Http(s"http://172.27.11.151:9200/churn-detect-problem-${month}/docs/_search")
-      .postData(query)
-      .header("content-type", "application/JSON")
-      .asString.body
-    val json = Json.parse(body)
-    val array = json.\("aggregations").\("checklist").\("top_cause").\("buckets").get.asInstanceOf[JsArray].value.toArray
-    val rss = array.map(y=> (y.\("key").get.asInstanceOf[JsString], y.\("contract").\("doc_count").get.asInstanceOf[JsNumber]))
-    rss.map(x=> (x._1.toString().replace("\"", ""), x._2.toString().toLong))
+      //println(query)
+      val body = Http(s"http://172.27.11.151:9200/churn-detect-problem-${month}/docs/_search")
+        .postData(query)
+        .header("content-type", "application/JSON")
+        .asString.body
+      val json = Json.parse(body)
+      val array = json.\("aggregations").\("checklist").\("top_cause").\("buckets").get.asInstanceOf[JsArray].value.toArray
+      val rss = array.map(y => (y.\("key").get.asInstanceOf[JsString], y.\("contract").\("doc_count").get.asInstanceOf[JsNumber]))
+      rss.map(x => (x._1.toString().replace("\"", ""), x._2.toString().toLong))
+    }
+    else Array[(String, Long)]()
   }
 
   def getMedicanByTobaotri(queryStr: String, month: String, contractGrp: String, maintain: String, cate: String, cause: String) = {
     //val last6Month = CommonService.getLast6Month()
     //val queries = queryStr + " AND month:>="+last6Month+" AND month:<=" + month + " AND "+CommonUtil.filterCommon("tenGoi")
-    val queries = queryStr + " AND "+CommonUtil.filterCommon("tenGoi")
-    val full_queries = CommonUtil.getFullQueryHaveNested(queries, contractGrp, maintain, cate, cause)
-    val request =
-      s"""
+    if(contractGrp.indexOf("Checklist No") <0) {
+      val queries = queryStr + " AND " + CommonUtil.filterCommon("tenGoi")
+      val full_queries = CommonUtil.getFullQueryHaveNested(queries, contractGrp, maintain, cate, cause)
+      val request =
+        s"""
         {
              ${full_queries},
              "aggs": {
@@ -240,23 +245,26 @@ object  ChurnDetectService{
              "size": 0
         }
         """
-    //println(request)
-    val body = Http(s"http://172.27.11.151:9200/churn-detect-problem-${month}/docs/_search")
-      .postData(request)
-      .header("content-type", "application/JSON")
-      .asString.body
-    val json = Json.parse(body)
-    val array = json.\("aggregations").\("checklist").\("tobaotri").\("buckets").get.asInstanceOf[JsArray].value.toArray
-    array.map(x => (x.\("key").get.asInstanceOf[JsString], x.\("median").\("values").\("50.0").get.asInstanceOf[JsNumber], x.\("contract").\("doc_count").get.asInstanceOf[JsNumber]))
-      .map(x=> (x._1.toString().replace("\"",""), CommonService.format2Decimal(x._2.toString().toDouble), x._3.toString().toLong)).sortWith((x, y) => x._3 > y._3)
+      //println(request)
+      val body = Http(s"http://172.27.11.151:9200/churn-detect-problem-${month}/docs/_search")
+        .postData(request)
+        .header("content-type", "application/JSON")
+        .asString.body
+      val json = Json.parse(body)
+      val array = json.\("aggregations").\("checklist").\("tobaotri").\("buckets").get.asInstanceOf[JsArray].value.toArray
+      array.map(x => (x.\("key").get.asInstanceOf[JsString], x.\("median").\("values").\("50.0").get.asInstanceOf[JsNumber], x.\("contract").\("doc_count").get.asInstanceOf[JsNumber]))
+        .map(x => (x._1.toString().replace("\"", ""), CommonService.format2Decimal(x._2.toString().toDouble), x._3.toString().toLong)).sortWith((x, y) => x._3 > y._3)
+    }
+    else Array[(String, Double, Long)]()
   }
 
   def getTrendHoursbyRegion(queryStr: String, month: String, contractGrp: String, maintain: String, cate: String, cause: String) = {
-    val last6Month = CommonService.getLast6Month()
-    val queries = queryStr + " AND month:>="+last6Month+" AND month:<=" + month + " AND "+CommonUtil.filterCommon("tenGoi")
-    val full_queries = CommonUtil.getFullQueryHaveNested(queries, contractGrp, maintain, cate, cause)
-    val request =
-      s"""
+    if(contractGrp.indexOf("Checklist No") < 0) {
+      val last6Month = CommonService.getLast6Month()
+      val queries = queryStr + " AND month:>=" + last6Month + " AND month:<=" + month + " AND " + CommonUtil.filterCommon("tenGoi")
+      val full_queries = CommonUtil.getFullQueryHaveNested(queries, contractGrp, maintain, cate, cause)
+      val request =
+        s"""
         {
              ${full_queries},
              "aggs": {
@@ -286,21 +294,23 @@ object  ChurnDetectService{
              "size": 0
         }
         """
-    println(request)
-    val body = Http(s"http://172.27.11.151:9200/churn-full-*/docs/_search")
-      .postData(request)
-      .header("content-type", "application/JSON")
-      .asString.body
-    val json = Json.parse(body)
-    val array = json.\("aggregations").\("month").\("buckets").get.asInstanceOf[JsArray].value.toArray
-    array.map(x => (x.\("key").get.asInstanceOf[JsString], x.\("checklist").get.\("median").\("values").\("50.0").get.asInstanceOf[JsNumber]))
-      .map(x=> (x._1.toString().replace("\"",""), CommonService.format2Decimal(x._2.toString().toDouble))).sorted
+      //println(request)
+      val body = Http(s"http://172.27.11.151:9200/churn-full-*/docs/_search")
+        .postData(request)
+        .header("content-type", "application/JSON")
+        .asString.body
+      val json = Json.parse(body)
+      val array = json.\("aggregations").\("month").\("buckets").get.asInstanceOf[JsArray].value.toArray
+      array.map(x => (x.\("key").get.asInstanceOf[JsString], x.\("checklist").get.\("median").\("values").\("50.0").get.asInstanceOf[JsNumber]))
+        .map(x => (x._1.toString().replace("\"", ""), CommonService.format2Decimal(x._2.toString().toDouble))).sorted
+    }
+    else Array[(String, Double)]()
   }
 
   def getInfErrors(queryStr: String, month: String, _type: String, contractGrp: String, maintain: String, cate: String, cause: String) = {
     val last6Month = CommonService.getLast6Month()
     val queries = queryStr+" AND month:>="+last6Month+" AND month:<="+month+" AND "+CommonUtil.filterCommon("tenGoi")
-    val full_queries = if(contractGrp.equals("-1"))
+    val full_queries = if(contractGrp.equals("*"))
       s"""
         "query": {
                              "bool": {
@@ -352,9 +362,10 @@ object  ChurnDetectService{
     /*val last6Month = CommonService.getLast6Month()
     val monthQueries = if(numRecords == 100) s"month:$month" else s"month:>=$last6Month AND month:<=$month"
     val queries = queryStr+" AND "+monthQueries+" AND "+CommonUtil.filterCommon("tenGoi")*/
-    val queries = queryStr+" AND "+CommonUtil.filterCommon("tenGoi")
-    val full_queries = if(contractGrp.equals("*"))
-      s"""
+    if(contractGrp.indexOf("Call No") < 0) {
+      val queries = queryStr + " AND " + CommonUtil.filterCommon("tenGoi")
+      val full_queries = if (contractGrp.equals("*"))
+        s"""
         "query": {
                              "bool": {
                                   "filter": [
@@ -377,8 +388,9 @@ object  ChurnDetectService{
                              }
                      }
       """
-    else CommonUtil.getFullQueryHaveNested(queries, contractGrp, maintain, cate, cause)
-    val request = s"""
+      else CommonUtil.getFullQueryHaveNested(queries, contractGrp, maintain, cate, cause)
+      val request =
+        s"""
         {
              ${full_queries},
              "sort":{
@@ -387,25 +399,29 @@ object  ChurnDetectService{
              "size": $numRecords
         }
         """
-    //println(request)
-    val body = Http(s"http://172.27.11.151:9200/churn-detect-problem-${month}/docs/_search")
-      .postData(request)
-      .header("content-type", "application/JSON")
-      .asString.body
-    val json = Json.parse(body)
-    json.\("hits").\("hits").get.asInstanceOf[JsArray].value.toArray
-          .map(y=> y.\("_source").\("contract").get.asInstanceOf[JsString] -> y.\("_source").\("calllog").get.asInstanceOf[JsArray].value.toArray.map(k=> k.\("time").get.asInstanceOf[JsString] -> k.\("content").get.asInstanceOf[JsString]))
-      .flatMap(x=> x._2.map(y=> x._1.toString().replace("\"","") -> y))
-      .map(x=> (x._1, x._2._1.toString().replace("\"",""), x._2._2.toString().replace("\"",""), ""))
+      //println(request)
+      val body = Http(s"http://172.27.11.151:9200/churn-detect-problem-${month}/docs/_search")
+        .postData(request)
+        .header("content-type", "application/JSON")
+        .asString.body
+      val json = Json.parse(body)
+      json.\("hits").\("hits").get.asInstanceOf[JsArray].value.toArray
+        .map(y => y.\("_source").\("contract").get.asInstanceOf[JsString] -> y.\("_source").\("calllog").get.asInstanceOf[JsArray].value.toArray.map(k => k.\("time").get.asInstanceOf[JsString] -> k.\("content").get.asInstanceOf[JsString]))
+        .flatMap(x => x._2.map(y => x._1.toString().replace("\"", "") -> y))
+        .map(x => (x._1, x._2._1.toString().replace("\"", ""), x._2._2.toString().replace("\"", ""), ""))
+
+    }
+    else Array[(String, String, String, String)]()
   }
 
   def getTopChecklistContent(queryStr: String, month: String, numRecords: Long, contractGrp: String, maintain: String, cate: String, cause: String) = {
     //val last6Month = CommonService.getLast6Month()
     //val monthQueries = if(numRecords == 100) s"month:$month" else s"month:>=$last6Month AND month:<=$month"
     //val queries = queryStr+" AND "+monthQueries+" AND "+CommonUtil.filterCommon("tenGoi")
-    val queries = queryStr+" AND "+CommonUtil.filterCommon("tenGoi")
-    val full_queries = if(contractGrp.equals("*"))
-      s"""
+    if(contractGrp.indexOf("Checklist No") < 0) {
+      val queries = queryStr + " AND " + CommonUtil.filterCommon("tenGoi")
+      val full_queries = if (contractGrp.equals("*"))
+        s"""
         "query": {
                              "bool": {
                                  "filter": [
@@ -428,8 +444,9 @@ object  ChurnDetectService{
                              }
                      }
       """
-    else CommonUtil.getFullQueryHaveNested(queries, contractGrp, maintain, cate, cause)
-    val request = s"""
+      else CommonUtil.getFullQueryHaveNested(queries, contractGrp, maintain, cate, cause)
+      val request =
+        s"""
         {
              ${full_queries},
              "sort":{
@@ -438,19 +455,21 @@ object  ChurnDetectService{
              "size": $numRecords
         }
         """
-    //println(request)
-    val body = Http(s"http://172.27.11.151:9200/churn-detect-problem-${month}/docs/_search")
-      .postData(request)
-      .header("content-type", "application/JSON")
-      .asString.body
-    val json = Json.parse(body)
-    json.\("hits").\("hits").get.asInstanceOf[JsArray].value.toArray
-      .map(y=> y.\("_source").\("contract").get.asInstanceOf[JsString] -> y.\("_source").\("checklist").get.asInstanceOf[JsArray].value.toArray.
-        map(k=> (k.\("ngaytaochecklist").getOrElse(new JsString("")).asInstanceOf[JsString],
-          k.\("ngayhoantatCL").getOrElse(new JsString("")).asInstanceOf[JsString],
-          k.\("ghichu").getOrElse(new JsString("")).asInstanceOf[JsString])))
-      .flatMap(x=> x._2.map(y=> x._1.toString().replace("\"","") -> y)).map(x=> (x._1, x._2._1.toString().replace("\"",""), x._2._2.toString().replace("\"",""), x._2._3.toString().replace("\"","")))
-      .map(x=> (x._1, if(x._2.indexOf(".") >=0) x._2.substring(0, x._2.indexOf(".")) else x._2, if(x._3.indexOf(".") >=0) x._3.substring(0, x._3.indexOf(".")) else x._3, x._4))
+      //println(request)
+      val body = Http(s"http://172.27.11.151:9200/churn-detect-problem-${month}/docs/_search")
+        .postData(request)
+        .header("content-type", "application/JSON")
+        .asString.body
+      val json = Json.parse(body)
+      json.\("hits").\("hits").get.asInstanceOf[JsArray].value.toArray
+        .map(y => y.\("_source").\("contract").get.asInstanceOf[JsString] -> y.\("_source").\("checklist").getOrElse(new JsArray()).asInstanceOf[JsArray].value.toArray.
+          map(k => (k.\("ngaytaochecklist").getOrElse(new JsString("")).asInstanceOf[JsString],
+            k.\("ngayhoantatCL").getOrElse(new JsString("")).asInstanceOf[JsString],
+            k.\("ghichu").getOrElse(new JsString("")).asInstanceOf[JsString])))
+        .flatMap(x => x._2.map(y => x._1.toString().replace("\"", "") -> y)).map(x => (x._1, x._2._1.toString().replace("\"", ""), x._2._2.toString().replace("\"", ""), x._2._3.toString().replace("\"", "")))
+        .map(x => (x._1, if (x._2.indexOf(".") >= 0) x._2.substring(0, x._2.indexOf(".")) else x._2, if (x._3.indexOf(".") >= 0) x._3.substring(0, x._3.indexOf(".")) else x._3, x._4))
+    }
+    else Array[(String, String, String, String)]()
   }
 
   def getContractByRegion(queryStr: String, month: String, indexs: String, groupContract: String, maintain: String, cate: String, cause: String) = {
@@ -482,11 +501,13 @@ object  ChurnDetectService{
   }
 
   def getTopCategory(queryStr: String, month: String, contractGrp: String, maintain: String, cate: String, cause: String) = {
-    val last6Month = CommonService.getLast6Month()
+    //val last6Month = CommonService.getLast6Month()
     //val queries = queryStr + " AND month:>="+last6Month+" AND month:<="+month+" AND "+CommonUtil.filterCommon("tenGoi")
-    val queries = queryStr + " AND "+CommonUtil.filterCommon("tenGoi")
-    val full_queries = CommonUtil.getFullQueryHaveNested(queries, contractGrp, maintain, cate, cause)
-    val query = s"""
+    if(contractGrp.indexOf("Call No") < 0) {
+      val queries = queryStr + " AND " + CommonUtil.filterCommon("tenGoi")
+      val full_queries = CommonUtil.getFullQueryHaveNested(queries, contractGrp, maintain, cate, cause)
+      val query =
+        s"""
         {
             ${full_queries},
             "aggs": {
@@ -512,15 +533,17 @@ object  ChurnDetectService{
             "size": 0
         }
         """
-    //println(query)
-    val body = Http(s"http://172.27.11.151:9200/churn-detect-problem-${month}/docs/_search")
-      .postData(query)
-      .header("content-type", "application/JSON")
-      .asString.body
-    val json = Json.parse(body)
-    val array = json.\("aggregations").\("calllog").\("top_cate").\("buckets").get.asInstanceOf[JsArray].value.toArray
-    val rss = array.map(y=> (y.\("key").get.asInstanceOf[JsString], y.\("contract").\("doc_count").get.asInstanceOf[JsNumber]))
-    rss.map(x=> (x._1.toString().replace("\"", ""), x._2.toString().toLong))
+      //println(query)
+      val body = Http(s"http://172.27.11.151:9200/churn-detect-problem-${month}/docs/_search")
+        .postData(query)
+        .header("content-type", "application/JSON")
+        .asString.body
+      val json = Json.parse(body)
+      val array = json.\("aggregations").\("calllog").\("top_cate").\("buckets").get.asInstanceOf[JsArray].value.toArray
+      val rss = array.map(y => (y.\("key").get.asInstanceOf[JsString], y.\("contract").\("doc_count").get.asInstanceOf[JsNumber]))
+      rss.map(x => (x._1.toString().replace("\"", ""), x._2.toString().toLong))
+    }
+    else Array[(String, Long)]()
   }
 
   def getInternet(request: Request[AnyContent], isFwd: Int) = {
@@ -598,6 +621,7 @@ object  ChurnDetectService{
       val arrProblem   = getnumByProblem(s"$complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", month, contractGrp, maintain, cate, cause).sortWith((x,y) => x._2 > y._2)
     logger.info("t51: "+(System.currentTimeMillis() -t5))
     val t52 = System.currentTimeMillis()
+
     /* CALLOG GROUP*/
       // chart 4
       val topCates       = getTopCategory(s"$complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", month, contractGrp, maintain, "", cause).sortWith((x,y) => x._2 > y._2).slice(0,10)
@@ -605,7 +629,6 @@ object  ChurnDetectService{
     val t53 = System.currentTimeMillis()
     // chart 12
       val topCallContent = getTopCallContent(s"$complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", month, 100, contractGrp, maintain, cate, cause).sortWith((x, y) => x._2 > y._2).slice(0,100)
-
     logger.info("t53: "+(System.currentTimeMillis() -t53))
     val t6 = System.currentTimeMillis()
 
@@ -614,28 +637,28 @@ object  ChurnDetectService{
       // splot 1
       val errorsChurn = getInfErrors(s"status:1 AND $complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", month, "inf", contractGrp, maintain, cate, cause).toMap
     logger.info("--tt0--: "+(System.currentTimeMillis() -t6))
-    val rsErrors = getInfErrors(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", month, "inf", "-1", "", "", "").map(x=> (x._1, CommonService.format2Decimal(x._2), CommonService.format2Decimal(errorsChurn.get(x._1).getOrElse(0))))
+    val rsErrors = getInfErrors(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", month, "inf", "*", "", "", "").map(x=> (x._1, CommonService.format2Decimal(x._2), CommonService.format2Decimal(errorsChurn.get(x._1).getOrElse(0))))
     logger.info("--tt1--: "+(System.currentTimeMillis() -t6))
     val tt2 = System.currentTimeMillis()
     // splot 2
       val signinChurn = getInfErrors(s"status:1 AND $complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", month, "signin", contractGrp, maintain, cate, cause).toMap
-      val rsSignin = getInfErrors(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", month, "signin", "-1", "", "", "").map(x=> (x._1, CommonService.format2Decimal(x._2), CommonService.format2Decimal(signinChurn.get(x._1).getOrElse(0))))
+      val rsSignin = getInfErrors(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", month, "signin", "*", "", "", "").map(x=> (x._1, CommonService.format2Decimal(x._2), CommonService.format2Decimal(signinChurn.get(x._1).getOrElse(0))))
     logger.info("--tt2--: "+(System.currentTimeMillis() -tt2))
     val tt3 = System.currentTimeMillis()
     // splot 3
       val suyhaoChurn = getInfErrors(s"status:1 AND $complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", month, "suyhao", contractGrp, maintain, cate, cause).toMap
-      val rsSuyhao = getInfErrors(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", month, "suyhao", "-1", "", "", "").map(x=> (x._1, CommonService.format2Decimal(x._2), CommonService.format2Decimal(suyhaoChurn.get(x._1).getOrElse(0))))
+      val rsSuyhao = getInfErrors(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", month, "suyhao", "*", "", "", "").map(x=> (x._1, CommonService.format2Decimal(x._2), CommonService.format2Decimal(suyhaoChurn.get(x._1).getOrElse(0))))
     logger.info("--tt3--: "+(System.currentTimeMillis() -tt3))
     val tt4 = System.currentTimeMillis()
     // splot 4
       val downChurn = getInfErrors(s"status:1 AND $complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", month, "usage", contractGrp, maintain, cate, cause).toMap
-      val rsDownload = getInfErrors(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", month, "usage", "-1", "", "", "")
+      val rsDownload = getInfErrors(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", month, "usage", "*", "", "", "")
         .map(x=> (x._1, CommonService.format2Decimal(BytesUtil.bytesToGigabytes(x._2.toLong)),CommonService.format2Decimal(BytesUtil.bytesToGigabytes(downChurn.get(x._1).getOrElse(0.0).toLong))))
     logger.info("--tt4--: "+(System.currentTimeMillis() -tt4))
     val tt5 = System.currentTimeMillis()
     // splot 5
       val feeChurn = getInfErrors(s"status:1 AND $complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", month, "fee", contractGrp, maintain, cate, cause).toMap
-      val rsFee = getInfErrors(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", month, "fee", "-1", "", "", "").map(x=> (x._1, CommonService.format2Decimal(x._2), CommonService.format2Decimal(feeChurn.get(x._1).getOrElse(0))))
+      val rsFee = getInfErrors(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", month, "fee", "*", "", "", "").map(x=> (x._1, CommonService.format2Decimal(x._2), CommonService.format2Decimal(feeChurn.get(x._1).getOrElse(0))))
 
     logger.info("--tt5--: "+(System.currentTimeMillis() -tt5))
 

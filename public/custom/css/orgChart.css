@@ -79,8 +79,8 @@ div.orgChart.interactive div.hasChildren {
 }
 
 div.orgChart div.node.hover {
-    color      : #fe9929;
-    background-color: #e5f5e0;
+    color      : #fff;
+    background-color: #006DF0;
 }
 
 div.orgChart div.adjunct.node {

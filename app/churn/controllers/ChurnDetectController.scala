@@ -68,7 +68,7 @@ class ChurnDetectController @Inject() (cc: ControllerComponents) extends Abstrac
   }
 
   def getJsonChurn() = withAuth {username => implicit request: Request[AnyContent] =>
-    try{
+    //try{
       val rs = ChurnDetectService.getInternet(request, 1)
       val churn1 = Json.obj(
         "numCt"     -> CommonService.formatPattern(rs.cardMetrics._1),
@@ -183,10 +183,10 @@ class ChurnDetectController @Inject() (cc: ControllerComponents) extends Abstrac
         "splot5"       -> splot5
       )
       Ok(Json.toJson(json))
-    }
+    /*}
     catch{
       case e: Exception => Ok("Error")
-    }
+    }*/
 
   }
 
