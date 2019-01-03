@@ -175,7 +175,8 @@
                 function handlerOut() {
                         $('.custom_tooltip').hide();
                 }
-                google.visualization.events.addListener(chartHuyDv, 'onmousedown', function (event) {
+                // tam remove qua v2
+                /*google.visualization.events.addListener(chartHuyDv, 'onmousedown', function (event) {
                         document.oncontextmenu = function() {
                                 var age = dataHuyDv.getValue(Number(event.targetID.split('#')[2]), 1)
                                 var region = dataHuyDv.getValue(Number(event.targetID.split('#')[2]), 2)
@@ -183,7 +184,7 @@
                                 if(ageGroup == "06-12") ageGroup = "6-12"
                                 window.location.href = "/churn/search?contract=Age:"+ageGroup+"_Region:"+region
                         };
-                });
+                });*/
                 google.visualization.events.addListener(chartHuyDv, 'onmouseover', function (event) {
                         var rate = dataHuyDv.getValue(event.row, 3);
                         var xAxis = dataHuyDv.getValue(event.row, 1);
@@ -269,12 +270,14 @@
                                                                         $('.divStatus').attr('style','height:110px;padding-top: 15px')
                                                                 }
                                                                 ajaxGetChurn("age")
-                                                        },
+                                                        }
+                                                        // tam remove qua v2
+                                                        /*,
                                                         contextmenu: function () {
                                                                 var ageGroup = this.category
                                                                 if(ageGroup == "06-12") ageGroup = "6-12"
                                                                 window.location.href = "/churn/search?contract=Age:"+ageGroup
-                                                        }
+                                                        }*/
                                                 }
                                         }
                                 }
@@ -336,7 +339,8 @@
                                 },
                                 opposite: true
                         }],
-                        plotOptions: {
+                        // tam remove qua v2
+                        /*plotOptions: {
                                 series: {
                                         cursor: 'pointer',
                                         point: {
@@ -347,7 +351,7 @@
                                                 }
                                         }
                                 }
-                        },
+                        },*/
                         tooltip: {
                                 shared: true
                         },
@@ -478,7 +482,8 @@
                                                             }
                                                             ajaxGetChurn("regionAge")
                                                     });
-                                                    google.visualization.events.addListener(chartStatus, 'onmousedown', function (event) {
+                                                    // tam remove qua v2
+                                                    /*google.visualization.events.addListener(chartStatus, 'onmousedown', function (event) {
                                                             document.oncontextmenu = function() {
                                                                     var age = dataStatus.getValue(Number(event.targetID.split('#')[2]), 1)
                                                                     var region = dataStatus.getValue(Number(event.targetID.split('#')[2]), 2)
@@ -486,7 +491,7 @@
                                                                     if(ageGroup == "06-12") ageGroup = "6-12"
                                                                     window.location.href = "/churn/search?contract=Age:"+ageGroup+"_Region:"+region
                                                             };
-                                                    });
+                                                    });*/
                                                     google.visualization.events.addListener(chartStatus, 'onmouseover', function (event) {
                                                             var rate = dataStatus.getValue(event.row, 3);
                                                             var xAxis = dataStatus.getValue(event.row, 1);

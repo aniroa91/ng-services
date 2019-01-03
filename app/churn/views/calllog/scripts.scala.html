@@ -172,8 +172,8 @@
                     },
                     opposite: true
                 }],
-
-                plotOptions: {
+                // tam remove qua v2
+                /*plotOptions: {
                     series: {
                         cursor: 'pointer',
                         point: {
@@ -184,7 +184,7 @@
                             }
                         }
                     }
-                },
+                },*/
 
                 tooltip: {
                     shared: true
@@ -241,8 +241,8 @@
                 tooltip: {
                     shared: true
                 },
-
-                plotOptions: {
+                // tam remove qua v2
+                /*plotOptions: {
                     series: {
                         cursor: 'pointer',
                         point: {
@@ -253,7 +253,7 @@
                             }
                         }
                     }
-                },
+                },*/
 
                 series: getJsonChurnMonthByStatus(@Html(Json.stringify(Json.toJson(rs.trendCallIn.map(x=> x._2)))),@Html(Json.stringify(Json.toJson(rs.trendCallIn.map(x=> x._3)))))
 
@@ -296,7 +296,8 @@
 
                 plotOptions: {
                     series: {
-                        point: {
+                        // tam remove qua v2
+                        /*point: {
                             events: {
                                 contextmenu: function (event) {
                                     var month = event.point.series.xAxis.categories[event.point.x]
@@ -305,7 +306,7 @@
                                 }
                             }
                         },
-                        cursor: 'pointer',
+                        cursor: 'pointer',*/
                         dataLabels:{
                             formatter:function(){
                                 var nf = new Intl.NumberFormat();
@@ -391,13 +392,14 @@
             else
                 optionsRegion.hAxis.gridlines.count = Object.keys(catesMonthRegion).length+2
             chartRegionHuyDv.draw(dataRegionHuyDv, optionsRegion);
-            google.visualization.events.addListener(chartRegionHuyDv, 'onmousedown', function (event) {
+            // tam remove qua v2
+            /*google.visualization.events.addListener(chartRegionHuyDv, 'onmousedown', function (event) {
                 document.oncontextmenu = function() {
                     var month = dataRegionHuyDv.getValue(Number(event.targetID.split('#')[2]), 1)
                     var region = dataRegionHuyDv.getValue(Number(event.targetID.split('#')[2]), 2)
                     window.location.href = "/churn/search?contract=Month:"+keyByValue(catesMonthRegion, month)+"_Region:"+region
                 };
-            });
+            });*/
             google.visualization.events.addListener(chartRegionHuyDv, 'onmouseover', function (event) {
                 var rate = dataRegionHuyDv.getValue(event.row, 3);
                 var xAxis = dataRegionHuyDv.getValue(event.row, 1);
@@ -473,13 +475,15 @@
                                     }
                                     //$('#cateCurr').val("")
                                     ajaxGetChurnCallIn("churn5")
-                                },
+                                }
+                                // tam remove qua v2
+                                /*,
                                 contextmenu: function (event) {
                                     var age = event.point.series.xAxis.categories[event.point.x]
                                     if(age == "06-12") age = "6-12"
                                     var region = event.point.series.yAxis.categories[event.point.y].split(" ")[1]
                                     window.location.href = "/churn/search?contract=Age:"+age +"_Region:"+region
-                                }
+                                }*/
                             }
                         },
                         dataLabels:{
@@ -596,7 +600,8 @@
                 //$('#cateCurr').val("")
                 ajaxGetChurnCallIn("churn6")
             });
-            google.visualization.events.addListener(chartHuyDv, 'onmousedown', function (event) {
+            // tam remove qua v2
+            /*google.visualization.events.addListener(chartHuyDv, 'onmousedown', function (event) {
                 document.oncontextmenu = function() {
                     var age = dataHuyDv.getValue(Number(event.targetID.split('#')[2]), 1)
                     var ageGroup = keyByValue(catesAge, age)
@@ -604,7 +609,7 @@
                     var region = dataHuyDv.getValue(Number(event.targetID.split('#')[2]), 2)
                     window.location.href = "/churn/search?contract=Age:"+ageGroup+"_Region:"+region
                 };
-            });
+            });*/
             google.visualization.events.addListener(chartHuyDv, 'onmouseover', function (event) {
                 var rate = dataHuyDv.getValue(event.row, 3);
                 var xAxis = dataHuyDv.getValue(event.row, 1);
@@ -852,13 +857,14 @@
                             else
                                 optionsRegion.hAxis.gridlines.count = Object.keys(dta.churn4.catesMonth).length+2
                             chartRegionMonth.draw(dataRegionMonth, optionsRegion)
-                            google.visualization.events.addListener(chartRegionMonth, 'onmousedown', function (event) {
+                            // tam remove qua v2
+                            /*google.visualization.events.addListener(chartRegionMonth, 'onmousedown', function (event) {
                                 document.oncontextmenu = function() {
                                     var month = dataRegionMonth.getValue(Number(event.targetID.split('#')[2]), 1)
                                     var region = dataRegionMonth.getValue(Number(event.targetID.split('#')[2]), 2)
                                     window.location.href = "/churn/search?contract=Month:"+keyByValue(dta.churn4.catesMonth, month)+"_Region:"+region
                                 };
-                            });
+                            });*/
                             google.visualization.events.addListener(chartRegionMonth, 'onmouseover', function (event) {
                                 var rate = dataRegionMonth.getValue(event.row, 3);
                                 var xAxis = dataRegionMonth.getValue(event.row, 1);
@@ -975,7 +981,8 @@
                                     $('#cateCurr').val("")
                                     ajaxGetChurnCallIn("churn6")
                                 });
-                                google.visualization.events.addListener(chartRegionAge, 'onmousedown', function (event) {
+                                // tam remove qua v2
+                                /*google.visualization.events.addListener(chartRegionAge, 'onmousedown', function (event) {
                                     document.oncontextmenu = function() {
                                         var age = dataRegionAge.getValue(Number(event.targetID.split('#')[2]), 1)
                                         var ageGroup = keyByValue(catesAge, age)
@@ -983,7 +990,7 @@
                                         var region = dataRegionAge.getValue(Number(event.targetID.split('#')[2]), 2)
                                         window.location.href = "/churn/search?contract=Age:"+ageGroup+"_Region:"+region
                                     };
-                                });
+                                });*/
                                 google.visualization.events.addListener(chartRegionAge, 'onmouseover', function (event) {
                                     var rate = dataRegionAge.getValue(event.row, 3);
                                     var xAxis = dataRegionAge.getValue(event.row, 1);

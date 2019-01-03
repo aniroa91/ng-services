@@ -33,6 +33,7 @@
         <link rel="stylesheet" href="/assets/otherLayout/style.css">
         <link rel="stylesheet" href="/assets/otherLayout/css/responsive.css">
         <link rel="stylesheet" href="/assets/custom/css/waitMe.css">
+        <link rel="stylesheet" href="/assets/custom/css/hover-min.css">
         <link href="/assets/custom/css/orgChart.css" rel="stylesheet">
         <link href="/assets/datatables/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
         <link href="/assets/datatables/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
@@ -44,8 +45,13 @@
         <style>
                 .aHeader{
                     font-size: 24px;
-                    color: #4292c6!important;
+                    color: #0df3cf!important;
                     font-weight: 600;
+                }
+                .animation{
+                    animation-duration: 5s;
+                    animation-delay: 2s;
+                    animation-iteration-count: infinite
                 }
                 .btn-export{
                     float: right;
@@ -56,12 +62,12 @@
                     color: #16a085;
                     font-weight: 600;
                     cursor: default;
-                    background-color: #fff;
+                    background: #fff;
                     border: 1px solid #fff;
                     border-bottom-color: transparent;
                 }
                 .nav-tabs>li>a:hover{
-                    background: #1c2752;
+                    background: linear-gradient(to right, #2b98ef, #90caf9 99%);
                 }
                 .nav-tabs>li>a{
                     color: #fff;
@@ -72,10 +78,9 @@
                 }
 
                 .panel-primary>.panel-heading{
-                    background-color: #1c2752;
+                    background:linear-gradient(to right, #2b98ef, #90caf9 99%);
                 }
                 .panel-heading {
-
                     padding: 10px 10px 0px !important;
                     border-bottom: 0px solid transparent !important;
                     border-top-left-radius: 3px;
@@ -86,25 +91,30 @@
                     color: #fff; background: #16a085;padding: 2px
                 }
                 .txtInput{
+                    text-align: center;cursor: pointer;background-color: white!important;height: 35px
+                }
+
+                .txtInputMb{
                     text-align: center;cursor: pointer;background-color: white!important;height: 20px
                 }
 
                 .activeLi{
-                    background: #16a085;
+                    background: linear-gradient(45deg, #f3822b 0%, #ffca28 100%);
+                    font-weight: 600;
                 }
                 .text-smInTab{
                     float: right;
-                    color: #81f1f1!important;
+                    color: #1f2aa9!important;
                     font-size: 16px!important;
                 }
                 .text-lgInTab{
-                    color: #ad1607!important;
+                    color: #b92c1e!important;
                     font-size: 28px!important;
                 }
 
                 .boxInTab{
                     padding: 10px;
-                    background-color: #73879C!important;
+                    background: linear-gradient(45deg, #43A047 0%, #1de9b6 100%);
                 }
                 .boxCss{
                     border: 1px solid #ddd;
@@ -247,6 +257,15 @@
                     width: 177px;
                     margin-left: 10px;
                     color: #555!important;
+                    height: 35px;
+                }
+                .selectBoxMb{
+                    cursor: pointer;
+                    margin-top: 10px;
+                    width: 177px;
+                    margin-left: 10px;
+                    color: #555!important;
+                    height: 20px;
                 }
                 .filter{
                     padding: 5px 0px 0px 10px;
@@ -261,13 +280,13 @@
                     color: #0D3349;
                 }
                 .box-area-2{
-                    background-color: #fec44f;
+                    background: linear-gradient(to right, #ffbf96, #fe7096);
                     padding: 15px;
                     color: #fff;
                     margin-bottom: 20px;
                 }
                 .box-area-3{
-                    background-color: #66c2a4;
+                    background: linear-gradient(to right, #84d9d2, #07cdae);
                     padding: 15px;
                     color: #fff;
                     margin-bottom: 20px;
@@ -288,7 +307,7 @@
                 .box-area-1{
                     padding: 30px;
                     color: #fff;
-                    background-color: #73879C;
+                    background: linear-gradient(to right, rgb(36, 177, 199), rgb(249, 194, 41));
                 }
         </style>
     </head>
@@ -297,8 +316,8 @@
             <!-- Start Left menu area -->
         <div class="left-sidebar-pro">
             <nav id="sidebar" class="">
-                <div class="sidebar-header" style="margin-top: 10px;height: 50px">
-                    <a href="/internet/age" class="aHeader"><img class="main-logo" width="38" height="35" src="/assets/images/home.jpg" alt=""> INTERNET</a>
+                <div class="sidebar-header">
+                    <a href="/internet/age" class="aHeader"><img class="main-logo" width="38" height="35" src="/assets/images/home.jpg" alt=""> <span class="hvr-pulse">INTERNET</span></a>
                 </div>
                 <div class="left-custom-menu-adp-wrap comment-scrollbar">
                     <nav class="sidebar-nav left-sidebar-menu-pro divLeft">
@@ -328,7 +347,7 @@
                         <div class="col-xs-12 lineDivBlack"></div>
                         <div class="divStatus" style="margin-bottom: 20px;padding-top: 15px">
                             <span class="titFilter"><i class="fa fa-bell"></i> Group Status</span></i>
-                            <select class="form-control selectBox slStatus" style="height: 35px">
+                            <select class="form-control selectBox slStatus" style="border: 1px solid #16a085!important">
                                 <option value="*">---Choose Status---</option>
                                 @for( (k,v) <- CommonUtil.STATUS_MAP){
                                     <option value="@v">@k</option>
@@ -339,7 +358,7 @@
                         <div style="height: 140px;padding-top: 15px">
                             <span class="titFilter"><i class="fa fa-bell"></i> Group Month</span></i>
                             <div class="input-group date monthPicker">
-                                <input type="text" id="monthGrp" class="form-control txtInput" value="@month" readonly="true" style="height: 35px">
+                                <input type="text" class="monthGrp form-control txtInput" value="@month" readonly="true" style="background-color:#16a085!important;color: #fff">
                                 <span class="input-group-addon" style="background-color: #5A738E!important;"><i class="fa fa-calendar" aria-hidden="true" style="color:white"></i>
                                 </span>
                             </div>
@@ -457,7 +476,7 @@
                                             <div class="disInline">
                                                 <div class="col-sm-6 col-xs-12" style="height: 70px;padding-top: 15px;">
                                                     <span class="titFilter"><i class="fa fa-bell"></i> Group Status</span></i>
-                                                    <select class="form-control selectBox slStatus" style="height: 20px">
+                                                    <select class="form-control selectBoxMb slStatus" style="border: 1px solid #16a085!important">
                                                         <option value="*">---Choose Status---</option>
                                                         @for( (k,v) <- CommonUtil.STATUS_MAP){
                                                             <option value="@v">@k</option>
@@ -467,7 +486,7 @@
                                                 <div class="col-sm-6 col-xs-12" style="height: 70px;padding-top: 15px;">
                                                     <span class="titFilter"><i class="fa fa-bell"></i> Group Month</span></i>
                                                     <div class="input-group date monthPicker">
-                                                        <input type="text" id="monthGrp" class="form-control txtInput" value="@month" readonly="true">
+                                                        <input type="text" class="monthGrp form-control txtInputMb" value="@month" readonly="true" style="background-color:#16a085!important;color: #fff">
                                                         <span class="input-group-addon" style="background-color: #5A738E!important;width: 40px"><i class="fa fa-calendar" aria-hidden="true" style="color:white;margin-left: 25px"></i>
                                                         </span>
                                                     </div>

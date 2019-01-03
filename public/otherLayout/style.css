@@ -3667,13 +3667,13 @@ div#sparklinehome canvas {
     width: 100% !important;
 }
 .header-top-area {
-    background: #2A3F54;
+    background: linear-gradient(to right, #047edf, #6cb1e8 99%);
 }
 .sidebar-nav .metismenu{
 	background: #fff;
 }
 .sidebar-nav {
-    background: #f0f0f0;
+    background: linear-gradient(to right, #f2edf3, #efe5f1);
 }
 .sidebar-nav ul{
 	background: #fff;
@@ -3716,10 +3716,13 @@ div#sparklinehome canvas {
     color: #fff;
 }
 #sidebar {
-    background: #e4e3e3;
+    background: linear-gradient(to right, #cbdeec, #ebf4f5 99%);
 }
 #sidebar .sidebar-header {
-    background: #e4e3e3;
+	margin-top: 0px;
+	height: 60px;
+	background: linear-gradient(to right, #da8cff, #8855d2);
+	padding-top: 10px;
 }
 #sidebar.active .sidebar-header {
     padding-top:10px;
@@ -3742,6 +3745,7 @@ div#sparklinehome canvas {
 .footer-copyright-area {
 	padding: 20px 0px;
     text-align: center;
+	background: #ebf4f5;
 }
 .message-single-top h1, .notification-single-top h1 {
     border-bottom: 1px solid #F6F8FA;

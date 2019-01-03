@@ -28,13 +28,55 @@ object  ChurnDetectService{
   val logger = Logger(this.getClass())
 
   def getCtCallorChecklist(month: String, queryString: String, contractGrp: String, maintain: String, cate: String, cause: String, complain: String, _type: String) ={
-    val indexes = if(contractGrp == "*" && maintain == "" && cate == "" && cause == "" && complain == "*") s"churn-${_type}-$month" else s"churn-detect-problem-$month"
+    val indexes = if(contractGrp == "*" && maintain == "" && cate == "" && cause == "" && complain == "*") s"churn-${_type}-$month" else s"churn-full-$month"
     val queries = queryString + s" AND $complain AND "+CommonUtil.filterCommon("tenGoi")
     val full_queries = CommonUtil.getFullQueryHaveNested(queries, contractGrp, maintain, cate, cause)
-    val query =
+    val maintainQuery = if(maintain == "") "" else ",{\"nested\":{\"path\":\"checklist\",\"query\":{\"query_string\":{\"query\":\"checklist.tobaotri:"+maintain+"\"}}}}"
+    val causeQuery = if(cause == "") "" else ",{\"nested\":{\"path\":\"checklist\",\"query\":{\"query_string\":{\"query\":\"checklist.lydo:"+cause.replace("\"", "\\\"")+"\"}}}}"
+    val cateQuery = if(cate == "") "" else ",{\"nested\":{\"path\":\"calllog\",\"query\":{\"query_string\":{\"query\":\"calllog.cate:"+cate.replace("\"", "\\\"")+"\"}}}}"
+
+    val query = if(maintain == "" && cate == "" && cause == "" && complain == "*")
       s"""
       {
          ${full_queries},
+         "size": 0
+      }
+      """
+    else
+      s"""
+      {
+         "query": {
+          "bool": {
+            "filter": [
+              {
+                "query_string": {
+                  "query": "${queries.replace("\"", "\\\"")}"
+                }
+              }
+              ${maintainQuery}
+              ${cateQuery}
+              ${causeQuery}
+            ],
+            "must": [
+              {
+                "nested": {
+                  "path": "${_type}",
+                  "query": {
+                    "bool": {
+                      "must": [
+                        {
+                          "exists": {
+                            "field": "${_type}"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
          "size": 0
       }
       """
@@ -82,7 +124,7 @@ object  ChurnDetectService{
   }
 
   def getnumByProblem(queryStr: String, month: String, contractGrp: String, maintain: String, cate: String, cause: String) = {
-    val last6Month = CommonService.getLast6Month()
+    //val last6Month = CommonService.getLast6Month()
     //val queries = queryStr + " AND month:>="+last6Month+" AND month:<=" + month + " AND "+CommonUtil.filterCommon("tenGoi")
     val queries = queryStr + " AND "+CommonUtil.filterCommon("tenGoi")
     val full_queries = CommonUtil.getFullQueryHaveNested(queries, contractGrp, maintain, cate, cause)
@@ -244,7 +286,7 @@ object  ChurnDetectService{
              "size": 0
         }
         """
-    //println(request)
+    println(request)
     val body = Http(s"http://172.27.11.151:9200/churn-full-*/docs/_search")
       .postData(request)
       .header("content-type", "application/JSON")
@@ -527,7 +569,6 @@ object  ChurnDetectService{
 
     logger.info("t2: "+(System.currentTimeMillis() -t2))
     val t3 = System.currentTimeMillis()
-
       // chart 8
       val numCtByRegion = getContractByRegion(s"$complain AND lifeGroup:$age AND tenGoi:$packages", month, "region", contractGrp, maintain, cate, cause)
       // chart 9
@@ -572,7 +613,8 @@ object  ChurnDetectService{
     // chart 11
       // splot 1
       val errorsChurn = getInfErrors(s"status:1 AND $complain AND lifeGroup:$age AND region:$region AND tenGoi:$packages", month, "inf", contractGrp, maintain, cate, cause).toMap
-      val rsErrors = getInfErrors(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", month, "inf", "-1", "", "", "").map(x=> (x._1, CommonService.format2Decimal(x._2), CommonService.format2Decimal(errorsChurn.get(x._1).getOrElse(0))))
+    logger.info("--tt0--: "+(System.currentTimeMillis() -t6))
+    val rsErrors = getInfErrors(s"lifeGroup:$age AND region:$region AND tenGoi:$packages", month, "inf", "-1", "", "", "").map(x=> (x._1, CommonService.format2Decimal(x._2), CommonService.format2Decimal(errorsChurn.get(x._1).getOrElse(0))))
     logger.info("--tt1--: "+(System.currentTimeMillis() -t6))
     val tt2 = System.currentTimeMillis()
     // splot 2

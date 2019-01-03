@@ -3,15 +3,18 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
-        $('#monthGrp').datepicker({
+        $('.monthPicker').datepicker({
             autoclose: true,
             minViewMode: 1,
             startDate: '-12m',
             endDate: '-1m',
             format: 'yyyy-mm'
-        })
+        }).on('changeDate', function (selected) {
+            // change highlight filters
+            $('.monthGrp').removeAttr('style')
+        });
 
-        $("#monthGrp").datepicker("update", $('#monthCurr').val())
+        $(".monthPicker").datepicker("update", $('#monthCurr').val())
 
         Highcharts.setOptions({
             lang: {
@@ -970,6 +973,12 @@
             }
         })
 
+        // click filter Status
+        $('.slStatus').on('change',function () {
+            // remove highlight filters
+            $('.slStatus').removeAttr('style')
+        })
+
         // click apply fitler
         $('.apply').click(function () {
             /*$('#contractGrp').val("*")
@@ -988,7 +997,12 @@
 
         // click refresh fitler
         $('.refresh').click(function () {
-            $("#monthGrp").datepicker("update", $('#monthCurr').val())
+            var currDate = new Date()
+            currDate.setMonth(currDate.getMonth() -2)
+            var yr = currDate.getFullYear()
+            var month = currDate.getMonth() < 9 ? ('0' + Number(currDate.getMonth() + 1)) : (Number(currDate.getMonth() + 1))
+            var currMonth = yr + '-' + month
+            $(".monthPicker").datepicker("update", currMonth)
             $('#slStatus').val("*")
             $('#contractGrp').val("*")
             $('#region').val("*")
@@ -1302,7 +1316,7 @@
         var obj = {
             "csrfToken"   : token,
             "groupCt"     : $('#contractGrp').val(),
-            "month"       : $('#monthGrp').val(),
+            "month"       : $('.monthGrp').val(),
             "status"      : $('.slStatus').val(),
             "cate"        : $('#cate').val(),
             "maintain"    : $('#maintain').val(),

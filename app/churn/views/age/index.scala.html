@@ -33,14 +33,20 @@
         <link rel="stylesheet" href="/assets/otherLayout/style.css">
         <link rel="stylesheet" href="/assets/otherLayout/css/responsive.css">
         <link rel="stylesheet" href="/assets/custom/css/waitMe.css">
+        <link rel="stylesheet" href="/assets/custom/css/hover-min.css">
             <!-- bootstrap-daterangepicker -->
         <link href="/assets/datepicker/css/bootstrap-datepicker.css" rel="stylesheet">
         <script src="/assets/otherLayout/js/vendor/modernizr-2.8.3.min.js"></script>
         <style>
             .aHeader{
                 font-size: 24px;
-                color: #4292c6!important;
+                color: #0df3cf!important;
                 font-weight: 600;
+            }
+            .animation{
+                animation-duration: 5s;
+                animation-delay: 2s;
+                animation-iteration-count: infinite
             }
             .txtFilter{
                 color: #fff; background: #16a085;padding: 2px
@@ -68,7 +74,8 @@
                 padding: 0px 10px 0px 10px;
             }
             .activeLi{
-                background: #16a085;
+                background: linear-gradient(45deg, #f3822b 0%, #ffca28 100%);
+                font-weight: 600;
             }
             .txtControl{
                 margin-top: 5px;
@@ -200,8 +207,8 @@
             <!-- Start Left menu area -->
         <div class="left-sidebar-pro">
             <nav id="sidebar" class="">
-                <div class="sidebar-header" style="margin-top: 10px;height: 50px">
-                    <a href="/internet/age" class="aHeader"><img class="main-logo" width="38" height="35" src="/assets/images/home.jpg" alt=""> INTERNET</a>
+                <div class="sidebar-header">
+                    <a href="/internet/age" class="aHeader"><img class="main-logo" width="38" height="35" src="/assets/images/home.jpg" alt=""> <span class="hvr-pulse">INTERNET</span></a>
                 </div>
                 <div class="left-custom-menu-adp-wrap comment-scrollbar">
                     <nav class="sidebar-nav left-sidebar-menu-pro divLeft">
