@@ -28,6 +28,7 @@ object  ChurnDetectService{
   val logger = Logger(this.getClass())
 
   def getCtCallorChecklist(month: String, queryString: String, contractGrp: String, maintain: String, cate: String, cause: String, complain: String, _type: String) ={
+    println(contractGrp)
     val indexes = if(contractGrp == "*" && maintain == "" && cate == "" && cause == "" && complain == "*") s"churn-${_type}-$month" else s"churn-full-$month"
     val queries = queryString + s" AND $complain AND "+CommonUtil.filterCommon("tenGoi")
     val full_queries = CommonUtil.getFullQueryHaveNested(queries, contractGrp, maintain, cate, cause)
@@ -35,7 +36,7 @@ object  ChurnDetectService{
     val causeQuery = if(cause == "") "" else ",{\"nested\":{\"path\":\"checklist\",\"query\":{\"query_string\":{\"query\":\"checklist.lydo:"+cause.replace("\"", "\\\"")+"\"}}}}"
     val cateQuery = if(cate == "") "" else ",{\"nested\":{\"path\":\"calllog\",\"query\":{\"query_string\":{\"query\":\"calllog.cate:"+cate.replace("\"", "\\\"")+"\"}}}}"
 
-    val query = if(maintain == "" && cate == "" && cause == "" && complain == "*")
+    val query = if(contractGrp == "*" && maintain == "" && cate == "" && cause == "" && complain == "*")
       s"""
       {
          ${full_queries},
@@ -406,7 +407,7 @@ object  ChurnDetectService{
         .asString.body
       val json = Json.parse(body)
       json.\("hits").\("hits").get.asInstanceOf[JsArray].value.toArray
-        .map(y => y.\("_source").\("contract").get.asInstanceOf[JsString] -> y.\("_source").\("calllog").get.asInstanceOf[JsArray].value.toArray.map(k => k.\("time").get.asInstanceOf[JsString] -> k.\("content").get.asInstanceOf[JsString]))
+        .map(y => y.\("_source").\("contract").get.asInstanceOf[JsString] -> y.\("_source").\("calllog").getOrElse(new JsArray()).asInstanceOf[JsArray].value.toArray.map(k => k.\("time").get.asInstanceOf[JsString] -> k.\("content").get.asInstanceOf[JsString]))
         .flatMap(x => x._2.map(y => x._1.toString().replace("\"", "") -> y))
         .map(x => (x._1, x._2._1.toString().replace("\"", ""), x._2._2.toString().replace("\"", ""), ""))
 
