@@ -227,6 +227,12 @@
                     font-size: 16px;
                     color: #0D3349;
                 }
+                .opacityLg{
+                    opacity: 0.1;
+                }
+                .opacityLg:hover{
+                    opacity: 1;
+                }
         </style>
     </head>
 
@@ -520,7 +526,7 @@
                                             <div class="chartWithOverlay">
                                                 <div id="churn4_tooltip" class="custom_tooltip" style="display: none"></div>
                                                 <div id="churn4" style="width: auto; height: 380px;"></div>
-                                                <div class="overlay">
+                                                <div class="overlay trendPrf">
                                                     <span>ChurnPert (%)</span>
                                                     <div style="margin: 4px 0px 2px 7px"><div class="circle" style="background: black;margin-right: 11px"><span style="opacity: 0"></span></div><span id="churn4_txtMin" style="color:#0D3349 ">@format3Decimal(rs.trendProfileMonth._3.map(x=>x._4).min)</span></div>
                                                     <div style="margin: 0px 0px 2px 6px"><div class="circle" style="background: black;margin-right: 8px"><span style="width: 15px;opacity: 0">11</span></div><span id="churn4_circle2" style="color:#0D3349 ">@format3Decimal((rs.trendProfileMonth._3.map(x=>x._4).max -rs.trendProfileMonth._3.map(x=>x._4).min)/5*2)</span></div>

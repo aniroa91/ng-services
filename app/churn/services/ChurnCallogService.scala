@@ -898,6 +898,15 @@ object  ChurnCallogService{
     queries
   }
 
+  def calChurnRateAndPercentageForRegionMonth(array: Array[(String, String, String, Int, Int)], status: Int) = {
+    val rs = array.filter(x => x._2.toInt == status)
+    //rs.foreach(println)
+    val sumByRegionMonth       = rs.map(x=> (x._1, x._3, x._5, CommonService.format2Decimal(x._5 * 100.0 / x._4)))
+    val sumByRegionMonthStatus = array.groupBy(x=> x._1-> x._3).map(x=> (x._1._1,x._1._2, x._2.map(y=> y._5).sum))
+    sumByRegionMonth.map(x=> (x._2.toInt, x._1, CommonService.format2Decimal(x._3 * 100.0 / sumByRegionMonthStatus.filter(y=> y._1 == x._1).filter(y=> y._2 == x._2)
+      .map(y=> y._3).sum), x._4, x._3))
+  }
+
   def getInternet(request: Request[AnyContent]) = {
     logger.info("========START CALLOG SERVICE=========")
     var status = 1 // Huy dich vu default
@@ -905,7 +914,7 @@ object  ChurnCallogService{
     var ageAll = "*"
     var region = "*"
     var cate = "*"
-    var month = "2018-11"
+    var month = CommonService.getPrevMonth()
     if(request != null) {
       status = request.body.asFormUrlEncoded.get("status").head.toInt
       if(request.body.asFormUrlEncoded.get("age").head != "" && request.body.asFormUrlEncoded.get("age").head == "12"){
@@ -958,7 +967,7 @@ object  ChurnCallogService{
     logger.info("t4: "+(System.currentTimeMillis() - t4))
     val t5 = System.currentTimeMillis()
     // region and month trends
-    val trendRegionMonth = ChurnRegionService.calChurnRateAndPercentageForRegionMonth(getCallInRegionMonth(ageCallIn, cate), status).filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
+    val trendRegionMonth = calChurnRateAndPercentageForRegionMonth(getCallInRegionMonth(ageCallIn, cate), status).filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
     val top12monthRegion = trendRegionMonth.map(x=> x._2).distinct.sortWith((x, y) => x > y).filter(x=> x != CommonService.getCurrentMonth()).slice(0,12).sorted
     val topMonth = if(top12monthRegion.length >= 12) 13 else top12monthRegion.length+1
     val mapMonthRegion   = if(top12monthRegion.length >0) (1 until topMonth).map(x=> top12monthRegion(x-1) -> x).toMap else Map[String, Int]()

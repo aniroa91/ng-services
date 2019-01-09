@@ -121,6 +121,11 @@ object CommonService extends AbstractService {
     date.minusMonths(1).toString(DateTimeFormat.forPattern("yyyy-MM"))
   }
 
+  def getNextMonth(month: String): String = {
+    val next = DateTimeUtil.create(month, "yyyy-MM")
+    next.plusMonths(1).toString(DateTimeFormat.forPattern("yyyy-MM"))
+  }
+
   def getLast6Month(): String = {
     val date = new DateTime()
     date.minusMonths(6).toString(DateTimeFormat.forPattern("yyyy-MM"))

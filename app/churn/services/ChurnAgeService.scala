@@ -39,7 +39,7 @@ object  ChurnAgeService{
                 .range("60", 54.001, 60.001)
                 .range("66", 60.001, Double.MaxValue)
             ) size 1000
-        ) size 13
+        ) size 12
       ) size 0
     val rs = client.execute(request).await
     CommonService.getMultiAggregations(rs.aggregations.get("month"),"status" ,"age").flatMap(x => x._2.map(y => x._1 -> y))
@@ -173,7 +173,7 @@ object  ChurnAgeService{
     var status = 1 // Huy dich vu default
     var age = "*"
     var region = "*"
-    var month = "2018-11"
+    var month = CommonService.getPrevMonth()
     if(request != null) {
        status = request.body.asFormUrlEncoded.get("status").head.toInt
        age = if(request.body.asFormUrlEncoded.get("age").head != "") request.body.asFormUrlEncoded.get("age").head else "*"

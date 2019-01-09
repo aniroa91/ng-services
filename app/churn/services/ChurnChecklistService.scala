@@ -33,7 +33,8 @@ object  ChurnChecklistService{
     var queryNested_time = "*"
     var queryRangeTime = ""
     if(time != "*"){
-      queryNested_time = if(time.indexOf(">=") < 0) "checklist.processTime:>="+time.split("-")(0)+" AND checklist.processTime:<"+time.split("-")(1) else s"checklist.processTime:$time"
+      //queryNested_time = if(time.indexOf(">=") < 0) "checklist.processTime:>="+time.split("-")(0)+" AND checklist.processTime:<"+time.split("-")(1) else s"checklist.processTime:$time"
+      queryNested_time = if(time.indexOf(">=") < 0) "checklist.processTimeGroup:"+time else s"checklist.processTime:$time"
       queryRangeTime = getRangeTimeNested(time)
     }
     val queryAggsType = if(_type == "*") "" else getTypeChecklist(_type)
@@ -64,7 +65,10 @@ object  ChurnChecklistService{
               "month": {
                   "terms": {
                        "field": "month",
-                       "size": 24
+                       "size": 13,
+                       "order":{
+                        "_key": "desc"
+                       }
                   },
                   "aggs": {
                       "checklist": {
@@ -77,14 +81,7 @@ object  ChurnChecklistService{
                   }
               }
             },
-            "size": 0,
-            "sort": [
-               {
-                 "month": {
-                    "order": "desc"
-                 }
-               }
-            ]
+            "size": 0
         }
         """
     //println(query)
@@ -131,7 +128,10 @@ object  ChurnChecklistService{
                "month": {
                   "terms": {
                      "field": "month",
-                     "size": 24
+                     "size": 24,
+                     "order":{
+                       "_key": "desc"
+                     }
                   },
                   "aggs": {
                      "status": {
@@ -143,14 +143,7 @@ object  ChurnChecklistService{
                   }
                }
             },
-            "size": 0,
-            "sort": [
-               {
-                 "month": {
-                    "order": "desc"
-                 }
-               }
-            ]
+            "size": 0
         }
         """
     //println(query)
@@ -199,7 +192,10 @@ object  ChurnChecklistService{
                "month": {
                   "terms": {
                      "field": "month",
-                     "size": 15
+                     "size": 13,
+                     "order":{
+                       "_key": "desc"
+                     }
                   },
                   "aggs": {
                      "region": {
@@ -211,14 +207,7 @@ object  ChurnChecklistService{
                   }
                }
             },
-            "size": 0,
-            "sort": [
-               {
-                 "month": {
-                    "order": "desc"
-                 }
-               }
-            ]
+            "size": 0
         }
         """
     //println(query)
@@ -431,9 +420,12 @@ object  ChurnChecklistService{
 
   }
 
-  def getChecklistRegionAge(month: String, _type: String) = {
+  def getChecklistRegionAge(month: String, _type: String, time: String) = {
     val queries = CommonUtil.filterCommon("tenGoi")
     val queryNested = if(_type == "*") "*" else "checklist.type:\""+_type+"\""
+    var queryNested_time = "*"
+    if(time != "*" && time.indexOf(">=") <0) queryNested_time = "checklist.processTime:>="+time.split("-")(0)+" AND checklist.processTime:<"+time.split("-")(1)
+    else if(time != "*" && time.indexOf(">=") >= 0) queryNested_time = s"checklist.processTime:$time"
     val query = s"""
         {
             "query": {
@@ -449,7 +441,7 @@ object  ChurnChecklistService{
                                "path": "checklist",
                                "query": {
                                      "query_string": {
-                                           "query": "${queryNested.replace("\"", "\\\"")}"
+                                           "query": "${queryNested.replace("\"", "\\\"")} AND ${queryNested_time.replace("\"", "\\\"")}"
                                      }
                                }
                            }
@@ -837,7 +829,7 @@ object  ChurnChecklistService{
             "size": 0
         }
         """
-    println(query)
+    //println(query)
     val body = Http(s"http://172.27.11.151:9200/churn-checklist-*/docs/_search")
       .postData(query)
       .header("content-type", "application/JSON")
@@ -861,8 +853,8 @@ object  ChurnChecklistService{
   }
 
   def getRangeTimeNested(time : String) = {
-    if(time.indexOf(">=") < 0) ",\"aggs\":{\"countCt\":{\"filter\":{\"bool\":{\"must\":[{\"range\":{\"checklist.processTime\":{\"gte\":"+time.split("-")(0)+",\"lt\":"+time.split("-")(1)+"}}}]}}}}"
-    else ",\"aggs\":{\"countCt\":{\"filter\":{\"bool\":{\"must\":[{\"range\":{\"checklist.processTime\":{\"gte\":"+time.substring(time.indexOf("=")+1)+"}}}]}}}}"
+    if(time.indexOf(">=") < 0) ",\"aggs\":{\"countCt\":{\"filter\":{\"bool\":{\"must\":[{\"term\":{\"checklist.processTimeGroup\":\""+time+"\"}}]}}}}"
+    else ",\"aggs\":{\"countCt\":{\"filter\":{\"bool\":{\"must\":[{\"term\":{\"checklist.processTimeGroup\":\">48\"}}]}}}}"
   }
 
   def getTypeChecklist(_type : String) = {
@@ -887,7 +879,7 @@ object  ChurnChecklistService{
     var region = "*"
     var _type = "*"
     var processTime = "*"
-    var month = "2018-11"
+    var month = CommonService.getPrevMonth()
     if(request != null) {
       status = request.body.asFormUrlEncoded.get("status").head.toInt
       if(request.body.asFormUrlEncoded.get("age").head != "" && request.body.asFormUrlEncoded.get("age").head == "12"){
@@ -933,7 +925,7 @@ object  ChurnChecklistService{
     logger.info("t2: "+(System.currentTimeMillis() -t2))
     val t3 = System.currentTimeMillis()
     // Chart 4: For Contracts That Have Checklist(s): Churn Rate and Churn Percentage by Region 2-3 sai
-    val trendRegionMonth = ChurnRegionService.calChurnRateAndPercentageForRegionMonth(getChecklistRegionMonth(ageChecklist, _type, processTime), status).filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
+    val trendRegionMonth = ChurnCallogService.calChurnRateAndPercentageForRegionMonth(getChecklistRegionMonth(ageChecklist, _type, processTime), status).filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
     val top12monthRegion = trendRegionMonth.map(x=> x._2).distinct.sortWith((x, y) => x > y).filter(x=> x != CommonService.getCurrentMonth()).slice(0,12).sorted
     val topMonth = if(top12monthRegion.length >= 12) 13 else top12monthRegion.length+1
     val mapMonthRegion   = if(top12monthRegion.length >0) (1 until topMonth).map(x=> top12monthRegion(x-1) -> x).toMap else Map[String, Int]()
@@ -960,7 +952,7 @@ object  ChurnChecklistService{
     logger.info("t4: "+(System.currentTimeMillis() -t4))
     val t5 = System.currentTimeMillis()
     // Chart 6: For Contracts Who Have Checklist(s): Churn Rate and Churn Percentage by Region by Contract Age
-    val trendRegionAge = ChurnCallogService.calCallInRateAndPercentageRegionAge(getChecklistRegionAge(month, _type), status)
+    val trendRegionAge = ChurnCallogService.calCallInRateAndPercentageRegionAge(getChecklistRegionAge(month, _type, processTime), status)
     val mapAge = AgeGroupUtil.AGE.map(y=> y._2).toArray
     val mapRegion1 = CommonUtil.REGION.map(x=> x._2).toArray
     var mapGroup1 = Array[(Int, Int)]()

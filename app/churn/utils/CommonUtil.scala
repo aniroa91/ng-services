@@ -8,8 +8,8 @@ object CommonUtil {
     "NVLDTT" -> 2,
     "CTBDV" -> 3,
     "KH dang chuyen dia diem".toUpperCase() -> 4,
-    "Cho thanh ly".toUpperCase() -> 5,
-    "Ngung vi tranh chap cuoc".toUpperCase() -> 6
+    "Cho thanh ly".toUpperCase() -> 5/*,
+    "Ngung vi tranh chap cuoc".toUpperCase() -> 6*/
   )
 
   val REGION = Map(
