@@ -1,4 +1,4 @@
-FROM bigdata-registry.local:5043/java:8-alpine-bash
+FROM bigdata-registry.local:5043/openjdk_8u191-jre-alpine3.8:v2
 
 ENV TZ=Asia/Ho_Chi_Minh
 #RUN mkdir -p /opt/bigdata-play
