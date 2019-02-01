@@ -16,6 +16,7 @@ import services.Configure
 import services.domain.CommonService
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.DateTime
+import service.ChurnAgeService.checkExistsIndex
 
 object  ChurnRegionService{
 
@@ -281,6 +282,7 @@ object  ChurnRegionService{
     var changeDate = "*"
     var allCtMonthRegion = Array[(String, String, Int)]()
     var month = CommonService.getPrevMonth()
+    if(!checkExistsIndex(s"churn-contract-info-$month")) month = CommonService.getPrevMonth(2)
     if(request != null) {
       status = request.body.asFormUrlEncoded.get("status").head.toInt
       age = if(request.body.asFormUrlEncoded.get("age").head != "") AgeGroupUtil.getCalAgeByName(request.body.asFormUrlEncoded.get("age").head) else "age:*"
@@ -387,6 +389,6 @@ object  ChurnRegionService{
     logger.info("t5: "+(System.currentTimeMillis()- t5))
     logger.info("Time: "+(System.currentTimeMillis()- t0))
     logger.info("========END REGION SERVICE=========")
-    RegionResponse(churnRegion, (mapMonthRegion, rsRegion), churnProfile, (mapProfileMonth, mapMonth, rsProfileMonth), (mapProfileMonth, arrProfileAge), (xAxisAgeGroup, yAxisProfile, contractProfiles))
+    RegionResponse(churnRegion, (mapMonthRegion, rsRegion), churnProfile, (mapProfileMonth, mapMonth, rsProfileMonth), (mapProfileMonth, arrProfileAge), (xAxisAgeGroup, yAxisProfile, contractProfiles), month)
   }
 }

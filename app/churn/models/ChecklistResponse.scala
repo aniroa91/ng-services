@@ -9,5 +9,6 @@ case class ChecklistResponse (
      numRegionAge: Array[(String, String, Double, Long)],
      processTime: (Array[String], Array[Long], Array[(Int, Long, Long)]),
      typeRegion: (Array[(Int, String)], Array[Long], Array[(Int, Long, Long)]),
-     trendTypeBubble: (Map[String, Int], Array[(Int, Int, Double, Double, Long)])
+     trendTypeBubble: (Map[String, Int], Array[(Int, Int, Double, Double, Long)]),
+     month: String
 )

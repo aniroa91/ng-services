@@ -32,7 +32,7 @@ class ChurnChecklistController @Inject() (cc: ControllerComponents) extends Abst
     val month = CommonService.getPrevMonth()
     try {
       val rs = ChurnChecklistService.getInternet(null)
-      Ok(churn.views.html.checklist.index(rs, month, username, churn.controllers.routes.ChurnChecklistController.index()))
+      Ok(churn.views.html.checklist.index(rs, rs.month, username, churn.controllers.routes.ChurnChecklistController.index()))
     }
     catch {
       case e: Exception => Ok(churn.views.html.checklist.index(null, month, username, churn.controllers.routes.ChurnChecklistController.index()))

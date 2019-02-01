@@ -167,6 +167,13 @@ object  ChurnAgeService{
       .map(y=> y._3).sum), x._4, x._3))
   }
 
+  def checkExistsIndex(name: String) = {
+    val isExists = client.execute{
+      indexExists(name)
+    }.await
+    isExists.isExists
+  }
+
   def getInternet(request: Request[AnyContent]) = {
     logger.info("========START AGE SERVICE=========")
     val t0 = System.currentTimeMillis()
@@ -174,6 +181,7 @@ object  ChurnAgeService{
     var age = "*"
     var region = "*"
     var month = CommonService.getPrevMonth()
+    if(!checkExistsIndex(s"churn-contract-info-$month")) month = CommonService.getPrevMonth(2)
     if(request != null) {
        status = request.body.asFormUrlEncoded.get("status").head.toInt
        age = if(request.body.asFormUrlEncoded.get("age").head != "") request.body.asFormUrlEncoded.get("age").head else "*"
@@ -203,6 +211,6 @@ object  ChurnAgeService{
     logger.info("t1: "+(System.currentTimeMillis() - t1))
     logger.info("Time: "+(System.currentTimeMillis() - t0))
     logger.info("========END AGE SERVICE=========")
-    (churnStatus, churnAge, churnMonth)
+    (churnStatus, churnAge, churnMonth, month)
   }
 }

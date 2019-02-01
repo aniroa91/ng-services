@@ -7,6 +7,7 @@ case class CallogResponse (
          trendCallIn: Array[(String, Double, Double)],
          callInRegion: (Array[String], Array[(String, String, Double, Long)]),
          trendRegionMonth : (Map[String, Int], Array[(Int, Int, Double, Double, Int)]),
-         callRegionAge: Array[(Int, Int, Double, Double, Int)]
+         callRegionAge: Array[(Int, Int, Double, Double, Int)],
+         month: String
 )
 

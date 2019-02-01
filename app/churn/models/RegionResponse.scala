@@ -6,5 +6,6 @@ case class RegionResponse(
         churnProfile     : Array[(String, Double, Double)],
         trendProfileMonth: (Map[String, Int], Map[String, Int], Array[(Int , Int, Double, Double, Int)]),
         trendAgeProfile  : (Map[String, Int], Array[(Int ,Int, Double, Double, Int)]),
-        numberOfContracts: (Array[(String)], Array[(String, Int)], Array[(Int , Int, Int)])
+        numberOfContracts: (Array[(String)], Array[(String, Int)], Array[(Int , Int, Int)]),
+        month: String
 )

@@ -16,6 +16,7 @@ import org.elasticsearch.search.sort.SortOrder
 import play.api.mvc.{AnyContent, Request}
 import churn.models.CallogResponse
 import play.api.Logger
+import service.ChurnAgeService.checkExistsIndex
 
 import scalaj.http.Http
 import services.Configure
@@ -915,6 +916,7 @@ object  ChurnCallogService{
     var region = "*"
     var cate = "*"
     var month = CommonService.getPrevMonth()
+    if(!checkExistsIndex(s"churn-contract-info-$month")) month = CommonService.getPrevMonth(2)
     if(request != null) {
       status = request.body.asFormUrlEncoded.get("status").head.toInt
       if(request.body.asFormUrlEncoded.get("age").head != "" && request.body.asFormUrlEncoded.get("age").head == "12"){
@@ -1005,6 +1007,6 @@ object  ChurnCallogService{
     logger.info("t6: "+(System.currentTimeMillis() - t6))
     logger.info("Time: "+(System.currentTimeMillis() - t0))
     logger.info("========END CALLOG SERVICE=========")
-    CallogResponse(whoCallIn, churnCates, callInRegionAge, trendCallIn, callInRegion, (mapMonthRegion, callRegionMonth), callRegionAge)
+    CallogResponse(whoCallIn, churnCates, callInRegionAge, trendCallIn, callInRegion, (mapMonthRegion, callRegionMonth), callRegionAge, month)
   }
 }

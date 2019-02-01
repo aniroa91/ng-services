@@ -32,7 +32,7 @@ class ChurnAgeController @Inject() (cc: ControllerComponents) extends AbstractCo
     val month = CommonService.getPrevMonth()
     try {
       val rs = ChurnAgeService.getInternet(null)
-      Ok(churn.views.html.age.index(rs, month, username, churn.controllers.routes.ChurnAgeController.index()))
+      Ok(churn.views.html.age.index(rs, rs._4, username, churn.controllers.routes.ChurnAgeController.index()))
     }
     catch {
       case e: Exception => Ok(churn.views.html.age.index(null, month, username, churn.controllers.routes.ChurnAgeController.index()))

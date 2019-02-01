@@ -32,7 +32,7 @@ class ChurnRegionController @Inject() (cc: ControllerComponents) extends Abstrac
     val month = CommonService.getPrevMonth()
     try{
       val rs = ChurnRegionService.getInternet(null)
-      Ok(churn.views.html.region.index(rs,month,username, churn.controllers.routes.ChurnRegionController.index()))
+      Ok(churn.views.html.region.index(rs, rs.month,username, churn.controllers.routes.ChurnRegionController.index()))
     }
     catch{
       case e: Exception => Ok(churn.views.html.region.index(null,month,username, churn.controllers.routes.ChurnRegionController.index()))

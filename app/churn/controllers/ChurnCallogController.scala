@@ -32,7 +32,7 @@ class ChurnCallogController @Inject() (cc: ControllerComponents) extends Abstrac
     val month = CommonService.getPrevMonth()
     try {
       val rs = ChurnCallogService.getInternet(null)
-      Ok(churn.views.html.calllog.index(rs, month, username, churn.controllers.routes.ChurnCallogController.index()))
+      Ok(churn.views.html.calllog.index(rs, rs.month, username, churn.controllers.routes.ChurnCallogController.index()))
     }
     catch {
       case e: Exception => Ok(churn.views.html.calllog.index(null, month, username, churn.controllers.routes.ChurnCallogController.index()))

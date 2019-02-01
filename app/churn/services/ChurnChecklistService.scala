@@ -16,6 +16,7 @@ import org.elasticsearch.search.sort.SortOrder
 import play.api.mvc.{AnyContent, Request}
 import churn.models.{CallogResponse, ChecklistResponse}
 import play.api.Logger
+import service.ChurnAgeService.checkExistsIndex
 
 import scalaj.http.Http
 import services.Configure
@@ -880,6 +881,7 @@ object  ChurnChecklistService{
     var _type = "*"
     var processTime = "*"
     var month = CommonService.getPrevMonth()
+    if(!checkExistsIndex(s"churn-contract-info-$month")) month = CommonService.getPrevMonth(2)
     if(request != null) {
       status = request.body.asFormUrlEncoded.get("status").head.toInt
       if(request.body.asFormUrlEncoded.get("age").head != "" && request.body.asFormUrlEncoded.get("age").head == "12"){
@@ -1010,7 +1012,7 @@ object  ChurnChecklistService{
     logger.info("Time: "+(System.currentTimeMillis() -t0))
     logger.info("========END CHECKLIST SERVICE=========")
     ChecklistResponse(ctCheckList, trendChecklist, checklistRegion, (mapMonthRegion, checklistRegionMonth), rsTrendRegionAge, checklistRegionAge,
-      (time_X, region_Y, dataChurn7), (types_X.toArray, types_Y, rsTypes), (trendType_X.toMap, rsTypeBubble))
+      (time_X, region_Y, dataChurn7), (types_X.toArray, types_Y, rsTypes), (trendType_X.toMap, rsTypeBubble), month)
 
   }
 }
