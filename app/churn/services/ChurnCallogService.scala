@@ -843,20 +843,20 @@ object  ChurnCallogService{
 
   def calChurnRateAndPercentageCategory(array: Array[(String, String, Long, Long)], status: Int, queryStr: String) ={
     val sumHuydvByCate = array.groupBy(x=> x._1).map(x=> x._1 -> x._2.map(x=> x._3).sum)
-    val rsHuydv   = array.filter(x=> x._2.toInt == status).map(x=> (x._1, CommonService.format2Decimal(x._3 * 100.00 / sumHuydvByCate.get(x._1).get), CommonService.format2Decimal(x._3 * 100.00 / x._4)))
-    val top9Cates = rsHuydv.map(x=> (x._1, x._2, x._3, 2*x._2*x._3*1.00/(x._2+x._3))).sortWith((x, y) => x._4 > y._4).slice(0,9).map(x=> (x._1,x._2,x._3))
+    val rsHuydv   = array.filter(x=> x._2.toInt == status).map(x=> (x._1, CommonService.format2Decimal(x._3 * 100.00 / sumHuydvByCate.get(x._1).get), CommonService.format2Decimal(x._3 * 100.00 / x._4), x._3))
+    val top9Cates = rsHuydv.map(x=> (x._1, x._2, x._3, 2*x._2*x._3*1.00/(x._2+x._3), x._4)).sortWith((x, y) => x._4 > y._4).slice(0,9).map(x=> (x._1,x._2,x._3,x._5))
 
     val arrayOthers = getCateOthers(queryStr, top9Cates.map(x=> "!(calllog.cate:\""+x._1+"\")"))
     val sumOthersRate = arrayOthers.map(x=> x._2).sum
     val sumOtherPercent = if(array.filter(x=> x._2.toInt == status).length >0) array.filter(x=> x._2.toInt == status)(0)._4 else 0
-    val others = if(sumOtherPercent >0) arrayOthers.filter(x=> x._1.toInt == status).map(x=> ("Others", CommonService.format2Decimal(x._2 * 100.00 / sumOthersRate), CommonService.format2Decimal(x._2 * 100.00 / sumOtherPercent)))
-                 else Array[(String, Double, Double)]()
+    val others = if(sumOtherPercent >0) arrayOthers.filter(x=> x._1.toInt == status).map(x=> ("Others", CommonService.format2Decimal(x._2 * 100.00 / sumOthersRate), CommonService.format2Decimal(x._2 * 100.00 / sumOtherPercent), x._2))
+                 else Array[(String, Double, Double,Long)]()
     top9Cates ++ others
   }
 
   def calTrendCallinRateAndPercentage(callInArray: Array[(String, String, Long, Long)], allChurn: Array[(String, Long)], status: Int) ={
     val rs  = callInArray.filter(x=> x._2.toInt == status).filter(x=> allChurn.map(y=> y._1).indexOf(x._1) >=0)
-    rs.map(x=> (x._1, x._3, x._4, allChurn.toMap.get(x._1).get)).map(x=>(x._1, CommonService.format2Decimal(x._2 * 100.00 / x._3), CommonService.format2Decimal(x._2 * 100.00 / x._4)))
+    rs.map(x=> (x._1, x._3, x._4, allChurn.toMap.get(x._1).get)).map(x=>(x._1, CommonService.format2Decimal(x._2 * 100.00 / x._3), CommonService.format2Decimal(x._2 * 100.00 / x._4), x._2))
       .sortWith((x, y) => x._1 > y._1).slice(0, 12).sorted
   }
 

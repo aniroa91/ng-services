@@ -218,12 +218,38 @@
                     $('#profile').val(keyByValue(catesProfile, profile))
                     $('.txtProfile').text(keyByValue(catesProfile, profile))
                     $('.profileDiv').show()
+                    // highlight region when click1
+                    Array.prototype.forEach.call(document.getElementById('churn4').getElementsByTagName('text'), function(text) {
+                        if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === 'green') && text.innerHTML != 0 && text.innerHTML != undefined && text.innerHTML != Object.keys(catesProfile).length+1) {
+                            if (text.innerHTML == keyByValue(catesProfile, profile)) {
+                                text.setAttribute('fill-opacity', 1)
+                                text.setAttribute('fill', "green")
+                                text.setAttribute('font-weight', "bold")
+                                text.setAttribute('font-size', "11px")
+                            }
+                            else {
+                                text.setAttribute('fill', "#444444")
+                                text.setAttribute('fill-opacity', 0.5)
+                                text.removeAttribute('font-weight')
+                                text.setAttribute('font-size', "9px")
+                            }
+                        }
+                    })
                 }
                 else{
                     $(".monthPicker").datepicker("update", $('#month').val());
                     $('#profile').val("")
                     $('.txtProfile').text("")
                     $('.profileDiv').hide()
+                    // highlight region when click
+                    Array.prototype.forEach.call(document.getElementById('churn4').getElementsByTagName('text'), function(text) {
+                        if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === 'green') && text.innerHTML != 0 && text.innerHTML != undefined && text.innerHTML != Object.keys(catesProfile).length+1) {
+                            text.setAttribute('fill-opacity', 1)
+                            text.setAttribute('fill', "#444444")
+                            text.removeAttribute('font-weight')
+                            text.setAttribute('font-size', "9px")
+                        }
+                    })
                 }
                 //$('.slRegion').val("*")
                 //$('#age').val("")
@@ -349,6 +375,38 @@
                     var row = selection[0].row;
                     var profile = keyByValue(catesProfAge, dataAgeProfHuyDv.getValue(row, 2))
                     var age = keyByValue(catesAge, dataAgeProfHuyDv.getValue(row, 1))
+                    Array.prototype.forEach.call(container5.getElementsByTagName('text'), function(text) {
+                        if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === '#d94801') && (text.innerHTML != 0) && (text.innerHTML != 9)) {
+                            if (text.innerHTML == profile){
+                                text.setAttribute('fill-opacity', 1)
+                                text.setAttribute('fill', "#d94801")
+                                text.setAttribute('font-weight', "bold")
+                                text.setAttribute('font-size', "11px")
+                            }
+                            else {
+                                text.setAttribute('fill', "#444444")
+                                text.setAttribute('fill-opacity', 0.5)
+                                text.removeAttribute('font-weight')
+                                text.setAttribute('font-size', "9px")
+                            }
+                        }
+                        // change label age
+                        if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === '#d94801')) {
+                            if (text.innerHTML != 0 && text.innerHTML != 72)
+                                if(age == text.textContent){
+                                    text.setAttribute('fill-opacity', 1)
+                                    text.setAttribute('fill', "#d94801")
+                                    text.setAttribute('font-weight', "bold")
+                                    text.setAttribute('font-size', "11px")
+                                }
+                                else {
+                                    text.setAttribute('fill', "#444444")
+                                    text.setAttribute('fill-opacity', 0.5)
+                                    text.removeAttribute('font-weight')
+                                    text.setAttribute('font-size', "9px")
+                                }
+                        }
+                    })
                     $('#profile').val(profile)
                     $('#age').val(age)
                     $('.txtProfile').text(profile)
@@ -357,6 +415,22 @@
                     $('.ageDiv').show()
                 }
                 else{
+                    Array.prototype.forEach.call(container5.getElementsByTagName('text'), function(text) {
+                        if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === '#d94801') && (text.innerHTML != 0) && (text.innerHTML != 9)) {
+                            text.setAttribute('fill-opacity', 1)
+                            text.setAttribute('fill', "#444444")
+                            text.removeAttribute('font-weight')
+                            text.setAttribute('font-size', "9px")
+                        }
+                        if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === '#d94801')) {
+                            if (text.innerHTML != 0 && text.innerHTML != 72){
+                                text.setAttribute('fill-opacity', 1)
+                                text.setAttribute('fill', "#444444")
+                                text.removeAttribute('font-weight')
+                                text.setAttribute('font-size', "9px")
+                            }
+                        }
+                    })
                     $('#profile').val("")
                     $('#age').val("")
                     $('.txtProfile').text("")
@@ -445,6 +519,31 @@
                     $(".monthPicker").datepicker("update", $('#month').val());
                     $('.slRegion').val("*")
                 }
+                // highlight region when click
+                Array.prototype.forEach.call(document.getElementById('churn3').getElementsByTagName('text'), function(text) {
+                    if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === '#B40404') && (text.innerHTML != "Vung 0") && (text.innerHTML != "Vung 8")) {
+                        if ($('.slRegion').val() != "*") {
+                            if (text.innerHTML == "Vung " + $('.slRegion').val()) {
+                                text.setAttribute('fill-opacity', 1)
+                                text.setAttribute('fill', "#B40404")
+                                text.setAttribute('font-weight', "bold")
+                                text.setAttribute('font-size', "14px")
+                            }
+                            else {
+                                text.setAttribute('fill', "#444444")
+                                text.setAttribute('fill-opacity', 0.5)
+                                text.removeAttribute('font-weight')
+                                text.setAttribute('font-size', "13px")
+                            }
+                        }
+                        else {
+                            text.setAttribute('fill-opacity', 1)
+                            text.setAttribute('fill', "#444444")
+                            text.removeAttribute('font-weight')
+                            text.setAttribute('font-size', "13px")
+                        }
+                    }
+                })
                 //$('#profile').val("")
                 //$('#age').val("")
                 //$('.txtProfile').text("")
@@ -470,7 +569,7 @@
                 var x = mouseX -225;
                 var y = mouseY +50;
                 $('#churn3_tooltip').html('<div><p><b>Month:</b> ' + keyByValue(catesMonthRegion, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
-                        '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>NumOfContracts: </b>'+contracts+'</p></div>').css({
+                        '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>NumOfContracts: </b>'+Highcharts.numberFormat(Math.abs(contracts), 0)+'</p></div>').css({
                     'top': y,
                     'left': x
                 }).fadeIn('slow');
@@ -503,14 +602,14 @@
                         }
                     },
                     title: {
-                        text: '',
+                        text: 'Churn Percent',
                         style: {
                             color: "#73879C"
                         }
                     }
                 }, { // Secondary yAxis
                     title: {
-                        text: '',
+                        text: 'Churn Rate',
                         style: {
                             color: "#dc5a78"
                         }
@@ -525,6 +624,24 @@
                 }],
 
                 tooltip: {
+                    formatter: function() {
+                        var s = [];
+
+                        $.each(this.points, function(i, point) {
+                            if(point.series.name == 'Churn Percent'){
+                                s.push('<span>'+ point.x +'</span><br>');
+                                s.push('<br><span>Number of Contracts : <b>'+ Highcharts.numberFormat(Math.abs(point.point.k), 0) +'</b><span>');
+                            }
+                            if(point.series.name == "Churn Rate"){
+                                s.push('<span style="color: #dc5a78">'+ point.series.name +' : <b>'+ point.y +' %</b><span>');
+                            }
+                            else {
+                                s.push('<span style="color: #73879C">'+ point.series.name +' : <b>'+ point.y +' %</b><span>');
+                            }
+                        });
+
+                        return s.join(' <br> ');
+                    },
                     shared: true
                 },
                 // tam remove qua v2
@@ -541,7 +658,7 @@
                     }
                 },*/
 
-                series: getJsonChurnMonth(@Html(Json.stringify(Json.toJson(rs.churnRegion.map(x=> x._2)))),@Html(Json.stringify(Json.toJson(rs.churnRegion.map(x=> x._3)))))
+                series: getJsonChurnMonth(@Html(Json.stringify(Json.toJson(rs.churnRegion.map(x=> x._2)))),@Html(Json.stringify(Json.toJson(rs.churnRegion.map(x=> x._3 -> x._4)))))
 
             });
             var churn_profile = Highcharts.chart('churn2', {
@@ -599,11 +716,18 @@
                                     //$('.txtAge').text("")
                                     //$('.ageDiv').hide()
                                     if(this.category == $('#profile').val()){
+                                        for (var i = 0; i < this.series.data.length; i++) {
+                                            this.series.data[i].update({ color: '#1c2752' }, false, false)
+                                        }
                                         $('#profile').val("")
                                         $('.txtProfile').text("")
                                         $('.profileDiv').hide()
                                     }
                                     else {
+                                        for (var i = 0; i < this.series.data.length; i++) {
+                                            this.series.data[i].update({ color: '#ddd' }, false, false)
+                                        }
+                                        this.update({ color: '#1c2752' });
                                         $('#profile').val(this.category)
                                         $('.txtProfile').text(this.category)
                                         $('.profileDiv').show()
@@ -620,10 +744,23 @@
                     }
                 },
                 tooltip: {
+                    formatter: function() {
+                        var s = [];
+
+                        $.each(this.points, function(i, point) {
+                            if(point.series.name == 'Churn Percent'){
+                                s.push('<span>'+ point.x +'</span><br>');
+                                s.push('<br><span>Number of Contracts : <b>'+ Highcharts.numberFormat(Math.abs(point.point.k), 0) +'</b><span>');
+                            }
+                            s.push('<span>'+ point.series.name +' : <b>'+ point.y +'</b><span>');
+                        });
+
+                        return s.join(' <br> ');
+                    },
                     shared: true
                 },
 
-                series: getJsonChurnMonth(@Html(Json.stringify(Json.toJson(rs.churnProfile.map(x=> x._2)))),@Html(Json.stringify(Json.toJson(rs.churnProfile.map(x=> x._3)))))
+                series: getJsonChurnMonth(@Html(Json.stringify(Json.toJson(rs.churnProfile.map(x=> x._2)))),@Html(Json.stringify(Json.toJson(rs.churnProfile.map(x=> x._3-> x._4)))))
 
             });
             // Heatmap Total contracts profile
@@ -680,9 +817,18 @@
                         point: {
                             events: {
                                 click: function (event) {
+                                    //console.log(event.series.xAxis[0])
                                     var age = event.point.series.xAxis.categories[event.point.x]
                                     var profile = event.point.series.yAxis.categories[event.point.y]
                                     if(age == $('#age').val() && profile == $('#profile').val()){
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes).css('fill', '#666666')
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes).attr('opacity', '1')
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes).css('font-weight', '100')
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes).css('font-size', '11px')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes).css('fill', '#666666')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes).attr('opacity', '1')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes).css('font-weight', '100')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes).css('font-size', '11px')
                                         $('#profile').val("")
                                         $('#age').val("")
                                         $('.txtAge').text("")
@@ -691,6 +837,23 @@
                                         $('.profileDiv').hide()
                                     }
                                     else{
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes).css('fill', '#666666')
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes).attr('opacity', '0.5')
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes).css('font-weight', '100')
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes).css('font-size', '11px')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes).css('fill', '#666666')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes).attr('opacity', '0.5')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes).css('font-weight', '100')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes).css('font-size', '11px')
+                                        // highlight xaxis and yaxis
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes[event.point.x]).css('fill', '#16a085')
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes[event.point.x]).css('font-weight', '700')
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes[event.point.x]).css('font-size', '13px')
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes[event.point.x]).attr('opacity', '1')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes[event.point.y]).css('fill', '#16a085')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes[event.point.y]).css('font-weight', '700')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes[event.point.y]).css('font-size', '13px')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes[event.point.y]).attr('opacity', '1')
                                         $('#profile').val(profile)
                                         $('#age').val(age)
                                         $('.txtAge').text(age)
@@ -794,11 +957,21 @@
                             // update chart Region
                                churn_region.xAxis[0].update({categories: dta.churn1.cates});
                                updateCharts(churn_region, getJsonChurnMonth(dta.churn1.churnRate, dta.churn1.churnPercent))
-
+                            if($('.slRegion').val() == "*"){
+                                churn_region.series[0].update({color: '#73879C'})
+                            }
+                            else{
+                                churn_region.series[0].update({color: '#ddd'})
+                                churn_region.series[0].data[Number($('.slRegion').val() -1)].update({color: '#73879C'})
+                                console.log(churn_region.series[0].data.length)
+                            }
                             // update chart Profile
                             if(_type != "profile"){
                                churn_profile.xAxis[0].update({categories: dta.churn2.cates});
                                updateCharts(churn_profile, getJsonChurnMonth(dta.churn2.churnRate, dta.churn2.churnPercent))
+                            }
+                            else{
+                                if($("#profile").val() == "") churn_profile.series[0].update({color: '#1c2752'})
                             }
 
                             // update chart Heatmap Contract
@@ -853,6 +1026,29 @@
                                                 }
                                             }
                                         }
+                                        // highlight region when click
+                                        if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === '#B40404') && (text.innerHTML != "Vung 0") && (text.innerHTML != "Vung 8")) {
+                                            if ($('.slRegion').val() != "*" ){
+                                                if (text.innerHTML == "Vung "+$('.slRegion').val()){
+                                                    text.setAttribute('fill-opacity', 1)
+                                                    text.setAttribute('fill', "#B40404")
+                                                    text.setAttribute('font-weight', "bold")
+                                                    text.setAttribute('font-size', "14px")
+                                                }
+                                                else {
+                                                    text.setAttribute('fill', "#444444")
+                                                    text.setAttribute('fill-opacity', 0.5)
+                                                    text.removeAttribute('font-weight')
+                                                    text.setAttribute('font-size', "13px")
+                                                }
+                                            }
+                                            else{
+                                                text.setAttribute('fill-opacity', 1)
+                                                text.setAttribute('fill', "#444444")
+                                                text.removeAttribute('font-weight')
+                                                text.setAttribute('font-size', "13px")
+                                            }
+                                        }
                                     });
                                 });
                                 var dataRegionMonth = google.visualization.arrayToDataTable(getDataChurn(dta.churn3.data, "Month", "Region"))
@@ -875,6 +1071,31 @@
                                         $(".monthPicker").datepicker("update", $('#month').val());
                                         $('.slRegion').val("*")
                                     }
+                                    // highlight region when click
+                                    Array.prototype.forEach.call(document.getElementById('churn3').getElementsByTagName('text'), function(text) {
+                                        if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === '#B40404') && (text.innerHTML != "Vung 0") && (text.innerHTML != "Vung 8")) {
+                                            if ($('.slRegion').val() != "*") {
+                                                if (text.innerHTML == "Vung " + $('.slRegion').val()) {
+                                                    text.setAttribute('fill-opacity', 1)
+                                                    text.setAttribute('fill', "#B40404")
+                                                    text.setAttribute('font-weight', "bold")
+                                                    text.setAttribute('font-size', "14px")
+                                                }
+                                                else {
+                                                    text.setAttribute('fill', "#444444")
+                                                    text.setAttribute('fill-opacity', 0.5)
+                                                    text.removeAttribute('font-weight')
+                                                    text.setAttribute('font-size', "13px")
+                                                }
+                                            }
+                                            else {
+                                                text.setAttribute('fill-opacity', 1)
+                                                text.setAttribute('fill', "#444444")
+                                                text.removeAttribute('font-weight')
+                                                text.setAttribute('font-size', "13px")
+                                            }
+                                        }
+                                    })
                                     /*$('#profile').val("")
                                     $('#age').val("")
                                     $('.txtProfile').text("")
@@ -900,7 +1121,7 @@
                                     var x = mouseX - 225;
                                     var y = mouseY + 50;
                                     $('#churn3_tooltip').html('<div><p><b>Month:</b> ' + keyByValue(dta.churn3.cates, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
-                                            '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>NumOfContracts: </b>'+contracts+'</p></div>').css({
+                                            '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>NumOfContracts: </b>'+Highcharts.numberFormat(Math.abs(contracts), 0)+'</p></div>').css({
                                         'top': y,
                                         'left': x
                                     }).fadeIn('slow');
@@ -986,12 +1207,38 @@
                                         $('#profile').val(keyByValue(dta.churn4.catesProfile, profile))
                                         $('.txtProfile').text(keyByValue(dta.churn4.catesProfile, profile))
                                         $('.profileDiv').show()
+                                        // highlight region when click1
+                                        Array.prototype.forEach.call(document.getElementById('churn4').getElementsByTagName('text'), function(text) {
+                                            if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === 'green') && text.innerHTML != 0 && text.innerHTML != undefined && text.innerHTML != Object.keys(dta.churn4.catesProfile).length+1) {
+                                                if (text.innerHTML == keyByValue(dta.churn4.catesProfile, profile)) {
+                                                    text.setAttribute('fill-opacity', 1)
+                                                    text.setAttribute('fill', "green")
+                                                    text.setAttribute('font-weight', "bold")
+                                                    text.setAttribute('font-size', "11px")
+                                                }
+                                                else {
+                                                    text.setAttribute('fill', "#444444")
+                                                    text.setAttribute('fill-opacity', 0.5)
+                                                    text.removeAttribute('font-weight')
+                                                    text.setAttribute('font-size', "9px")
+                                                }
+                                            }
+                                        })
                                     }
                                     else{
                                         $(".monthPicker").datepicker("update", $('#month').val());
                                         $('#profile').val("")
                                         $('.txtProfile').text("")
                                         $('.profileDiv').hide()
+                                        // highlight region when click
+                                        Array.prototype.forEach.call(document.getElementById('churn4').getElementsByTagName('text'), function(text) {
+                                            if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === 'green') && text.innerHTML != 0 && text.innerHTML != undefined && text.innerHTML != Object.keys(dta.churn4.catesProfile).length+1) {
+                                                text.setAttribute('fill-opacity', 1)
+                                                text.setAttribute('fill', "#444444")
+                                                text.removeAttribute('font-weight')
+                                                text.setAttribute('font-size', "9px")
+                                            }
+                                        })
                                     }
                                     //$('.slRegion').val("*")
                                     //$('#age').val("")
@@ -1142,6 +1389,38 @@
                                         var row = selection[0].row;
                                         var profile = keyByValue(dta.churn5.catesProfile, dataAgeProfile.getValue(row, 2))
                                         var age = keyByValue(catesAge, dataAgeProfile.getValue(row, 1))
+                                        Array.prototype.forEach.call(document.getElementById('churn5').getElementsByTagName('text'), function(text) {
+                                            if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === '#d94801') && (text.innerHTML != 0) && (text.innerHTML != 9)) {
+                                                if (text.innerHTML == profile){
+                                                    text.setAttribute('fill-opacity', 1)
+                                                    text.setAttribute('fill', "#d94801")
+                                                    text.setAttribute('font-weight', "bold")
+                                                    text.setAttribute('font-size', "11px")
+                                                }
+                                                else {
+                                                    text.setAttribute('fill', "#444444")
+                                                    text.setAttribute('fill-opacity', 0.5)
+                                                    text.removeAttribute('font-weight')
+                                                    text.setAttribute('font-size', "9px")
+                                                }
+                                            }
+                                            // change label age
+                                            if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === '#d94801')) {
+                                                if (text.innerHTML != 0 && text.innerHTML != 72)
+                                                    if(age == text.textContent){
+                                                        text.setAttribute('fill-opacity', 1)
+                                                        text.setAttribute('fill', "#d94801")
+                                                        text.setAttribute('font-weight', "bold")
+                                                        text.setAttribute('font-size', "11px")
+                                                    }
+                                                    else {
+                                                        text.setAttribute('fill', "#444444")
+                                                        text.setAttribute('fill-opacity', 0.5)
+                                                        text.removeAttribute('font-weight')
+                                                        text.setAttribute('font-size', "9px")
+                                                    }
+                                            }
+                                        })
                                         $('#profile').val(profile)
                                         $('#age').val(age)
                                         $('.txtProfile').text(profile)
@@ -1150,6 +1429,22 @@
                                         $('.ageDiv').show()
                                     }
                                     else{
+                                        Array.prototype.forEach.call(document.getElementById('churn5').getElementsByTagName('text'), function(text) {
+                                            if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === '#d94801') && (text.innerHTML != 0) && (text.innerHTML != 9)) {
+                                                text.setAttribute('fill-opacity', 1)
+                                                text.setAttribute('fill', "#444444")
+                                                text.removeAttribute('font-weight')
+                                                text.setAttribute('font-size', "9px")
+                                            }
+                                            if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === '#d94801')) {
+                                                if (text.innerHTML != 0 && text.innerHTML != 72){
+                                                    text.setAttribute('fill-opacity', 1)
+                                                    text.setAttribute('fill', "#444444")
+                                                    text.removeAttribute('font-weight')
+                                                    text.setAttribute('font-size', "9px")
+                                                }
+                                            }
+                                        })
                                         $('#profile').val("")
                                         $('#age').val("")
                                         $('.txtProfile').text("")

@@ -217,14 +217,14 @@
                         }
                     },
                     title: {
-                        text: '',
+                        text: 'Churn Percent',
                         style: {
                             color: "#1ABB9C"
                         }
                     }
                 }, { // Secondary yAxis
                     title: {
-                        text: '',
+                        text: 'Churn Rate',
                         style: {
                             color: "#dc5a78"
                         }
@@ -239,6 +239,24 @@
                 }],
 
                 tooltip: {
+                    formatter: function() {
+                        var s = [];
+
+                        $.each(this.points, function(i, point) {
+                            if(point.series.name == 'Churn Percent'){
+                                s.push('<span>'+ point.x +'</span>');
+                                s.push('<span>Number of Contracts : <b>'+ Highcharts.numberFormat(Math.abs(point.point.k), 0) +'</b><span>');
+                            }
+                            if(point.series.name == "Churn Rate"){
+                                s.push('<span style="color: #dc5a78">'+ point.series.name +' : <b>'+ point.y +' %</b><span>');
+                            }
+                            else {
+                                s.push('<span style="color: #1ABB9C">'+ point.series.name +' : <b>'+ point.y +' %</b><span>');
+                            }
+                        });
+
+                        return s.join(' <br> ');
+                    },
                     shared: true
                 },
                 // tam remove qua v2
@@ -255,7 +273,7 @@
                     }
                 },*/
 
-                series: getJsonChurnMonthByStatus(@Html(Json.stringify(Json.toJson(rs.trendCallIn.map(x=> x._2)))),@Html(Json.stringify(Json.toJson(rs.trendCallIn.map(x=> x._3)))))
+                series: getJsonChurnMonthByStatus(@Html(Json.stringify(Json.toJson(rs.trendCallIn.map(x=> x._2)))),@Html(Json.stringify(Json.toJson(rs.trendCallIn.map(x=> x._3->x._4)))))
 
             });
 
@@ -458,6 +476,14 @@
                                     //$('.txtCate').text("")
                                     //$('.cateDiv').hide()
                                     if(age == $('#age').val() && region == $('#region').val()){
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes).css('fill', '#666666')
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes).attr('opacity', '1')
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes).css('font-weight', '100')
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes).css('font-size', '11px')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes).css('fill', '#666666')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes).attr('opacity', '1')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes).css('font-weight', '100')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes).css('font-size', '11px')
                                         $('#region').val("")
                                         $('#age').val("")
                                         $('.txtAge').text("")
@@ -466,6 +492,23 @@
                                         $('.regionDiv').hide()
                                     }
                                     else{
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes).css('fill', '#666666')
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes).attr('opacity', '0.5')
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes).css('font-weight', '100')
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes).css('font-size', '11px')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes).css('fill', '#666666')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes).attr('opacity', '0.5')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes).css('font-weight', '100')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes).css('font-size', '11px')
+                                        // highlight xaxis and yaxis
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes[event.point.x]).css('fill', '#16a085')
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes[event.point.x]).css('font-weight', '700')
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes[event.point.x]).css('font-size', '13px')
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes[event.point.x]).attr('opacity', '1')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes[event.point.y]).css('fill', '#16a085')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes[event.point.y]).css('font-weight', '700')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes[event.point.y]).css('font-size', '13px')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes[event.point.y]).attr('opacity', '1')
                                         $('#region').val(region)
                                         $('#age').val(age)
                                         $('.txtAge').text(getNameByIdAge(age))
@@ -582,6 +625,38 @@
                     var row = selection[0].row;
                     var region = dataHuyDv.getValue(row, 2)
                     var age = dataHuyDv.getValue(row, 1)
+                    Array.prototype.forEach.call(container.getElementsByTagName('text'), function(text) {
+                        if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === 'green') && (text.innerHTML != "Vung 0") && (text.innerHTML != "Vung 8")) {
+                            if (text.innerHTML == "Vung "+region){
+                                text.setAttribute('fill-opacity', 1)
+                                text.setAttribute('fill', "green")
+                                text.setAttribute('font-weight', "bold")
+                                text.setAttribute('font-size', "14px")
+                            }
+                            else {
+                                text.setAttribute('fill', "#444444")
+                                text.setAttribute('fill-opacity', 0.5)
+                                text.removeAttribute('font-weight')
+                                text.setAttribute('font-size', "13px")
+                            }
+                        }
+                        // change label age
+                        if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#1c2752' || text.getAttribute('fill') === 'green')) {
+                            if (text.innerHTML != 0 && text.innerHTML != 72)
+                                if(getNameByIdAge(Number(age)) == text.textContent){
+                                    text.setAttribute('fill-opacity', 1)
+                                    text.setAttribute('fill', "green")
+                                    text.setAttribute('font-weight', "bold")
+                                    text.setAttribute('font-size', "14px")
+                                }
+                                else {
+                                    text.setAttribute('fill', "#1c2752")
+                                    text.setAttribute('fill-opacity', 0.5)
+                                    text.removeAttribute('font-weight')
+                                    text.setAttribute('font-size', "13px")
+                                }
+                        }
+                    })
                     $('#age').val(age)
                     $('#region').val(region)
                     $('.txtAge').text(getNameByIdAge(age))
@@ -590,6 +665,22 @@
                     $('.regionDiv').show()
                 }
                 else{
+                    Array.prototype.forEach.call(container.getElementsByTagName('text'), function(text) {
+                        if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === 'green') && (text.innerHTML != "Vung 0") && (text.innerHTML != "Vung 8")) {
+                            text.setAttribute('fill-opacity', 1)
+                            text.setAttribute('fill', "#444444")
+                            text.removeAttribute('font-weight')
+                            text.setAttribute('font-size', "13px")
+                        }
+                        if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#1c2752' || text.getAttribute('fill') === 'green')) {
+                            if (text.innerHTML != 0 && text.innerHTML != 72){
+                                text.setAttribute('fill-opacity', 1)
+                                text.setAttribute('fill', "#1c2752")
+                                text.removeAttribute('font-weight')
+                                text.setAttribute('font-size', "13px")
+                            }
+                        }
+                    })
                     $('#age').val("")
                     $('#region').val("")
                     $('.txtAge').text("")
@@ -691,11 +782,18 @@
                                     $('.txtRegion').text("")
                                     $('.regionDiv').hide()*/
                                     if(this.category == $('#cateCurr').val()){
+                                        for (var i = 0; i < this.series.data.length; i++) {
+                                            this.series.data[i].update({ color: '#FFAA00' }, false, false)
+                                        }
                                         $('#cateCurr').val("")
                                         $('.cateDiv').hide()
                                         $('.txtCate').text("")
                                     }
                                     else {
+                                        for (var i = 0; i < this.series.data.length; i++) {
+                                            this.series.data[i].update({ color: '#ddd' }, false, false)
+                                        }
+                                        this.update({ color: '#FFAA00' });
                                         $('.cateDiv').show()
                                         $('.txtCate').text(this.category)
                                         $('#cateCurr').val(this.category)
@@ -708,10 +806,23 @@
                 },
 
                 tooltip: {
+                    formatter: function() {
+                        var s = [];
+
+                        $.each(this.points, function(i, point) {
+                            if(point.series.name == 'Churn Percent'){
+                                s.push('<span>'+ point.x +'</span><br>');
+                                s.push('<br><span>Number of Contracts : <b>'+ Highcharts.numberFormat(Math.abs(point.point.k), 0) +'</b><span>');
+                            }
+                            s.push('<span>'+ point.series.name +' : <b>'+ point.y +' %</b><span>');
+                        });
+
+                        return s.join(' <br> ');
+                    },
                     shared: true
                 },
 
-                series: getJsonChurnMonth(@Html(Json.stringify(Json.toJson(rs.churnCates.map(x=> x._2)))),@Html(Json.stringify(Json.toJson(rs.churnCates.map(x=> x._3)))))
+                series: getJsonChurnMonth(@Html(Json.stringify(Json.toJson(rs.churnCates.map(x=> x._2)))),@Html(Json.stringify(Json.toJson(rs.churnCates.map(x=> x._3 -> x._4)))))
 
             });
 
@@ -807,6 +918,9 @@
                             if(_type != "churn7") {
                                 churn7.xAxis[0].update({categories: dta.churn7.cates});
                                 updateCharts(churn7, getJsonChurnMonth(dta.churn7.churnRate, dta.churn7.churnPercent))
+                            }
+                            else{
+                                if($('#cateCurr').val() == "") churn7.series[0].update({color: '#FFAA00'})
                             }
 
                             // update chart 4 For Contracts Who Call in: Trend in Churn Rate and Churn Percentage by Region
@@ -963,6 +1077,38 @@
                                         var row = selection[0].row;
                                         var region = dataRegionAge.getValue(row, 2)
                                         var age = dataRegionAge.getValue(row, 1)
+                                        Array.prototype.forEach.call(document.getElementById('churn6').getElementsByTagName('text'), function(text) {
+                                            if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === 'green') && (text.innerHTML != "Vung 0") && (text.innerHTML != "Vung 8")) {
+                                                if (text.innerHTML == "Vung "+region){
+                                                    text.setAttribute('fill-opacity', 1)
+                                                    text.setAttribute('fill', "green")
+                                                    text.setAttribute('font-weight', "bold")
+                                                    text.setAttribute('font-size', "14px")
+                                                }
+                                                else {
+                                                    text.setAttribute('fill', "#444444")
+                                                    text.setAttribute('fill-opacity', 0.5)
+                                                    text.removeAttribute('font-weight')
+                                                    text.setAttribute('font-size', "13px")
+                                                }
+                                            }
+                                            // change label age
+                                            if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#1c2752' || text.getAttribute('fill') === 'green')) {
+                                                if (text.innerHTML != 0 && text.innerHTML != 72)
+                                                    if(getNameByIdAge(Number(age)) == text.textContent){
+                                                        text.setAttribute('fill-opacity', 1)
+                                                        text.setAttribute('fill', "green")
+                                                        text.setAttribute('font-weight', "bold")
+                                                        text.setAttribute('font-size', "14px")
+                                                    }
+                                                    else {
+                                                        text.setAttribute('fill', "#1c2752")
+                                                        text.setAttribute('fill-opacity', 0.5)
+                                                        text.removeAttribute('font-weight')
+                                                        text.setAttribute('font-size', "13px")
+                                                    }
+                                            }
+                                        })
                                         $('#age').val(age)
                                         $('#region').val(region)
                                         $('.txtAge').text(getNameByIdAge(age))
@@ -971,6 +1117,22 @@
                                         $('.regionDiv').show()
                                     }
                                     else {
+                                        Array.prototype.forEach.call(document.getElementById('churn6').getElementsByTagName('text'), function(text) {
+                                            if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === 'green') && (text.innerHTML != "Vung 0") && (text.innerHTML != "Vung 8")) {
+                                                text.setAttribute('fill-opacity', 1)
+                                                text.setAttribute('fill', "#444444")
+                                                text.removeAttribute('font-weight')
+                                                text.setAttribute('font-size', "13px")
+                                            }
+                                            if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#1c2752' || text.getAttribute('fill') === 'green')) {
+                                                if (text.innerHTML != 0 && text.innerHTML != 72){
+                                                    text.setAttribute('fill-opacity', 1)
+                                                    text.setAttribute('fill', "#1c2752")
+                                                    text.removeAttribute('font-weight')
+                                                    text.setAttribute('font-size', "13px")
+                                                }
+                                            }
+                                        })
                                         $('#age').val("")
                                         $('#region').val("")
                                         $('.txtAge').text("")
@@ -1065,7 +1227,7 @@
                 name: ($('.slStatus').val() == 0? "Percent":"Churn Percent"),
                 type: 'column',
                 yAxis: 0,
-                data: churnPercent
+                data: parseMulMetris(churnPercent)
             })
             rs.push({
                 name: ($('.slStatus').val() == 0? "Rate":"Churn Rate"),

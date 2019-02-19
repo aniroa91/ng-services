@@ -2,7 +2,7 @@ package churn.models
 
 case class ChecklistResponse (
      ctCheckList: Array[(String, Long, Double, Long)],
-     trendChecklist: Array[(String, Double, Double)],
+     trendChecklist: Array[(String, Double, Double, Long)],
      checklistRegion: (Array[String], Array[(String, String, Double, Long)]),
      trendRegionMonth : (Map[String, Int], Array[(Int, Int, Double, Double, Int)]),
      checklistRegionAge: Array[(Int, Int, Double, Double, Int)],

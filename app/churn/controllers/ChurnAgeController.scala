@@ -49,11 +49,11 @@ class ChurnAgeController @Inject() (cc: ControllerComponents) extends AbstractCo
       )
       val rsAge = Json.obj(
         "churnRate"    -> rs._2.map(x=> x._2),
-        "churnPercent" -> rs._2.map(x=> x._3)
+        "churnPercent" -> rs._2.map(x=> x._3 -> x._4)
       )
       val rsMonth = Json.obj(
         "churnRate"    -> rs._3.map(x=> x._2),
-        "churnPercent" -> rs._3.map(x=> x._3)
+        "churnPercent" -> rs._3.map(x=> x._3-> x._4)
       )
       val json = Json.obj(
         "churnAge"       -> rsAge,

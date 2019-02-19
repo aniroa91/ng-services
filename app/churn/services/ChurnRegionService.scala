@@ -220,7 +220,7 @@ object  ChurnRegionService{
 
     // month, age, rate, percentage
     sumByStatus.map(x=> (x._1, x._2, sumByStatusAll.filter(y=> y._1 == x._1).map(x=> x._2).sum))
-      .map(x => (x._1, CommonService.format2Decimal(x._2  * 100.0/ x._3), CommonService.format2Decimal(x._2 * 100.0 / sumAll) ) ).toArray.sorted
+      .map(x => (x._1, CommonService.format2Decimal(x._2  * 100.0/ x._3), CommonService.format2Decimal(x._2 * 100.0 / sumAll), x._2 ) ).toArray.sorted
   }
 
   def calChurnRateAndPercentageForRegionMonth(array: Array[(String, String, String, Int, Int)], status: Int, allCtMonthRegion: Array[(String, String, Int)]) = {
@@ -336,8 +336,8 @@ object  ChurnRegionService{
     val t2 = System.currentTimeMillis()
     // churn profile
     val churnProfile     = calChurnRateAndPercentageByStatus(getChurnGroupbyStatusProfile(s"month:$month AND $age AND region:$region AND $changeDate"), status, "profile")
-      .map(x=> (x._1, x._2, x._3, 2 * x._2 * x._3 * 0.01/(x._2 + x._3))).sortWith((x, y) => x._4 > y._4)
-      .slice(0, 8).map(x=> (x._1, x._2, x._3))
+      .map(x=> (x._1, x._2, x._3, 2 * x._2 * x._3 * 0.01/(x._2 + x._3), x._4)).sortWith((x, y) => x._4 > y._4)
+      .slice(0, 8).map(x=> (x._1, x._2, x._3, x._5))
     logger.info("t2: "+(System.currentTimeMillis()- t2))
     val t3 = System.currentTimeMillis()
     // profile and month trends

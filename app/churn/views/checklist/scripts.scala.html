@@ -247,14 +247,14 @@
                         }
                     },
                     title: {
-                        text: '',
+                        text: 'Churn Percent',
                         style: {
                             color: "#1ABB9C"
                         }
                     }
                 }, { // Secondary yAxis
                     title: {
-                        text: '',
+                        text: 'Churn Rate',
                         style: {
                             color: "#dc5a78"
                         }
@@ -269,6 +269,24 @@
                 }],
 
                 tooltip: {
+                    formatter: function() {
+                        var s = [];
+
+                        $.each(this.points, function(i, point) {
+                            if(point.series.name == 'Churn Percent'){
+                                s.push('<span>'+ point.x +'</span><br>');
+                                s.push('<br><span>Number of Contracts : <b>'+ Highcharts.numberFormat(Math.abs(point.point.k), 0) +'</b><span>');
+                            }
+                            if(point.series.name == "Churn Rate"){
+                                s.push('<span style="color: #dc5a78">'+ point.series.name +' : <b>'+ point.y +' %</b><span>');
+                            }
+                            else {
+                                s.push('<span style="color: #1ABB9C">'+ point.series.name +' : <b>'+ point.y +' %</b><span>');
+                            }
+                        });
+
+                        return s.join(' <br> ');
+                    },
                     shared: true
                 },
                 // tam remove qua v2
@@ -285,7 +303,7 @@
                     }
                 },*/
 
-                series: getJsonChurnMonth(@Html(Json.stringify(Json.toJson(rs.trendChecklist.map(x=> x._2)))),@Html(Json.stringify(Json.toJson(rs.trendChecklist.map(x=> x._3)))))
+                series: getJsonChurnMonth(@Html(Json.stringify(Json.toJson(rs.trendChecklist.map(x=> x._2)))),@Html(Json.stringify(Json.toJson(rs.trendChecklist.map(x=> x._3->x._4)))))
 
             });
 
@@ -431,6 +449,14 @@
                                     $('.txtType').text("")
                                     $('.typeDiv').hide()
                                     if(age == $('#age').val() && region == $('#region').val()){
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes).css('fill', '#666666')
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes).attr('opacity', '1')
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes).css('font-weight', '100')
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes).css('font-size', '11px')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes).css('fill', '#666666')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes).attr('opacity', '1')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes).css('font-weight', '100')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes).css('font-size', '11px')
                                         $('#region').val("")
                                         $('#age').val("")
                                         $('.txtRegion').text("")
@@ -439,6 +465,23 @@
                                         $('.ageDiv').hide()
                                     }
                                     else{
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes).css('fill', '#666666')
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes).attr('opacity', '0.5')
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes).css('font-weight', '100')
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes).css('font-size', '11px')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes).css('fill', '#666666')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes).attr('opacity', '0.5')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes).css('font-weight', '100')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes).css('font-size', '11px')
+                                        // highlight xaxis and yaxis
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes[event.point.x]).css('fill', '#f3822b')
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes[event.point.x]).css('font-weight', '700')
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes[event.point.x]).css('font-size', '13px')
+                                        $(event.point.series.xAxis.labelGroup.element.childNodes[event.point.x]).attr('opacity', '1')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes[event.point.y]).css('fill', '#f3822b')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes[event.point.y]).css('font-weight', '700')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes[event.point.y]).css('font-size', '13px')
+                                        $(event.point.series.yAxis.labelGroup.element.childNodes[event.point.y]).attr('opacity', '1')
                                         $('#region').val(region)
                                         $('#age').val(age)
                                         $('.txtRegion').text("Vung "+region)
@@ -546,6 +589,14 @@
                                 $('.txtType').text("")
                                 $('.typeDiv').hide()
                                 if(time == $('#time').val() && region == $('#region').val()){
+                                    $(event.point.series.xAxis.labelGroup.element.childNodes).css('fill', '#666666')
+                                    $(event.point.series.xAxis.labelGroup.element.childNodes).attr('opacity', '1')
+                                    $(event.point.series.xAxis.labelGroup.element.childNodes).css('font-weight', '100')
+                                    $(event.point.series.xAxis.labelGroup.element.childNodes).css('font-size', '11px')
+                                    $(event.point.series.yAxis.labelGroup.element.childNodes).css('fill', '#666666')
+                                    $(event.point.series.yAxis.labelGroup.element.childNodes).attr('opacity', '1')
+                                    $(event.point.series.yAxis.labelGroup.element.childNodes).css('font-weight', '100')
+                                    $(event.point.series.yAxis.labelGroup.element.childNodes).css('font-size', '11px')
                                     $('#region').val("")
                                     $('#time').val("")
                                     $('.txtTime').text("")
@@ -554,6 +605,23 @@
                                     $('.regionDiv').hide()
                                 }
                                 else{
+                                    $(event.point.series.xAxis.labelGroup.element.childNodes).css('fill', '#666666')
+                                    $(event.point.series.xAxis.labelGroup.element.childNodes).attr('opacity', '0.5')
+                                    $(event.point.series.xAxis.labelGroup.element.childNodes).css('font-weight', '100')
+                                    $(event.point.series.xAxis.labelGroup.element.childNodes).css('font-size', '11px')
+                                    $(event.point.series.yAxis.labelGroup.element.childNodes).css('fill', '#666666')
+                                    $(event.point.series.yAxis.labelGroup.element.childNodes).attr('opacity', '0.5')
+                                    $(event.point.series.yAxis.labelGroup.element.childNodes).css('font-weight', '100')
+                                    $(event.point.series.yAxis.labelGroup.element.childNodes).css('font-size', '11px')
+                                    // highlight xaxis and yaxis
+                                    $(event.point.series.xAxis.labelGroup.element.childNodes[event.point.x]).css('fill', '#006837')
+                                    $(event.point.series.xAxis.labelGroup.element.childNodes[event.point.x]).css('font-weight', '700')
+                                    $(event.point.series.xAxis.labelGroup.element.childNodes[event.point.x]).css('font-size', '13px')
+                                    $(event.point.series.xAxis.labelGroup.element.childNodes[event.point.x]).attr('opacity', '1')
+                                    $(event.point.series.yAxis.labelGroup.element.childNodes[event.point.y]).css('fill', '#006837')
+                                    $(event.point.series.yAxis.labelGroup.element.childNodes[event.point.y]).css('font-weight', '700')
+                                    $(event.point.series.yAxis.labelGroup.element.childNodes[event.point.y]).css('font-size', '13px')
+                                    $(event.point.series.yAxis.labelGroup.element.childNodes[event.point.y]).attr('opacity', '1')
                                     $('#region').val(region)
                                     $('#time').val(time)
                                     $('.txtTime').text(time+" hours")
@@ -665,6 +733,13 @@
                                 $('.txtTime').text("")
                                 $('.timeDiv').hide()
                                 if(_type == $('#typeCurr').val() && region == $('#region').val()){
+                                    $(event.point.series.xAxis.labelGroup.div.childNodes).css('color', '#666666')
+                                    $(event.point.series.xAxis.labelGroup.div.childNodes).attr('opacity', '1')
+                                    $(event.point.series.xAxis.labelGroup.div.childNodes).css('font-weight', '100')
+                                    $(event.point.series.yAxis.labelGroup.element.childNodes).css('fill', '#666666')
+                                    $(event.point.series.yAxis.labelGroup.element.childNodes).attr('opacity', '1')
+                                    $(event.point.series.yAxis.labelGroup.element.childNodes).css('font-weight', '100')
+                                    $(event.point.series.yAxis.labelGroup.element.childNodes).css('font-size', '11px')
                                     $('#region').val("")
                                     $('#typeCurr').val("")
                                     $('.txtRegion').text("")
@@ -673,6 +748,21 @@
                                     $('.typeDiv').hide()
                                 }
                                 else{
+                                    $(event.point.series.xAxis.labelGroup.div.childNodes).css('color', '#666666')
+                                    $(event.point.series.xAxis.labelGroup.div.childNodes).attr('opacity', '0.5')
+                                    $(event.point.series.xAxis.labelGroup.div.childNodes).css('font-weight', '100')
+                                    $(event.point.series.yAxis.labelGroup.element.childNodes).css('fill', '#666666')
+                                    $(event.point.series.yAxis.labelGroup.element.childNodes).attr('opacity', '0.5')
+                                    $(event.point.series.yAxis.labelGroup.element.childNodes).css('font-weight', '100')
+                                    $(event.point.series.yAxis.labelGroup.element.childNodes).css('font-size', '11px')
+                                    // highlight xaxis and yaxis
+                                    $(event.point.series.xAxis.labelGroup.div.childNodes[event.point.x]).css('color', '#b30000')
+                                    $(event.point.series.xAxis.labelGroup.div.childNodes[event.point.x]).css('font-weight', '700')
+                                    $(event.point.series.xAxis.labelGroup.div.childNodes[event.point.x]).attr('opacity', '1')
+                                    $(event.point.series.yAxis.labelGroup.element.childNodes[event.point.y]).css('fill', '#b30000')
+                                    $(event.point.series.yAxis.labelGroup.element.childNodes[event.point.y]).css('font-weight', '700')
+                                    $(event.point.series.yAxis.labelGroup.element.childNodes[event.point.y]).css('font-size', '13px')
+                                    $(event.point.series.yAxis.labelGroup.element.childNodes[event.point.y]).attr('opacity', '1')
                                     $('#region').val(region)
                                     $('#typeCurr').val(_type)
                                     $('.txtRegion').text("Vung "+region)
@@ -856,6 +946,38 @@
                         var row = selection[0].row;
                         var region = dataHuyDv.getValue(row, 2)
                         var age = dataHuyDv.getValue(row, 1)
+                        Array.prototype.forEach.call(container.getElementsByTagName('text'), function(text) {
+                            if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === 'green') && (text.innerHTML != "Vung 0") && (text.innerHTML != "Vung 8")) {
+                                if (text.innerHTML == "Vung "+region){
+                                    text.setAttribute('fill-opacity', 1)
+                                    text.setAttribute('fill', "green")
+                                    text.setAttribute('font-weight', "bold")
+                                    text.setAttribute('font-size', "14px")
+                                }
+                                else {
+                                    text.setAttribute('fill', "#444444")
+                                    text.setAttribute('fill-opacity', 0.5)
+                                    text.removeAttribute('font-weight')
+                                    text.setAttribute('font-size', "13px")
+                                }
+                            }
+                            // change label age
+                            if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === 'green')) {
+                                if (text.innerHTML != 0 && text.innerHTML != 72)
+                                    if(getNameByIdAge(Number(age)) == text.textContent){
+                                        text.setAttribute('fill-opacity', 1)
+                                        text.setAttribute('fill', "green")
+                                        text.setAttribute('font-weight', "bold")
+                                        text.setAttribute('font-size', "14px")
+                                    }
+                                    else {
+                                        text.setAttribute('fill', "#444444")
+                                        text.setAttribute('fill-opacity', 0.5)
+                                        text.removeAttribute('font-weight')
+                                        text.setAttribute('font-size', "13px")
+                                    }
+                            }
+                        })
                         $('#age').val(age)
                         $('#region').val(region)
                         $('.txtAge').text(getNameByIdAge(age))
@@ -864,6 +986,22 @@
                         $('.regionDiv').show()
                     }
                     else{
+                        Array.prototype.forEach.call(container.getElementsByTagName('text'), function(text) {
+                            if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === 'green') && (text.innerHTML != "Vung 0") && (text.innerHTML != "Vung 8")) {
+                                text.setAttribute('fill-opacity', 1)
+                                text.setAttribute('fill', "#444444")
+                                text.removeAttribute('font-weight')
+                                text.setAttribute('font-size', "13px")
+                            }
+                            if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === 'green')) {
+                                if (text.innerHTML != 0 && text.innerHTML != 72){
+                                    text.setAttribute('fill-opacity', 1)
+                                    text.setAttribute('fill', "#444444")
+                                    text.removeAttribute('font-weight')
+                                    text.setAttribute('font-size', "13px")
+                                }
+                            }
+                        })
                         $('#age').val("")
                         $('#region').val("")
                         $('.txtAge').text("")
@@ -958,6 +1096,34 @@
                         var row = selection[0].row;
                         var region = dataTypeHuyDv.getValue(row, 2)
                         var _type = keyByValue(catesType, dataTypeHuyDv.getValue(row, 1))
+                        // change label region
+                        Array.prototype.forEach.call(container9.getElementsByTagName('text'), function(text) {
+                            if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === '#1c2752') && (text.innerHTML != "Vung 0") && (text.innerHTML != "Vung 8")) {
+                                if (text.innerHTML == "Vung "+region){
+                                    text.setAttribute('fill-opacity', 1)
+                                    text.setAttribute('fill', "#1c2752")
+                                    text.setAttribute('font-weight', "bold")
+                                    text.setAttribute('font-size', "14px")
+                                }
+                                else {
+                                    text.setAttribute('fill', "#444444")
+                                    text.setAttribute('fill-opacity', 0.5)
+                                    text.removeAttribute('font-weight')
+                                    text.setAttribute('font-size', "13px")
+                                }
+                            }
+                        })
+                        // change label type
+                        Array.prototype.forEach.call(container9.getElementsByTagName('foreignObject'), function(text) {
+                            if(_type == text.textContent){
+                                text.setAttribute('font-weight', "bold")
+                                text.setAttribute('font-size', "14px")
+                            }
+                            else {
+                                text.removeAttribute('font-weight')
+                                text.setAttribute('font-size', "13px")
+                            }
+                        })
                         $('#typeCurr').val(_type)
                         $('#region').val(region)
                         $('.txtType').text(_type)
@@ -966,6 +1132,20 @@
                         $('.regionDiv').show()
                     }
                     else{
+                        // change label region
+                        Array.prototype.forEach.call(container9.getElementsByTagName('text'), function(text) {
+                            if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === '#1c2752') && (text.innerHTML != "Vung 0") && (text.innerHTML != "Vung 8")) {
+                                text.setAttribute('fill-opacity', 1)
+                                text.setAttribute('fill', "#444444")
+                                text.removeAttribute('font-weight')
+                                text.setAttribute('font-size', "13px")
+                            }
+                        })
+                        // change label type
+                        Array.prototype.forEach.call(container9.getElementsByTagName('foreignObject'), function(text) {
+                            text.removeAttribute('font-weight')
+                            text.setAttribute('font-size', "13px")
+                        })
                         $('#typeCurr').val("")
                         $('#region').val("")
                         $('.txtType').text("")
@@ -1247,6 +1427,38 @@
                                         var row = selection[0].row;
                                         var region = dataRegionAge.getValue(row, 2)
                                         var age = dataRegionAge.getValue(row, 1)
+                                        Array.prototype.forEach.call(document.getElementById('churn6').getElementsByTagName('text'), function(text) {
+                                            if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === 'green') && (text.innerHTML != "Vung 0") && (text.innerHTML != "Vung 8")) {
+                                                if (text.innerHTML == "Vung "+region){
+                                                    text.setAttribute('fill-opacity', 1)
+                                                    text.setAttribute('fill', "green")
+                                                    text.setAttribute('font-weight', "bold")
+                                                    text.setAttribute('font-size', "14px")
+                                                }
+                                                else {
+                                                    text.setAttribute('fill', "#444444")
+                                                    text.setAttribute('fill-opacity', 0.5)
+                                                    text.removeAttribute('font-weight')
+                                                    text.setAttribute('font-size', "13px")
+                                                }
+                                            }
+                                            // change label age
+                                            if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === 'green')) {
+                                                if (text.innerHTML != 0 && text.innerHTML != 72)
+                                                    if(getNameByIdAge(Number(age)) == text.textContent){
+                                                        text.setAttribute('fill-opacity', 1)
+                                                        text.setAttribute('fill', "green")
+                                                        text.setAttribute('font-weight', "bold")
+                                                        text.setAttribute('font-size', "14px")
+                                                    }
+                                                    else {
+                                                        text.setAttribute('fill', "#444444")
+                                                        text.setAttribute('fill-opacity', 0.5)
+                                                        text.removeAttribute('font-weight')
+                                                        text.setAttribute('font-size', "13px")
+                                                    }
+                                            }
+                                        })
                                         $('#age').val(age)
                                         $('#region').val(region)
                                         $('.txtAge').text(getNameByIdAge(age))
@@ -1255,6 +1467,22 @@
                                         $('.regionDiv').show()
                                     }
                                     else {
+                                        Array.prototype.forEach.call(document.getElementById('churn6').getElementsByTagName('text'), function(text) {
+                                            if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === 'green') && (text.innerHTML != "Vung 0") && (text.innerHTML != "Vung 8")) {
+                                                text.setAttribute('fill-opacity', 1)
+                                                text.setAttribute('fill', "#444444")
+                                                text.removeAttribute('font-weight')
+                                                text.setAttribute('font-size', "13px")
+                                            }
+                                            if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === 'green')) {
+                                                if (text.innerHTML != 0 && text.innerHTML != 72){
+                                                    text.setAttribute('fill-opacity', 1)
+                                                    text.setAttribute('fill', "#444444")
+                                                    text.removeAttribute('font-weight')
+                                                    text.setAttribute('font-size', "13px")
+                                                }
+                                            }
+                                        })
                                         $('#age').val("")
                                         $('#region').val("")
                                         $('.txtAge').text("")
@@ -1360,6 +1588,34 @@
                                         var row = selection[0].row;
                                         var region = dataRegionType.getValue(row, 2)
                                         var _type = keyByValue(dta.churn9.catesType, dataRegionType.getValue(row, 1))
+                                        // change label region
+                                        Array.prototype.forEach.call(document.getElementById('churn9').getElementsByTagName('text'), function(text) {
+                                            if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === '#1c2752') && (text.innerHTML != "Vung 0") && (text.innerHTML != "Vung 8")) {
+                                                if (text.innerHTML == "Vung "+region){
+                                                    text.setAttribute('fill-opacity', 1)
+                                                    text.setAttribute('fill', "#1c2752")
+                                                    text.setAttribute('font-weight', "bold")
+                                                    text.setAttribute('font-size', "14px")
+                                                }
+                                                else {
+                                                    text.setAttribute('fill', "#444444")
+                                                    text.setAttribute('fill-opacity', 0.5)
+                                                    text.removeAttribute('font-weight')
+                                                    text.setAttribute('font-size', "13px")
+                                                }
+                                            }
+                                        })
+                                        // change label type
+                                        Array.prototype.forEach.call(document.getElementById('churn9').getElementsByTagName('foreignObject'), function(text) {
+                                            if(_type == text.textContent){
+                                                text.setAttribute('font-weight', "bold")
+                                                text.setAttribute('font-size', "14px")
+                                            }
+                                            else {
+                                                text.removeAttribute('font-weight')
+                                                text.setAttribute('font-size', "13px")
+                                            }
+                                        })
                                         $('#typeCurr').val(_type)
                                         $('#region').val(region)
                                         $('.txtType').text(_type)
@@ -1368,6 +1624,20 @@
                                         $('.regionDiv').show()
                                     }
                                     else {
+                                        // change label region
+                                        Array.prototype.forEach.call(document.getElementById('churn9').getElementsByTagName('text'), function(text) {
+                                            if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === '#1c2752') && (text.innerHTML != "Vung 0") && (text.innerHTML != "Vung 8")) {
+                                                text.setAttribute('fill-opacity', 1)
+                                                text.setAttribute('fill', "#444444")
+                                                text.removeAttribute('font-weight')
+                                                text.setAttribute('font-size', "13px")
+                                            }
+                                        })
+                                        // change label type
+                                        Array.prototype.forEach.call(document.getElementById('churn9').getElementsByTagName('foreignObject'), function(text) {
+                                            text.removeAttribute('font-weight')
+                                            text.setAttribute('font-size', "13px")
+                                        })
                                         $('#typeCurr').val("")
                                         $('#region').val("")
                                         $('.txtType').text("")
@@ -1445,7 +1715,7 @@
                     }
                 }
             }
-            console.log(rs)
+            //console.log(rs)
             return rs
         }
 

@@ -52,7 +52,7 @@ class ChurnChecklistController @Inject() (cc: ControllerComponents) extends Abst
         val churn2 = Json.obj(
           "cates"        -> rs.trendChecklist.map(x=> x._1),
           "churnRate"    -> rs.trendChecklist.map(x=> x._2),
-          "churnPercent" -> rs.trendChecklist.map(x=> x._3)
+          "churnPercent" -> rs.trendChecklist.map(x=> x._3->x._4)
         )
         val churn3 = Json.obj(
           "data"   -> rs.checklistRegion._2,

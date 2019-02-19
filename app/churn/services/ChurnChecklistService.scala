@@ -849,7 +849,7 @@ object  ChurnChecklistService{
 
   def calTrendCallinRateAndPercentage(callInArray: Array[(String, String, Long, Long)], allChurn: Array[(String, Long)], status: Int) ={
     val rs  = callInArray.filter(x=> x._2.toInt == status).filter(x=> allChurn.map(y=> y._1).indexOf(x._1) >=0)
-    rs.map(x=> (x._1, x._3, x._4, allChurn.toMap.get(x._1).get)).map(x=>(x._1, CommonService.format3Decimal(x._2 * 100.00 / x._3), CommonService.format3Decimal(x._2 * 100.00 / x._4)))
+    rs.map(x=> (x._1, x._3, x._4, allChurn.toMap.get(x._1).get)).map(x=>(x._1, CommonService.format3Decimal(x._2 * 100.00 / x._3), CommonService.format3Decimal(x._2 * 100.00 / x._4), x._2))
       .sortWith((x, y) => x._1 > y._1).slice(0, 12).sorted
   }
 

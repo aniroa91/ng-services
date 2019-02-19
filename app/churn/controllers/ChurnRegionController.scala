@@ -45,12 +45,12 @@ class ChurnRegionController @Inject() (cc: ControllerComponents) extends Abstrac
       val churn1 = Json.obj(
         "cates"        -> rs.churnRegion.map(x=> "Vung "+ x._1),
         "churnRate"    -> rs.churnRegion.map(x=> x._2),
-        "churnPercent" -> rs.churnRegion.map(x=> x._3)
+        "churnPercent" -> rs.churnRegion.map(x=> x._3-> x._4)
       )
       val churn2 = Json.obj(
         "cates"        -> rs.churnProfile.map(x=> x._1),
         "churnRate"    -> rs.churnProfile.map(x=> x._2),
-        "churnPercent" -> rs.churnProfile.map(x=> x._3)
+        "churnPercent" -> rs.churnProfile.map(x=> x._3-> x._4)
       )
       val minPerc3 = if(rs.trendRegionMonth._2.length > 0) CommonService.format3Decimal(rs.trendRegionMonth._2.map(x=>x._4).min) else 0
       val maxPerc3 = if(rs.trendRegionMonth._2.length > 0) CommonService.format3Decimal(rs.trendRegionMonth._2.map(x=>x._4).max) else 0
