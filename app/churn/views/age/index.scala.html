@@ -195,6 +195,27 @@
                 background: white;
                 width: 95%;
             }
+            .divMore span{
+                color: #fff;
+                font-size: 13px;
+                font-weight: 100;
+            }
+            .divMore{
+                margin-bottom: 0px;
+                padding: 0px 4px 0px 4px;
+            }
+            .ddMore a{
+                float: right;
+                padding-right: 11px;
+                cursor: pointer;
+            }
+            .ddMore a i {
+                color: #fff;
+                font-size: 16px;
+            }
+            .ddMore{
+                min-width: 390px!important;
+            }
             .titBox{
                 font-family: "Helvetica Neue", Roboto, Arial, "Droid Sans", sans-serif;
                 font-size: 14px;
@@ -214,15 +235,15 @@
                     <nav class="sidebar-nav left-sidebar-menu-pro divLeft">
                         <div class="col-xs-12 filter"><i class="fa fa-filter"></i> FILTERING </div>
                         <div class="ageDiv" style="padding-top: 15px;display: none;margin-bottom: 15px">
-                            <span class="titFilter"><i class="fa fa-bell"></i> Group Age</span></i>
+                            <span class="titFilter"><i class="fa fa-bell"></i> Group Age</span>
                             <span class="txtControl txtAge"></span>
                         </div>
                         <div class="regionDiv" style="padding-top: 15px;display: none;margin-bottom: 15px">
-                            <span class="titFilter"><i class="fa fa-bell"></i> Group Region</span></i>
+                            <span class="titFilter"><i class="fa fa-bell"></i> Group Region</span>
                             <span class="txtControl txtRegion"></span>
                         </div>
                         <div class="divStatus" style="height: 170px;padding-top: 15px">
-                            <span class="titFilter"><i class="fa fa-bell"></i> Group Status</span></i>
+                            <span class="titFilter"><i class="fa fa-bell"></i> Group Status</span>
                             <select class="form-control selectBox slStatus" style="border: 1px solid #16a085!important">
                             @for( (k,v) <- CommonUtil.STATUS_MAP){
                                 @if(v == 1){
@@ -235,7 +256,7 @@
                         </div>
                         <div class="col-xs-12 lineDivBlack"></div>
                         <div style="height: 140px;padding-top: 15px">
-                            <span class="titFilter"><i class="fa fa-bell"></i> Group Month</span></i>
+                            <span class="titFilter"><i class="fa fa-bell"></i> Group Month</span>
                             <div class="input-group date monthPicker">
                                 <input type="text" class="monthGrp form-control txtInput" value="@month" readonly="true" style="background-color:#16a085!important;color: #fff">
                                 <span class="input-group-addon" style="background-color: #5A738E!important;"><i class="fa fa-calendar" aria-hidden="true" style="color:white"></i>
@@ -330,17 +351,17 @@
                                         <ul class="mobile-menu-nav">
                                             <div class="disInline">
                                                 <div class="col-sm-6 col-xs-12 ageDiv" style="padding-top: 15px;display: none">
-                                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Age</span></i>
+                                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Age</span>
                                                     <span class="txtAge txtFilter"></span>
                                                 </div>
                                                 <div class="col-sm-6 col-xs-12 regionDiv" style="padding-top: 15px;display: none">
-                                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Region</span></i>
+                                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Region</span>
                                                     <span class="txtRegion txtFilter"></span>
                                                 </div>
                                             </div>
                                             <div class="disInline">
                                                 <div class="col-sm-6 col-xs-12" style="height: 70px;padding-top: 15px;">
-                                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Status</span></i>
+                                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Status</span>
                                                     <select class="form-control selectBoxMb slStatus" style="border: 1px solid #16a085!important">
                                                     @for( (k,v) <- CommonUtil.STATUS_MAP){
                                                         @if(v == 1){
@@ -395,7 +416,24 @@
                                         <div class="row">
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                 <div class="caption pro-sl-hd">
-                                                    <span class="caption-subject">Churn Rate and Percentage by Contract Age</span>
+                                                    <span class="caption-subject">Churn Rate and Percentage by Contract Age
+                                                        <span class="dropdown">
+                                                            <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                            <div class="dropdown-menu ddMore" style="background: #211d1d">
+                                                                <p class="divMore">
+                                                                    <span>Thống kê tỷ lệ và phần trăm rời mạng theo nhóm tuổi hợp đồng</span><span class="dots">...</span><br>
+                                                                    <span class="more" style="display: none">
+                                                                        <b>Ví dụ:</b><br>
+                                                                        <span>Đối với nhóm tuổi 0-6 tháng tuổi:</span><br>
+                                                                        <span>- Tỷ lệ rời mạng = Số HĐ RỜI MẠNG 0-6 tháng tuổi / Tổng số HĐ 0-6 tháng tuổi</span><br>
+                                                                        <span>- Phần trăm rời mạng = Số HĐ RỜI MẠNG 0-6 tháng tuổi / Tổng số HĐ RỜI MẠNG trong tháng</span><br>
+                                                                        <span><b>*Lưu ý</b>: Mặc định, RỜI MẠNG = HỦY DỊCH VỤ</span>
+                                                                    </span>
+                                                                </p>
+                                                                <a onclick="showMoreLess(this)"><i class="fa fa-angle-double-down tooltipSL" aria-hidden="true"></i></a>
+                                                            </div>
+                                                        </span>
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
@@ -410,7 +448,16 @@
                                         <div class="row">
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                 <div class="caption pro-sl-hd">
-                                                    <span class="caption-subject">Trends in Churn Rate and Churn Percentage</span>
+                                                    <span class="caption-subject">Trend in Churn Rate and Churn Percentage
+                                                        <span class="dropdown">
+                                                            <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                            <div class="dropdown-menu ddMore" style="background: #211d1d">
+                                                                <p class="divMore">
+                                                                    <span>Thống kê tỷ lệ và phần trăm rời mạng, đi kèm là số lượng HĐ rời mạng tương ứng, trong 12 tháng gần nhất</span>
+                                                                </p>
+                                                            </div>
+                                                        </span>
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
@@ -432,7 +479,24 @@
                                             <div class="col-lg-1 col-md-6 col-sm-6 col-xs-12"></div>
                                             <div class="col-lg-11 col-md-11 col-sm-11 col-xs-12">
                                                 <div class="caption pro-sl-hd">
-                                                    <span class="caption-subject"><b>Churn Rate and Churn Percentage by Contract Age by Region</b></span>
+                                                    <span class="caption-subject">Churn Rate and Churn Percentage by Contract Age by Region
+                                                        <span class="dropdown">
+                                                            <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                            <div class="dropdown-menu ddMore" style="background: #211d1d">
+                                                                <p class="divMore">
+                                                                    <span>Thống kê tỷ lệ và phần trăm rời mạng, đi kèm là số lượng HĐ rời mạng tương ứng, theo Tuổi HĐ và vùng</span><span class="dots">...</span><br>
+                                                                    <span class="more" style="display: none">
+                                                                        <b>Ví dụ:</b><br>
+                                                                        <span>Đối với KH ở Vùng 1, tuổi từ 6-12 tháng tuổi:</span><br>
+                                                                        <span>- Tỷ lệ rời mạng = Số lượng HĐ RỜI MẠNG ở Vùng 1, tuổi từ 6-12 tháng tuổi / Số lượng HĐ ở Vùng 1, tuổi từ 6-12 tháng tuổi</span><br>
+                                                                        <span>- Phần trăm rời mạng = Số lượng HĐ RỜI MẠNG ở Vùng 1, tuổi từ 6-12 tháng tuổi / Số lượng HĐ RỜI MẠNG ở Vùng 1</span><br>
+                                                                        <span><b>*Lưu ý</b>: Mặc định, RỜI MẠNG = HỦY DỊCH VỤ</span>
+                                                                    </span>
+                                                                </p>
+                                                                <a onclick="showMoreLess(this)"><i class="fa fa-angle-double-down tooltipSL" aria-hidden="true"></i></a>
+                                                            </div>
+                                                        </span>
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>

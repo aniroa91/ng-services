@@ -251,10 +251,10 @@
                         }
                     })
                 }
-                //$('.slRegion').val("*")
-                //$('#age').val("")
-                //$('.txtAge').text("")
-                //$('.ageDiv').hide()
+                $('.slRegion').val("*")
+                $('#age').val("")
+                $('.txtAge').text("")
+                $('.ageDiv').hide()
                 ajaxGetChurn("profileMonth")
             });
             // tam remove qua v2
@@ -438,7 +438,7 @@
                     $('.txtAge').text("")
                     $('.ageDiv').hide()
                 }
-                //$('.slRegion').val("*")
+                $('.slRegion').val("*")
                 $(".monthPicker").datepicker("update", $('#month').val());
                 ajaxGetChurn("profileAge")
             });
@@ -544,12 +544,12 @@
                         }
                     }
                 })
-                //$('#profile').val("")
-                //$('#age').val("")
-                //$('.txtProfile').text("")
-                //$('.profileDiv').hide()
-                //$('.txtAge').text("")
-                //$('.ageDiv').hide()
+                $('#profile').val("")
+                $('#age').val("")
+                $('.txtProfile').text("")
+                $('.profileDiv').hide()
+                $('.txtAge').text("")
+                $('.ageDiv').hide()
                 ajaxGetChurn("regionMonth")
             });
             // tam remove qua v2
@@ -710,11 +710,11 @@
                         point: {
                             events: {
                                 click: function () {
-                                    //$('#age').val("")
-                                    //$('.slRegion').val("*")
+                                    $('#age').val("")
+                                    $('.slRegion').val("*")
                                     $(".monthPicker").datepicker("update", $('#month').val());
-                                    //$('.txtAge').text("")
-                                    //$('.ageDiv').hide()
+                                    $('.txtAge').text("")
+                                    $('.ageDiv').hide()
                                     if(this.category == $('#profile').val()){
                                         for (var i = 0; i < this.series.data.length; i++) {
                                             this.series.data[i].update({ color: '#1c2752' }, false, false)
@@ -862,7 +862,7 @@
                                         $('.profileDiv').show()
 
                                     }
-                                    //$('.slRegion').val("*")
+                                    $('.slRegion').val("*")
                                     $(".monthPicker").datepicker("update", $('#month').val());
                                     ajaxGetChurn("churn5_heatmap")
                                 }
@@ -1096,12 +1096,12 @@
                                             }
                                         }
                                     })
-                                    /*$('#profile').val("")
+                                    $('#profile').val("")
                                     $('#age').val("")
                                     $('.txtProfile').text("")
                                     $('.profileDiv').hide()
                                     $('.txtAge').text("")
-                                    $('.ageDiv').hide()*/
+                                    $('.ageDiv').hide()
                                     ajaxGetChurn("regionMonth")
                                 });
                                 // tam remove qua v2
@@ -1240,10 +1240,10 @@
                                             }
                                         })
                                     }
-                                    //$('.slRegion').val("*")
-                                    //$('#age').val("")
-                                    //$('.txtAge').text("")
-                                    //$('.ageDiv').hide()
+                                    $('.slRegion').val("*")
+                                    $('#age').val("")
+                                    $('.txtAge').text("")
+                                    $('.ageDiv').hide()
                                     ajaxGetChurn("profileMonth")
                                 })
                                 // tam remove qua v2
@@ -1452,7 +1452,7 @@
                                         $('.txtAge').text("")
                                         $('.ageDiv').hide()
                                     }
-                                    //$('.slRegion').val("*")
+                                    $('.slRegion').val("*")
                                     $(".monthPicker").datepicker("update", $('#month').val());
                                     ajaxGetChurn("profileAge")
                                 })

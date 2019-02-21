@@ -233,6 +233,29 @@
                 .opacityLg:hover{
                     opacity: 1;
                 }
+                .divMore span{
+                    color: #fff;
+                    font-size: 13px;
+                    font-weight: 100;
+                }
+                .divMore{
+                    margin-bottom: 0px;
+                    padding: 0px 4px 0px 4px;
+                }
+                .ddMore a{
+                    float: right;
+                    padding-right: 11px;
+                    cursor: pointer;
+                    margin-top: 0px;
+                }
+                .ddMore a i {
+                    color: #fff;
+                    font-size: 16px;
+                }
+                .ddMore{
+                    /*min-width: 390px!important;*/
+                    position: inherit
+                }
         </style>
     </head>
 
@@ -247,16 +270,16 @@
                     <nav class="sidebar-nav left-sidebar-menu-pro divLeft">
                         <div class="col-xs-12 filter"><i class="fa fa-filter"></i> FILTERING </div>
                         <div class="ageDiv" style="padding-top: 15px;display: none;margin-bottom: 15px">
-                            <span class="titFilter"><i class="fa fa-bell"></i> Group Age</span></i>
+                            <span class="titFilter"><i class="fa fa-bell"></i> Group Age</span>
                             <p class="txtControl txtAge"></p>
                         </div>
                         <div class="profileDiv" style="padding-top: 15px;display: none;margin-bottom: 15px">
-                            <span class="titFilter"><i class="fa fa-bell"></i> Group Profile</span></i>
+                            <span class="titFilter"><i class="fa fa-bell"></i> Group Profile</span>
                             <p class="txtControl txtProfile"></p>
                         </div>
                         <div class="col-xs-12 lineDivBlack"></div>
                         <div class="divStatus" style="margin-bottom: 20px;padding-top: 15px">
-                            <span class="titFilter"><i class="fa fa-bell"></i> Group Status</span></i>
+                            <span class="titFilter"><i class="fa fa-bell"></i> Group Status</span>
                             <select class="form-control selectBox slStatus" style="border: 1px solid #16a085!important">
                             @for( (k,v) <- CommonUtil.STATUS_MAP){
                                 @if(v == 1){
@@ -269,7 +292,7 @@
                         </div>
                         <div class="col-xs-12 lineDivBlack"></div>
                         <div class="divRegion" style="height: 120px;padding-top: 15px">
-                            <span class="titFilter"><i class="fa fa-bell"></i> Group Region</span></i>
+                            <span class="titFilter"><i class="fa fa-bell"></i> Group Region</span>
                             <select class="form-control selectBox slRegion" style="border: 1px solid #16a085!important">
                                 <option value="*" selected>--- Choose Region ---</option>
                                 @for( (k,v) <- CommonUtil.REGION.toArray.sorted){
@@ -279,7 +302,7 @@
                         </div>
                         <div class="col-xs-12 lineDivBlack"></div>
                         <div style="height: 140px;padding-top: 15px">
-                            <span class="titFilter"><i class="fa fa-bell"></i> Group Month</span></i>
+                            <span class="titFilter"><i class="fa fa-bell"></i> Group Month</span>
                             <div class="input-group date monthPicker">
                                 <input type="text" class="monthGrp form-control txtInput" value="@month" readonly="true" style="background-color: #16a085!important;color: #fff">
                                 <span class="input-group-addon" style="background-color: #5A738E!important;"><i class="fa fa-calendar" aria-hidden="true" style="color:white"></i>
@@ -374,17 +397,17 @@
                                         <ul class="mobile-menu-nav">
                                             <div class="disInline">
                                                 <div class="col-sm-6 col-xs-12 ageDiv" style="padding-top: 15px;display: none">
-                                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Age</span></i>
+                                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Age</span>
                                                     <span class="txtAge txtFilter"></span>
                                                 </div>
                                                 <div class="col-sm-6 col-xs-12 profileDiv" style="padding-top: 15px;display: none">
-                                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Profile</span></i>
+                                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Profile</span>
                                                     <span class="txtProfile txtFilter"></span>
                                                 </div>
                                             </div>
                                             <div class="disInline">
                                                 <div class="col-sm-4 col-xs-12" style="height: 70px;padding-top: 15px">
-                                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Region</span></i>
+                                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Region</span>
                                                     <select class="form-control selectBoxMb slRegion" style="height: 20px">
                                                         <option value="*" selected>--- Choose Region ---</option>
                                                         @for( (k,v) <- CommonUtil.REGION.toArray.sorted){
@@ -393,7 +416,7 @@
                                                     </select>
                                                 </div>
                                                 <div class="col-sm-4 col-xs-12" style="height: 70px;padding-top: 15px;">
-                                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Status</span></i>
+                                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Status</span>
                                                     <select class="form-control selectBoxMb slStatus" style="height: 20px">
                                                     @for( (k,v) <- CommonUtil.STATUS_MAP){
                                                         @if(v == 1){
@@ -405,7 +428,7 @@
                                                     </select>
                                                 </div>
                                                 <div class="col-sm-4 col-xs-12" style="height: 70px;padding-top: 15px;">
-                                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Month</span></i>
+                                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Month</span>
                                                     <div class="input-group date monthPicker">
                                                         <input type="text" class="monthGrp form-control txtInputMb" value="@month" readonly="true" style="background-color: #16a085!important;color: #fff">
                                                         <span class="input-group-addon" style="background-color: #5A738E!important;width: 40px"><i class="fa fa-calendar" aria-hidden="true" style="color:white;margin-left: 25px"></i>
@@ -447,7 +470,24 @@
                                         <div class="row">
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                 <div class="caption pro-sl-hd">
-                                                    <span class="caption-subject">Churn Rate & Percentage by Region</span>
+                                                    <span class="caption-subject">Churn Rate and Percentage by Region
+                                                        <span class="dropdown">
+                                                            <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                            <div class="dropdown-menu ddMore" style="background: #211d1d;position: absolute;min-width: 390px!important;">
+                                                                <p class="divMore">
+                                                                    <span>Thống kê tỷ lệ và phần trăm rời mạng theo vùng</span><span class="dots">...</span><br>
+                                                                    <span class="more" style="display: none">
+                                                                        <b>Ví dụ:</b><br>
+                                                                        <span>Đối với Vùng 1:</span><br>
+                                                                        <span>- Tỷ lệ rời mạng = Số HĐ RỜI MẠNG ở Vùng 1 / Tổng số HĐ ở Vùng 1</span><br>
+                                                                        <span>- Phần trăm rời mạng = Số HĐ RỜI MẠNG ở Vùng 1 / Tổng số HĐ RỜI MẠNG trong tháng</span><br>
+                                                                        <span><b>*Lưu ý</b>: Mặc định, RỜI MẠNG = HỦY DỊCH VỤ</span>
+                                                                    </span>
+                                                                </p>
+                                                                <a onclick="showMoreLess(this)"><i class="fa fa-angle-double-down tooltipSL" aria-hidden="true"></i></a>
+                                                            </div>
+                                                        </span>
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
@@ -462,7 +502,16 @@
                                         <div class="row">
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                 <div class="caption pro-sl-hd">
-                                                    <span class="caption-subject">Trend in Churn Rate & Percentage by Region</span>
+                                                    <span class="caption-subject">Trend in Churn Rate and Percentage by Region
+                                                        <span class="dropdown">
+                                                            <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                            <div class="dropdown-menu ddMore" style="background: #211d1d">
+                                                                <p class="divMore">
+                                                                    <span>Thống kê tỷ lệ và phần trăm rời mạng theo vùng, đi kèm là số lượng HĐ rời mạng tương ứng, trong 12 tháng gần nhất</span>
+                                                                </p>
+                                                            </div>
+                                                        </span>
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
@@ -503,7 +552,25 @@
                                                 <div class="row">
                                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                         <div class="caption pro-sl-hd">
-                                                            <span class="caption-subject">Churn Rate & Percentage by Profile</span>
+                                                            <span class="caption-subject">Churn Rate and Percentage by Package
+                                                                <span class="dropdown" style="position: inherit">
+                                                                    <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                                    <div class="dropdown-menu ddMore" style="background: #211d1d;position: absolute;left:15px">
+                                                                        <p class="divMore">
+                                                                            <span>Thống kê tỷ lệ và phần trăm rời mạng, đi kèm là số lượng HĐ rời mạng tương ứng, theo gói dịch vụ. Chỉ hiển thị 8 gói dịch vụ có chỉ số rời mạng (tỷ lệ kết hợp phần trăm rời mạng) cao nhất trong tháng
+                                                                            </span><span class="dots">...</span><br>
+                                                                            <span class="more" style="display: none">
+                                                                                <b>Ví dụ:</b><br>
+                                                                                <span>Đối với gói FTTH - F2:</span><br>
+                                                                                <span>- Tỷ lệ rời mạng = Số HĐ RỜI MẠNG gói FTTH - F2 / Tổng số HĐ sử dụng gói FTTH - F2</span><br>
+                                                                                <span>- Phần trăm rời mạng = Số HĐ RỜI MẠNG gói FTTH - F2 / Tổng số HĐ RỜI MẠNG trong tháng</span><br>
+                                                                                <span><b>*Lưu ý</b>: Mặc định, RỜI MẠNG = HỦY DỊCH VỤ</span>
+                                                                            </span>
+                                                                        </p>
+                                                                        <a onclick="showMoreLess(this)"><i class="fa fa-angle-double-down tooltipSL" aria-hidden="true"></i></a>
+                                                                    </div>
+                                                                </span>
+                                                            </span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -518,7 +585,16 @@
                                                 <div class="row">
                                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                         <div class="caption pro-sl-hd">
-                                                            <span class="caption-subject">Trend in Churn Rate & Percentage by Profile</span>
+                                                            <span class="caption-subject">Trend in Churn Rate and Percentage by Package
+                                                                <span class="dropdown">
+                                                                    <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                                    <div class="dropdown-menu ddMore" style="background: #211d1d">
+                                                                        <p class="divMore">
+                                                                            <span>Thống kê tỷ lệ và phần trăm rời mạng, đi kèm là số lượng HĐ rời mạng tương ứng, theo gói dịch vụ (cho 8 gói dịch vụ được chọn ở biểu đồ bên trái) trong 12 tháng gần nhất</span>
+                                                                        </p>
+                                                                    </div>
+                                                                </span>
+                                                            </span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -547,7 +623,16 @@
                                                 <div class="row">
                                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                         <div class="caption pro-sl-hd">
-                                                            <span class="caption-subject">Number of Contracts by Contract Age for Profiles That Have High Churns</span>
+                                                            <span class="caption-subject">Number of Contracts by Contract Age for Packages That Have High Churns
+                                                                <span class="dropdown" style="position: inherit">
+                                                                    <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                                    <div class="dropdown-menu ddMore" style="background: #211d1d;position: absolute;left:15px">
+                                                                        <p class="divMore">
+                                                                            <span>Thống kê số HĐ theo tuổi HĐ và gói dịch vụ. Chỉ hiển thị 8 gói dịch vụ có chỉ số rời mạng (tỷ lệ kết hợp phần trăm rời mạng) cao nhất trong tháng</span>
+                                                                        </p>
+                                                                    </div>
+                                                                </span>
+                                                            </span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -562,7 +647,25 @@
                                                 <div class="row">
                                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                         <div class="caption pro-sl-hd">
-                                                            <span class="caption-subject">Churn Rate and Churn Percentage by Profile by Contract Age</span>
+                                                            <span class="caption-subject">Churn Rate and Churn Percentage by Package by Contract Age
+                                                                <span class="dropdown">
+                                                                    <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                                    <div class="dropdown-menu ddMore" style="background: #211d1d">
+                                                                        <p class="divMore">
+                                                                            <span>Thống kê tỷ lệ và phần trăm rời mạng, đi kèm là số lượng HĐ rời mạng tương ứng, theo gói dịch vụ (cho 8 gói dịch vụ được chọn ở biểu đồ bên trái)
+                                                                            </span><span class="dots">...</span><br>
+                                                                            <span class="more" style="display: none">
+                                                                                <b>Ví dụ:</b><br>
+                                                                                <span>Đối với các HĐ sử dụng gói FTTH - F2, từ 6-12 tháng tuổi:</span><br>
+                                                                                <span>- Tỷ lệ rời mạng = Số HĐ RỜI MẠNG sử dụng gói FTTH - F2, từ 6-12 tháng tuổi / Tổng số HĐ sử dụng gói FTTH - F2, từ 6-12 tháng tuổi</span><br>
+                                                                                <span>- Phần trăm rời mạng = Số HĐ RỜI MẠNG sử dụng gói FTTH - F2, từ 6-12 tháng tuổi / Tổng số HĐ RỜI MẠNG sử dụng gói FTTH - F2</span><br>
+                                                                                <span><b>*Lưu ý</b>: Mặc định, RỜI MẠNG = HỦY DỊCH VỤ</span>
+                                                                            </span>
+                                                                        </p>
+                                                                        <a onclick="showMoreLess(this)"><i class="fa fa-angle-double-down tooltipSL" aria-hidden="true"></i></a>
+                                                                    </div>
+                                                                </span>
+                                                            </span>
                                                         </div>
                                                     </div>
                                                 </div>

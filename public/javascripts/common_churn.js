@@ -1,3 +1,31 @@
+/* Author hoangnh44 */
+
+function showMoreLess(event){
+    if ($(event).parent().find('.dots').is(':visible')) {
+        $(event).parent().find('.more').show()
+        $(event).parent().find('.dots').hide()
+        $(event).parent().find('i').removeClass('fa-angle-double-down').addClass('fa-angle-double-up')
+    } else {
+        $(event).parent().find('.dots').show()
+        $(event).parent().find('.more').hide()
+        $(event).parent().find('i').removeClass('fa-angle-double-up').addClass('fa-angle-double-down')
+    }
+}
+
+function toogleTooltip(event){
+    var isVisibe = 0
+    if ($(event).parent().find('.ddMore').is(':hidden')) {
+        isVisibe = 1
+    }
+    $('.ddMore').hide()
+    $('.dots').show()
+    $('.more').hide()
+    $('.tooltipSL').removeClass('fa-angle-double-up').addClass('fa-angle-double-down')
+    if (isVisibe == 1) {
+        $(event).parent().find('.ddMore').show()
+    }
+}
+
 function updateCharts(charts, data){
     var seriesLength = charts.series.length;
     for(var i = seriesLength -1; i > -1; i--) {

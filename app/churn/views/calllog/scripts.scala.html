@@ -473,8 +473,8 @@
                                 click: function (event) {
                                     var age = getIdBynameAge(event.point.series.xAxis.categories[event.point.x])
                                     var region = event.point.series.yAxis.categories[event.point.y].split(" ")[1]
-                                    //$('.txtCate').text("")
-                                    //$('.cateDiv').hide()
+                                    $('.txtCate').text("")
+                                    $('.cateDiv').hide()
                                     if(age == $('#age').val() && region == $('#region').val()){
                                         $(event.point.series.xAxis.labelGroup.element.childNodes).css('fill', '#666666')
                                         $(event.point.series.xAxis.labelGroup.element.childNodes).attr('opacity', '1')
@@ -516,7 +516,7 @@
                                         $('.txtRegion').text("Vung "+region)
                                         $('.regionDiv').show()
                                     }
-                                    //$('#cateCurr').val("")
+                                    $('#cateCurr').val("")
                                     ajaxGetChurnCallIn("churn5")
                                 }
                                 // tam remove qua v2
@@ -688,7 +688,7 @@
                     $('.txtRegion').text("")
                     $('.regionDiv').hide()
                 }
-                //$('#cateCurr').val("")
+                $('#cateCurr').val("")
                 ajaxGetChurnCallIn("churn6")
             });
             // tam remove qua v2
@@ -773,14 +773,14 @@
                         point: {
                             events: {
                                 click: function () {
-                                    //$('#age').val("")
-                                    //$('#region').val("")
-                                    //$(".monthPicker").datepicker("update", $('#monthCurr').val())
-                                    //$('#month').val($('#monthCurr').val())
-                                    /*$('.txtAge').text("")
+                                    $('#age').val("")
+                                    $('#region').val("")
+                                    $(".monthPicker").datepicker("update", $('#monthCurr').val())
+                                    $('#month').val($('#monthCurr').val())
+                                    $('.txtAge').text("")
                                     $('.ageDiv').hide()
                                     $('.txtRegion').text("")
-                                    $('.regionDiv').hide()*/
+                                    $('.regionDiv').hide()
                                     if(this.category == $('#cateCurr').val()){
                                         for (var i = 0; i < this.series.data.length; i++) {
                                             this.series.data[i].update({ color: '#FFAA00' }, false, false)

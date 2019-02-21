@@ -226,6 +226,29 @@
                     font-size: 16px;
                     color: #0D3349;
                 }
+                .divMore span{
+                    color: #fff;
+                    font-size: 13px;
+                    font-weight: 100;
+                }
+                .divMore{
+                    margin-bottom: 0px;
+                    padding: 0px 4px 0px 4px;
+                }
+                .ddMore a{
+                    float: right;
+                    padding-right: 11px;
+                    cursor: pointer;
+                    margin-top: 0px;
+                }
+                .ddMore a i {
+                    color: #fff;
+                    font-size: 16px;
+                }
+                .ddMore{
+                    /*min-width: 390px!important;*/
+                    position: inherit
+                }
         </style>
         </head>
 
@@ -240,25 +263,25 @@
                         <nav class="sidebar-nav left-sidebar-menu-pro divLeft">
                             <div class="col-xs-12 filter"><i class="fa fa-filter"></i> FILTERING </div>
                             <div class="ageDiv" style="padding-top: 15px;display: none;margin-bottom: 15px">
-                                <span class="titFilter"><i class="fa fa-bell"></i> Group Age</span></i>
+                                <span class="titFilter"><i class="fa fa-bell"></i> Group Age</span>
                                 <p class="txtControl txtAge"></p>
                             </div>
                             <div class="regionDiv" style="padding-top: 15px;display: none;margin-bottom: 15px">
-                                <span class="titFilter"><i class="fa fa-bell"></i> Group Region</span></i>
+                                <span class="titFilter"><i class="fa fa-bell"></i> Group Region</span>
                                 <p class="txtControl txtRegion"></p>
                             </div>
                             <div class="timeDiv" style="padding-top: 15px;display: none;margin-bottom: 15px">
-                                <span class="titFilter"><i class="fa fa-bell"></i> Group Process Time</span></i>
+                                <span class="titFilter"><i class="fa fa-bell"></i> Group Process Time</span>
                                 <p class="txtControl txtTime"></p>
                             </div>
                             <div class="typeDiv" style="padding-top: 15px;display: none;margin-bottom: 15px">
-                                <span class="titFilter"><i class="fa fa-bell"></i> Group Type</span></i>
+                                <span class="titFilter"><i class="fa fa-bell"></i> Group Type</span>
                                 <p class="txtControl txtType"></p>
                             </div>
 
                             <div class="col-xs-12 lineDivBlack"></div>
                             <div class="divStatus" style="margin-bottom: 20px;padding-top: 15px">
-                                <span class="titFilter"><i class="fa fa-bell"></i> Group Status</span></i>
+                                <span class="titFilter"><i class="fa fa-bell"></i> Group Status</span>
                                 <select class="form-control selectBox slStatus" style="border: 1px solid #16a085!important">
                                 @for( (k,v) <- CommonUtil.STATUS_MAP){
                                     @if(v == 1){
@@ -271,7 +294,7 @@
                             </div>
                             <div class="col-xs-12 lineDivBlack"></div>
                             <div style="height: 140px;padding-top: 15px">
-                                <span class="titFilter"><i class="fa fa-bell"></i> Group Month</span></i>
+                                <span class="titFilter"><i class="fa fa-bell"></i> Group Month</span>
                                 <div class="input-group date monthPicker">
                                     <input type="text" class="monthGrp form-control txtInput" value="@month" readonly="true" style="background-color: #16a085!important;color: #fff">
                                     <span class="input-group-addon" style="background-color: #5A738E!important;"><i class="fa fa-calendar" aria-hidden="true" style="color:white"></i>
@@ -366,25 +389,25 @@
                                             <ul class="mobile-menu-nav">
                                                 <div class="disInline">
                                                     <div class="col-sm-6 col-xs-12 ageDiv" style="padding-top: 15px;display: none">
-                                                        <span class="titFilter"><i class="fa fa-bell"></i> Group Age</span></i>
+                                                        <span class="titFilter"><i class="fa fa-bell"></i> Group Age</span>
                                                         <span class="txtAge txtFilter"></span>
                                                     </div>
                                                     <div class="col-sm-6 col-xs-12 regionDiv" style="padding-top: 15px;display: none">
-                                                        <span class="titFilter"><i class="fa fa-bell"></i> Group Region</span></i>
+                                                        <span class="titFilter"><i class="fa fa-bell"></i> Group Region</span>
                                                         <span class="txtRegion txtFilter"></span>
                                                     </div>
                                                     <div class="col-sm-6 col-xs-12 timeDiv" style="padding-top: 15px;display: none">
-                                                        <span class="titFilter"><i class="fa fa-bell"></i> Group Process Time</span></i>
+                                                        <span class="titFilter"><i class="fa fa-bell"></i> Group Process Time</span>
                                                         <span class="txtTime txtFilter"></span>
                                                     </div>
                                                     <div class="col-sm-6 col-xs-12 typeDiv" style="padding-top: 15px;display: none">
-                                                        <span class="titFilter"><i class="fa fa-bell"></i> Group Type</span></i>
+                                                        <span class="titFilter"><i class="fa fa-bell"></i> Group Type</span>
                                                         <span class="txtType txtFilter"></span>
                                                     </div>
                                                 </div>
                                                 <div class="disInline">
                                                     <div class="col-sm-6 col-xs-12" style="height: 70px;padding-top: 15px;">
-                                                        <span class="titFilter"><i class="fa fa-bell"></i> Group Status</span></i>
+                                                        <span class="titFilter"><i class="fa fa-bell"></i> Group Status</span>
                                                         <select class="form-control selectBoxMb slStatus" style="border: 1px solid #16a085!important">
                                                         @for( (k,v) <- CommonUtil.STATUS_MAP){
                                                             @if(v == 1){
@@ -396,7 +419,7 @@
                                                         </select>
                                                     </div>
                                                     <div class="col-sm-6 col-xs-12" style="height: 70px;padding-top: 15px;">
-                                                        <span class="titFilter"><i class="fa fa-bell"></i> Group Month</span></i>
+                                                        <span class="titFilter"><i class="fa fa-bell"></i> Group Month</span>
                                                         <div class="input-group date monthPicker">
                                                             <input type="text" class="monthGrp form-control txtInputMb" value="@month" readonly="true" style="background-color: #16a085!important;color: #fff">
                                                             <span class="input-group-addon" style="background-color: #5A738E!important;width: 40px"><i class="fa fa-calendar" aria-hidden="true" style="color:white;margin-left: 25px"></i>
@@ -442,7 +465,22 @@
                                             <div class="row">
                                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                     <div class="caption pro-sl-hd">
-                                                        <span class="caption-subject">Number of Contracts That Have Checklist</span>
+                                                        <span class="caption-subject">Number of Contracts That Have Checklist
+                                                            <span class="dropdown">
+                                                                <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                                <div class="dropdown-menu ddMore" style="background: #211d1d;position: absolute; min-width: 390px !important;">
+                                                                    <p class="divMore">
+                                                                        <span>Thống kế số checklist, số HĐ và phần trăm KH có checklist trong 12 tháng gần nhất</span><span class="dots">...</span><br>
+                                                                        <span class="more" style="display: none">
+                                                                            <span>- Count Contract: Đếm số HĐ có checklist</span><br>
+                                                                            <span>- Count Call: Đếm số checklist</span><br>
+                                                                            <span>- Percent (%): Số HĐ có checklist trong tháng / Tổng số HĐ</span>
+                                                                        </span>
+                                                                    </p>
+                                                                    <a onclick="showMoreLess(this)"><i class="fa fa-angle-double-down tooltipSL" aria-hidden="true"></i></a>
+                                                                </div>
+                                                            </span>
+                                                        </span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -457,7 +495,24 @@
                                             <div class="row">
                                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                     <div class="caption pro-sl-hd">
-                                                        <span class="caption-subject">Churn Rate & Percentage For Customers Who Have Checklist</span>
+                                                        <span class="caption-subject">For Contracts That Have Checklist: Trend in Churn Rate and Percentage
+                                                            <span class="dropdown" style="position: inherit">
+                                                                <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                                <div class="dropdown-menu ddMore" style="background: #211d1d;position: absolute">
+                                                                    <p class="divMore">
+                                                                        <span>Thống kê trong nhóm KH có checklist: tỷ lệ và phần trăm rời mạng, đi kèm là số HĐ rời mạng, trong 12 tháng gần nhất</span><span class="dots">...</span><br>
+                                                                        <span class="more" style="display: none">
+                                                                            <b>Ví dụ:</b><br>
+                                                                            <span>Tháng 01/2019:</span><br>
+                                                                            <span>- Tỷ lệ rời mạng = Số lượng HĐ RỜI MẠNG có checklist trong tháng 01-2019 / Số lượng HĐ có checklist trong tháng 01-2019</span><br>
+                                                                            <span>- Phần trăm rời mạng = Số lượng HĐ RỜI MẠNG có checklist trong tháng 01-2019 / Số lượng HĐ RỜI MẠNG trong tháng 01-2019</span><br>
+                                                                            <span><b>*Lưu ý</b>: Mặc định, RỜI MẠNG = HỦY DỊCH VỤ</span>
+                                                                        </span>
+                                                                    </p>
+                                                                    <a onclick="showMoreLess(this)"><i class="fa fa-angle-double-down tooltipSL" aria-hidden="true"></i></a>
+                                                                </div>
+                                                            </span>
+                                                        </span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -490,7 +545,22 @@
                                                             <div class="row">
                                                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                                     <div class="caption pro-sl-hd">
-                                                                        <span class="caption-subject">Number of Contracts That Have Checklist by Region</span>
+                                                                        <span class="caption-subject">Number of Contracts That Have Checklist by Region
+                                                                            <span class="dropdown" style="position: inherit">
+                                                                                <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                                                <div class="dropdown-menu ddMore" style="background: #211d1d;position: absolute">
+                                                                                    <p class="divMore">
+                                                                                        <span>Thống kê phần trăm KH có checklist, đi kèm là số lượng HĐ có checklist, theo vùng trong 12 tháng gần nhất</span><span class="dots">...</span><br>
+                                                                                        <span class="more" style="display: none">
+                                                                                            <b>Ví dụ:</b><br>
+                                                                                            <span>Vùng 1, tháng 1/2019:</span><br>
+                                                                                            <span>Phần trăm = Số lượng HĐ có checklist ở Vùng 1, trong tháng 01-2019 / Tổng số lượng HĐ Vùng 1 trong tháng 01-2019</span>
+                                                                                        </span>
+                                                                                    </p>
+                                                                                    <a onclick="showMoreLess(this)"><i class="fa fa-angle-double-down tooltipSL" aria-hidden="true"></i></a>
+                                                                                </div>
+                                                                            </span>
+                                                                        </span>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -505,7 +575,24 @@
                                                             <div class="row">
                                                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                                     <div class="caption pro-sl-hd">
-                                                                        <span class="caption-subject">For Contracts That Have Checklist: Churn Rate & Percentage by Region</span>
+                                                                        <span class="caption-subject">For Contracts That Have Checklist: Trend in Churn Rate and Percentage by Region
+                                                                            <span class="dropdown" style="position: inherit">
+                                                                                <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                                                <div class="dropdown-menu ddMore" style="background: #211d1d;position: absolute">
+                                                                                    <p class="divMore">
+                                                                                        <span>Thống kê trong nhóm KH có checklist: tỷ lệ và phần trăm rời mạng, đi kèm là số HĐ rời mạng, theo vùng trong 12 tháng gần nhất</span><span class="dots">...</span><br>
+                                                                                        <span class="more" style="display: none">
+                                                                                            <b>Ví dụ:</b><br>
+                                                                                            <span>Đối với KH có checklist vào tháng 1/2019, ở Vùng 1:</span><br>
+                                                                                            <span>- Tỷ lệ rời mạng = Số lượng HĐ RỜI MẠNG có checklist vào tháng 01-2019, ở Vùng 1 / Số lượng HĐ có checklist vào tháng 01-2019, ở Vùng 1</span><br>
+                                                                                            <span>- Phần trăm rời mạng = Số lượng HĐ RỜI MẠNG có checklist vào tháng 01-2019, ở Vùng 1 / Số lượng HĐ RỜI MẠNG có checklist vào tháng 01-2019</span><br>
+                                                                                            <span><b>*Lưu ý</b>: Mặc định, RỜI MẠNG = HỦY DỊCH VỤ</span>
+                                                                                        </span>
+                                                                                    </p>
+                                                                                    <a onclick="showMoreLess(this)"><i class="fa fa-angle-double-down tooltipSL" aria-hidden="true"></i></a>
+                                                                                </div>
+                                                                            </span>
+                                                                        </span>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -534,7 +621,22 @@
                                                             <div class="row">
                                                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                                     <div class="caption pro-sl-hd">
-                                                                        <span class="caption-subject">Number of Contracts That Have Checklist by Region by Contract Age</span>
+                                                                        <span class="caption-subject">Number of Contracts That Have Checklist by Region by Contract Age
+                                                                            <span class="dropdown" style="position: inherit">
+                                                                                <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                                                <div class="dropdown-menu ddMore" style="background: #211d1d;position: absolute">
+                                                                                    <p class="divMore">
+                                                                                        <span>Thống kê phần trăm KH có checklist, đi kèm là số lượng KH có checklist, theo vùng và tuổi HĐ trong tháng</span><span class="dots">...</span><br>
+                                                                                        <span class="more" style="display: none">
+                                                                                            <b>Ví dụ:</b><br>
+                                                                                            <span>Vùng 1, từ 6-12 tháng tuổi:</span><br>
+                                                                                            <span>  Phần trăm = Số lượng HĐ có checklist ở Vùng 1, từ 6-12 tháng tuổi / Tổng số lượng HĐ Vùng 1, từ 6-12 tháng tuổi</span><br>
+                                                                                        </span>
+                                                                                    </p>
+                                                                                    <a onclick="showMoreLess(this)"><i class="fa fa-angle-double-down tooltipSL" aria-hidden="true"></i></a>
+                                                                                </div>
+                                                                            </span>
+                                                                        </span>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -549,7 +651,24 @@
                                                             <div class="row">
                                                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                                     <div class="caption pro-sl-hd">
-                                                                        <span class="caption-subject">Contracts That Have Checklist: Churn Rate & Percentage by Region by Age</span>
+                                                                        <span class="caption-subject">For Contracts That Have Checklist: Churn Rate and Percentage by Region by Age
+                                                                            <span class="dropdown" style="position: inherit">
+                                                                                <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                                                <div class="dropdown-menu ddMore" style="background: #211d1d;position: absolute">
+                                                                                    <p class="divMore">
+                                                                                        <span>Thống kê trong nhóm KH có checklist: tỷ lệ và phần trăm rời mạng, đi kèm là số HĐ rời mạng, theo vùng và tuổi HĐ</span><span class="dots">...</span><br>
+                                                                                        <span class="more" style="display: none">
+                                                                                            <b>Ví dụ:</b><br>
+                                                                                            <span>Đối với KH có checklist, Vùng 1, tuổi từ 6-12 tháng tuổi:</span><br>
+                                                                                            <span>- Tỷ lệ rời mạng = Số lượng HĐ RỜI MẠNG có checklist, Vùng 1, tuổi từ 6-12 tháng tuổi / Số lượng HĐ có checklist, Vùng 1, tuổi từ 6-12 tháng tuổi</span><br>
+                                                                                            <span>- Phần trăm rời mạng = Số lượng HĐ RỜI MẠNG có checklist, Vùng 1, tuổi từ 6-12 tháng tuổi / Số lượng HĐ RỜI MẠNG có checklist, Vùng 1</span><br>
+                                                                                            <span><b>*Lưu ý</b>: Mặc định, RỜI MẠNG = HỦY DỊCH VỤ</span>
+                                                                                        </span>
+                                                                                    </p>
+                                                                                    <a onclick="showMoreLess(this)"><i class="fa fa-angle-double-down tooltipSL" aria-hidden="true"></i></a>
+                                                                                </div>
+                                                                            </span>
+                                                                        </span>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -578,7 +697,16 @@
                                                             <div class="row">
                                                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                                     <div class="caption pro-sl-hd">
-                                                                        <span class="caption-subject">Number of Checklist by Checklist Processing Time by Region</span>
+                                                                        <span class="caption-subject">Number of Checklist by Checklist Processing Time by Region
+                                                                            <span class="dropdown">
+                                                                                <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                                                <div class="dropdown-menu ddMore" style="background: #211d1d;position: absolute; min-width: 390px !important;">
+                                                                                    <p class="divMore">
+                                                                                        <span>Thống kê số lượng HĐ theo thời gian xử lý checklist theo vùng</span>
+                                                                                    </p>
+                                                                                </div>
+                                                                            </span>
+                                                                        </span>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -597,7 +725,16 @@
                                                             <div class="row">
                                                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                                     <div class="caption pro-sl-hd">
-                                                                        <span class="caption-subject">Number of Checklist by Checklist Type by Region</span>
+                                                                        <span class="caption-subject">Number of Checklist by Checklist Type by Region
+                                                                            <span class="dropdown" style="position: inherit">
+                                                                                <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                                                <div class="dropdown-menu ddMore" style="background: #211d1d;position: absolute">
+                                                                                    <p class="divMore">
+                                                                                        <span>Thống kê số lượng HĐ theo loại checklist (tình trạng sự cố ban đầu khai báo từ KH). Chỉ hiển thị 12 loại có số lượng HĐ nhiều nhất</span>
+                                                                                    </p>
+                                                                                </div>
+                                                                            </span>
+                                                                        </span>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -612,7 +749,24 @@
                                                             <div class="row">
                                                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                                     <div class="caption pro-sl-hd">
-                                                                        <span class="caption-subject">Churn Rate and Churn Percentage by Checklist Type by Region</span>
+                                                                        <span class="caption-subject">Churn Rate and Churn Percentage by Checklist Type by Region
+                                                                            <span class="dropdown" style="position: inherit">
+                                                                                <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                                                <div class="dropdown-menu ddMore" style="background: #211d1d;position: absolute">
+                                                                                    <p class="divMore">
+                                                                                        <span>Thống kê trong nhóm KH có checklist: tỷ lệ và phần trăm rời mạng, đi kèm là số HĐ rời mạng, theo loại checklist (cho 12 loại được chọn ở biểu đồ bên trái)</span><span class="dots">...</span><br>
+                                                                                        <span class="more" style="display: none">
+                                                                                            <b>Ví dụ:</b><br>
+                                                                                            <span>Đối với KH có checklist với triệu chứng là 'không có tín hiệu', ở Vùng 1:</span><br>
+                                                                                            <span>- Tỷ lệ rời mạng = Số lượng HĐ RỜI MẠNG có checklist 'không có tín hiệu', ở Vùng 1 / Số lượng HĐ có checklist 'không có tín hiệu', ở Vùng 1</span><br>
+                                                                                            <span>- Phần trăm rời mạng = Số lượng HĐ RỜI MẠNG có checklist 'không có tín hiệu', ở Vùng 1 / Số lượng HĐ RỜI MẠNG có checklist, ở Vùng 1</span><br>
+                                                                                            <span><b>*Lưu ý</b>: Mặc định, RỜI MẠNG = HỦY DỊCH VỤ</span>
+                                                                                        </span>
+                                                                                    </p>
+                                                                                    <a onclick="showMoreLess(this)"><i class="fa fa-angle-double-down tooltipSL" aria-hidden="true"></i></a>
+                                                                                </div>
+                                                                            </span>
+                                                                        </span>
                                                                     </div>
                                                                 </div>
                                                             </div>
