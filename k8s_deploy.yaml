@@ -43,7 +43,7 @@ metadata:
   name: ingr-${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
 spec:
   rules:
-  - host: ${URL}.bigdata.local
+  - host: ${WEB_URL}.bigdata.local
     http:
       paths:
       - path: /
