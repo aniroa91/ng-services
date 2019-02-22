@@ -7,7 +7,7 @@ pipeline {
         HTTPS_PROXY = 'http://proxy.hcm.fpt.vn:80'
         NO_PROXY = '172.0.0.1,*.local,172.27.11.0/24'
         DOCKER_IMAGE_NAME = 'web-internet-churn'
-        WEB_URL = 'internet-churn-staging'
+        WEB_URL = 'internet-churn'
     }
 
     stages {
