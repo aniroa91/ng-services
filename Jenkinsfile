@@ -24,7 +24,7 @@ pipeline {
 
                 script {
                     docker.withRegistry('https://bigdata-registry.local:5043', '010ed969-34b5-473b-bcd9-01a207e7e382') {
-                        def app = docker.build("${BRANCH_NAME}/${DOCKER_IMAGE_NAME}:${BUILD_ID}")
+                        def app = docker.build("${BRANCH_NAME}/${DOCKER_IMAGE_NAME}:${env.BUILD_ID}")
                         /* Push the container to the custom Registry */
                         app.push()
                     }
