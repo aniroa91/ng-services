@@ -8,6 +8,7 @@ pipeline {
                 sh 'printenv'
                 echo "Compiling..."
                 sh "${tool name: 'sbt', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'}/bin/sbt dist"
+                DOCKER_IMAGE_NAME = 'bigdata-play-fplay'
             }
         }
         stage('Docker Publish') {
@@ -17,7 +18,7 @@ pipeline {
 
                 script {
                     docker.withRegistry('https://bigdata-registry.local:5043', '010ed969-34b5-473b-bcd9-01a207e7e382') {
-                        def app = docker.build("${env.JOB_NAME}:${env.BUILD_ID}")
+                        def app = docker.build("${env.BRANCH_NAME}-${env.DOCKER_IMAGE_NAME}:${env.BUILD_ID}")
                         /* Push the container to the custom Registry */
                         app.push()
                     }
