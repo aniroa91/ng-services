@@ -1,0 +1,53 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: ${DOCKER_IMAGE_NAME}-${BRANCH_NAME}
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ${DOCKER_IMAGE_NAME}-${BRANCH_NAME}
+  template:
+    metadata:
+      labels:
+        app: ${DOCKER_IMAGE_NAME}-${BRANCH_NAME}
+    spec:
+      containers:
+      - name: ${DOCKER_IMAGE_NAME}-${BRANCH_NAME}
+        image: bigdata-registry.local:5043/${DOCKER_IMAGE_NAME}-${BRANCH_NAME}:${BUILD_ID}
+        ports:
+        - containerPort: 9000
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${DOCKER_IMAGE_NAME}-${BRANCH_NAME}
+  labels:
+    app: ${DOCKER_IMAGE_NAME}-${BRANCH_NAME}
+spec:
+  ports:
+  - port: 9000
+    targetPort: 9000
+    protocol: TCP
+    name: http
+  selector:
+    app: ${DOCKER_IMAGE_NAME}-${BRANCH_NAME}
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingr-${DOCKER_IMAGE_NAME}-${BRANCH_NAME}
+spec:
+  rules:
+  - host: ${DOCKER_IMAGE_NAME}.${BRANCH_NAME}.bigdata.local
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: ${DOCKER_IMAGE_NAME}-${BRANCH_NAME}
+          servicePort: 9000
+---
