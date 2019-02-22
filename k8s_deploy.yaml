@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: ${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
-        image: bigdata-registry.local:5043/${BRANCH_NAME}/${DOCKER_IMAGE_NAME}:${env.BUILD_ID}
+        image: bigdata-registry.local:5043/${BRANCH_NAME}/${DOCKER_IMAGE_NAME}:${BUILD_ID}
         ports:
         - containerPort: 9000
 
