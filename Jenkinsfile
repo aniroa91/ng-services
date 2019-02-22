@@ -8,6 +8,7 @@ pipeline {
         NO_PROXY = '172.0.0.1,*.local,172.27.11.0/24'
         DOCKER_IMAGE_NAME = 'web-internet-churn'
         BRANCH_NAME = 'production'
+        WEB_URL = 'internet-churn'
     }
 
     stages {
