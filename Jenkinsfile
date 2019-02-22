@@ -2,13 +2,19 @@ pipeline {
 
     agent { node { label 'agent33' } }
 
+    environment {
+        HTTP_PROXY = 'http://proxy.hcm.fpt.vn:80'
+        HTTPS_PROXY = 'http://proxy.hcm.fpt.vn:80'
+        NO_PROXY = '172.0.0.1,*.local,172.27.11.0/24'
+        DOCKER_IMAGE_NAME = 'bigdata-play-fplay'
+    }
+
     stages {
         stage('Build') {
             steps {
                 sh 'printenv'
                 echo "Compiling..."
                 sh "${tool name: 'sbt', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'}/bin/sbt dist"
-                DOCKER_IMAGE_NAME = 'bigdata-play-fplay'
             }
         }
         stage('Docker Publish') {
