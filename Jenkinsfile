@@ -1,10 +1,11 @@
 pipeline {
 
-    agent { node { label 'master' } }
+    agent { node { label 'agent33' } }
 
     stages {
         stage('Build') {
             steps {
+                sh 'printenv'
                 echo "Compiling..."
                 sh "${tool name: 'sbt', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'}/bin/sbt dist"
             }
