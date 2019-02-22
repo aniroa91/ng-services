@@ -2,20 +2,20 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: ${DOCKER_IMAGE_NAME}-${BRANCH_NAME}
+  name: ${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: ${DOCKER_IMAGE_NAME}-${BRANCH_NAME}
+      app: ${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
   template:
     metadata:
       labels:
-        app: ${DOCKER_IMAGE_NAME}-${BRANCH_NAME}
+        app: ${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
     spec:
       containers:
-      - name: ${DOCKER_IMAGE_NAME}-${BRANCH_NAME}
-        image: bigdata-registry.local:5043/${DOCKER_IMAGE_NAME}-${BRANCH_NAME}:${BUILD_ID}
+      - name: ${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
+        image: bigdata-registry.local:5043/${BRANCH_NAME}/${DOCKER_IMAGE_NAME}:${env.BUILD_ID}
         ports:
         - containerPort: 9000
 
@@ -24,9 +24,9 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ${DOCKER_IMAGE_NAME}-${BRANCH_NAME}
+  name: ${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
   labels:
-    app: ${DOCKER_IMAGE_NAME}-${BRANCH_NAME}
+    app: ${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
 spec:
   ports:
   - port: 9000
@@ -34,13 +34,13 @@ spec:
     protocol: TCP
     name: http
   selector:
-    app: ${DOCKER_IMAGE_NAME}-${BRANCH_NAME}
+    app: ${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
 
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: ingr-${DOCKER_IMAGE_NAME}-${BRANCH_NAME}
+  name: ingr-${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
 spec:
   rules:
   - host: ${DOCKER_IMAGE_NAME}.${BRANCH_NAME}.bigdata.local
@@ -48,6 +48,6 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: ${DOCKER_IMAGE_NAME}-${BRANCH_NAME}
+          serviceName: ${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
           servicePort: 9000
 ---
