@@ -2,20 +2,20 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: ${JOB_NAME}
+  name: ${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: ${JOB_NAME}
+      app: ${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
   template:
     metadata:
       labels:
-        app: ${JOB_NAME}
+        app: ${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
     spec:
       containers:
-      - name: ${JOB_NAME}
-        image: bigdata-registry.local:5043/${JOB_NAME}:${BUILD_ID}
+      - name: ${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
+        image: bigdata-registry.local:5043/${BRANCH_NAME}/${DOCKER_IMAGE_NAME}:${BUILD_ID}
         ports:
         - containerPort: 9000
 
@@ -24,9 +24,9 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ${JOB_NAME}
+  name: ${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
   labels:
-    app: ${JOB_NAME}
+    app: ${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
 spec:
   ports:
   - port: 9000
@@ -34,20 +34,20 @@ spec:
     protocol: TCP
     name: http
   selector:
-    app: ${JOB_NAME}
+    app: ${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
 
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: ingress-${JOB_NAME}
+  name: ingr-${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
 spec:
   rules:
-  - host: internet-churn-staging.bigdata.local
+  - host: ${WEB_URL}-${BRANCH_NAME}.bigdata.local
     http:
       paths:
       - path: /
         backend:
-          serviceName: ${JOB_NAME}
+          serviceName: ${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
           servicePort: 9000
 ---
