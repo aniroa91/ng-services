@@ -899,6 +899,19 @@
                 }]
 
             });
+
+            // click tooltip title
+            var specifiedElement = document.getElementsByClassName('aMore');
+            document.addEventListener('click', function(event) {
+                var isClickInside = specifiedElement[Number($('#indexChart').val())].contains(event.target)
+                if(!isClickInside && String(event.target.className).indexOf('tooltipSL')<0){
+                    $('.ddMore').hide()
+                    $('.dots').show()
+                    $('.more').hide()
+                    $('.tooltipSL').removeClass('fa-angle-double-up').addClass('fa-angle-double-down')
+                }
+            });
+
             $('.nav-tabs li').click(function () {
                 var tabCurr = $('.nav-tabs li.active').find('a').attr('class')
                 var tab = $(this).find('a').attr('class')

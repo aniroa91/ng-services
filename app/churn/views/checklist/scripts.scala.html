@@ -1180,6 +1180,18 @@
                 google.visualization.events.addListener(chartTypeHuyDv, 'onmouseout', handlerOut);
             }
 
+            // click tooltip title
+            var specifiedElement = document.getElementsByClassName('aMore');
+            document.addEventListener('click', function(event) {
+                var isClickInside = specifiedElement[Number($('#indexChart').val())].contains(event.target)
+                if(!isClickInside && String(event.target.className).indexOf('tooltipSL')<0){
+                    $('.ddMore').hide()
+                    $('.dots').show()
+                    $('.more').hide()
+                    $('.tooltipSL').removeClass('fa-angle-double-up').addClass('fa-angle-double-down')
+                }
+            });
+
             /*$(window).resize(function(){
                 drawChart()
             });*/

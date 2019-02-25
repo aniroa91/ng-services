@@ -230,6 +230,7 @@
                     color: #fff;
                     font-size: 13px;
                     font-weight: 100;
+                    font-family: Arial;
                 }
                 .divMore{
                     margin-bottom: 0px;
@@ -353,8 +354,8 @@
                                                         </li>
                                                         <li class="nav-item activeLi"><a href="/internet/checklist" class="nav-link"><i class="fa fa-building"></i> CHECKLIST</a>
                                                         </li>
-                                                        <li class="nav-item"><a href="/internet/detect" class="nav-link"><i class="fa fa-exclamation-triangle"></i> DETECT PROBLEM</a>
-                                                        </li>
+                                                        @*<li class="nav-item"><a href="/internet/detect" class="nav-link"><i class="fa fa-exclamation-triangle"></i> DETECT PROBLEM</a>
+                                                        </li>*@
                                                     </ul>
                                                 </div>
                                                 <div class="header-right-info">
@@ -456,6 +457,8 @@
                     <input type="hidden" id="typeCurr">
                     <input type="hidden" id="time">
 
+                    <input type="hidden" id="indexChart">
+
                     <div class="rate-percent-area mg-t-15">
                         <div class="container-fluid">
                             <div class="row">
@@ -467,7 +470,7 @@
                                                     <div class="caption pro-sl-hd">
                                                         <span class="caption-subject">Number of Contracts That Have Checklist
                                                             <span class="dropdown">
-                                                                <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                                <a name="0" class="dropdown-toggle aMore" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
                                                                 <div class="dropdown-menu ddMore" style="background: #211d1d;position: absolute; min-width: 390px !important;">
                                                                     <p class="divMore">
                                                                         <span>Thống kế số checklist, số HĐ và phần trăm KH có checklist trong 12 tháng gần nhất</span><span class="dots">...</span><br>
@@ -497,8 +500,8 @@
                                                     <div class="caption pro-sl-hd">
                                                         <span class="caption-subject">For Contracts That Have Checklist: Trend in Churn Rate and Percentage
                                                             <span class="dropdown" style="position: inherit">
-                                                                <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
-                                                                <div class="dropdown-menu ddMore" style="background: #211d1d;position: absolute">
+                                                                <a name="1" class="dropdown-toggle aMore" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                                <div class="dropdown-menu ddMore" style="left: 15px;background: #211d1d;position: absolute">
                                                                     <p class="divMore">
                                                                         <span>Thống kê trong nhóm KH có checklist: tỷ lệ và phần trăm rời mạng, đi kèm là số HĐ rời mạng, trong 12 tháng gần nhất</span><span class="dots">...</span><br>
                                                                         <span class="more" style="display: none">
@@ -547,8 +550,8 @@
                                                                     <div class="caption pro-sl-hd">
                                                                         <span class="caption-subject">Number of Contracts That Have Checklist by Region
                                                                             <span class="dropdown" style="position: inherit">
-                                                                                <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
-                                                                                <div class="dropdown-menu ddMore" style="background: #211d1d;position: absolute">
+                                                                                <a name="2" class="dropdown-toggle aMore" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                                                <div class="dropdown-menu ddMore" style="left: 15px;background: #211d1d;position: absolute">
                                                                                     <p class="divMore">
                                                                                         <span>Thống kê phần trăm KH có checklist, đi kèm là số lượng HĐ có checklist, theo vùng trong 12 tháng gần nhất</span><span class="dots">...</span><br>
                                                                                         <span class="more" style="display: none">
@@ -577,7 +580,7 @@
                                                                     <div class="caption pro-sl-hd">
                                                                         <span class="caption-subject">For Contracts That Have Checklist: Trend in Churn Rate and Percentage by Region
                                                                             <span class="dropdown" style="position: inherit">
-                                                                                <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                                                <a name="3" class="dropdown-toggle aMore" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
                                                                                 <div class="dropdown-menu ddMore" style="background: #211d1d;position: absolute">
                                                                                     <p class="divMore">
                                                                                         <span>Thống kê trong nhóm KH có checklist: tỷ lệ và phần trăm rời mạng, đi kèm là số HĐ rời mạng, theo vùng trong 12 tháng gần nhất</span><span class="dots">...</span><br>
@@ -623,8 +626,8 @@
                                                                     <div class="caption pro-sl-hd">
                                                                         <span class="caption-subject">Number of Contracts That Have Checklist by Region by Contract Age
                                                                             <span class="dropdown" style="position: inherit">
-                                                                                <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
-                                                                                <div class="dropdown-menu ddMore" style="background: #211d1d;position: absolute">
+                                                                                <a name="4" class="dropdown-toggle aMore" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                                                <div class="dropdown-menu ddMore" style="left: 15px;background: #211d1d;position: absolute">
                                                                                     <p class="divMore">
                                                                                         <span>Thống kê phần trăm KH có checklist, đi kèm là số lượng KH có checklist, theo vùng và tuổi HĐ trong tháng</span><span class="dots">...</span><br>
                                                                                         <span class="more" style="display: none">
@@ -653,7 +656,7 @@
                                                                     <div class="caption pro-sl-hd">
                                                                         <span class="caption-subject">For Contracts That Have Checklist: Churn Rate and Percentage by Region by Age
                                                                             <span class="dropdown" style="position: inherit">
-                                                                                <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                                                <a name="5" class="dropdown-toggle aMore" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
                                                                                 <div class="dropdown-menu ddMore" style="background: #211d1d;position: absolute">
                                                                                     <p class="divMore">
                                                                                         <span>Thống kê trong nhóm KH có checklist: tỷ lệ và phần trăm rời mạng, đi kèm là số HĐ rời mạng, theo vùng và tuổi HĐ</span><span class="dots">...</span><br>
@@ -699,7 +702,7 @@
                                                                     <div class="caption pro-sl-hd">
                                                                         <span class="caption-subject">Number of Checklist by Checklist Processing Time by Region
                                                                             <span class="dropdown">
-                                                                                <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                                                <a name="6" class="dropdown-toggle aMore" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
                                                                                 <div class="dropdown-menu ddMore" style="background: #211d1d;position: absolute; min-width: 390px !important;">
                                                                                     <p class="divMore">
                                                                                         <span>Thống kê số lượng HĐ theo thời gian xử lý checklist theo vùng</span>
@@ -727,7 +730,7 @@
                                                                     <div class="caption pro-sl-hd">
                                                                         <span class="caption-subject">Number of Checklist by Checklist Type by Region
                                                                             <span class="dropdown" style="position: inherit">
-                                                                                <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                                                <a name="7" class="dropdown-toggle aMore" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
                                                                                 <div class="dropdown-menu ddMore" style="background: #211d1d;position: absolute">
                                                                                     <p class="divMore">
                                                                                         <span>Thống kê số lượng HĐ theo loại checklist (tình trạng sự cố ban đầu khai báo từ KH). Chỉ hiển thị 12 loại có số lượng HĐ nhiều nhất</span>
@@ -751,7 +754,7 @@
                                                                     <div class="caption pro-sl-hd">
                                                                         <span class="caption-subject">Churn Rate and Churn Percentage by Checklist Type by Region
                                                                             <span class="dropdown" style="position: inherit">
-                                                                                <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                                                <a name="8" class="dropdown-toggle aMore" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
                                                                                 <div class="dropdown-menu ddMore" style="background: #211d1d;position: absolute">
                                                                                     <p class="divMore">
                                                                                         <span>Thống kê trong nhóm KH có checklist: tỷ lệ và phần trăm rời mạng, đi kèm là số HĐ rời mạng, theo loại checklist (cho 12 loại được chọn ở biểu đồ bên trái)</span><span class="dots">...</span><br>

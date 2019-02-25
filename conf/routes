@@ -24,7 +24,7 @@ GET      /logout                       controllers.LoginController.logout
 #######################################################################
 
 ### SEARCH CONTRACT
-GET    /churn/search                     churn.controllers.ChurnDetectController.getFormContract(contract: String)
+#GET    /churn/search                     churn.controllers.ChurnDetectController.getFormContract(contract: String)
 
 ### PAGE AGE
 GET     /internet/age                    churn.controllers.ChurnAgeController.index
@@ -43,8 +43,8 @@ GET     /internet/checklist              churn.controllers.ChurnChecklistControl
 POST    /internet/checklist/getJsonChurn churn.controllers.ChurnChecklistController.getJsonChurn
 
 ### PAGE DETECT PROBLEM
-GET     /internet/detect                 churn.controllers.ChurnDetectController.index
-POST    /internet/detect/exportCSV       churn.controllers.ChurnDetectController.exportCSV
-POST    /internet/detect/getJsonChurn    churn.controllers.ChurnDetectController.getJsonChurn
+#GET     /internet/detect                 churn.controllers.ChurnDetectController.index
+#POST    /internet/detect/exportCSV       churn.controllers.ChurnDetectController.exportCSV
+#POST    /internet/detect/getJsonChurn    churn.controllers.ChurnDetectController.getJsonChurn
 
 #######################################################################

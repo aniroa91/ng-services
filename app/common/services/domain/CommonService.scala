@@ -239,6 +239,13 @@ object CommonService extends AbstractService {
     prev.minusDays(num).toString(DateTimeUtil.YMD)
   }
 
+  def getRangeDateByLimit(day: String, limit: Int, field: String): String = {
+    val endDate = DateTimeUtil.create(day, "yyyy-MM").toString("yyyy-MM")
+    val fromDate = DateTimeUtil.create(day, "yyyy-MM").minusMonths(limit-1).toString("yyyy-MM")
+    return s"$field:>=$fromDate AND $field:<=$endDate"
+
+  }
+
   def getRangeDay(day: String): String = {
     var from = day.split("/")(0)
     val to = day.split("/")(1)

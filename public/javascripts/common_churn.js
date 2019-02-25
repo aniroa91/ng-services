@@ -13,6 +13,7 @@ function showMoreLess(event){
 }
 
 function toogleTooltip(event){
+    $('#indexChart').val($(event).attr('name'))
     var isVisibe = 0
     if ($(event).parent().find('.ddMore').is(':hidden')) {
         isVisibe = 1

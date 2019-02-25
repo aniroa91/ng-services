@@ -17,6 +17,7 @@ import play.api.mvc.{AnyContent, Request}
 import churn.models.{CallogResponse, ChecklistResponse}
 import play.api.Logger
 import service.ChurnAgeService.checkExistsIndex
+import service.ChurnRegionService.rangeDate
 
 import scalaj.http.Http
 import services.Configure
@@ -28,9 +29,9 @@ object  ChurnChecklistService{
 
   val logger = Logger(this.getClass())
 
-  def getNumberOfContractChecklist(region:String, age: String, _type: String, time: String) ={
+  def getNumberOfContractChecklist(region:String, age: String, _type: String, time: String, topTypes: String) ={
     val queries = "region:"+region+" AND lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
-    val queryNested_type = parseTypes(_type)
+    val queryNested_type = parseTypes(_type, topTypes)
     var queryNested_time = "*"
     var queryRangeTime = ""
     if(time != "*"){
@@ -85,7 +86,6 @@ object  ChurnChecklistService{
             "size": 0
         }
         """
-    //println(query)
     val body = Http("http://172.27.11.151:9200/churn-checklist-*/docs/_search")
       .postData(query)
       .header("content-type", "application/JSON")
@@ -96,9 +96,10 @@ object  ChurnChecklistService{
       if(time == "*" && _type == "*") x.\("checklist").\("doc_count").get.asInstanceOf[JsNumber].toString().toLong else x.\("checklist").\("countCt").\("doc_count").get.asInstanceOf[JsNumber].toString().toLong))
   }
 
-  def getChurnContractbyStatus(region: String, age: String, _type: String, time: String) ={
+  def getChurnContractbyStatus(region: String, age: String, _type: String, time: String, topTypes: String) ={
     val queries = "region:"+region+" AND lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
-    val queryNested_type = if(_type == "*") "*" else "checklist.type:\""+_type+"\""
+    //val queryNested_type = if(_type == "*") "*" else "checklist.type:\""+_type+"\""
+    val queryNested_type = parseTypes(_type, topTypes)
     var queryNested_time = "*"
     if(time != "*" && time.indexOf(">=") <0) queryNested_time = "checklist.processTime:>="+time.split("-")(0)+" AND checklist.processTime:<"+time.split("-")(1)
     else if(time != "*" && time.indexOf(">=") >= 0) queryNested_time = s"checklist.processTime:$time"
@@ -160,9 +161,10 @@ object  ChurnChecklistService{
     array.flatMap(x=> x._3.map(y=> (x._1, x._2) -> y)).map(x=> (x._1._1, x._2._1, x._2._2, x._1._2))
   }
 
-  def getChurnCallInbyRegionChecklist(age: String, _type: String, time: String) ={
+  def getChurnCallInbyRegionChecklist(age: String, _type: String, time: String, topTypes: String) ={
     val queries = "lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
-    val queryNested_type = if(_type == "*") "*" else "checklist.type:\""+_type+"\""
+    //val queryNested_type = if(_type == "*") "*" else "checklist.type:\""+_type+"\""
+    val queryNested_type = parseTypes(_type, topTypes)
     var queryNested_time = "*"
     if(time != "*" && time.indexOf(">=") <0) queryNested_time = "checklist.processTime:>="+time.split("-")(0)+" AND checklist.processTime:<"+time.split("-")(1)
     else if(time != "*" && time.indexOf(">=") >= 0) queryNested_time = s"checklist.processTime:$time"
@@ -224,9 +226,10 @@ object  ChurnChecklistService{
     array.flatMap(x=> x._2.map(y=> x._1 -> y)).map(x=> (x._1, x._2._1, x._2._2)).filter(x=> x._1 != CommonService.getCurrentMonth()).sortWith((x, y) => x._1 > y._1)
   }
 
-  def getChecklistRegionMonth(age: String, _type: String, time: String) = {
+  def getChecklistRegionMonth(age: String, _type: String, time: String, topTypes: String) = {
     val queries = "lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
-    val queryNested_type = if(_type == "*") "*" else "checklist.type:\""+_type+"\""
+    //val queryNested_type = if(_type == "*") "*" else "checklist.type:\""+_type+"\""
+    val queryNested_type = parseTypes(_type, topTypes)
     var queryNested_time = "*"
     if(time != "*" && time.indexOf(">=") <0) queryNested_time = "checklist.processTime:>="+time.split("-")(0)+" AND checklist.processTime:<"+time.split("-")(1)
     else if(time != "*" && time.indexOf(">=") >= 0) queryNested_time = s"checklist.processTime:$time"
@@ -303,9 +306,10 @@ object  ChurnChecklistService{
 
   }
 
-  def getChurnByRegionAgeChecklist(month: String, _type: String, time: String) ={
+  def getChurnByRegionAgeChecklist(month: String, _type: String, time: String, topTypes: String) ={
     val queries = CommonUtil.filterCommon("tenGoi")
-    val queryNested_type = if(_type == "*") "*" else "checklist.type:\""+_type+"\""
+    //val queryNested_type = if(_type == "*") "*" else "checklist.type:\""+_type+"\""
+    val queryNested_type = parseTypes(_type, topTypes)
     var queryNested_time = "*"
     if(time != "*" && time.indexOf(">=") <0) queryNested_time = "checklist.processTime:>="+time.split("-")(0)+" AND checklist.processTime:<"+time.split("-")(1)
     else if(time != "*" && time.indexOf(">=") >= 0) queryNested_time = s"checklist.processTime:$time"
@@ -421,9 +425,10 @@ object  ChurnChecklistService{
 
   }
 
-  def getChecklistRegionAge(month: String, _type: String, time: String) = {
+  def getChecklistRegionAge(month: String, _type: String, time: String, topTypes: String) = {
     val queries = CommonUtil.filterCommon("tenGoi")
-    val queryNested = if(_type == "*") "*" else "checklist.type:\""+_type+"\""
+    //val queryNested = if(_type == "*") "*" else "checklist.type:\""+_type+"\""
+    val queryNested = parseTypes(_type, topTypes)
     var queryNested_time = "*"
     if(time != "*" && time.indexOf(">=") <0) queryNested_time = "checklist.processTime:>="+time.split("-")(0)+" AND checklist.processTime:<"+time.split("-")(1)
     else if(time != "*" && time.indexOf(">=") >= 0) queryNested_time = s"checklist.processTime:$time"
@@ -492,10 +497,11 @@ object  ChurnChecklistService{
 
   }
 
-  def getChurnByRegionProcessTime(month: String, age: String, _type: String) ={
+  def getChurnByRegionProcessTime(month: String, age: String, _type: String, topTypes: String) ={
     val queries = "lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
-    val queryNested = if(_type == "*") "*" else "checklist.type:\""+_type+"\""
-    val queryAggsType = if(_type == "*") "" else getTypeChecklist(_type)
+    //val queryNested = if(_type == "*") "*" else "checklist.type:\""+_type+"\""
+    val queryNested = parseTypes(_type, topTypes)
+    val queryAggsType = getOtherTypeChecklist(_type, topTypes)
     val request = s"""
         {
              "query": {
@@ -795,7 +801,7 @@ object  ChurnChecklistService{
 
   def getAllContractHaveCt(status: String, _type: String) = {
     val fieldQuery = if(_type == "*") "checklist.processTime:>=0" else "checklist.type:*"
-    val queries = status +" AND "+CommonUtil.filterCommon("tenGoi")
+    val queries = rangeDate+" AND " + status +" AND "+CommonUtil.filterCommon("tenGoi")
     val query = s"""
         {
             "query": {
@@ -862,11 +868,23 @@ object  ChurnChecklistService{
     ",\"aggs\":{\"countCt\":{\"filter\":{\"bool\":{\"must\":[{\"term\":{\"checklist.type\":\""+_type+"\"}}]}}}}"
   }
 
+  def getOtherTypeChecklist(_types : String, topTypes: String) = {
+    val queries = _types match {
+      case _types if(_types == "*")      => ""
+      case _types if(_types == "Others") =>{
+        val tt = topTypes.split(",").filter(!_.contains("Others")).map(x=> "{\"term\":{\"checklist.type\":\""+x+"\"}}").mkString(",")
+        ",\"aggs\":{\"countCt\":{\"filter\":{\"bool\":{\"must_not\":["+tt+"]}}}}"
+      }
+      case _  => ",\"aggs\":{\"countCt\":{\"filter\":{\"bool\":{\"must\":[{\"term\":{\"checklist.type\":\""+_types+"\"}}]}}}}"
+    }
+    queries
+  }
+
   // parse query type
-  def parseTypes(_types: String) = {
+  def parseTypes(_types: String, topTypes: String) = {
     val queries = _types match {
       case _types if(_types == "*")      => "*"
-      case _types if(_types == "Others") => _types.split(",").filter(!_.contains("Others")).map(x=> "!(checklist.type:\""+x+"\")").mkString(" AND ")
+      case _types if(_types == "Others") => topTypes.split(",").filter(!_.contains("Others")).map(x=> "!(checklist.type:\""+x+"\")").mkString(" AND ")
       case _  => "checklist.type:\""+_types+"\""
     }
     queries
@@ -879,6 +897,7 @@ object  ChurnChecklistService{
     var ageAll = "*"
     var region = "*"
     var _type = "*"
+    var topTypes = "*"
     var processTime = "*"
     var month = CommonService.getPrevMonth()
     if(!checkExistsIndex(s"churn-contract-info-$month")) month = CommonService.getPrevMonth(2)
@@ -906,28 +925,41 @@ object  ChurnChecklistService{
           _type = "checklist.type:\""+request.body.asFormUrlEncoded.get("typeCurr").head+"\""
         }
       }*/
+      request.body.asFormUrlEncoded.get("typeCurr").head match {
+        case "" => {
+          topTypes = "*"
+        }
+        case "Others" =>  {
+          val top = request.body.asFormUrlEncoded.get("topType").head
+          topTypes = top.split(",").filter(!_.contains("Others")).mkString(",")
+        }
+        case _ => {
+          topTypes = request.body.asFormUrlEncoded.get("typeCurr").head
+        }
+      }
+
       _type = if(request.body.asFormUrlEncoded.get("typeCurr").head != "") request.body.asFormUrlEncoded.get("typeCurr").head else "*"
     }
     val t0 = System.currentTimeMillis()
     // Chart 1: Number of Contracts That Have Checklist(s)
     val contractAll   = ChurnCallogService.getNumberOfContractAll(s"region:$region AND $ageAll", "churn-contract-info-*").slice(0,12).sorted
-    val ctCheckList   = getNumberOfContractChecklist(region, ageChecklist, _type, processTime).filter(x=> contractAll.map(y=> y._1).indexOf(x._1) >=0)
+    val ctCheckList   = getNumberOfContractChecklist(region, ageChecklist, _type, processTime, topTypes).filter(x=> contractAll.map(y=> y._1).indexOf(x._1) >=0)
       .map(x=> (x._1, x._2, CommonService.format2Decimal(x._2 * 100.00 / contractAll.toMap.get(x._1).get), x._3)).sorted
     logger.info("t0: "+(System.currentTimeMillis() -t0))
     val t1 = System.currentTimeMillis()
     // Chart 2: Churn Rate & Percentage For Customers Who Have Checklist
     val allChurn_count  = if(processTime == "*" && _type == "*") ChurnCallogService.getNumberOfContractAll(s"status:$status AND $ageAll AND region:$region", "churn-contract-info-*")
                           else getAllContractHaveCt(s"status:$status", _type)
-    val trendChecklist  = calTrendCallinRateAndPercentage(getChurnContractbyStatus(region, ageChecklist, _type, processTime), allChurn_count , status)
+    val trendChecklist  = calTrendCallinRateAndPercentage(getChurnContractbyStatus(region, ageChecklist, _type, processTime, topTypes), allChurn_count , status)
     logger.info("t1: "+(System.currentTimeMillis() -t1))
     val t2 = System.currentTimeMillis()
     // Chart 3: Number of Contracts That Have Checklist(s) by Region (%) 2-3 sai
     val ctAllRegion     = ChurnCallogService.getChurnCallInbyRegionAll(s"$ageAll AND !(region:0)")
-    val checklistRegion = ChurnCallogService.calChurnCallinRateAndPercentagebyRegion(getChurnCallInbyRegionChecklist(ageChecklist, _type, processTime), ctAllRegion)
+    val checklistRegion = ChurnCallogService.calChurnCallinRateAndPercentagebyRegion(getChurnCallInbyRegionChecklist(ageChecklist, _type, processTime, topTypes), ctAllRegion)
     logger.info("t2: "+(System.currentTimeMillis() -t2))
     val t3 = System.currentTimeMillis()
     // Chart 4: For Contracts That Have Checklist(s): Churn Rate and Churn Percentage by Region 2-3 sai
-    val trendRegionMonth = ChurnCallogService.calChurnRateAndPercentageForRegionMonth(getChecklistRegionMonth(ageChecklist, _type, processTime), status).filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
+    val trendRegionMonth = ChurnCallogService.calChurnRateAndPercentageForRegionMonth(getChecklistRegionMonth(ageChecklist, _type, processTime, topTypes), status).filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
     val top12monthRegion = trendRegionMonth.map(x=> x._2).distinct.sortWith((x, y) => x > y).filter(x=> x != CommonService.getCurrentMonth()).slice(0,12).sorted
     val topMonth = if(top12monthRegion.length >= 12) 13 else top12monthRegion.length+1
     val mapMonthRegion   = if(top12monthRegion.length >0) (1 until topMonth).map(x=> top12monthRegion(x-1) -> x).toMap else Map[String, Int]()
@@ -948,13 +980,13 @@ object  ChurnChecklistService{
     logger.info("t3: "+(System.currentTimeMillis() -t3))
     val t4 = System.currentTimeMillis()
     // Chart 5: Number of Contracts Who Have Checklist(s) by Region by Contract Age (%)
-    val numOfChecklist     = getChurnByRegionAgeChecklist(month, _type, processTime)
+    val numOfChecklist     = getChurnByRegionAgeChecklist(month, _type, processTime, topTypes)
     val numOfContract      = ChurnCallogService.getChurnByRegionAgeAll(month)
     val checklistRegionAge = numOfChecklist.map(x=> (x._1, x._2, CommonService.format2Decimal(x._3 * 100.00 / numOfContract.filter(y=> y._1 == x._1).filter(y=> y._2 == x._2).map(y=> y._3).sum), x._3))
     logger.info("t4: "+(System.currentTimeMillis() -t4))
     val t5 = System.currentTimeMillis()
     // Chart 6: For Contracts Who Have Checklist(s): Churn Rate and Churn Percentage by Region by Contract Age
-    val trendRegionAge = ChurnCallogService.calCallInRateAndPercentageRegionAge(getChecklistRegionAge(month, _type, processTime), status)
+    val trendRegionAge = ChurnCallogService.calCallInRateAndPercentageRegionAge(getChecklistRegionAge(month, _type, processTime, topTypes), status)
     val mapAge = AgeGroupUtil.AGE.map(y=> y._2).toArray
     val mapRegion1 = CommonUtil.REGION.map(x=> x._2).toArray
     var mapGroup1 = Array[(Int, Int)]()
@@ -971,10 +1003,10 @@ object  ChurnChecklistService{
     logger.info("t5: "+(System.currentTimeMillis() -t5))
     val t6 = System.currentTimeMillis()
     // Chart 7: Number of Checklist(s) by Checklist Processing Time by Region
-    val numOfProcessTime   = getChurnByRegionProcessTime(month, ageChecklist, _type)
+    val numOfProcessTime   = getChurnByRegionProcessTime(month, ageChecklist, _type, topTypes)
     val time_X     = numOfProcessTime.map(x=> x._1).distinct.sorted.map(x=> ProcessTimeUtil.getNameById(x))
     val region_Y   = numOfProcessTime.map(x=> x._2).distinct.sorted
-    val dataChurn7 = numOfProcessTime.map(x=> (ProcessTimeUtil.getIndexById(x._1), x._2 -1, x._3))
+    val dataChurn7 = numOfProcessTime.map(x=> (ProcessTimeUtil.getIndexById(x._1), x._2 -1, x._3)).filter(x=> x._3 >0)
     logger.info("t6: "+(System.currentTimeMillis() -t6))
     val t7 = System.currentTimeMillis()
     // Chart 8: Number of Checklist(s) by Checklist Types by Region

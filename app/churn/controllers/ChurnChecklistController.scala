@@ -41,7 +41,7 @@ class ChurnChecklistController @Inject() (cc: ControllerComponents) extends Abst
 
 
   def getJsonChurn() =  withAuth {username => implicit request: Request[AnyContent] =>
-    try{
+    //try{
         val rs = ChurnChecklistService.getInternet(request)
         val churn1 = Json.obj(
           "cates"        -> rs.ctCheckList.map(x=> x._1),
@@ -113,10 +113,10 @@ class ChurnChecklistController @Inject() (cc: ControllerComponents) extends Abst
           "churn9" -> churn9
         )
         Ok(Json.toJson(json))
-    }
+    /*}
     catch{
       case e: Exception => Ok("Error")
-    }
+    }*/
 
   }
 

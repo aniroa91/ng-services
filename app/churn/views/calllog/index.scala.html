@@ -232,6 +232,7 @@
                     color: #fff;
                     font-size: 13px;
                     font-weight: 100;
+                    font-family: Arial;
                 }
                 .divMore{
                     margin-bottom: 0px;
@@ -351,8 +352,8 @@
                                                     </li>
                                                     <li class="nav-item"><a href="/internet/checklist" class="nav-link"><i class="fa fa-building"></i> CHECKLIST</a>
                                                     </li>
-                                                    <li class="nav-item"><a href="/internet/detect" class="nav-link"><i class="fa fa-exclamation-triangle"></i> DETECT PROBLEM</a>
-                                                    </li>
+                                                    @*<li class="nav-item"><a href="/internet/detect" class="nav-link"><i class="fa fa-exclamation-triangle"></i> DETECT PROBLEM</a>
+                                                    </li>*@
                                                 </ul>
                                             </div>
                                             <div class="header-right-info">
@@ -449,6 +450,8 @@
                 <input type="hidden" id="cateArr" value="@rs.churnCates.map(x=> x._1).mkString(",")">
                 <input type="hidden" id="cateCurr">
 
+                <input type="hidden" id="indexChart">
+
                 <div class="rate-percent-area mg-t-15">
                     <div class="container-fluid">
                         <div class="row">
@@ -460,7 +463,7 @@
                                                 <div class="caption pro-sl-hd">
                                                     <span class="caption-subject">Total Number of Inbound Calls and Number of Contracts Who Call in
                                                         <span class="dropdown" style="position: inherit">
-                                                            <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                            <a name="0" class="dropdown-toggle aMore" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
                                                             <div class="dropdown-menu ddMore" style="background: #211d1d;position: absolute;left: 15px">
                                                                 <p class="divMore">
                                                                     <span>Thống kế số cuộc gọi vào tổng đài, số lượng HĐ và phần trăm KH có gọi vào tổng đài trong 12 tháng gần nhất</span><span class="dots">...</span><br>
@@ -490,7 +493,7 @@
                                                 <div class="caption pro-sl-hd">
                                                     <span class="caption-subject">For Contracts Who Call in: Trend in Churn Rate and Percentage
                                                         <span class="dropdown" style="position: inherit;">
-                                                            <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                            <a name="1" class="dropdown-toggle aMore" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
                                                             <div class="dropdown-menu ddMore" style="background: #211d1d;position: absolute;left: 15px">
                                                                 <p class="divMore">
                                                                     <span>Thống kê trong nhóm KH có gọi vào tổng đài: tỷ lệ và phần trăm rời mạng, đi kèm là số HĐ rời mạng, trong 12 tháng gần nhất</span><span class="dots">...</span><br>
@@ -539,7 +542,7 @@
                                                                 <div class="caption pro-sl-hd">
                                                                     <span class="caption-subject">Number of Contracts Who Call in by Region
                                                                         <span class="dropdown" style="position: inherit">
-                                                                            <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                                            <a name="2" class="dropdown-toggle aMore" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
                                                                             <div class="dropdown-menu ddMore" style="background: #211d1d;position: absolute;left: 15px">
                                                                                 <p class="divMore">
                                                                                     <span>Thống kê phần trăm KH có gọi vào tổng đài, đi kèm là số lượng KH có gọi vào tổng đài, theo vùng trong 12 tháng gần nhất</span><span class="dots">...</span><br>
@@ -569,7 +572,7 @@
                                                                 <div class="caption pro-sl-hd">
                                                                     <span class="caption-subject">For Contracts Who Call in: Trend in Churn Rate and Percentage by Region
                                                                         <span class="dropdown">
-                                                                            <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                                            <a name="3" class="dropdown-toggle aMore" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
                                                                             <div class="dropdown-menu ddMore" style="background: #211d1d;">
                                                                                 <p class="divMore">
                                                                                     <span>Thống kê trong nhóm KH có gọi vào tổng đài: tỷ lệ và phần trăm rời mạng, đi kèm là số lượng HĐ rời mạng, theo vùng trong 12 tháng gần nhất</span><span class="dots">...</span><br>
@@ -615,7 +618,7 @@
                                                                 <div class="caption pro-sl-hd">
                                                                     <span class="caption-subject">Number of Contracts Who Call in by Region by Contract Age
                                                                         <span class="dropdown" style="position: inherit">
-                                                                            <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                                            <a name="4" class="dropdown-toggle aMore" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
                                                                             <div class="dropdown-menu ddMore" style="background: #211d1d;position: absolute;left: 15px">
                                                                                 <p class="divMore">
                                                                                     <span>Thống kê phần trăm KH có gọi vào tổng đài, đi kèm là số lượng KH có gọi vào tổng đài, theo vùng và tuổi HĐ trong tháng</span><span class="dots">...</span><br>
@@ -645,7 +648,7 @@
                                                                 <div class="caption pro-sl-hd">
                                                                     <span class="caption-subject">For Contracts Who Call In: Churn Rate and Percentage by Region by Age
                                                                         <span class="dropdown" style="position: inherit">
-                                                                            <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                                            <a name="5" class="dropdown-toggle aMore" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
                                                                             <div class="dropdown-menu ddMore" style="background: #211d1d;position: absolute;left: 15px">
                                                                                 <p class="divMore">
                                                                                     <span>Thống kê trong nhóm KH có gọi vào tổng đài: tỷ lệ và phần trăm rời mạng, đi kèm là số HĐ rời mạng, theo vùng và tuổi HĐ</span><span class="dots">...</span><br>
@@ -692,7 +695,7 @@
                                                                 <div class="caption pro-sl-hd">
                                                                     <span class="caption-subject">Churn Rate and Churn Percentage by Call Category
                                                                         <span class="dropdown" style="position: inherit">
-                                                                            <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                                            <a name="6" class="dropdown-toggle aMore" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
                                                                             <div class="dropdown-menu ddMore" style="background: #211d1d;position: absolute;left: 15px">
                                                                                 <p class="divMore">
                                                                                     <span>Thống kê trong nhóm KH có gọi vào tổng đài: tỷ lệ và phần trăm rời mạng, đi kèm là số HĐ rời mạng, theo nội dung cuộc gọi</span><span class="dots">...</span><br>

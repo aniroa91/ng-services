@@ -17,6 +17,7 @@ import play.api.mvc.{AnyContent, Request}
 import churn.models.CallogResponse
 import play.api.Logger
 import service.ChurnAgeService.checkExistsIndex
+import service.ChurnRegionService.rangeDate
 
 import scalaj.http.Http
 import services.Configure
@@ -184,7 +185,7 @@ object  ChurnCallogService{
   }*/
 
   def getNumberOfContractAll(queryString: String, tb: String) ={
-    val queries = queryString + " AND "+ CommonUtil.filterCommon(if(tb == "churn-contract-info-*") "package_name" else "tenGoi")
+    val queries = rangeDate+" AND " + queryString + " AND "+ CommonUtil.filterCommon(if(tb == "churn-contract-info-*") "package_name" else "tenGoi")
     val request = search(s"$tb" / "docs") query(queries) aggregations (
       termsAggregation("month")
         .field("month") size 24

@@ -199,6 +199,7 @@
                 color: #fff;
                 font-size: 13px;
                 font-weight: 100;
+                font-family: Arial;
             }
             .divMore{
                 margin-bottom: 0px;
@@ -315,8 +316,8 @@
                                                     </li>
                                                     <li class="nav-item"><a href="/internet/checklist" class="nav-link"><i class="fa fa-building"></i> CHECKLIST</a>
                                                     </li>
-                                                    <li class="nav-item"><a href="/internet/detect" class="nav-link"><i class="fa fa-exclamation-triangle"></i> DETECT PROBLEM</a>
-                                                    </li>
+                                                    @*<li class="nav-item"><a href="/internet/detect" class="nav-link"><i class="fa fa-exclamation-triangle"></i> DETECT PROBLEM</a>
+                                                    </li>*@
                                                 </ul>
                                             </div>
                                             <div class="header-right-info">
@@ -407,6 +408,8 @@
                 <input type="hidden" id="region">
                 <input type="hidden" id="status" value="1">
 
+                <input type="hidden" id="indexChart">
+
                 <div class="rate-percent-area mg-t-15">
                     <div class="container-fluid">
                         <div class="row">
@@ -418,7 +421,7 @@
                                                 <div class="caption pro-sl-hd">
                                                     <span class="caption-subject">Churn Rate and Percentage by Contract Age
                                                         <span class="dropdown">
-                                                            <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                            <a name="0" class="dropdown-toggle aMore" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
                                                             <div class="dropdown-menu ddMore" style="background: #211d1d">
                                                                 <p class="divMore">
                                                                     <span>Thống kê tỷ lệ và phần trăm rời mạng theo nhóm tuổi hợp đồng</span><span class="dots">...</span><br>
@@ -450,7 +453,7 @@
                                                 <div class="caption pro-sl-hd">
                                                     <span class="caption-subject">Trend in Churn Rate and Churn Percentage
                                                         <span class="dropdown">
-                                                            <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                            <a name="1" class="dropdown-toggle aMore" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
                                                             <div class="dropdown-menu ddMore" style="background: #211d1d">
                                                                 <p class="divMore">
                                                                     <span>Thống kê tỷ lệ và phần trăm rời mạng, đi kèm là số lượng HĐ rời mạng tương ứng, trong 12 tháng gần nhất</span>
@@ -481,7 +484,7 @@
                                                 <div class="caption pro-sl-hd">
                                                     <span class="caption-subject">Churn Rate and Churn Percentage by Contract Age by Region
                                                         <span class="dropdown">
-                                                            <a class="dropdown-toggle" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                            <a name="2" class="dropdown-toggle aMore" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
                                                             <div class="dropdown-menu ddMore" style="background: #211d1d">
                                                                 <p class="divMore">
                                                                     <span>Thống kê tỷ lệ và phần trăm rời mạng, đi kèm là số lượng HĐ rời mạng tương ứng, theo Tuổi HĐ và vùng</span><span class="dots">...</span><br>

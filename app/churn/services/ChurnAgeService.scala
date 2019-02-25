@@ -6,6 +6,7 @@ import com.sksamuel.elastic4s.http.search.SearchResponse
 import churn.utils.{AgeGroupUtil, CommonUtil}
 import play.api.Logger
 import play.api.mvc.{AnyContent, Request}
+import service.ChurnRegionService.rangeDate
 import services.Configure
 import services.domain.CommonService
 
@@ -18,7 +19,7 @@ object  ChurnAgeService{
   val logger = Logger(this.getClass())
 
   def getChurnGroupMonth(queryString: String) ={
-    val request = search(s"churn-contract-info-*" / "docs") query(queryString+" AND "+CommonUtil.filterCommon("package_name")) aggregations (
+    val request = search(s"churn-contract-info-*" / "docs") query(rangeDate+" AND " + queryString+" AND "+CommonUtil.filterCommon("package_name")) aggregations (
       termsAggregation("month")
         .field("month")
         .subaggs(
@@ -42,6 +43,7 @@ object  ChurnAgeService{
         ) size 12
       ) size 0
     val rs = client.execute(request).await
+    println(rangeDate)
     CommonService.getMultiAggregations(rs.aggregations.get("month"),"status" ,"age").flatMap(x => x._2.map(y => x._1 -> y))
       .map(x => (x._1 , x._2._1) -> x._2._2)
       .flatMap(x => x._2.map(y => x._1 -> y))
