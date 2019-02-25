@@ -988,7 +988,7 @@
                             }
 
                             // update chart Heatmap Contract
-                            if(_type != "churn5_heatmap") {
+                            if(_type != "churn5_heatmap" && _type != "profileAge") {
                                 churn_heatmap.xAxis[0].update({categories: dta.heat_map.xAxis})
                                 churn_heatmap.yAxis[0].update({categories: dta.heat_map.yAxis})
                                 churn_heatmap.series[0].setData(dta.heat_map.data, true, true, false)
@@ -1290,7 +1290,7 @@
                                 google.visualization.events.addListener(chartProfileMonth, 'onmouseout', handlerOut)
                             }
                             // update chart bubble Trend profile & age
-                            if(_type != "profileAge") {
+                            if(_type != "profileAge" && _type != "churn5_heatmap") {
                                 if(dta.churn5.data.length <= 0){
                                     $('#churn5_overlay').hide()
                                     $('#churn5').hide()

@@ -30,7 +30,7 @@ object  ChurnChecklistService{
   val logger = Logger(this.getClass())
 
   def getNumberOfContractChecklist(region:String, age: String, _type: String, time: String, topTypes: String) ={
-    val queries = "region:"+region+" AND lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
+    val queries = rangeDate+" AND " + "region:"+region+" AND lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
     val queryNested_type = parseTypes(_type, topTypes)
     var queryNested_time = "*"
     var queryRangeTime = ""
@@ -97,7 +97,7 @@ object  ChurnChecklistService{
   }
 
   def getChurnContractbyStatus(region: String, age: String, _type: String, time: String, topTypes: String) ={
-    val queries = "region:"+region+" AND lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
+    val queries = rangeDate+" AND "+"region:"+region+" AND lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
     //val queryNested_type = if(_type == "*") "*" else "checklist.type:\""+_type+"\""
     val queryNested_type = parseTypes(_type, topTypes)
     var queryNested_time = "*"
@@ -162,7 +162,7 @@ object  ChurnChecklistService{
   }
 
   def getChurnCallInbyRegionChecklist(age: String, _type: String, time: String, topTypes: String) ={
-    val queries = "lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
+    val queries = rangeDate+" AND " +  "lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
     //val queryNested_type = if(_type == "*") "*" else "checklist.type:\""+_type+"\""
     val queryNested_type = parseTypes(_type, topTypes)
     var queryNested_time = "*"
@@ -227,7 +227,7 @@ object  ChurnChecklistService{
   }
 
   def getChecklistRegionMonth(age: String, _type: String, time: String, topTypes: String) = {
-    val queries = "lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
+    val queries = rangeDate+" AND " + "lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
     //val queryNested_type = if(_type == "*") "*" else "checklist.type:\""+_type+"\""
     val queryNested_type = parseTypes(_type, topTypes)
     var queryNested_time = "*"
@@ -849,7 +849,6 @@ object  ChurnChecklistService{
 
   def calTrendTypeRegion(array: Array[(String, Int, Int, Long, Long)], status: Int, sumAll_churn: Array[(Int, Long)]) = {
     val rsHuyDv = array.filter(x=> x._3 == status).map(x=> (x._1, x._2, x._4, x._5))
-    //rsHuyDv.foreach(println)
     rsHuyDv.map(x=> (x._1, x._2, CommonService.format2Decimal(x._3 * 100.00 / x._4), CommonService.format2Decimal(x._3 * 100.00 / sumAll_churn.find(y=> y._1 == x._2).get._2), x._3))
   }
 

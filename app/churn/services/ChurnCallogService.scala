@@ -30,7 +30,7 @@ object  ChurnCallogService{
   val logger = Logger(this.getClass())
 
   def getNumberOfContractCallIn(region:String, age: String, category: String) ={
-    val queries = "region:"+region+" AND lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
+    val queries = rangeDate+" AND " + "region:"+region+" AND lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
     val queryNested = parseCategories(category)
     val queryAggsNested = parseOtherCatesQuery(category)
     val query = s"""
@@ -102,7 +102,7 @@ object  ChurnCallogService{
   }
 
   def getNumberOfContractCallIn1(region:String, age: String, category: String) ={
-    val queries = "region:"+region+" AND lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
+    val queries = rangeDate+" AND " + "region:"+region+" AND lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
     val queryNested = if(category == "*") "calllog.cate:*" else "calllog.cate:\""+category+"\""
     val query = s"""
         {
@@ -314,7 +314,7 @@ object  ChurnCallogService{
   }
 
   def getTrendCallIn(region: String, age: String, cate: String) ={
-    val queries = "region:"+region+" AND lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
+    val queries = rangeDate+" AND " + "region:"+region+" AND lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
     val queryNested = parseCategories(cate)
     val query = s"""
         {
@@ -409,7 +409,7 @@ object  ChurnCallogService{
   }
 
   def getChurnCallInbyRegionCallIn(age: String, cate: String) ={
-    val queries = "lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
+    val queries = rangeDate+" AND " + "lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
     val queryNested = parseCategories(cate)
     val query = s"""
         {
@@ -657,7 +657,7 @@ object  ChurnCallogService{
   }*/
 
   def getCallInRegionMonth(age: String, cate: String) = {
-    val queries = "lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
+    val queries = rangeDate+" AND " + "lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
     val queryNested = parseCategories(cate)
     val query = s"""
         {
