@@ -1,4 +1,3 @@
-/*
 package churn.controllers
 
 import play.api.data.Form
@@ -24,8 +23,7 @@ import services.domain.CommonService
 
 /**
   * This controller creates an `Action` to handle HTTP requests to the
-  * application's home page.
-  */
+  * application's home page. */
 
 @Singleton
 class ChurnDetectController @Inject() (cc: ControllerComponents) extends AbstractController(cc) with Secured{
@@ -43,12 +41,12 @@ class ChurnDetectController @Inject() (cc: ControllerComponents) extends Abstrac
 
   def exportCSV() = withAuth {username => implicit request: Request[AnyContent] =>
     try{
-     /* val contractGrp = request.body.asFormUrlEncoded.get("groupCt").head
+      val contractGrp = request.body.asFormUrlEncoded.get("groupCt").head
       val maintain = request.body.asFormUrlEncoded.get("maintain").head
       val cate = if(request.body.asFormUrlEncoded.get("cate").head == "") "" else "\"" + request.body.asFormUrlEncoded.get("cate").head + "\""
       val cause = if(request.body.asFormUrlEncoded.get("cause").head == "") "" else "\"" + request.body.asFormUrlEncoded.get("cause").head + "\""
       val complain = if(request.body.asFormUrlEncoded.get("complain").head == "*") "*" else "problem:\"" + request.body.asFormUrlEncoded.get("complain").head + "\""
-      val status = "status:"+request.body.asFormUrlEncoded.get("status").head */
+      val status = "status:"+request.body.asFormUrlEncoded.get("status").head
       val month = request.body.asFormUrlEncoded.get("month").head
       val packages = if(request.body.asFormUrlEncoded.get("package").head == "*") "*" else "\"" +request.body.asFormUrlEncoded.get("package").head +"\""
       val region = request.body.asFormUrlEncoded.get("region").head
@@ -200,4 +198,3 @@ class ChurnDetectController @Inject() (cc: ControllerComponents) extends Abstrac
     Redirect(churn.controllers.routes.ChurnDetectController.index()).flashing( key1 -> values1, key2 -> values2)
   }
 }
-*/
