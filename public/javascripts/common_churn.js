@@ -81,7 +81,7 @@ function getJson2Column1Line(count_ct, churnPercent, count_call, _type){
         data: count_call
     })
     rs.push({
-        name: "Churn Percent",
+        name: "Percent",
         type: 'line',
         yAxis: 1,
         data: churnPercent
