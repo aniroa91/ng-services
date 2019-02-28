@@ -43,7 +43,7 @@ metadata:
   name: ingr-${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
 spec:
   rules:
-  - host: stagging-bigdata-play-fplay.bigdata.local
+  - host: ${WEB_URL}-${BRANCH_NAME}.bigdata.local
     http:
       paths:
       - path: /
