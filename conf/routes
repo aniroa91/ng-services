@@ -24,7 +24,10 @@ GET      /logout                       controllers.LoginController.logout
 #######################################################################
 
 ### SEARCH CONTRACT
-GET    /churn/search                     churn.controllers.ChurnDetectController.getFormContract(contract: String)
+GET     /churn/search                    churn.controllers.ChurnDetectController.getFormContract(contract: String)
+
+### PAGE OVERVIEW
+GET     /internet/overview               churn.controllers.OverviewController.index
 
 ### PAGE AGE
 GET     /internet/age                    churn.controllers.ChurnAgeController.index
