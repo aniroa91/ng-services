@@ -1,8 +1,11 @@
-@(rs: String, month: String, email: String ,postUrl: Call)(implicit request: RequestHeader)
+@(rs: churn.models.OverviewResponse, month: String, email: String ,postUrl: Call)(implicit request: RequestHeader)
 
 @import services.domain.CommonService.formatNumber
 @import services.domain.CommonService.percent
 @import services.domain.CommonService.format3Decimal
+@import services.domain.CommonService.formatPattern
+@import services.domain.CommonService.getPrevYYYY
+@import services.domain.CommonService.getPrevYYYYMM
 @import churn.utils.CommonUtil
 @import churn.utils.AgeGroupUtil
 
@@ -34,6 +37,9 @@
         <link rel="stylesheet" href="/assets/otherLayout/css/responsive.css">
         <link rel="stylesheet" href="/assets/custom/css/waitMe.css">
         <link rel="stylesheet" href="/assets/custom/css/hover-min.css">
+        <link rel="stylesheet" href="/assets/custom/css/select2.min.css">
+        <link rel="stylesheet" href="/assets/custom/css/jsTree.css">
+        <link rel="stylesheet" href="/assets/custom/css/icheck.css">
             <!-- bootstrap-daterangepicker -->
         <link href="/assets/datepicker/css/bootstrap-datepicker.css" rel="stylesheet">
         <script src="/assets/otherLayout/js/vendor/modernizr-2.8.3.min.js"></script>
@@ -42,6 +48,11 @@
                     font-size: 24px;
                     color: #0df3cf!important;
                     font-weight: 600;
+                }
+                .listview{
+                    color: rgb(52,152,219);
+                    padding: 5px 15px 0px 15px!important;
+                    font-size: 13px;
                 }
                 .animation{
                     animation-duration: 5s;
@@ -177,16 +188,41 @@
                     font-size: 14px;
                     color: #0D3349;
                 }
-                .box-area{
-                    background: linear-gradient(to right, #ffbf96, #fe7096);
-                    padding: 15px;
+                .box-area-active{
+                    background: linear-gradient(to left, #4acade, #48af76);
                     color: #fff;
-                    margin-bottom: 20px;
+                    height: 149px;
+                }
+                .box-area-cancel{
+                     background: linear-gradient(to left, #ffbf96, #fe7096);
+                     color: #fff;
+                     height: 149px;
+                 }
+                .box-area-warning{
+                    background: linear-gradient(45deg, #6bbdf7 0%, #ffca28 100%);
+                    color: #fff;
+                    height: 149px;
                 }
                 .ibox {
                     float: right;
                     margin-top: 5px;
                     margin-right: 5px;
+                }
+                .down{
+                    color: red;
+                }
+                .boxCorner{
+                    padding: 5px;
+                    font-size: 13px;
+                    float: right;
+                    border-top: 0.5px solid white;
+                    border-left: 0.5px solid white;
+                }
+                .analytics-content{
+                    padding: 15px 15px 0px 15px;
+                }
+                .up{
+                    color: #132186;
                 }
         </style>
     </head>
@@ -201,25 +237,44 @@
                 <div class="left-custom-menu-adp-wrap comment-scrollbar">
                     <nav class="sidebar-nav left-sidebar-menu-pro divLeft">
                         <div class="col-xs-12 filter"><i class="fa fa-filter"></i> FILTERING </div>
-                        <div class="ageDiv" style="padding-top: 15px;display: none;margin-bottom: 15px">
-                            <span class="titFilter"><i class="fa fa-bell"></i> Group Age</span>
-                            <span class="txtControl txtAge"></span>
-                        </div>
-                        <div class="regionDiv" style="padding-top: 15px;display: none;margin-bottom: 15px">
-                            <span class="titFilter"><i class="fa fa-bell"></i> Group Region</span>
-                            <span class="txtControl txtRegion"></span>
-                        </div>
-                        <div class="divStatus" style="height: 170px;padding-top: 15px">
-                            <span class="titFilter"><i class="fa fa-bell"></i> Group Status</span>
-                            <select class="form-control selectBox slStatus" style="border: 1px solid #16a085!important">
-                            @for( (k,v) <- CommonUtil.STATUS_MAP){
-                                @if(v == 1){
-                                    <option value="@v" selected>@k</option>
-                                }else{
+                        <div class="ageDiv" style="padding-top: 15px;margin-bottom: 15px">
+                            <p class="titFilter"><i class="fa fa-bell"></i> Group Age</p>
+                            <select class="form-control selectBox slAge" multiple="multiple" style="border: 1px solid #16a085!important">
+                                @for( (k,v) <- AgeGroupUtil.AGE.toArray.sorted){
                                     <option value="@v">@k</option>
                                 }
-                            }
                             </select>
+                        </div>
+                        <div class="packageDiv" style="margin-bottom: 15px">
+                            <p class="titFilter"><i class="fa fa-bell"></i> Group Package</p>
+                            <select class="form-control selectBox slPackage" multiple="multiple" style="border: 1px solid #16a085!important">
+                                @for( v <- rs.packages){
+                                    <option value="@v">@v</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="comboDiv" style="margin-bottom: 15px">
+                            <p class="titFilter"><i class="fa fa-bell"></i> Group Combo</p>
+                            <ul class="listview">
+                                <li>
+                                    <label class="radiobutton">
+                                        <input name="radio" class="radio" value="int" type="radio">
+                                        <span class="label-text"><strong>Internet Only</strong></span>
+                                    </label>
+                                </li>
+                                <li>
+                                    <label class="radiobutton">
+                                        <input name="radio" class="radio" value="combo" type="radio">
+                                        <span class="label-text"><strong>Combo Paytv & Internet</strong></span>
+                                    </label>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="packageDiv" style="margin-bottom: 15px">
+                            <p class="titFilter"><i class="fa fa-bell"></i> Group Region</p>
+                            <div class="region" style="margin-top: 10px;margin-bottom: 20px"></div>
                         </div>
                         <div class="col-xs-12 lineDivBlack"></div>
                         <div style="height: 140px;padding-top: 15px">
@@ -233,14 +288,9 @@
                         <div class="col-xs-12 lineDivWhite"></div>
                         <div style="padding:0px 10px">
                             <a class="apply btn btn-xs btn-success" style="float: right;"><i class="fa fa-check-circle"></i> Apply</a>
-                            <a href="/internet/age" class="btn btn-xs btn-secondary btnRefresh"><i class="fa fa-refresh"></i> Refresh</a>
+                            <a href="/internet/overview" class="btn btn-xs btn-secondary btnRefresh"><i class="fa fa-refresh"></i> Refresh</a>
                         </div>
                         <div class="col-xs-12 lineDivBlack"></div>
-                        @*<div style="margin-top: 60px">
-                        <label class="txtCmt">Data is pending 2018-10</label>
-                        <textarea class="form-control" placeholder="Your comment report..." id="cmt" rows="3" style="color: #5A738E"></textarea>
-                        <a class="btn btn-xs btn-primary" style="margin: 10px 0px 20px 0px;float: right">Comment</a>
-                        </div>*@
                     </nav>
                 </div>
             </nav>
@@ -369,29 +419,191 @@
                 </div>
                     <!-- Mobile Menu end -->
             </div>
-            @if(rs == null) {
+            @if(rs != null) {
                 @helper.CSRF.formField
                 <input type="hidden" value="@month" id="month">
-                <input type="hidden" id="age">
+                <input type="hidden" id="combo">
                 <input type="hidden" id="region">
-
+                <input type="hidden" id="province">
                 <input type="hidden" id="indexChart">
+
+                <div class="rate-percent-area mg-tb-15">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
+                                <div class="reso-mg-b-30 box-area-active boxnum" id="boxCtActive">
+                                    <div class="analytics-content">
+                                        <h1>
+                                            <span class="counter currCtActive">@formatPattern(rs.numContract._1.curr)</span>
+                                            <i class="fa fa-check-circle ibox" aria-hidden="true"></i>
+                                        </h1>
+                                        <h3>Active Contracts</h3>
+                                    </div>
+                                    <div class="boxCorner prevCtActive">
+                                        <h4>@formatPattern(rs.numContract._1.prev)</h4>
+                                        @if(rs.numContract._1.prev > rs.numContract._1.curr){
+                                            <span class="down"><i class="fa fa-arrow-down fadeInDown animated" aria-hidden="true"></i> @percent(rs.numContract._1.curr.toLong, rs.numContract._1.prev.toLong) %</span> from @getPrevYYYYMM(month)
+                                        }else{
+                                            <span class="up"><i class="fa fa-arrow-up fadeInUp animated" aria-hidden="true"></i> @percent(rs.numContract._1.curr.toLong, rs.numContract._1.prev.toLong) %</span> from @getPrevYYYYMM(month)
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
+                                <div class="reso-mg-b-30 box-area-cancel boxnum" id="boxCtHuydv">
+                                    <div class="analytics-content">
+                                        <h1>
+                                            <span class="counter currCtHuydv">@formatPattern(rs.numContract._2.curr)</span>
+                                            <i class="fa fa-sign-out ibox" aria-hidden="true"></i>
+                                        </h1>
+                                        <h3>HSSD Contracts</h3>
+                                    </div>
+                                    <div class="boxCorner prevCtHuydv">
+                                        <h4>@formatPattern(rs.numContract._2.prev)</h4>
+                                        @if(rs.numContract._2.prev > rs.numContract._2.curr){
+                                            <span class="down"><i class="fa fa-arrow-down fadeInDown animated" aria-hidden="true"></i> @percent(rs.numContract._2.curr.toLong, rs.numContract._2.prev.toLong) %</span> from @getPrevYYYY(month)
+                                        }else{
+                                            <span class="up"><i class="fa fa-arrow-up fadeInUp animated" aria-hidden="true"></i> @percent(rs.numContract._2.curr.toLong, rs.numContract._2.prev.toLong) %</span> from @getPrevYYYY(month)
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
+                                <div class="reso-mg-b-30 box-area-warning boxnum" id="boxCtCtbdv">
+                                    <div class="analytics-content">
+                                        <h1>
+                                            <span class="counter currCtCtbdv">@formatPattern(rs.numContract._3.curr)</span>
+                                            <i class="fa fa-exclamation-circle ibox" aria-hidden="true"></i>
+                                        </h1>
+                                        <h3>CTBDV Contracts</h3>
+                                    </div>
+                                    <div class="boxCorner prevCtCtbdv">
+                                        <h4>@formatPattern(rs.numContract._3.prev)</h4>
+                                        @if(rs.numContract._3.prev > rs.numContract._3.curr){
+                                            <span class="down"><i class="fa fa-arrow-down fadeInDown animated" aria-hidden="true"></i> @percent(rs.numContract._3.curr.toLong, rs.numContract._3.prev.toLong) %</span> from @getPrevYYYY(month)
+                                        }else{
+                                            <span class="up"><i class="fa fa-arrow-up fadeInUp animated" aria-hidden="true"></i> @percent(rs.numContract._3.curr.toLong, rs.numContract._3.prev.toLong) %</span> from @getPrevYYYY(month)
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12 mg-t-15">
+                                <div class="reso-mg-b-30 box-area-active boxnum" id="boxRateTotal">
+                                    <div class="analytics-content">
+                                        <h1>
+                                            <span class="counter avgRateTotal">@rs.churnRate._3.avg</span> %
+                                            <i class="fa fa-bolt ibox" aria-hidden="true"></i>
+                                        </h1>
+                                        <h3>Churn Rate</h3>
+                                    </div>
+                                    <div class="boxCorner" style="color: #c53a1a">
+                                        <h4 class="currRateTotal">@rs.churnRate._3.curr %</h4>
+                                        <span><i class="fa fa-calendar" aria-hidden="true"></i> <span class="currMonth">@month</span></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12 mg-t-15">
+                                <div class="reso-mg-b-30 box-area-cancel boxnum" id="boxRateHuydv">
+                                    <div class="analytics-content">
+                                        <h1>
+                                            <span class="counter avgRateHuydv">@rs.churnRate._1.avg</span> %
+                                            <i class="fa fa-bolt ibox" aria-hidden="true"></i>
+                                        </h1>
+                                        <h3>HSSD Churn Rate</h3>
+                                    </div>
+                                    <div class="boxCorner" style="color: #0e820e">
+                                        <h4 class="currRateHuydv">@rs.churnRate._1.curr %</h4>
+                                        <span><i class="fa fa-calendar" aria-hidden="true"></i> <span class="currMonth">@month</span></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12 mg-t-15">
+                                <div class="reso-mg-b-30 box-area-warning boxnum" id="boxRateCtbdv">
+                                    <div class="analytics-content">
+                                        <h1>
+                                            <span class="counter avgRateCtbdv">@rs.churnRate._2.avg</span> %
+                                            <i class="fa fa-bolt ibox" aria-hidden="true"></i>
+                                        </h1>
+                                        <h3>CTBDV Churn Rate</h3>
+                                    </div>
+                                    <div class="boxCorner" style="color: #1e44b5">
+                                        <h4 class="currRateCtbdv">@rs.churnRate._2.curr %</h4>
+                                        <span><i class="fa fa-calendar" aria-hidden="true"></i> <span class="currMonth">@month</span></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="rate-percent-area mg-t-15">
                     <div class="container-fluid">
                         <div class="row">
-                            <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
-                                <div class="row">
-                                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                                        <div class="reso-mg-b-30 box-area">
-                                            <div class="analytics-content">
-                                                <h1 class="mg-b-10"><span id="churnCt" class="counter"> 10,000</span>  <i class="fa fa-check ibox" aria-hidden="true"></i></h1>
-                                                <h3>Active Contracts</h3>
-                                                <p></p>
+                            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                                <div class="product-sales-chart">
+                                    <div class="portlet-title" style="height: 35px">
+                                        <div class="row">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                <div class="caption pro-sl-hd">
+                                                    <span class="caption-subject">Number of Contracts By Status
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
+                                    <div id="track1" style="width: auto; height: 320px;"></div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                                <div class="product-sales-chart">
+                                    <div class="portlet-title" style="height: 35px">
+                                        <div class="row">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                <div class="caption pro-sl-hd">
+                                                    <span class="caption-subject">Churn Rate and Percent By Status
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="track2" style="width: auto; height: 320px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
+                <div class="rate-percent-area mg-tb-15">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                                <div class="product-sales-chart">
+                                    <div class="portlet-title" style="height: 35px">
+                                        <div class="row">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                <div class="caption pro-sl-hd">
+                                                    <span class="caption-subject">Number of Contracts By HSSD
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="track3" style="width: auto; height: 320px;"></div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                                <div class="product-sales-chart">
+                                    <div class="portlet-title" style="height: 35px">
+                                        <div class="row">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                <div class="caption pro-sl-hd">
+                                                    <span class="caption-subject">Churn Rate and Percent By CTBDV
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="track4" style="width: auto; height: 320px;"></div>
                                 </div>
                             </div>
                         </div>
@@ -432,13 +644,17 @@
         <script src="/assets/otherLayout/js/metisMenu/metisMenu-active.js"></script>
         <script src="/assets/otherLayout/js/plugins.js"></script>
         <script src="/assets/otherLayout/js/main.js"></script>
-
+        <script src="/assets/javascripts/select2.min.js"></script>
+        <script src="/assets/javascripts/jsTree.js"></script>
         <script src="/assets/javascripts/waitMe.js"></script>
+        <script src="/assets/javascripts/icheck.js"></script>
             <!--  Datepicker -->
         <script src="/assets/datepicker/js/bootstrap-datepicker.js"></script>
             <!-- High chart -->
         <script src="/assets/javascripts/highcharts.js"></script>
-        @scripts()
+        @if(rs != null){
+            @scripts(rs)
+        }
     </body>
 
 </html>

@@ -126,6 +126,11 @@ object CommonService extends AbstractService {
     date.minusMonths(pre).toString(DateTimeFormat.forPattern("yyyy-MM"))
   }
 
+  def getPrevMonth(month: String): String = {
+    val next = DateTimeUtil.create(month, "yyyy-MM")
+    next.minusMonths(1).toString(DateTimeFormat.forPattern("yyyy-MM"))
+  }
+
   def getNextMonth(month: String): String = {
     val next = DateTimeUtil.create(month, "yyyy-MM")
     next.plusMonths(1).toString(DateTimeFormat.forPattern("yyyy-MM"))
@@ -134,6 +139,16 @@ object CommonService extends AbstractService {
   def getLast6Month(): String = {
     val date = new DateTime()
     date.minusMonths(6).toString(DateTimeFormat.forPattern("yyyy-MM"))
+  }
+
+  def getPrevYYYY(month: String): String = {
+    val next = DateTimeUtil.create(month, "yyyy-MM")
+    next.minusYears(1).toString(DateTimeFormat.forPattern("yyyy"))
+  }
+
+  def getPrevYYYYMM(month: String): String = {
+    val next = DateTimeUtil.create(month, "yyyy-MM")
+    next.minusYears(1).toString(DateTimeFormat.forPattern("yyyy-MM"))
   }
 
   def getpreviousMinutes(times: Int): String = {

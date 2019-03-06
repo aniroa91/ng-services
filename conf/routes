@@ -28,6 +28,7 @@ GET     /churn/search                    churn.controllers.ChurnDetectController
 
 ### PAGE OVERVIEW
 GET     /internet/overview               churn.controllers.OverviewController.index
+POST    /internet/overview/getJsonChurn  churn.controllers.OverviewController.getJsonChurn
 
 ### PAGE AGE
 GET     /internet/age                    churn.controllers.ChurnAgeController.index

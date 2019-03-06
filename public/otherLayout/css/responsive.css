@@ -1,4 +1,4 @@
-@media (max-width: 1599px) {
+@media (max-width: 1168px) {
 	.txtHead{
 		font-size: 24px;
 	}
@@ -12,8 +12,26 @@
 		left: auto!important;
 	}
 }
+
+@media (min-width: 1441px) {
+	.boxnum {
+		margin: 0px 75px 0px 75px;
+	}
+}
+
+@media (min-width: 1169px) and (max-width: 1280px) {
+	.boxnum {
+		margin: 0px 35px 0px 35px;
+	}
+}
 /* Normal desktop :992px. */
 @media (min-width: 992px) and (max-width: 1169px) {
+	.box-area-warning{
+		background: linear-gradient(45deg, #6bbdf7 0%, #ffca28 100%);
+		color: #fff;
+		height: 149px;
+		margin: 0px 35px 0px 35px;
+	}
 	.left-sidebar-pro{
 		display:block;
 	}

@@ -10,8 +10,6 @@ import service.ChurnRegionService.rangeDate
 import services.Configure
 import services.domain.CommonService
 
-case class Bubble(x: Double, y: Double, z: Double, name: String)
-
 object  ChurnAgeService{
 
   val client = Configure.client
