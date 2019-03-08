@@ -202,6 +202,11 @@
                         }
                     }
                 });
+                // remove circle value =0
+                Array.prototype.forEach.call(document.getElementById('churn4').getElementsByTagName('circle'), function(circle) {
+                    if(circle.getAttribute('r') == 5 && $('#minRatemonthProf').val() == 0 && $('#minPertmonthProf').val() == 0)
+                        circle.setAttribute('r', 1)
+                })
             });
             if(Object.keys(catesMonth).length == 1)
                 optionsProfile.hAxis.gridlines.count = 4
@@ -294,11 +299,19 @@
                     mouseY = mouseY -450
                 }
                 var y = mouseY
-                $('#churn4_tooltip').html('<div><p><b>Month:</b> ' + keyByValue(catesMonth, xAxis) +'</p><p><b>Profile:</b> '+ keyByValue( catesProfile, yAxis) +
-                        '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
-                    'top': y,
-                    'left': x
-                }).fadeIn('slow');
+                if(!(Number(percent == 0) && Number(rate) == 0)){
+                    $('#churn4_tooltip').html('<div><p><b>Month:</b> ' + keyByValue(catesMonth, xAxis) +'</p><p><b>Profile:</b> '+ keyByValue( catesProfile, yAxis) +
+                            '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
+                        'top': y,
+                        'left': x
+                    }).fadeIn('slow');
+                }
+                // remove circle value =0
+                Array.prototype.forEach.call(document.getElementById('churn4').getElementsByTagName('circle'), function(circle) {
+                    if($('#minRatemonthProf').val() == 0 && $('#minPertmonthProf').val() == 0 && (circle.getAttribute('fill') == 'none' || circle.getAttribute('r') == 5)){
+                        circle.setAttribute('r', 1)
+                    }
+                })
             });
             google.visualization.events.addListener(chartHuyDv, 'onmouseout', handlerOut);
 
@@ -367,6 +380,11 @@
                         }
                     }
                 });
+                // remove circle value =0
+                Array.prototype.forEach.call(document.getElementById('churn5').getElementsByTagName('circle'), function(circle) {
+                    if(circle.getAttribute('r') == 5 && $('#minRateAgeProf').val() == 0 && $('#minPertAgeProf').val() == 0)
+                        circle.setAttribute('r', 1)
+                })
             });
             chartAgeProfHuyDv.draw(dataAgeProfHuyDv, optionsProfileAge);
             google.visualization.events.addListener(chartAgeProfHuyDv, 'select', function () {
@@ -466,11 +484,19 @@
                     mouseY = mouseY -450
                 }
                 var y = mouseY
-                $('#churn5_tooltip').html('<div><p><b>Age:</b> ' + keyByValue( catesAge, xAxis) +'</p><p><b>Profile:</b> '+ keyByValue( catesProfAge, yAxis) +
-                        '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
-                    'top': y,
-                    'left': x
-                }).fadeIn('slow');
+                if(!(Number(percent == 0) && Number(rate) == 0)){
+                    $('#churn5_tooltip').html('<div><p><b>Age:</b> ' + keyByValue( catesAge, xAxis) +'</p><p><b>Profile:</b> '+ keyByValue( catesProfAge, yAxis) +
+                            '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
+                        'top': y,
+                        'left': x
+                    }).fadeIn('slow');
+                }
+                // remove circle value =0
+                Array.prototype.forEach.call(document.getElementById('churn5').getElementsByTagName('circle'), function(circle) {
+                    if($('#minRateAgeProf').val() == 0 && $('#minPertAgeProf').val() == 0 && (circle.getAttribute('fill') == 'none' || circle.getAttribute('r') == 5)){
+                        circle.setAttribute('r', 1)
+                    }
+                })
             });
             google.visualization.events.addListener(chartAgeProfHuyDv, 'onmouseout', handlerOut);
 
@@ -499,6 +525,11 @@
                         }
                     }
                 });
+                // remove circle value =0
+                Array.prototype.forEach.call(document.getElementById('churn3').getElementsByTagName('circle'), function(circle) {
+                    if(circle.getAttribute('r') == 5 && $('#minRatemonthRegion').val() == 0 && $('#minPertmonthRegion').val() == 0)
+                        circle.setAttribute('r', 1)
+                })
             });
             if(Object.keys(catesMonthRegion).length == 1)
                 optionsRegion.hAxis.gridlines.count = 4
@@ -568,11 +599,19 @@
                 var contracts = dataRegionHuyDv.getValue(event.row, 5);
                 var x = mouseX -225;
                 var y = mouseY +50;
-                $('#churn3_tooltip').html('<div><p><b>Month:</b> ' + keyByValue(catesMonthRegion, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
-                        '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>NumOfContracts: </b>'+Highcharts.numberFormat(Math.abs(contracts), 0)+'</p></div>').css({
-                    'top': y,
-                    'left': x
-                }).fadeIn('slow');
+                if(!(Number(percent == 0) && Number(rate) == 0)){
+                    $('#churn3_tooltip').html('<div><p><b>Month:</b> ' + keyByValue(catesMonthRegion, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
+                            '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>NumOfContracts: </b>'+Highcharts.numberFormat(Math.abs(contracts), 0)+'</p></div>').css({
+                        'top': y,
+                        'left': x
+                    }).fadeIn('slow');
+                }
+                // remove circle value =0
+                Array.prototype.forEach.call(document.getElementById('churn3').getElementsByTagName('circle'), function(circle) {
+                    if($('#minRatemonthRegion').val() == 0 && $('#minPertmonthRegion').val() == 0 && (circle.getAttribute('fill') == 'none' || circle.getAttribute('r') == 5)){
+                        circle.setAttribute('r', 1)
+                    }
+                })
             });
             google.visualization.events.addListener(chartRegionHuyDv, 'onmouseout', handlerOut);
 
@@ -658,7 +697,7 @@
                     }
                 },*/
 
-                series: getJsonChurnMonth(@Html(Json.stringify(Json.toJson(rs.churnRegion.map(x=> x._2)))),@Html(Json.stringify(Json.toJson(rs.churnRegion.map(x=> x._3 -> x._4)))))
+                series: getJsonChurnMonth2Col(@Html(Json.stringify(Json.toJson(rs.churnRegion.map(x=> x._2)))),@Html(Json.stringify(Json.toJson(rs.churnRegion.map(x=> x._3 -> x._4)))))
 
             });
             var churn_profile = Highcharts.chart('churn2', {
@@ -670,7 +709,7 @@
                     text: ''
                 },
 
-                colors : ['#1c2752','#d9534f'],
+                colors : ['#00a0b0','#d9534f'],
 
                 xAxis: {
                     categories: @Html(Json.stringify(Json.toJson(rs.churnProfile.map(x=>x._1))))
@@ -680,18 +719,18 @@
                     labels: {
                         format: '{value} %',
                         style: {
-                            color: "#1c2752"
+                            color: "#00a0b0"
                         }
                     },
                     title: {
-                        text: '',
+                        text: 'Churn Percent',
                         style: {
-                            color: "#1c2752"
+                            color: "#00a0b0"
                         }
                     }
                 }, { // Secondary yAxis
                     title: {
-                        text: '',
+                        text: 'Churn Rate',
                         style: {
                             color: "#d9534f"
                         }
@@ -710,24 +749,38 @@
                         point: {
                             events: {
                                 click: function () {
+                                    var charts = churn_profile
                                     $('#age').val("")
                                     $('.slRegion').val("*")
                                     $(".monthPicker").datepicker("update", $('#month').val());
                                     $('.txtAge').text("")
                                     $('.ageDiv').hide()
                                     if(this.category == $('#profile').val()){
-                                        for (var i = 0; i < this.series.data.length; i++) {
-                                            this.series.data[i].update({ color: '#1c2752' }, false, false)
+                                        for (var i = 0; i < charts.series[0].data.length; i++) {
+                                            charts.series[0].data[i].update({ color: '#00a0b0' }, false, false)
+                                            charts.series[1].data[i].update({ color: '#d9534f' }, false, false)
                                         }
                                         $('#profile').val("")
                                         $('.txtProfile').text("")
                                         $('.profileDiv').hide()
                                     }
                                     else {
-                                        for (var i = 0; i < this.series.data.length; i++) {
-                                            this.series.data[i].update({ color: '#ddd' }, false, false)
+                                        var isColor = 0
+                                        for (var i = 0; i < charts.series[0].data.length; i++) {
+                                            charts.series[0].data[i].update({ color: '#ddd' }, false, false)
+                                            charts.series[1].data[i].update({ color: '#ddd' }, false, false)
+                                            if(this.category == charts.series[1].data[i].category){
+                                                isColor = i
+                                            }
                                         }
-                                        this.update({ color: '#1c2752' });
+                                        if(this.series.name == "Churn Rate") {
+                                            this.update({ color: '#d9534f' })
+                                            charts.series[0].data[isColor].update({ color: '#00a0b0' }, false, false)
+                                        }
+                                        else {
+                                            this.update({ color: '#00a0b0' })
+                                            charts.series[1].data[isColor].update({ color: '#d9534f' }, false, false)
+                                        }
                                         $('#profile').val(this.category)
                                         $('.txtProfile').text(this.category)
                                         $('.profileDiv').show()
@@ -752,7 +805,12 @@
                                 s.push('<span>'+ point.x +'</span><br>');
                                 s.push('<br><span>Number of Contracts : <b>'+ Highcharts.numberFormat(Math.abs(point.point.k), 0) +'</b><span>');
                             }
-                            s.push('<span>'+ point.series.name +' : <b>'+ point.y +'</b><span>');
+                            if(point.series.name == "Churn Rate"){
+                                s.push('<span style="color: #d9534f">'+ point.series.name +' : <b>'+ point.y +' %</b><span>');
+                            }
+                            else {
+                                s.push('<span style="color: #00a0b0">'+ point.series.name +' : <b>'+ point.y +' %</b><span>');
+                            }
                         });
 
                         return s.join(' <br> ');
@@ -760,7 +818,7 @@
                     shared: true
                 },
 
-                series: getJsonChurnMonth(@Html(Json.stringify(Json.toJson(rs.churnProfile.map(x=> x._2)))),@Html(Json.stringify(Json.toJson(rs.churnProfile.map(x=> x._3-> x._4)))))
+                series: getJsonChurnMonth2Col(@Html(Json.stringify(Json.toJson(rs.churnProfile.map(x=> x._2)))),@Html(Json.stringify(Json.toJson(rs.churnProfile.map(x=> x._3-> x._4)))))
 
             });
             // Heatmap Total contracts profile
@@ -791,7 +849,7 @@
                     type: 'logarithmic',
                     stops: [
                         [0, '#FFFFFF'],
-                        [0.67, '#81BEF7'],
+                        [0.37, '#81BEF7'],
                         [1, '#4980b5']
                     ]
                 },
@@ -969,22 +1027,24 @@
                             $('.monthGrp').attr('style','background-color: #16a085!important;color: #fff')
                             // update chart Region
                                churn_region.xAxis[0].update({categories: dta.churn1.cates});
-                               updateCharts(churn_region, getJsonChurnMonth(dta.churn1.churnRate, dta.churn1.churnPercent))
+                               updateCharts(churn_region, getJsonChurnMonth2Col(dta.churn1.churnRate, dta.churn1.churnPercent))
                             if($('.slRegion').val() == "*"){
                                 churn_region.series[0].update({color: '#73879C'})
                             }
                             else{
                                 churn_region.series[0].update({color: '#ddd'})
                                 churn_region.series[0].data[Number($('.slRegion').val() -1)].update({color: '#73879C'})
-                                console.log(churn_region.series[0].data.length)
                             }
                             // update chart Profile
                             if(_type != "profile"){
                                churn_profile.xAxis[0].update({categories: dta.churn2.cates});
-                               updateCharts(churn_profile, getJsonChurnMonth(dta.churn2.churnRate, dta.churn2.churnPercent))
+                               updateCharts(churn_profile, getJsonChurnMonth2Col(dta.churn2.churnRate, dta.churn2.churnPercent))
                             }
                             else{
-                                if($("#profile").val() == "") churn_profile.series[0].update({color: '#1c2752'})
+                                if($("#profile").val() == "") {
+                                    churn_profile.series[0].update({color: '#00a0b0'})
+                                    churn_profile.series[1].update({color: '#d9534f'})
+                                }
                             }
 
                             // update chart Heatmap Contract
@@ -1063,6 +1123,11 @@
                                             }
                                         }
                                     });
+                                    // remove circle value =0
+                                    Array.prototype.forEach.call(document.getElementById('churn3').getElementsByTagName('circle'), function(circle) {
+                                        if(circle.getAttribute('r') == 5 && Number(dta.churn3.isNull) == 1)
+                                            circle.setAttribute('r', 1)
+                                    })
                                 });
                                 var dataRegionMonth = google.visualization.arrayToDataTable(getDataChurn(dta.churn3.data, "Month", "Region"))
                                 if(Object.keys(dta.churn3.cates).length == 1)
@@ -1133,11 +1198,19 @@
                                     var contracts = dataRegionMonth.getValue(event.row, 5);
                                     var x = mouseX - 225;
                                     var y = mouseY + 50;
-                                    $('#churn3_tooltip').html('<div><p><b>Month:</b> ' + keyByValue(dta.churn3.cates, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
-                                            '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>NumOfContracts: </b>'+Highcharts.numberFormat(Math.abs(contracts), 0)+'</p></div>').css({
-                                        'top': y,
-                                        'left': x
-                                    }).fadeIn('slow');
+                                    if(!(Number(percent == 0) && Number(rate) == 0)){
+                                        $('#churn3_tooltip').html('<div><p><b>Month:</b> ' + keyByValue(dta.churn3.cates, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
+                                                '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>NumOfContracts: </b>'+Highcharts.numberFormat(Math.abs(contracts), 0)+'</p></div>').css({
+                                            'top': y,
+                                            'left': x
+                                        }).fadeIn('slow');
+                                    }
+                                    // remove circle value =0
+                                    Array.prototype.forEach.call(document.getElementById('churn3').getElementsByTagName('circle'), function(circle) {
+                                        if(Number(dta.churn3.isNull) == 1 && (circle.getAttribute('fill') == 'none' || circle.getAttribute('r') == 5)){
+                                            circle.setAttribute('r', 1)
+                                        }
+                                    })
                                 });
                                 google.visualization.events.addListener(chartRegionMonth, 'onmouseout', handlerOut);
                             }
@@ -1202,6 +1275,11 @@
                                             }
                                         }
                                     });
+                                    // remove circle value =0
+                                    Array.prototype.forEach.call(document.getElementById('churn4').getElementsByTagName('circle'), function(circle) {
+                                        if(circle.getAttribute('r') == 5 && Number(dta.churn4.isNull) == 1)
+                                            circle.setAttribute('r', 1)
+                                    })
                                 })
                                 var dataProfileMonth = google.visualization.arrayToDataTable(getDataChurn(dta.churn4.data,  "Month", "Profile"))
                                 if(Object.keys(dta.churn4.catesMonth).length == 1)
@@ -1281,11 +1359,19 @@
                                         mouseY = mouseY -450
                                     }
                                     var y = mouseY
-                                    $('#churn4_tooltip').html('<div><p><b>Month:</b> ' + keyByValue(dta.churn4.catesMonth, xAxis) +'</p><p><b>Profile:</b> '+ keyByValue( dta.churn4.catesProfile, yAxis) +
-                                            '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
-                                        'top': y,
-                                        'left': x
-                                    }).fadeIn('slow');
+                                    if(!(Number(percent == 0) && Number(rate) == 0)){
+                                        $('#churn4_tooltip').html('<div><p><b>Month:</b> ' + keyByValue(dta.churn4.catesMonth, xAxis) +'</p><p><b>Profile:</b> '+ keyByValue( dta.churn4.catesProfile, yAxis) +
+                                                '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
+                                            'top': y,
+                                            'left': x
+                                        }).fadeIn('slow');
+                                    }
+                                    // remove circle value =0
+                                    Array.prototype.forEach.call(document.getElementById('churn4').getElementsByTagName('circle'), function(circle) {
+                                        if(Number(dta.churn4.isNull) == 1 && (circle.getAttribute('fill') == 'none' || circle.getAttribute('r') == 5)){
+                                            circle.setAttribute('r', 1)
+                                        }
+                                    })
                                 })
                                 google.visualization.events.addListener(chartProfileMonth, 'onmouseout', handlerOut)
                             }
@@ -1362,6 +1448,11 @@
                                             }
                                         }
                                     });
+                                    // remove circle value =0
+                                    Array.prototype.forEach.call(document.getElementById('churn5').getElementsByTagName('circle'), function(circle) {
+                                        if(circle.getAttribute('r') == 5 && Number(dta.churn5.isNull) == 1)
+                                            circle.setAttribute('r', 1)
+                                    })
                                 })
                                 var dataAgeProfile = google.visualization.arrayToDataTable(getDataChurn(dta.churn5.data,  "Age", "Profile"))
                                 optionsProfileAge.vAxis.gridlines.count = Object.keys(dta.churn5.catesProfile).length+2
@@ -1380,11 +1471,19 @@
                                         mouseY = mouseY -450
                                     }
                                     var y = mouseY
-                                    $('#churn5_tooltip').html('<div><p><b>Age:</b> ' + keyByValue( catesAge, xAxis) +'</p><p><b>Profile:</b> '+ keyByValue( dta.churn5.catesProfile, yAxis) +
-                                            '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
-                                        'top': y,
-                                        'left': x
-                                    }).fadeIn('slow');
+                                    if(!(Number(percent == 0) && Number(rate) == 0)){
+                                        $('#churn5_tooltip').html('<div><p><b>Age:</b> ' + keyByValue( catesAge, xAxis) +'</p><p><b>Profile:</b> '+ keyByValue( dta.churn5.catesProfile, yAxis) +
+                                                '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
+                                            'top': y,
+                                            'left': x
+                                        }).fadeIn('slow');
+                                    }
+                                    // remove circle value =0
+                                    Array.prototype.forEach.call(document.getElementById('churn5').getElementsByTagName('circle'), function(circle) {
+                                        if(Number(dta.churn5.isNull) == 1 && (circle.getAttribute('fill') == 'none' || circle.getAttribute('r') == 5)){
+                                            circle.setAttribute('r', 1)
+                                        }
+                                    })
                                 })
                                 // tam remove qua v2
                                 /*google.visualization.events.addListener(chartAgeProfile, 'onmousedown', function (event) {

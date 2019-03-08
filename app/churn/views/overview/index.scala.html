@@ -49,13 +49,32 @@
                     color: #0df3cf!important;
                     font-weight: 600;
                 }
+                .comboDiv .mean-last{
+                    border-top: none!important;
+                }
                 .select2-search__field{
                     color: #686262 !important;
+                }
+                .select2-selection__choice{
+                    color: #fff!important;
+                    width: auto!important;
+                }
+                .select2-search--inline{
+                    border-top: none!important;
+                    background: #fff!important;
+                }
+                .region .select2-selection__rendered{
+                    overflow: auto!important;
+                    max-height: 80px!important;
                 }
                 .listview{
                     color: rgb(52,152,219);
                     padding: 5px 15px 0px 15px!important;
                     font-size: 13px;
+                    display: block!important;
+                }
+                .mean-expand{
+                    display: none!important;
                 }
                 .animation{
                     animation-duration: 5s;
@@ -227,6 +246,15 @@
                 .up{
                     color: #132186;
                 }
+                .region {
+                    overflow: auto!important;
+                    max-height: 180px!important;
+                }
+                .iconTip{
+                    position: absolute;
+                    font-size: 15px;
+                    margin: -4px 0px 0px 2px;
+                }
         </style>
     </head>
 
@@ -275,7 +303,7 @@
                             </ul>
                         </div>
 
-                        <div class="packageDiv" style="margin-bottom: 15px">
+                        <div class="regionDiv" style="margin-bottom: 15px">
                             <p class="titFilter"><i class="fa fa-bell"></i> Group Region</p>
                             <div class="region" style="margin-top: 10px;margin-bottom: 20px"></div>
                         </div>
@@ -291,7 +319,7 @@
                         <div class="col-xs-12 lineDivWhite"></div>
                         <div style="padding:0px 10px">
                             <a class="apply btn btn-xs btn-success" style="float: right;"><i class="fa fa-check-circle"></i> Apply</a>
-                            <a href="/internet/overview" class="btn btn-xs btn-secondary btnRefresh"><i class="fa fa-refresh"></i> Refresh</a>
+                            <a class="btn btn-xs btn-secondary btnRefresh"><i class="fa fa-refresh"></i> Refresh</a>
                         </div>
                         <div class="col-xs-12 lineDivBlack"></div>
                     </nav>
@@ -372,29 +400,7 @@
                                     <nav id="dropdown">
                                         <ul class="mobile-menu-nav">
                                             <div class="disInline">
-                                                <div class="col-sm-6 col-xs-12 ageDiv" style="padding-top: 15px;display: none">
-                                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Age</span>
-                                                    <span class="txtAge txtFilter"></span>
-                                                </div>
-                                                <div class="col-sm-6 col-xs-12 regionDiv" style="padding-top: 15px;display: none">
-                                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Region</span>
-                                                    <span class="txtRegion txtFilter"></span>
-                                                </div>
-                                            </div>
-                                            <div class="disInline">
-                                                <div class="col-sm-6 col-xs-12" style="height: 70px;padding-top: 15px;">
-                                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Status</span>
-                                                    <select class="form-control selectBoxMb slStatus" style="border: 1px solid #16a085!important">
-                                                    @for( (k,v) <- CommonUtil.STATUS_MAP){
-                                                        @if(v == 1){
-                                                            <option value="@v" selected>@k</option>
-                                                        }else{
-                                                            <option value="@v">@k</option>
-                                                        }
-                                                    }
-                                                    </select>
-                                                </div>
-                                                <div class="col-sm-6 col-xs-12" style="height: 70px;padding-top: 15px;">
+                                                <div class="col-xs-4" style="height: 70px;padding-top: 15px;">
                                                     <span class="titFilter"><i class="fa fa-bell"></i> Group Month</span></i>
                                                     <div class="input-group date monthPicker">
                                                         <input type="text" class="monthGrp form-control txtInputMb" value="@month" readonly="true" style="background-color:#16a085!important;color: #fff">
@@ -402,10 +408,50 @@
                                                         </span>
                                                     </div>
                                                 </div>
+                                                <div class="col-xs-4 comboDiv" style="padding-top: 15px">
+                                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Combo</span>
+                                                    <ul class="listview">
+                                                        <li>
+                                                            <label class="radiobutton">
+                                                                <input name="radio" class="radio" value="int" type="radio">
+                                                                <span class="label-text"><strong>Internet Only</strong></span>
+                                                            </label>
+                                                        </li>
+                                                        <li>
+                                                            <label class="radiobutton">
+                                                                <input name="radio" class="radio" value="combo" type="radio">
+                                                                <span class="label-text"><strong>Combo Paytv & Internet</strong></span>
+                                                            </label>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="col-xs-4 regionDiv" style="padding-top: 15px">
+                                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Region</span>
+                                                    <div class="region" style="margin-top: 10px;margin-bottom: 20px"></div>
+                                                </div>
+                                            </div>
+                                            <div class="disInline">
+                                                <div class="col-xs-4 ageDiv" style="height: 70px;padding-top: 15px;">
+                                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Age</span>
+                                                    <select class="form-control selectBoxMb slAge" multiple="multiple" style="border: 1px solid #16a085!important">
+                                                    @for( (k,v) <- AgeGroupUtil.AGE.toArray.sorted){
+                                                        <option value="@v">@k</option>
+                                                    }
+                                                    </select>
+                                                </div>
+                                                <div class="col-xs-4 packageDiv" style="height: 70px;padding-top: 15px;">
+                                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Package</span>
+                                                    <select class="form-control selectBoxMb slPackage" multiple="multiple" style="border: 1px solid #16a085!important">
+                                                    @for( v <- rs.packages){
+                                                        <option value="@v">@v</option>
+                                                    }
+                                                    </select>
+                                                </div>
+                                                <div class="col-xs-4"></div>
                                             </div>
                                             <div style="margin:15px 0px 0px 0px;padding:0px 15px">
                                                 <a class="apply btn btn-xs btn-success" style="float: right;margin-bottom: 15px"><i class="fa fa-check-circle"></i> Apply</a>
-                                                <a href="/internet/overview" class="btn btn-xs btn-secondary btnRefresh"><i class="fa fa-refresh"></i> Refresh</a>
+                                                <a class="btn btn-xs btn-secondary btnRefresh"><i class="fa fa-refresh"></i> Refresh</a>
                                             </div>
                                             <div class="col-xs-12 lineDivXs"></div>
                                             @*<div style="margin-top: 60px">
@@ -425,9 +471,12 @@
             @if(rs != null) {
                 @helper.CSRF.formField
                 <input type="hidden" value="@month" id="month">
+                <input type="hidden" value="@month" id="monthCurr">
                 <input type="hidden" id="combo">
                 <input type="hidden" id="region">
                 <input type="hidden" id="province">
+                <input type="hidden" id="indexChart">
+
                 <input type="hidden" id="indexChart">
 
                 <div class="rate-percent-area mg-tb-15">
@@ -438,12 +487,13 @@
                                     <div class="analytics-content">
                                         <h1>
                                             <span class="counter currCtActive">@formatPattern(rs.numContract._1.curr)</span>
+                                            <i class="fa fa-info-circle iconTip" title="Tổng số hợp đồng tháng gần nhất"></i>
                                             <i class="fa fa-check-circle ibox" aria-hidden="true"></i>
                                         </h1>
                                         <h3>Active Contracts</h3>
                                     </div>
                                     <div class="boxCorner prevCtActive">
-                                        <h4>@formatPattern(rs.numContract._1.prev)</h4>
+                                        <h4>@formatPattern(rs.numContract._1.prev) <i class="fa fa-info-circle iconTip" title="Tổng số hợp đồng tháng cùng kỳ năm ngoái"></i></h4>
                                         @if(rs.numContract._1.prev > rs.numContract._1.curr){
                                             <span class="down"><i class="fa fa-arrow-down fadeInDown animated" aria-hidden="true"></i> @percent(rs.numContract._1.curr.toLong, rs.numContract._1.prev.toLong) %</span> from @getPrevYYYYMM(month)
                                         }else{
@@ -457,12 +507,13 @@
                                     <div class="analytics-content">
                                         <h1>
                                             <span class="counter currCtHuydv">@formatPattern(rs.numContract._2.curr)</span>
+                                            <i class="fa fa-info-circle iconTip" title="Tổng số hợp đồng HSSD trong năm hiện tại"></i>
                                             <i class="fa fa-sign-out ibox" aria-hidden="true"></i>
                                         </h1>
                                         <h3>HSSD Contracts</h3>
                                     </div>
                                     <div class="boxCorner prevCtHuydv">
-                                        <h4>@formatPattern(rs.numContract._2.prev)</h4>
+                                        <h4>@formatPattern(rs.numContract._2.prev) <i class="fa fa-info-circle iconTip" title="Tổng số hợp đồng HSSD cùng kỳ năm ngoái"></i></h4>
                                         @if(rs.numContract._2.prev > rs.numContract._2.curr){
                                             <span class="down"><i class="fa fa-arrow-down fadeInDown animated" aria-hidden="true"></i> @percent(rs.numContract._2.curr.toLong, rs.numContract._2.prev.toLong) %</span> from @getPrevYYYY(month)
                                         }else{
@@ -471,17 +522,18 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
+                            <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12 mg-t-15">
                                 <div class="reso-mg-b-30 box-area-warning boxnum" id="boxCtCtbdv">
                                     <div class="analytics-content">
                                         <h1>
                                             <span class="counter currCtCtbdv">@formatPattern(rs.numContract._3.curr)</span>
+                                            <i class="fa fa-info-circle iconTip" title="Tổng số hợp đồng CTBDV trong năm hiện tại"></i>
                                             <i class="fa fa-exclamation-circle ibox" aria-hidden="true"></i>
                                         </h1>
                                         <h3>CTBDV Contracts</h3>
                                     </div>
                                     <div class="boxCorner prevCtCtbdv">
-                                        <h4>@formatPattern(rs.numContract._3.prev)</h4>
+                                        <h4>@formatPattern(rs.numContract._3.prev) <i class="fa fa-info-circle iconTip" title="Tổng số hợp đồng CTBDV cùng kỳ năm ngoái"></i></h4>
                                         @if(rs.numContract._3.prev > rs.numContract._3.curr){
                                             <span class="down"><i class="fa fa-arrow-down fadeInDown animated" aria-hidden="true"></i> @percent(rs.numContract._3.curr.toLong, rs.numContract._3.prev.toLong) %</span> from @getPrevYYYY(month)
                                         }else{
@@ -495,12 +547,13 @@
                                     <div class="analytics-content">
                                         <h1>
                                             <span class="counter avgRateTotal">@rs.churnRate._3.avg</span> %
+                                            <i class="fa fa-info-circle iconTip" title="Tỷ lệ rời mạng, bao gồm HSSD và CTBDV, trung bình trong năm hiện tại"></i>
                                             <i class="fa fa-bolt ibox" aria-hidden="true"></i>
                                         </h1>
                                         <h3>Churn Rate</h3>
                                     </div>
-                                    <div class="boxCorner" style="color: #c53a1a">
-                                        <h4 class="currRateTotal">@rs.churnRate._3.curr %</h4>
+                                    <div class="boxCorner" style="width: 100px;color: #c53a1a">
+                                        <h4 class="currRateTotal">@rs.churnRate._3.curr % <i class="fa fa-info-circle iconTip" title="Tỷ lệ rời mạng, bao gồm HSSD và CTBDV, của tháng hiện tại"></i></h4>
                                         <span><i class="fa fa-calendar" aria-hidden="true"></i> <span class="currMonth">@month</span></span>
                                     </div>
                                 </div>
@@ -510,12 +563,13 @@
                                     <div class="analytics-content">
                                         <h1>
                                             <span class="counter avgRateHuydv">@rs.churnRate._1.avg</span> %
+                                            <i class="fa fa-info-circle iconTip" title="Tỷ lệ rời mạng, tính theo HSSD, trung bình trong năm hiện tại"></i>
                                             <i class="fa fa-bolt ibox" aria-hidden="true"></i>
                                         </h1>
                                         <h3>HSSD Churn Rate</h3>
                                     </div>
-                                    <div class="boxCorner" style="color: #0e820e">
-                                        <h4 class="currRateHuydv">@rs.churnRate._1.curr %</h4>
+                                    <div class="boxCorner" style="width: 100px;color: #0e820e">
+                                        <h4 class="currRateHuydv">@rs.churnRate._1.curr % <i class="fa fa-info-circle iconTip" title="Tỷ lệ rời mạng, tính theo HSSD, của tháng hiện tại"></i></h4>
                                         <span><i class="fa fa-calendar" aria-hidden="true"></i> <span class="currMonth">@month</span></span>
                                     </div>
                                 </div>
@@ -525,12 +579,13 @@
                                     <div class="analytics-content">
                                         <h1>
                                             <span class="counter avgRateCtbdv">@rs.churnRate._2.avg</span> %
+                                            <i class="fa fa-info-circle iconTip" title="Tỷ lệ rời mạng, tính theo CTBDV, trung bình trong năm hiện tại"></i>
                                             <i class="fa fa-bolt ibox" aria-hidden="true"></i>
                                         </h1>
                                         <h3>CTBDV Churn Rate</h3>
                                     </div>
-                                    <div class="boxCorner" style="color: #1e44b5">
-                                        <h4 class="currRateCtbdv">@rs.churnRate._2.curr %</h4>
+                                    <div class="boxCorner" style="width:100px;color: #1e44b5">
+                                        <h4 class="currRateCtbdv">@rs.churnRate._2.curr % <i class="fa fa-info-circle iconTip" title="Tỷ lệ rời mạng, tính theo CTBDV, của tháng hiện tại"></i></h4>
                                         <span><i class="fa fa-calendar" aria-hidden="true"></i> <span class="currMonth">@month</span></span>
                                     </div>
                                 </div>
@@ -549,6 +604,14 @@
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                 <div class="caption pro-sl-hd">
                                                     <span class="caption-subject">Number of Contracts By Status
+                                                        <span class="dropdown">
+                                                            <a name="0" class="dropdown-toggle aMore" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                            <div class="dropdown-menu ddMore" style="background: #211d1d">
+                                                                <p class="divMore">
+                                                                    <span>Thống kê số lượng hợp đồng HSSD và CTBDV 12 tháng gần nhất</span>
+                                                                </p>
+                                                            </div>
+                                                        </span>
                                                     </span>
                                                 </div>
                                             </div>
@@ -564,6 +627,21 @@
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                 <div class="caption pro-sl-hd">
                                                     <span class="caption-subject">Churn Rate and Percent By Status
+                                                        <span class="dropdown">
+                                                            <a name="1" class="dropdown-toggle aMore" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                            <div class="dropdown-menu ddMore" style="background: #211d1d;position: absolute;min-width: 390px!important;">
+                                                                <p class="divMore">
+                                                                    <span>Thống kê tỷ lệ và phần trăm rời mạng, bao gồm cả HSSD và CTBDV, trong 12 tháng gần nhất</span><span class="dots">...</span><br>
+                                                                    <span class="more" style="display: none">
+                                                                        <b>Ví dụ: tháng 1/2019:</b><br>
+                                                                        <span>- Tỷ lệ rời mạng = Tổng số HĐ HSSD và CTBDV tháng 01-2019 / Tổng số HĐ tháng 01-2019</span><br>
+                                                                        <span>- Phần trăm rời mạng (ví dụ cho khách hàng ở Vùng 1) = Tổng số HĐ HSSD và CTBDV tháng 01-2019 ở Vùng 1 / Tổng số HĐ HSSD và CTBDV tháng 01-2019</span><br>
+                                                                        <span>- Chỉ số F1 = 2 * (Tỷ lệ RM * Phần trăm RM) / (Tỷ lệ RM + Phần trăm RM)</span>
+                                                                    </span>
+                                                                </p>
+                                                                <a onclick="showMoreLess(this)"><i class="fa fa-angle-double-down tooltipSL" aria-hidden="true"></i></a>
+                                                            </div>
+                                                        </span>
                                                     </span>
                                                 </div>
                                             </div>
@@ -585,7 +663,22 @@
                                         <div class="row">
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                 <div class="caption pro-sl-hd">
-                                                    <span class="caption-subject">Number of Contracts By HSSD
+                                                    <span class="caption-subject">Churn Rate and Percent By HSSD
+                                                        <span class="dropdown">
+                                                            <a name="2" class="dropdown-toggle aMore" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                            <div class="dropdown-menu ddMore" style="background: #211d1d;position: absolute;min-width: 390px!important;">
+                                                                <p class="divMore">
+                                                                    <span>Thống kê tỷ lệ và phần trăm rời mạng, tính theo HSSD, trong 12 tháng gần nhất</span><span class="dots">...</span><br>
+                                                                    <span class="more" style="display: none">
+                                                                        <b>Ví dụ: tháng 1/2019:</b><br>
+                                                                        <span>- Tỷ lệ rời mạng = Tổng số HĐ HSSD tháng 01-2019 / Tổng số HĐ tháng 01-2019</span><br>
+                                                                        <span>- Phần trăm rời mạng (ví dụ cho nhóm khách hàng ở Vùng 1) = Tổng số HĐ HSSD tháng 01-2019 ở Vùng 1 / Tổng số HĐ HSSD tháng 01-2019</span><br>
+                                                                        <span>- Chỉ số F1 = 2 * (Tỷ lệ RM * Phần trăm RM) / (Tỷ lệ RM + Phần trăm RM)</span>
+                                                                    </span>
+                                                                </p>
+                                                                <a onclick="showMoreLess(this)"><i class="fa fa-angle-double-down tooltipSL" aria-hidden="true"></i></a>
+                                                            </div>
+                                                        </span>
                                                     </span>
                                                 </div>
                                             </div>
@@ -601,6 +694,21 @@
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                 <div class="caption pro-sl-hd">
                                                     <span class="caption-subject">Churn Rate and Percent By CTBDV
+                                                        <span class="dropdown">
+                                                            <a name="3" class="dropdown-toggle aMore" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                            <div class="dropdown-menu ddMore" style="background: #211d1d;position: absolute;min-width: 390px!important;">
+                                                                <p class="divMore">
+                                                                    <span>Thống kê tỷ lệ và phần trăm rời mạng, tính theo CTBDV, trong 12 tháng gần nhất</span><span class="dots">...</span><br>
+                                                                    <span class="more" style="display: none">
+                                                                        <b>Ví dụ: tháng 1/2019:</b><br>
+                                                                        <span>- Tỷ lệ rời mạng = Tổng số HĐ CTBDV tháng 01-2019 / Tổng số HĐ tháng 01-2019</span><br>
+                                                                        <span>- Phần trăm rời mạng (ví dụ cho nhóm khách hàng ở Vùng 1) = Tổng số HĐ CTBDV tháng 01-2019 ở Vùng 1 / Tổng số HĐ CTBDV tháng 01-2019</span><br>
+                                                                        <span>- Chỉ số F1 = 2 * (Tỷ lệ RM * Phần trăm RM) / (Tỷ lệ RM + Phần trăm RM)</span>
+                                                                    </span>
+                                                                </p>
+                                                                <a onclick="showMoreLess(this)"><i class="fa fa-angle-double-down tooltipSL" aria-hidden="true"></i></a>
+                                                            </div>
+                                                        </span>
                                                     </span>
                                                 </div>
                                             </div>
@@ -651,6 +759,7 @@
         <script src="/assets/javascripts/jsTree.js"></script>
         <script src="/assets/javascripts/waitMe.js"></script>
         <script src="/assets/javascripts/icheck.js"></script>
+        <script src="/assets/javascripts/common_churn.js"></script>
             <!--  Datepicker -->
         <script src="/assets/datepicker/js/bootstrap-datepicker.js"></script>
             <!-- High chart -->

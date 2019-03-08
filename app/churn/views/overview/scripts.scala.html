@@ -30,7 +30,11 @@
         // jsTree Region and province
         $('.region').jstree({
             "plugins" : ["checkbox"],
+            'checkbox': {
+                three_state: true
+            },
             'core' : {
+                expand_selected_onload : false,
                 "themes":{
                     "icons":false
                 },
@@ -101,26 +105,26 @@
                 labels: {
                     format: '{value} %',
                     style: {
-                        color: "#73879C"
+                        color: "rgb(255,122,86)"
                     }
                 },
                 title: {
-                    text: 'Rate & Percent',
+                    text: 'Churn Rate & F1',
                     style: {
-                        color: "#73879C"
+                        color: "rgb(255,122,86)"
                     }
                 }
             }, { // Secondary yAxis
                 title: {
-                    text: 'F1',
+                    text: 'Churn Percent',
                     style: {
-                        color: "rgb(255,122,86)"
+                        color: "rgb(126,223,114)"
                     }
                 },
                 labels: {
                     format: '{value}',
                     style: {
-                        color: "rgb(255,122,86)"
+                        color: "rgb(126,223,114)"
                     }
                 },
                 opposite: true
@@ -138,12 +142,12 @@
             }, {
                 type: 'column',
                 name: 'Churn Percent(%)',
-                yAxis: 0,
+                yAxis: 1,
                 data: @Html(Json.stringify(Json.toJson(rs.trendRatePert._1.map(x=> x._3))))
             }, {
                 type: 'spline',
                 name: 'F1',
-                yAxis: 1,
+                yAxis: 0,
                 data: @Html(Json.stringify(Json.toJson(rs.trendRatePert._1.map(x=> x._4))))
             }]
 
@@ -168,26 +172,26 @@
                 labels: {
                     format: '{value} %',
                     style: {
-                        color: "#73879C"
+                        color: "rgb(255,122,86)"
                     }
                 },
                 title: {
-                    text: 'Rate & Percent',
+                    text: 'Churn Rate & F1',
                     style: {
-                        color: "#73879C"
+                        color: "rgb(255,122,86)"
                     }
                 }
             }, { // Secondary yAxis
                 title: {
-                    text: 'F1',
+                    text: 'Churn Percent',
                     style: {
-                        color: "rgb(255,122,86)"
+                        color: "rgb(126,223,114)"
                     }
                 },
                 labels: {
                     format: '{value}',
                     style: {
-                        color: "rgb(255,122,86)"
+                        color: "rgb(126,223,114)"
                     }
                 },
                 opposite: true
@@ -205,12 +209,12 @@
             }, {
                 type: 'column',
                 name: 'Churn Percent(%)',
-                yAxis: 0,
+                yAxis: 1,
                 data: @Html(Json.stringify(Json.toJson(rs.trendRatePert._2.map(x=> x._3))))
             }, {
                 type: 'spline',
                 name: 'F1',
-                yAxis: 1,
+                yAxis: 0,
                 data: @Html(Json.stringify(Json.toJson(rs.trendRatePert._2.map(x=> x._4))))
             }]
 
@@ -235,26 +239,26 @@
                 labels: {
                     format: '{value} %',
                     style: {
-                        color: "#73879C"
+                        color: "rgb(255,122,86)"
                     }
                 },
                 title: {
-                    text: 'Rate & Percent',
+                    text: 'Churn Rate & F1',
                     style: {
-                        color: "#73879C"
+                        color: "rgb(255,122,86)"
                     }
                 }
             }, { // Secondary yAxis
                 title: {
-                    text: 'F1',
+                    text: 'Churn Percent',
                     style: {
-                        color: "rgb(255,122,86)"
+                        color: "rgb(126,223,114)"
                     }
                 },
                 labels: {
                     format: '{value}',
                     style: {
-                        color: "rgb(255,122,86)"
+                        color: "rgb(126,223,114)"
                     }
                 },
                 opposite: true
@@ -272,19 +276,48 @@
             }, {
                 type: 'column',
                 name: 'Churn Percent(%)',
-                yAxis: 0,
+                yAxis: 1,
                 data: @Html(Json.stringify(Json.toJson(rs.trendRatePert._3.map(x=> x._3))))
             }, {
                 type: 'spline',
                 name: 'F1',
-                yAxis: 1,
+                yAxis: 0,
                 data: @Html(Json.stringify(Json.toJson(rs.trendRatePert._3.map(x=> x._4))))
             }]
 
         });
 
+        // click tooltip title
+        var specifiedElement = document.getElementsByClassName('aMore');
+        document.addEventListener('click', function(event) {
+            var isClickInside = specifiedElement[Number($('#indexChart').val())].contains(event.target)
+            if(!isClickInside && String(event.target.className).indexOf('tooltipSL')<0){
+                $('.ddMore').hide()
+                $('.dots').show()
+                $('.more').hide()
+                $('.tooltipSL').removeClass('fa-angle-double-up').addClass('fa-angle-double-down')
+            }
+        });
+
+        // click refresh fitler
+        $('.btnRefresh').click(function () {
+            $('.slAge').val('').trigger('change')
+            $('.slPackage').val('').trigger('change')
+            $('.radio').removeAttr('checked').iCheck('update')
+            $(".monthPicker").datepicker("update", $('#monthCurr').val())
+            $(".region").jstree("check_all")
+            getAjaxChurn()
+        })
+
         // click apply fitler
         $('.apply').click(function () {
+            getAjaxChurn()
+        });
+        $('.radio').on('ifChecked', function(){
+            $('#combo').val($(this).val())
+        });
+
+        function getAjaxChurn() {
             var fields = getParamFields(document.querySelector('input[name=csrfToken]').value)
             $.ajax({
                 url: "/internet/overview/getJsonChurn",
@@ -305,21 +338,21 @@
                         /* update box number */
                         // box Active Contract
                         $('#boxCtActive .currCtActive').text(dta.numContract.actives.curr)
-                        var prevCtActive = '<h4>'+dta.numContract.actives.prev+'</h4>';
+                        var prevCtActive = '<h4>'+dta.numContract.actives.prev+' <i class="fa fa-info-circle iconTip" title="Tổng số hợp đồng tháng cùng kỳ năm ngoái"></i></h4>';
                         prevCtActive += (Number(dta.numContract.actives.prev.replace(",","")) > Number(dta.numContract.actives.curr.replace(",","")))? '<span class="down"><i class="fa fa-arrow-down fadeInDown animated" aria-hidden="true"></i> ' : '<span class="up"><i class="fa fa-arrow-up fadeInUp animated" aria-hidden="true"></i> '
                         prevCtActive += dta.numContract.actives.perct+' % </span> from '+dta.lastYYYYmm
                         $('#boxCtActive .prevCtActive').html("").append(prevCtActive)
 
                         // box HUYDV Contract
                         $('#boxCtHuydv .currCtHuydv').text(dta.numContract.huydv.curr)
-                        var prevCthuydv = '<h4>'+dta.numContract.huydv.prev+'</h4>';
+                        var prevCthuydv = '<h4>'+dta.numContract.huydv.prev+' <i class="fa fa-info-circle iconTip" title="Tổng số hợp đồng HSSD cùng kỳ năm ngoái"></i></h4>';
                         prevCthuydv += (Number(dta.numContract.huydv.prev.replace(",","")) > Number(dta.numContract.huydv.curr.replace(",",""))) ? '<span class="down"><i class="fa fa-arrow-down fadeInDown animated" aria-hidden="true"></i> ' : '<span class="up"><i class="fa fa-arrow-up fadeInUp animated" aria-hidden="true"></i> '
                         prevCthuydv += dta.numContract.huydv.perct+' % </span> from '+dta.lastYYYY
                         $('#boxCtHuydv .prevCtHuydv').html("").append(prevCthuydv)
 
                         // box CTBDV Contract
                         $('#boxCtCtbdv .currCtCtbdv').text(dta.numContract.ctbdv.curr)
-                        var prevCtCtbdv = '<h4>'+dta.numContract.ctbdv.prev+'</h4>';
+                        var prevCtCtbdv = '<h4>'+dta.numContract.ctbdv.prev+' <i class="fa fa-info-circle iconTip" title="Tổng số hợp đồng CTBDV cùng kỳ năm ngoái"></i></h4>';
                         prevCtCtbdv += (Number(dta.numContract.ctbdv.prev.replace(",","")) > Number(dta.numContract.ctbdv.curr.replace(",","")))? '<span class="down"><i class="fa fa-arrow-down fadeInDown animated" aria-hidden="true"></i> ' : '<span class="up"><i class="fa fa-arrow-up fadeInUp animated" aria-hidden="true"></i> '
                         prevCtCtbdv += dta.numContract.ctbdv.perct+' % </span> from '+dta.lastYYYY
                         $('#boxCtCtbdv .prevCtCtbdv').html("").append(prevCtCtbdv)
@@ -327,15 +360,15 @@
                         // box Total Churn Rate
                         $('.currMonth').text($('.monthGrp').val())
                         $('#boxRateTotal .avgRateTotal').text(dta.churnRate.totalRate.avg)
-                        $('#boxRateTotal .currRateTotal').text(dta.churnRate.totalRate.curr+" %")
+                        $('#boxRateTotal .currRateTotal').html(dta.churnRate.totalRate.curr+' % <i class="fa fa-info-circle iconTip" title="Tỷ lệ rời mạng, bao gồm HSSD và CTBDV, của tháng hiện tại"></i>')
 
                         // box HUYDV Churn Rate
                         $('#boxRateHuydv .avgRateHuydv').text(dta.churnRate.huydvRate.avg)
-                        $('#boxRateHuydv .currRateHuydv').text(dta.churnRate.huydvRate.curr+" %")
+                        $('#boxRateHuydv .currRateHuydv').html(dta.churnRate.huydvRate.curr+' % <i class="fa fa-info-circle iconTip" title="Tỷ lệ rời mạng, tính theo HSSD, của tháng hiện tại"></i>')
 
                         // box CTBDV Churn Rate
                         $('#boxRateCtbdv .avgRateCtbdv').text(dta.churnRate.ctbdvRate.avg)
-                        $('#boxRateCtbdv .currRateCtbdv').text(dta.churnRate.ctbdvRate.curr+" %")
+                        $('#boxRateCtbdv .currRateCtbdv').html(dta.churnRate.ctbdvRate.curr+ ' % <i class="fa fa-info-circle iconTip" title="Tỷ lệ rời mạng, tính theo CTBDV, của tháng hiện tại"></i>')
 
                         $('.counter').counterUp({
                             delay: 10,
@@ -360,10 +393,7 @@
                     $('.divLeft').waitMe("hide");
                 }
             });
-        });
-        $('.radio').on('ifChecked', function(){
-            $('#combo').val($(this).val())
-        });
+        }
     })
 
     function getJsonChurnSeries(data, _type){
@@ -390,13 +420,13 @@
                 {
                     name: "Churn Percent(%)",
                     type: 'column',
-                    yAxis: 0,
+                    yAxis: 1,
                     data: data.perct
                 },
                 {
                     name: "F1",
                     type: 'spline',
-                    yAxis: 1,
+                    yAxis: 0,
                     data: data.f1
                 })
         }
@@ -439,7 +469,11 @@
         jsArray.push({
             "text": "Choose Region",
             "id": "All",
-            "parent": "#"
+            "parent": "#",
+            'state' : {
+                'opened' : false,
+                'selected' : true
+            }
         })
         for(var key=0;key<arrKey.length;key++){
             jsArray.push({

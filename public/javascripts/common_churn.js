@@ -55,6 +55,24 @@ function getJsonChurnMonth(churnRate, churnPercent){
     return rs
 }
 
+function getJsonChurnMonth2Col(churnRate, churnPercent){
+    var rs = []
+    rs.push({
+        name: "Churn Percent",
+        type: 'column',
+        yAxis: 0,
+        data: parseMulMetris(churnPercent)
+    })
+    rs.push({
+        name: "Churn Rate",
+        type: 'column',
+        yAxis: 1,
+        data: churnRate
+    });
+
+    return rs
+}
+
 function parseMulMetris(arrs) {
     var rs = []
     for(var i=0; i< arrs.length; i++) {

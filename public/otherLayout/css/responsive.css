@@ -1,4 +1,19 @@
 @media (max-width: 1168px) {
+	.select2-search__field{
+		width: auto!important;
+	}
+	.select2-container{
+		margin-left: 9px!important;
+	}
+	.jstree-anchor{
+		padding: 0px!important;
+		float: none!important;
+		display: inline-block!important;
+		width: 80%!important;
+	}
+	.jstree-default .jstree-node{
+		width: auto!important;
+	}
 	.txtHead{
 		font-size: 24px;
 	}
@@ -26,12 +41,6 @@
 }
 /* Normal desktop :992px. */
 @media (min-width: 992px) and (max-width: 1169px) {
-	.box-area-warning{
-		background: linear-gradient(45deg, #6bbdf7 0%, #ffca28 100%);
-		color: #fff;
-		height: 149px;
-		margin: 0px 35px 0px 35px;
-	}
 	.left-sidebar-pro{
 		display:block;
 	}

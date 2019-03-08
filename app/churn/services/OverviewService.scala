@@ -31,7 +31,7 @@ object OverviewService{
         .subaggs(
           termsAgg("province", "province")) size 1000) size 0
     val response = client.execute(request).await
-    CommonService.getTerm1(response, "region", "province").map(x=> (x._1, ProvinceUtil.getProvince(x._2.toInt))).sorted
+    CommonService.getTerm1(response, "region", "province").map(x=> (x._1, ProvinceUtil.getProvince(x._2.toInt).toLowerCase)).sorted
   }
 
   private def getListPackage(month: String) = {
@@ -103,10 +103,13 @@ object OverviewService{
     val arrRegion = region.split(",").map(x=> x.trim() -> lstProvince.filter(y=> y._1 == x.trim())).flatMap(x=> x._2.map(y=> x._1->y)).map(x=> x._2._1 -> x._2._2)
     val provinces = province.split(",").map(x=> x.trim())
     val diffProvince = provinces diff arrRegion.map(x=> x._2)
-    val regionFilter = if(region == "") "*" else arrRegion.map(x=> x._1).distinct.map(x=> s"region:$x").mkString(" OR ")
-    var provinceFilter = diffProvince.filter(x=> x != "" && x != "All").map(x=> "province:"+ProvinceUtil.getProvinceCode(x)).mkString(" OR ")
-    if(provinceFilter != "") provinceFilter = s"OR $provinceFilter"
-    return s"($ageFilter) AND ($packageFilter) AND ($regionFilter $provinceFilter) AND ($comboFitler)"
+    val regionFilter = arrRegion.map(x=> x._1).distinct.map(x=> s"region:$x").mkString(" OR ")
+    val provinceFilter = diffProvince.filter(x=> x != "" && x != "All").map(x=> "province:"+ProvinceUtil.getProvinceCode(x.toUpperCase())).mkString(" OR ")
+    val filterCN =  if(provinceFilter != "" && regionFilter != "") s"($regionFilter OR $provinceFilter)"
+                    else if(provinceFilter != "" && regionFilter == "") "("+provinceFilter+")"
+                    else if(provinceFilter == "" && regionFilter != "") "("+regionFilter+")"
+                    else "*"
+    return s"($ageFilter) AND ($packageFilter) AND $filterCN AND ($comboFitler)"
   }
 
   def getInternet(request: Request[AnyContent]) = {
