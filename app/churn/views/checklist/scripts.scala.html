@@ -854,6 +854,11 @@
                             }
                         }
                     });
+                    // remove circle value =0
+                    Array.prototype.forEach.call(document.getElementById('churn4').getElementsByTagName('circle'), function(circle) {
+                        if(circle.getAttribute('r') == 5 && $('#minRateregionMonth').val() == 0 && $('#minPertregionMonth').val() == 0)
+                            circle.setAttribute('r', 1)
+                    })
                 });
                 if(Object.keys(catesMonthRegion).length == 1)
                     optionsRegion.hAxis.gridlines.count = 4
@@ -882,11 +887,19 @@
                         mouseY = mouseY -450
                     }
                     var y = mouseY
-                    $('#churn4_tooltip').html('<div><p><b>Month:</b> ' + keyByValue(catesMonthRegion, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
-                            '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contract:</b> '+contracts+'</p></div>').css({
-                        'top': y,
-                        'left': x
-                    }).fadeIn('slow');
+                    if(!(Number(percent == 0) && Number(rate) == 0)){
+                        $('#churn4_tooltip').html('<div><p><b>Month:</b> ' + keyByValue(catesMonthRegion, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
+                                '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contract:</b> '+contracts+'</p></div>').css({
+                            'top': y,
+                            'left': x
+                        }).fadeIn('slow');
+                    }
+                    // remove circle value =0
+                    Array.prototype.forEach.call(document.getElementById('churn4').getElementsByTagName('circle'), function(circle) {
+                        if($('#minRateregionMonth').val() == 0 && $('#minPertregionMonth').val() == 0 && (circle.getAttribute('fill') == 'none' || circle.getAttribute('r') == 5)){
+                            circle.setAttribute('r', 1)
+                        }
+                    })
                 });
                 google.visualization.events.addListener(chartRegionHuyDv, 'onmouseout', handlerOut);
 
@@ -934,6 +947,11 @@
                             }
                         }
                     });
+                    // remove circle value =0
+                    Array.prototype.forEach.call(document.getElementById('churn6').getElementsByTagName('circle'), function(circle) {
+                        if(circle.getAttribute('r') == 5 && $('#minRateregionAge').val() == 0 && $('#minPertregionAge').val() == 0)
+                            circle.setAttribute('r', 1)
+                    })
                 });
                 chartHuyDv.draw(dataHuyDv, options);
                 google.visualization.events.addListener(chartHuyDv, 'select', function () {
@@ -1037,11 +1055,19 @@
                         mouseY = mouseY -450
                     }
                     var y = mouseY
-                    $('#churn6_tooltip').html('<div><p><b>Age:</b> ' + keyByValue( catesAge, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
-                            '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contract:</b> '+contracts+'</p></div>').css({
-                        'top': y,
-                        'left': x
-                    }).fadeIn('slow');
+                    if(!(Number(percent == 0) && Number(rate) == 0)){
+                        $('#churn6_tooltip').html('<div><p><b>Age:</b> ' + keyByValue( catesAge, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
+                                '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contract:</b> '+contracts+'</p></div>').css({
+                            'top': y,
+                            'left': x
+                        }).fadeIn('slow');
+                    }
+                    // remove circle value =0
+                    Array.prototype.forEach.call(document.getElementById('churn6').getElementsByTagName('circle'), function(circle) {
+                        if($('#minRateregionAge').val() == 0 && $('#minPertregionAge').val() == 0 && (circle.getAttribute('fill') == 'none' || circle.getAttribute('r') == 5)){
+                            circle.setAttribute('r', 1)
+                        }
+                    })
                 });
                 google.visualization.events.addListener(chartHuyDv, 'onmouseout', handlerOut);
 
@@ -1080,6 +1106,11 @@
                             }
                         }
                     });
+                    // remove circle value =0
+                    Array.prototype.forEach.call(document.getElementById('churn9').getElementsByTagName('circle'), function(circle) {
+                        if(circle.getAttribute('r') == 5 && $('#minRateregionType').val() == 0 && $('#minPertregionType').val() == 0)
+                            circle.setAttribute('r', 1)
+                    })
                 });
                 if(Object.keys(catesType).length == 1)
                     optionsType.hAxis.gridlines.count = 4
@@ -1171,11 +1202,19 @@
                         mouseY = mouseY -450
                     }
                     var y = mouseY
-                    $('#churn9_tooltip').html('<div><p><b>Type:</b> ' + keyByValue(catesType, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
-                            '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contract:</b> '+contracts+'</p></div>').css({
-                        'top': y,
-                        'left': x
-                    }).fadeIn('slow');
+                    if(!(Number(percent == 0) && Number(rate) == 0)){
+                        $('#churn9_tooltip').html('<div><p><b>Type:</b> ' + keyByValue(catesType, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
+                                '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contract:</b> '+contracts+'</p></div>').css({
+                            'top': y,
+                            'left': x
+                        }).fadeIn('slow');
+                    }
+                    // remove circle value =0
+                    Array.prototype.forEach.call(document.getElementById('churn9').getElementsByTagName('circle'), function(circle) {
+                        if($('#minRateregionType').val() == 0 && $('#minPertregionType').val() == 0 && (circle.getAttribute('fill') == 'none' || circle.getAttribute('r') == 5)){
+                            circle.setAttribute('r', 1)
+                        }
+                    })
                 });
                 google.visualization.events.addListener(chartTypeHuyDv, 'onmouseout', handlerOut);
             }
@@ -1336,6 +1375,11 @@
                                         }
                                     }
                                 });
+                                // remove circle value =0
+                                Array.prototype.forEach.call(document.getElementById('churn4').getElementsByTagName('circle'), function(circle) {
+                                    if(circle.getAttribute('r') == 5 && Number(dta.churn4.isNull) == 1)
+                                        circle.setAttribute('r', 1)
+                                })
                             });
                             if(Object.keys(dta.churn4.catesMonth).length == 1)
                                 optionsRegion.hAxis.gridlines.count = 4
@@ -1364,11 +1408,19 @@
                                     mouseY = mouseY -450
                                 }
                                 var y = mouseY
-                                $('#churn4_tooltip').html('<div><p><b>Month:</b> ' + keyByValue(dta.churn4.catesMonth, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
-                                        '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contract:</b> '+contracts+'</p></div>').css({
-                                    'top': y,
-                                    'left': x
-                                }).fadeIn('slow');
+                                if(!(Number(percent == 0) && Number(rate) == 0)){
+                                    $('#churn4_tooltip').html('<div><p><b>Month:</b> ' + keyByValue(dta.churn4.catesMonth, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
+                                            '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contract:</b> '+contracts+'</p></div>').css({
+                                        'top': y,
+                                        'left': x
+                                    }).fadeIn('slow');
+                                }
+                                // remove circle value =0
+                                Array.prototype.forEach.call(document.getElementById('churn4').getElementsByTagName('circle'), function(circle) {
+                                    if(Number(dta.churn4.isNull) == 1 && (circle.getAttribute('fill') == 'none' || circle.getAttribute('r') == 5)){
+                                        circle.setAttribute('r', 1)
+                                    }
+                                })
                             });
                             google.visualization.events.addListener(chartRegionMonth, 'onmouseout', handlerOut);
 
@@ -1427,6 +1479,11 @@
                                             }
                                         }
                                     });
+                                    // remove circle value =0
+                                    Array.prototype.forEach.call(document.getElementById('churn6').getElementsByTagName('circle'), function(circle) {
+                                        if((circle.getAttribute('r') == 5 && Number(dta.churn6.isNull) == 1) || dta.churn6.emptyAll == "all")
+                                            circle.setAttribute('r', 1)
+                                    })
                                 });
                                 chartRegionAge.draw(dataRegionAge, options);
                                 google.visualization.events.addListener(chartRegionAge, 'select', function () {
@@ -1530,11 +1587,19 @@
                                         mouseY = mouseY -450
                                     }
                                     var y = mouseY
-                                    $('#churn6_tooltip').html('<div><p><b>Age:</b> ' + keyByValue( catesAge, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
-                                            '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contract:</b> '+contracts+'</p></div>').css({
-                                        'top': y,
-                                        'left': x
-                                    }).fadeIn('slow');
+                                    if(!(Number(percent == 0) && Number(rate) == 0)){
+                                        $('#churn6_tooltip').html('<div><p><b>Age:</b> ' + keyByValue( catesAge, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
+                                                '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contract:</b> '+contracts+'</p></div>').css({
+                                            'top': y,
+                                            'left': x
+                                        }).fadeIn('slow');
+                                    }
+                                    // remove circle value =0
+                                    Array.prototype.forEach.call(document.getElementById('churn6').getElementsByTagName('circle'), function(circle) {
+                                        if(Number(dta.churn6.isNull) == 1 && (circle.getAttribute('fill') == 'none' || circle.getAttribute('r') == 5) || dta.churn6.emptyAll == "all"){
+                                            circle.setAttribute('r', 1)
+                                        }
+                                    })
                                 });
                                 google.visualization.events.addListener(chartRegionAge, 'onmouseout', handlerOut);
                             }
@@ -1588,6 +1653,11 @@
                                             }
                                         }
                                     });
+                                    // remove circle value =0
+                                    Array.prototype.forEach.call(document.getElementById('churn9').getElementsByTagName('circle'), function(circle) {
+                                        if(circle.getAttribute('r') == 5 && Number(dta.churn9.isNull) == 1)
+                                            circle.setAttribute('r', 1)
+                                    })
                                 });
                                 chartRegionType.draw(dataRegionType, optionsType);
                                 google.visualization.events.addListener(chartRegionType, 'select', function () {
@@ -1675,11 +1745,19 @@
                                         mouseY = mouseY -450
                                     }
                                     var y = mouseY
-                                    $('#churn9_tooltip').html('<div><p><b>Type:</b> ' + keyByValue(dta.churn9.catesType, xAxis) + '</p><p><b>Region:</b> ' + yAxis +
-                                            '</p><p><b>Rate:</b> ' + rate + ' %</p><p><b>Percent:</b> ' + percent + ' %</p><p><b>Number of contract:</b> ' + contracts + '</p></div>').css({
-                                        'top': y,
-                                        'left': x
-                                    }).fadeIn('slow');
+                                    if(!(Number(percent == 0) && Number(rate) == 0)){
+                                        $('#churn9_tooltip').html('<div><p><b>Type:</b> ' + keyByValue(dta.churn9.catesType, xAxis) + '</p><p><b>Region:</b> ' + yAxis +
+                                                '</p><p><b>Rate:</b> ' + rate + ' %</p><p><b>Percent:</b> ' + percent + ' %</p><p><b>Number of contract:</b> ' + contracts + '</p></div>').css({
+                                            'top': y,
+                                            'left': x
+                                        }).fadeIn('slow');
+                                    }
+                                    // remove circle value =0
+                                    Array.prototype.forEach.call(document.getElementById('churn9').getElementsByTagName('circle'), function(circle) {
+                                        if(Number(dta.churn9.isNull) == 1 && (circle.getAttribute('fill') == 'none' || circle.getAttribute('r') == 5)){
+                                            circle.setAttribute('r', 1)
+                                        }
+                                    })
                                 });
                                 google.visualization.events.addListener(chartRegionType, 'onmouseout', handlerOut);
                             }

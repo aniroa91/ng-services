@@ -62,11 +62,13 @@ class ChurnCallogController @Inject() (cc: ControllerComponents) extends Abstrac
       )
       val minPerc4 = if(rs.trendRegionMonth._2.length > 0) CommonService.format3Decimal(rs.trendRegionMonth._2.map(x=>x._4).min) else 0
       val maxPerc4 = if(rs.trendRegionMonth._2.length > 0) CommonService.format3Decimal(rs.trendRegionMonth._2.map(x=>x._4).max) else 0
+      val isNull4  = if(rs.trendRegionMonth._2.length > 0 && rs.trendRegionMonth._2.map(x=>x._4).min == 0 && rs.trendRegionMonth._2.map(x=> x._3).min == 0) 1 else 0
       val churn4 = Json.obj(
         "catesMonth" -> rs.trendRegionMonth._1,
         "data"       -> rs.trendRegionMonth._2,
         "minPercent" -> minPerc4,
-        "maxPercent" -> maxPerc4
+        "maxPercent" -> maxPerc4,
+        "isNull"     -> isNull4
       )
       val churn5 = Json.obj(
         "data"   -> rs.callInRegionAge,
@@ -77,10 +79,12 @@ class ChurnCallogController @Inject() (cc: ControllerComponents) extends Abstrac
       )
       val minPerc6 = if(rs.callRegionAge.length > 0) CommonService.format3Decimal(rs.callRegionAge.map(x=>x._4).min) else 0
       val maxPerc6 = if(rs.callRegionAge.length > 0) CommonService.format3Decimal(rs.callRegionAge.map(x=>x._4).max) else 0
+      val isNull6  = if(rs.callRegionAge.length > 0 && rs.callRegionAge.map(x=>x._4).min == 0 && rs.callRegionAge.map(x=> x._3).min == 0) 1 else 0
       val churn6 = Json.obj(
         "data"       -> rs.callRegionAge,
         "minPercent" -> minPerc6,
-        "maxPercent" -> maxPerc6
+        "maxPercent" -> maxPerc6,
+        "isNull"     -> isNull6
       )
       val churn7 = Json.obj(
         "cates"        -> rs.churnCates.map(x=> x._1),

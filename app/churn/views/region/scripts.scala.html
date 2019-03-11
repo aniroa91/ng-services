@@ -256,7 +256,9 @@
                         }
                     })
                 }
-                $('.slRegion').val("*")
+                $('#region').val("*")
+                $('.txtRegion').text("")
+                $('.regionDiv').hide()
                 $('#age').val("")
                 $('.txtAge').text("")
                 $('.ageDiv').hide()
@@ -456,7 +458,9 @@
                     $('.txtAge').text("")
                     $('.ageDiv').hide()
                 }
-                $('.slRegion').val("*")
+                $('#region').val("*")
+                $('.txtRegion').text("")
+                $('.regionDiv').hide()
                 $(".monthPicker").datepicker("update", $('#month').val());
                 ajaxGetChurn("profileAge")
             });
@@ -544,17 +548,17 @@
                     var region = dataRegionHuyDv.getValue(row, 2)
                     var month = dataRegionHuyDv.getValue(row, 1)
                     $(".monthPicker").datepicker("update", keyByValue(catesMonthRegion, month));
-                    $('.slRegion').val(region)
+                    $('#region').val(region)
                 }
                 else{
                     $(".monthPicker").datepicker("update", $('#month').val());
-                    $('.slRegion').val("*")
+                    $('#region').val("*")
                 }
                 // highlight region when click
                 Array.prototype.forEach.call(document.getElementById('churn3').getElementsByTagName('text'), function(text) {
                     if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === '#B40404') && (text.innerHTML != "Vung 0") && (text.innerHTML != "Vung 8")) {
-                        if ($('.slRegion').val() != "*") {
-                            if (text.innerHTML == "Vung " + $('.slRegion').val()) {
+                        if ($('#region').val() != "*") {
+                            if (text.innerHTML == "Vung " + $('#region').val()) {
                                 text.setAttribute('fill-opacity', 1)
                                 text.setAttribute('fill', "#B40404")
                                 text.setAttribute('font-weight', "bold")
@@ -662,6 +666,62 @@
                     opposite: true
                 }],
 
+                plotOptions: {
+                    series: {
+                        cursor: 'pointer',
+                        point: {
+                            events: {
+                                click: function () {
+                                    var charts = churn_region
+                                    $('#age').val("")
+                                    $(".monthPicker").datepicker("update", $('#month').val());
+                                    $('.txtAge').text("")
+                                    $('.ageDiv').hide()
+                                    $('.txtProfile').text("")
+                                    $('.profileDiv').hide()
+                                    $('#profile').val("")
+                                    if(this.category == $('#region').val()){
+                                        for (var i = 0; i < charts.series[0].data.length; i++) {
+                                            charts.series[0].data[i].update({ color: '#73879C' }, false, false)
+                                            charts.series[1].data[i].update({ color: '#dc5a78' }, false, false)
+                                        }
+                                        $('#region').val("*")
+                                        $('.txtRegion').text("")
+                                        $('.regionDiv').hide()
+                                    }
+                                    else {
+                                        var isColor = 0
+                                        for (var i = 0; i < charts.series[0].data.length; i++) {
+                                            charts.series[0].data[i].update({ color: '#ddd' }, false, false)
+                                            charts.series[1].data[i].update({ color: '#ddd' }, false, false)
+                                            if(this.category == charts.series[1].data[i].category){
+                                                isColor = i
+                                            }
+                                        }
+                                        if(this.series.name == "Churn Rate") {
+                                            this.update({ color: '#dc5a78' })
+                                            charts.series[0].data[isColor].update({ color: '#73879C' }, false, false)
+                                        }
+                                        else {
+                                            this.update({ color: '#73879C' })
+                                            charts.series[1].data[isColor].update({ color: '#dc5a78' }, false, false)
+                                        }
+                                        $('#region').val(this.category)
+                                        $('.txtRegion').text(this.category)
+                                        $('.regionDiv').show()
+                                    }
+                                    ajaxGetChurn("region")
+                                }
+                                // tam remove qua v2
+                                /*,
+                                contextmenu: function () {
+                                    window.location.href = "/churn/search?contract=TenGoi:"+this.category
+                                }*/
+                            }
+                        }
+                    }
+                },
+
                 tooltip: {
                     formatter: function() {
                         var s = [];
@@ -751,7 +811,9 @@
                                 click: function () {
                                     var charts = churn_profile
                                     $('#age').val("")
-                                    $('.slRegion').val("*")
+                                    $('#region').val("*")
+                                    $('.txtRegion').text("")
+                                    $('.regionDiv').hide()
                                     $(".monthPicker").datepicker("update", $('#month').val());
                                     $('.txtAge').text("")
                                     $('.ageDiv').hide()
@@ -920,7 +982,9 @@
                                         $('.profileDiv').show()
 
                                     }
-                                    $('.slRegion').val("*")
+                                    $('#region').val("*")
+                                    $('.txtRegion').text("")
+                                    $('.regionDiv').hide()
                                     $(".monthPicker").datepicker("update", $('#month').val());
                                     ajaxGetChurn("churn5_heatmap")
                                 }
@@ -985,11 +1049,6 @@
                 // remove highlight filters
                 $('.slStatus').removeAttr('style')
             })
-            // click filter Region
-            $('.slRegion').on('change',function () {
-                // remove highlight filters
-                $('.slRegion').removeAttr('style')
-            })
             // click apply fitler
             $('.apply').click(function () {
                 //$('#profile').val("")
@@ -1023,22 +1082,23 @@
                             else $('.trendPrf').removeClass('opacityLg')*/
                             // change highlight filters
                             $('.slStatus').attr('style','border:1px solid #16a085!important')
-                            $('.slRegion').attr('style','border:1px solid #16a085!important')
                             $('.monthGrp').attr('style','background-color: #16a085!important;color: #fff')
                             // update chart Region
-                               churn_region.xAxis[0].update({categories: dta.churn1.cates});
-                               updateCharts(churn_region, getJsonChurnMonth2Col(dta.churn1.churnRate, dta.churn1.churnPercent))
-                            if($('.slRegion').val() == "*"){
-                                churn_region.series[0].update({color: '#73879C'})
+                            if(_type != "region"){
+                                churn_region.xAxis[0].update({categories: dta.churn1.cates});
+                                updateCharts(churn_region, getJsonChurnMonth2Col(dta.churn1.churnRate, dta.churn1.churnPercent))
                             }
                             else{
-                                churn_region.series[0].update({color: '#ddd'})
-                                churn_region.series[0].data[Number($('.slRegion').val() -1)].update({color: '#73879C'})
+                                if($("#region").val() == "*") {
+                                    churn_region.series[0].update({color: '#73879C'})
+                                    churn_region.series[1].update({color: '#dc5a78'})
+                                }
                             }
+
                             // update chart Profile
                             if(_type != "profile"){
-                               churn_profile.xAxis[0].update({categories: dta.churn2.cates});
-                               updateCharts(churn_profile, getJsonChurnMonth2Col(dta.churn2.churnRate, dta.churn2.churnPercent))
+                                churn_profile.xAxis[0].update({categories: dta.churn2.cates});
+                                updateCharts(churn_profile, getJsonChurnMonth2Col(dta.churn2.churnRate, dta.churn2.churnPercent))
                             }
                             else{
                                 if($("#profile").val() == "") {
@@ -1101,8 +1161,8 @@
                                         }
                                         // highlight region when click
                                         if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === '#B40404') && (text.innerHTML != "Vung 0") && (text.innerHTML != "Vung 8")) {
-                                            if ($('.slRegion').val() != "*" ){
-                                                if (text.innerHTML == "Vung "+$('.slRegion').val()){
+                                            if ($('#region').val() != "*" ){
+                                                if (text.innerHTML == "Vung "+ $('#region').val().substring($('#region').val().indexOf(' ')+1)){
                                                     text.setAttribute('fill-opacity', 1)
                                                     text.setAttribute('fill', "#B40404")
                                                     text.setAttribute('font-weight', "bold")
@@ -1143,17 +1203,17 @@
                                         var region = dataRegionMonth.getValue(row, 2)
                                         var month = dataRegionMonth.getValue(row, 1)
                                         $(".monthPicker").datepicker("update", keyByValue(dta.churn3.cates, month));
-                                        $('.slRegion').val(region)
+                                        $('#region').val(region)
                                     }
                                     else{
                                         $(".monthPicker").datepicker("update", $('#month').val());
-                                        $('.slRegion').val("*")
+                                        $('#region').val("*")
                                     }
                                     // highlight region when click
                                     Array.prototype.forEach.call(document.getElementById('churn3').getElementsByTagName('text'), function(text) {
                                         if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === '#B40404') && (text.innerHTML != "Vung 0") && (text.innerHTML != "Vung 8")) {
-                                            if ($('.slRegion').val() != "*") {
-                                                if (text.innerHTML == "Vung " + $('.slRegion').val()) {
+                                            if ($('#region').val() != "*") {
+                                                if (text.innerHTML == "Vung " + $('#region').val()) {
                                                     text.setAttribute('fill-opacity', 1)
                                                     text.setAttribute('fill', "#B40404")
                                                     text.setAttribute('font-weight', "bold")
@@ -1331,7 +1391,9 @@
                                             }
                                         })
                                     }
-                                    $('.slRegion').val("*")
+                                    $('#region').val("*")
+                                    $('.txtRegion').text("")
+                                    $('.regionDiv').hide()
                                     $('#age').val("")
                                     $('.txtAge').text("")
                                     $('.ageDiv').hide()
@@ -1564,7 +1626,9 @@
                                         $('.txtAge').text("")
                                         $('.ageDiv').hide()
                                     }
-                                    $('.slRegion').val("*")
+                                    $('#region').val("*")
+                                    $('.txtRegion').text("")
+                                    $('.regionDiv').hide()
                                     $(".monthPicker").datepicker("update", $('#month').val());
                                     ajaxGetChurn("profileAge")
                                 })
@@ -1585,7 +1649,7 @@
         function getParamFields(token){
             var obj = {
                 "csrfToken" : token,
-                "region" : $('.slRegion').val(),
+                "region" : $('#region').val().substring($('#region').val().indexOf(' ')+1),
                 "age"    : $('#age').val(),
                 "profile": $('#profile').val(),
                 "month"  : $('.monthGrp').val(),

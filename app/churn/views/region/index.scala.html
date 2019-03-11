@@ -280,6 +280,10 @@
                             <span class="titFilter"><i class="fa fa-bell"></i> Group Profile</span>
                             <p class="txtControl txtProfile"></p>
                         </div>
+                        <div class="regionDiv" style="padding-top: 15px;display: none;margin-bottom: 15px">
+                            <span class="titFilter"><i class="fa fa-bell"></i> Group Region</span>
+                            <p class="txtControl txtRegion"></p>
+                        </div>
                         <div class="col-xs-12 lineDivBlack"></div>
                         <div class="divStatus" style="margin-bottom: 20px;padding-top: 15px">
                             <span class="titFilter"><i class="fa fa-bell"></i> Group Status</span>
@@ -293,7 +297,7 @@
                             }
                             </select>
                         </div>
-                        <div class="col-xs-12 lineDivBlack"></div>
+                        @*<div class="col-xs-12 lineDivBlack"></div>
                         <div class="divRegion" style="height: 120px;padding-top: 15px">
                             <span class="titFilter"><i class="fa fa-bell"></i> Group Region</span>
                             <select class="form-control selectBox slRegion" style="border: 1px solid #16a085!important">
@@ -302,7 +306,7 @@
                                     <option value="@v">@k</option>
                                 }
                             </select>
-                        </div>
+                        </div>*@
                         <div class="col-xs-12 lineDivBlack"></div>
                         <div style="height: 140px;padding-top: 15px">
                             <span class="titFilter"><i class="fa fa-bell"></i> Group Month</span>
@@ -401,17 +405,21 @@
                                     <nav id="dropdown">
                                         <ul class="mobile-menu-nav">
                                             <div class="disInline">
-                                                <div class="col-sm-6 col-xs-12 ageDiv" style="padding-top: 15px;display: none">
+                                                <div class="col-sm-4 col-xs-12 ageDiv" style="padding-top: 15px;display: none">
                                                     <span class="titFilter"><i class="fa fa-bell"></i> Group Age</span>
                                                     <span class="txtAge txtFilter"></span>
                                                 </div>
-                                                <div class="col-sm-6 col-xs-12 profileDiv" style="padding-top: 15px;display: none">
+                                                <div class="col-sm-4 col-xs-12 profileDiv" style="padding-top: 15px;display: none">
                                                     <span class="titFilter"><i class="fa fa-bell"></i> Group Profile</span>
                                                     <span class="txtProfile txtFilter"></span>
                                                 </div>
+                                                <div class="col-sm-4 col-xs-12 regionDiv" style="padding-top: 15px;display: none">
+                                                    <span class="titFilter"><i class="fa fa-bell"></i> Group Region</span>
+                                                    <span class="txtRegion txtFilter"></span>
+                                                </div>
                                             </div>
                                             <div class="disInline">
-                                                <div class="col-sm-4 col-xs-12" style="height: 70px;padding-top: 15px">
+                                                @*<div class="col-sm-4 col-xs-12" style="height: 70px;padding-top: 15px">
                                                     <span class="titFilter"><i class="fa fa-bell"></i> Group Region</span>
                                                     <select class="form-control selectBoxMb slRegion" style="height: 20px">
                                                         <option value="*" selected>--- Choose Region ---</option>
@@ -419,8 +427,8 @@
                                                             <option value="@v">@k</option>
                                                         }
                                                     </select>
-                                                </div>
-                                                <div class="col-sm-4 col-xs-12" style="height: 70px;padding-top: 15px;">
+                                                </div>*@
+                                                <div class="col-sm-6 col-xs-12" style="height: 70px;padding-top: 15px;">
                                                     <span class="titFilter"><i class="fa fa-bell"></i> Group Status</span>
                                                     <select class="form-control selectBoxMb slStatus" style="height: 20px">
                                                     @for( (k,v) <- CommonUtil.STATUS_MAP){
@@ -432,7 +440,7 @@
                                                     }
                                                     </select>
                                                 </div>
-                                                <div class="col-sm-4 col-xs-12" style="height: 70px;padding-top: 15px;">
+                                                <div class="col-sm-6 col-xs-12" style="height: 70px;padding-top: 15px;">
                                                     <span class="titFilter"><i class="fa fa-bell"></i> Group Month</span>
                                                     <div class="input-group date monthPicker">
                                                         <input type="text" class="monthGrp form-control txtInputMb" value="@month" readonly="true" style="background-color: #16a085!important;color: #fff">
@@ -464,6 +472,7 @@
                 @helper.CSRF.formField
                 <input type="hidden" value="@month" id="month">
                 <input type="hidden" id="age">
+                <input type="hidden" id="region">
                 <input type="hidden" id="profile">
 
                 <input type="hidden" id="minRateAgeProf" value="@rs.trendAgeProfile._2.map(x=>x._3).min">

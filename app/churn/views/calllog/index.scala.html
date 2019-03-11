@@ -110,6 +110,8 @@
                     margin-bottom: 0px!important;
                 }
                 .circle {
+                    background: #fff;
+                    border: 1px solid black;
                     margin-bottom: 5px;
                     display: inline-block;
                     border-radius: 50%;
@@ -452,6 +454,11 @@
                 <input type="hidden" id="cateArr" value="@rs.churnCates.map(x=> x._1).mkString(",")">
                 <input type="hidden" id="cateCurr">
 
+                <input type="hidden" id="minRateregionMonth" value="@rs.trendRegionMonth._2.map(x=>x._3).min">
+                <input type="hidden" id="minPertregionMonth" value="@rs.trendRegionMonth._2.map(x=>x._4).min">
+                <input type="hidden" id="minRateregionAge" value="@rs.trendRegionMonth._2.map(x=>x._4).min">
+                <input type="hidden" id="minPertregionAge" value="@rs.trendRegionMonth._2.map(x=>x._4).min">
+
                 <input type="hidden" id="indexChart">
 
                 <div class="rate-percent-area mg-t-15">
@@ -599,10 +606,10 @@
                                                         <div id="churn4" style="width: auto; max-height: 400px;"></div>
                                                         <div class="overlay">
                                                             <span>ChurnPert (%)</span>
-                                                            <div style="margin: 4px 0px 2px 7px"><div class="circle" style="background: black;margin-right: 10px"><span style="opacity: 0"></span></div><span id="churn4_txtMin" style="color:#0D3349 ">@format3Decimal(rs.trendRegionMonth._2.map(x=>x._4).min)</span></div>
-                                                            <div style="margin: 0px 0px 2px 6px"><div class="circle" style="background: black;margin-right: 8px"><span style="width: 15px;opacity: 0">11</span></div><span id="churn4_circle2" style="color:#0D3349 ">@format3Decimal((rs.trendRegionMonth._2.map(x=>x._4).max -rs.trendRegionMonth._2.map(x=>x._4).min)/5*2)</span></div>
-                                                            <div style="margin: 0px 0px 2px 5px"><div class="circle" style="background: black;margin-right: 6px"><span style="width: 17px;opacity: 0">111</span></div><span id="churn4_circle3" style="color:#0D3349 ">@format3Decimal((rs.trendRegionMonth._2.map(x=>x._4).max -rs.trendRegionMonth._2.map(x=>x._4).min)/5*3)</span></div>
-                                                            <div style="margin-left: 4px"><div class="circle" style="margin-right: 4px;background: black"><span style="width: 20px;opacity: 0">1111</span></div><span id="churn4_txtMax" style="color:#0D3349 ">@format3Decimal(rs.trendRegionMonth._2.map(x=>x._4).max)</span></div>
+                                                            <div style="margin: 4px 0px 2px 7px"><div class="circle" style="margin-right: 10px"><span style="opacity: 0"></span></div><span id="churn4_txtMin" style="color:#0D3349 ">@format3Decimal(rs.trendRegionMonth._2.map(x=>x._4).min)</span></div>
+                                                            <div style="margin: 0px 0px 2px 6px"><div class="circle" style="margin-right: 8px"><span style="width: 15px;opacity: 0">11</span></div><span id="churn4_circle2" style="color:#0D3349 ">@format3Decimal((rs.trendRegionMonth._2.map(x=>x._4).max -rs.trendRegionMonth._2.map(x=>x._4).min)/5*2)</span></div>
+                                                            <div style="margin: 0px 0px 2px 5px"><div class="circle" style="margin-right: 6px"><span style="width: 17px;opacity: 0">111</span></div><span id="churn4_circle3" style="color:#0D3349 ">@format3Decimal((rs.trendRegionMonth._2.map(x=>x._4).max -rs.trendRegionMonth._2.map(x=>x._4).min)/5*3)</span></div>
+                                                            <div style="margin-left: 4px"><div class="circle" style="margin-right: 4px"><span style="width: 20px;opacity: 0">1111</span></div><span id="churn4_txtMax" style="color:#0D3349 ">@format3Decimal(rs.trendRegionMonth._2.map(x=>x._4).max)</span></div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -675,10 +682,10 @@
                                                         <div id="churn6" style="width: auto; height: 400px;"></div>
                                                         <div class="overlay">
                                                             <span>ChurnPert (%)</span>
-                                                            <div style="margin: 4px 0px 2px 7px"><div class="circle" style="background: black;margin-right: 10px"><span style="opacity: 0"></span></div><span id="churn6_txtMin" style="color:#0D3349 ">@format3Decimal(rs.callRegionAge.map(x=>x._4).min)</span></div>
-                                                            <div style="margin: 0px 0px 2px 6px"><div class="circle" style="background: black;margin-right: 8px"><span style="width: 15px;opacity: 0">11</span></div><span id="churn6_circle2" style="color:#0D3349 ">@format3Decimal((rs.callRegionAge.map(x=>x._4).max -rs.callRegionAge.map(x=>x._4).min)/5*2)</span></div>
-                                                            <div style="margin: 0px 0px 2px 5px"><div class="circle" style="background: black;margin-right: 6px"><span style="width: 17px;opacity: 0">111</span></div><span id="churn6_circle3" style="color:#0D3349 ">@format3Decimal((rs.callRegionAge.map(x=>x._4).max -rs.callRegionAge.map(x=>x._4).min)/5*3)</span></div>
-                                                            <div style="margin-left: 4px"><div class="circle" style="margin-right: 4px;background: black"><span style="width: 20px;opacity: 0">1111</span></div><span id="churn6_txtMax" style="color:#0D3349 ">@format3Decimal(rs.callRegionAge.map(x=>x._4).max)</span></div>
+                                                            <div style="margin: 4px 0px 2px 7px"><div class="circle" style="margin-right: 10px"><span style="opacity: 0"></span></div><span id="churn6_txtMin" style="color:#0D3349 ">@format3Decimal(rs.callRegionAge.map(x=>x._4).min)</span></div>
+                                                            <div style="margin: 0px 0px 2px 6px"><div class="circle" style="margin-right: 8px"><span style="width: 15px;opacity: 0">11</span></div><span id="churn6_circle2" style="color:#0D3349 ">@format3Decimal((rs.callRegionAge.map(x=>x._4).max -rs.callRegionAge.map(x=>x._4).min)/5*2)</span></div>
+                                                            <div style="margin: 0px 0px 2px 5px"><div class="circle" style="margin-right: 6px"><span style="width: 17px;opacity: 0">111</span></div><span id="churn6_circle3" style="color:#0D3349 ">@format3Decimal((rs.callRegionAge.map(x=>x._4).max -rs.callRegionAge.map(x=>x._4).min)/5*3)</span></div>
+                                                            <div style="margin-left: 4px"><div class="circle" style="margin-right: 4px"><span style="width: 20px;opacity: 0">1111</span></div><span id="churn6_txtMax" style="color:#0D3349 ">@format3Decimal(rs.callRegionAge.map(x=>x._4).max)</span></div>
                                                         </div>
                                                     </div>
                                                 </div>

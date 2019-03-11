@@ -42,7 +42,7 @@ class ChurnAgeController @Inject() (cc: ControllerComponents) extends AbstractCo
   def getJsonChurn() = withAuth {username => implicit request: Request[AnyContent] =>
    try{
       val rs = ChurnAgeService.getInternet(request)
-      val isNull = if(rs._1.map(x=>x._4).min == 0 && rs._1.map(x=> x._3).min == 0) 1 else 0
+      val isNull = if(rs._1.length > 0 && rs._1.map(x=>x._4).min == 0 && rs._1.map(x=> x._3).min == 0) 1 else 0
       val regionAge = Json.obj(
         "data"       -> rs._1,
         "minPercent" -> CommonService.format2Decimal(rs._1.map(x=>x._4).min),

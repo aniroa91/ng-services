@@ -169,6 +169,7 @@
                                                         }
                                         }
                                 })
+                                $('#isPercent').val(1)
                                 $('#age').val(age)
                                 $('#region').val(region)
                                 $('.regionDiv').show()
@@ -192,6 +193,7 @@
                                                 }
                                         }
                                 })
+                                $('#isPercent').val(0)
                                 $('#age').val("")
                                 $('#region').val("")
                                 $('.regionDiv').hide()
@@ -310,23 +312,46 @@
                                         point: {
                                                 events: {
                                                         click: function () {
+                                                                var charts = churn_age
                                                                 $('#region').val("")
                                                                 $('.txtRegion').text("")
                                                                 $('.regionDiv').hide()
                                                                 if(getIdBynameAge(this.category) == $('#age').val()){
-                                                                        for (var i = 0; i < this.series.data.length; i++) {
+                                                                        /*for (var i = 0; i < this.series.data.length; i++) {
                                                                                 this.series.data[i].update({ color: '#73879C' }, false, false)
+                                                                        }*/
+                                                                        for (var i = 0; i < charts.series[0].data.length; i++) {
+                                                                                charts.series[0].data[i].update({ color: '#73879C' }, false, false)
+                                                                                charts.series[1].data[i].update({ color: '#dc5a78' }, false, false)
                                                                         }
+                                                                        $('#isPercent').val(0)
                                                                         $('#age').val("")
                                                                         $('.ageDiv').hide()
                                                                         $('.txtAge').text("")
                                                                         $('.divStatus').attr('style','height:170px;padding-top: 15px')
                                                                 }
                                                                 else{
-                                                                        for (var i = 0; i < this.series.data.length; i++) {
+                                                                        /*for (var i = 0; i < this.series.data.length; i++) {
                                                                                 this.series.data[i].update({ color: '#ddd' }, false, false)
                                                                         }
-                                                                        this.update({ color: '#73879C' });
+                                                                        this.update({ color: '#73879C' });*/
+
+                                                                        for (var i = 0; i < charts.series[0].data.length; i++) {
+                                                                                charts.series[0].data[i].update({ color: '#ddd' }, false, false)
+                                                                                charts.series[1].data[i].update({ color: '#ddd' }, false, false)
+                                                                                if(this.category == charts.series[1].data[i].category){
+                                                                                        isColor = i
+                                                                                }
+                                                                        }
+                                                                        if(this.series.name == "Churn Rate") {
+                                                                                this.update({ color: '#dc5a78' })
+                                                                                charts.series[0].data[isColor].update({ color: '#73879C' }, false, false)
+                                                                        }
+                                                                        else {
+                                                                                this.update({ color: '#73879C' })
+                                                                                charts.series[1].data[isColor].update({ color: '#dc5a78' }, false, false)
+                                                                        }
+                                                                        $('#isPercent').val(1)
                                                                         $('#age').val(getIdBynameAge(this.category))
                                                                         $('.ageDiv').show()
                                                                         $('.txtAge').text(this.category)
@@ -445,7 +470,12 @@
                                                         s.push('<span>'+ point.x +'</span><br>');
                                                         s.push('<br><span>Number of Contracts : <b>'+ Highcharts.numberFormat(Math.abs(point.point.k), 0) +'</b><span>');
                                                 }
-                                                s.push('<span>'+ point.series.name +' : <b>'+ point.y +'</b><span>');
+                                                if(point.series.name == "Churn Rate"){
+                                                        s.push('<span style="color: #dc5a78">'+ point.series.name +' : <b>'+ point.y +' %</b><span>');
+                                                }
+                                                else {
+                                                        s.push('<span style="color: #149c7f">'+ point.series.name +' : <b>'+ point.y +' %</b><span>');
+                                                }
                                         });
 
                                         return s.join(' <br> ');
@@ -515,10 +545,13 @@
                                                 updateCharts(churn_age, getJsonChurnMonth2Col(dta.churnAge.churnRate, dta.churnAge.churnPercent))
                                             }
                                             else{
-                                                if($("#age").val() == "") churn_age.series[0].update({color: '#73879C'})
+                                                if($("#age").val() == "") {
+                                                    churn_age.series[0].update({color: '#73879C'})
+                                                    churn_age.series[1].update({color: '#dc5a78'})
+                                                }
                                             }
                                             // update chart Month
-                                            updateCharts(churn_month, getChurnMonthHavePerct(dta.churnMonth.churnRate, dta.churnMonth.churnPercent, 1))
+                                            updateCharts(churn_month, getChurnMonthHavePerct(dta.churnMonth.churnRate, dta.churnMonth.churnPercent, Number($('#isPercent').val())))
                                             churn_month.yAxis[0].update({
                                                 title:{
                                                      style:{
@@ -618,6 +651,7 @@
                                                                                             }
                                                                             }
                                                                     })
+                                                                    $('#isPercent').val(1)
                                                                     $('#age').val(age)
                                                                     $('#region').val(region)
                                                                     $('.regionDiv').show()
@@ -641,6 +675,7 @@
                                                                                     }
                                                                             }
                                                                     })
+                                                                    $('#isPercent').val(0)
                                                                     $('#age').val("")
                                                                     $('#region').val("")
                                                                     $('.regionDiv').hide()

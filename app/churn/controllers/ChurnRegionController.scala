@@ -55,7 +55,7 @@ class ChurnRegionController @Inject() (cc: ControllerComponents) extends Abstrac
       val minPerc3 = if(rs.trendRegionMonth._2.length > 0) CommonService.format2Decimal(rs.trendRegionMonth._2.map(x=>x._4).min) else 0
       val maxPerc3 = if(rs.trendRegionMonth._2.length > 0) CommonService.format2Decimal(rs.trendRegionMonth._2.map(x=>x._4).max) else 0
       val numRegion = if(rs.trendRegionMonth._2.length > 0) rs.trendRegionMonth._2.map(x=> x._1).max else 0
-      val isNull3   = if(rs.trendRegionMonth._2.map(x=>x._4).min == 0 && rs.trendRegionMonth._2.map(x=>x._3).min == 0) 1 else 0
+      val isNull3   = if(rs.trendRegionMonth._2.length > 0 && rs.trendRegionMonth._2.map(x=>x._4).min == 0 && rs.trendRegionMonth._2.map(x=>x._3).min == 0) 1 else 0
       val churn3 = Json.obj(
         "cates"      -> rs.trendRegionMonth._1,
         "numRegion"  -> numRegion,
@@ -66,7 +66,7 @@ class ChurnRegionController @Inject() (cc: ControllerComponents) extends Abstrac
       )
       val minPerc4 = if(rs.trendProfileMonth._3.length > 0) CommonService.format2Decimal(rs.trendProfileMonth._3.map(x=>x._4).min) else 0
       val maxPerc4 = if(rs.trendProfileMonth._3.length > 0) CommonService.format2Decimal(rs.trendProfileMonth._3.map(x=>x._4).max) else 0
-      val isNull4  = if(rs.trendProfileMonth._3.map(x=>x._4).min == 0 && rs.trendProfileMonth._3.map(x=>x._3).min == 0) 1 else 0
+      val isNull4  = if(rs.trendProfileMonth._3.length > 0 && rs.trendProfileMonth._3.map(x=>x._4).min == 0 && rs.trendProfileMonth._3.map(x=>x._3).min == 0) 1 else 0
       val churn4 = Json.obj(
         "catesProfile" -> rs.trendProfileMonth._1,
         "catesMonth"  -> rs.trendProfileMonth._2,
@@ -77,7 +77,7 @@ class ChurnRegionController @Inject() (cc: ControllerComponents) extends Abstrac
       )
       val minPerc5 = if(rs.trendAgeProfile._2.length > 0) CommonService.format2Decimal(rs.trendAgeProfile._2.map(x=>x._4).min) else 0
       val maxPerc5 = if(rs.trendAgeProfile._2.length > 0) CommonService.format2Decimal(rs.trendAgeProfile._2.map(x=>x._4).max) else 0
-      val isNull5 = if(rs.trendAgeProfile._2.map(x=>x._4).min == 0 && rs.trendAgeProfile._2.map(x=>x._3).min == 0) 1 else 0
+      val isNull5 = if(rs.trendAgeProfile._2.length > 0 && rs.trendAgeProfile._2.map(x=>x._4).min == 0 && rs.trendAgeProfile._2.map(x=>x._3).min == 0) 1 else 0
       val churn5 = Json.obj(
         "catesProfile" -> rs.trendAgeProfile._1,
         "data"       -> rs.trendAgeProfile._2,
