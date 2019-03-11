@@ -97,19 +97,22 @@ class OverviewController @Inject() (cc: ControllerComponents) extends AbstractCo
         "cates"       -> rs.trendRatePert._1.map(x=> x._1).distinct.sorted,
         "rate"        -> rs.trendRatePert._1.map(x=> x._2),
         "perct"       -> rs.trendRatePert._1.map(x=> x._3),
-        "f1"          -> rs.trendRatePert._1.map(x=> x._4)
+        "f1"          -> rs.trendRatePert._1.map(x=> x._4),
+        "maxPercent"  -> rs.trendRatePert._1.map(x=> x._3).max
       )
       val huydvTrend = Json.obj(
         "cates"       -> rs.trendRatePert._2.map(x=> x._1).distinct.sorted,
         "rate"        -> rs.trendRatePert._2.map(x=> x._2),
         "perct"       -> rs.trendRatePert._2.map(x=> x._3),
-        "f1"          -> rs.trendRatePert._2.map(x=> x._4)
+        "f1"          -> rs.trendRatePert._2.map(x=> x._4),
+        "maxPercent"  -> rs.trendRatePert._2.map(x=> x._3).max
       )
       val ctbdvTrend = Json.obj(
         "cates"       -> rs.trendRatePert._3.map(x=> x._1).distinct.sorted,
         "rate"        -> rs.trendRatePert._3.map(x=> x._2),
         "perct"       -> rs.trendRatePert._3.map(x=> x._3),
-        "f1"          -> rs.trendRatePert._3.map(x=> x._4)
+        "f1"          -> rs.trendRatePert._3.map(x=> x._4),
+        "maxPercent"  -> rs.trendRatePert._3.map(x=> x._3).max
       )
       val trendRatePert = Json.obj(
         "totalTrend"       -> totalTrend,

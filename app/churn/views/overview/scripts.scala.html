@@ -115,6 +115,8 @@
                     }
                 }
             }, { // Secondary yAxis
+                max: 100,
+                min: 0,
                 title: {
                     text: 'Churn Percent',
                     style: {
@@ -182,6 +184,8 @@
                     }
                 }
             }, { // Secondary yAxis
+                max: 100,
+                min: 0,
                 title: {
                     text: 'Churn Percent',
                     style: {
@@ -249,6 +253,8 @@
                     }
                 }
             }, { // Secondary yAxis
+                max: 100,
+                min: 0,
                 title: {
                     text: 'Churn Percent',
                     style: {
@@ -306,6 +312,7 @@
             $('.radio').removeAttr('checked').iCheck('update')
             $(".monthPicker").datepicker("update", $('#monthCurr').val())
             $(".region").jstree("check_all")
+            $('#combo').val("")
             getAjaxChurn()
         })
 
@@ -379,10 +386,19 @@
                         track1.xAxis[0].update({categories: dta.numofMonth.cates})
                         updateChartOverview(track1, getJsonChurnSeries(dta.numofMonth, 0))
                         track2.xAxis[0].update({categories: dta.trendRatePert.totalTrend.cates})
+                        track2.yAxis[1].update({
+                            max: Number(dta.trendRatePert.totalTrend.maxPercent)
+                        })
                         updateChartOverview(track2, getJsonChurnSeries(dta.trendRatePert.totalTrend, 1))
                         track3.xAxis[0].update({categories: dta.trendRatePert.huydvTrend.cates})
+                        track3.yAxis[1].update({
+                            max: Number(dta.trendRatePert.huydvTrend.maxPercent)
+                        })
                         updateChartOverview(track3, getJsonChurnSeries(dta.trendRatePert.huydvTrend, 1))
                         track4.xAxis[0].update({categories: dta.trendRatePert.ctbdvTrend.cates})
+                        track4.yAxis[1].update({
+                            max: Number(dta.trendRatePert.ctbdvTrend.maxPercent)
+                        })
                         updateChartOverview(track4, getJsonChurnSeries(dta.trendRatePert.ctbdvTrend, 1))
                     }
                     else{
