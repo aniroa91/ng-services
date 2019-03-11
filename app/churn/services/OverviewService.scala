@@ -68,18 +68,29 @@ object OverviewService{
     CommonService.getTerm1(response, "month", "status")
   }
 
-  private def calRateAndPercentByMonth(array: Array[(String, String, Long)], status: Int) = {
-    val fitlerArray = status match {
-      case 1  => array.filter(x=> x._2.toInt == 1)
-      case 3  => array.filter(x=> x._2.toInt == 3)
-      case 13 => array.filter(x=> x._2.toInt == 1 ||  x._2.toInt == 3)
+  private def calRateAndPercentByMonth(array: Array[(String, String, Long)], arrayAll: Array[(String, String, Long)], status: Int) = {
+    var fitlerArray = new Array[(String, String , Long)](0)
+    var arrPercent  = new Array[(String, String , Long)](0)
+    status match {
+      case 1  => {
+        fitlerArray = array.filter(x=> x._2.toInt == 1)
+        arrPercent  = arrayAll.filter(x=> x._2.toInt == 1)
+      }
+      case 3  => {
+        fitlerArray = array.filter(x=> x._2.toInt == 3)
+        arrPercent  = arrayAll.filter(x=> x._2.toInt == 3)
+      }
+      case 13 => {
+        fitlerArray = array.filter(x=> x._2.toInt == 1 ||  x._2.toInt == 3)
+        arrPercent  = arrayAll.filter(x=> x._2.toInt == 1 ||  x._2.toInt == 3)
+      }
     }
     val sumAll = fitlerArray.map(x=> x._3).sum
     val sumByStatus    = fitlerArray.groupBy(x=> x._1).map(x=> x._1 -> x._2.map(y=> y._3).sum)
     val sumByStatusAll = array.groupBy(x=> x._1).map(x=>x._1 -> x._2.map(y=> y._3).sum)
     // month, rate, percentage
-    sumByStatus.map(x=> (x._1, x._2, sumByStatusAll.filter(y=> y._1 == x._1).map(x=> x._2).sum))
-      .map(x => (x._1, CommonService.format3Decimal(x._2  * 100.0/ x._3), CommonService.format3Decimal(x._2 * 100.0 / sumAll)) )
+    sumByStatus.map(x=> (x._1, x._2, sumByStatusAll.filter(y=> y._1 == x._1).map(x=> x._2).sum, arrPercent.filter(y=> y._1 == x._1).map(x=> x._3).sum))
+      .map(x => (x._1, CommonService.format3Decimal(x._2  * 100.0/ x._3), CommonService.format3Decimal(x._2 * 100.0 / x._4)) )
         .map(x=> (x._1, x._2, x._3, CommonService.format3Decimal(2* x._2 * x._3 /(x._2 + x._3)))).toArray.sorted
   }
 
@@ -170,9 +181,9 @@ object OverviewService{
     val t4 = System.currentTimeMillis()
 
     // Churn Rate & Percent HUYDV and CTBDV
-    val trendRatePert = calRateAndPercentByMonth(getContractChurnRate(month, "month", queries), 13)
-    val huyDvRatePert = calRateAndPercentByMonth(getContractChurnRate(month, "month", queries), 1)
-    val ctbdvRatePert = calRateAndPercentByMonth(getContractChurnRate(month, "month", queries), 3)
+    val trendRatePert = calRateAndPercentByMonth(getContractChurnRate(month, "month", queries), getContractChurnRate(month, "month", CommonUtil.filterCommon("package_name")) , 13)
+    val huyDvRatePert = calRateAndPercentByMonth(getContractChurnRate(month, "month", queries), getContractChurnRate(month, "month", CommonUtil.filterCommon("package_name")), 1)
+    val ctbdvRatePert = calRateAndPercentByMonth(getContractChurnRate(month, "month", queries), getContractChurnRate(month, "month", CommonUtil.filterCommon("package_name")), 3)
     logger.info("t5: "+(System.currentTimeMillis() - t4))
 
     logger.info("Time: "+(System.currentTimeMillis() - t0))
