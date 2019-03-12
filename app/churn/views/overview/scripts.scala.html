@@ -349,6 +349,8 @@
                         prevCtActive += (Number(dta.numContract.actives.prev.replace(",","")) > Number(dta.numContract.actives.curr.replace(",","")))? '<span class="down"><i class="fa fa-arrow-down fadeInDown animated" aria-hidden="true"></i> ' : '<span class="up"><i class="fa fa-arrow-up fadeInUp animated" aria-hidden="true"></i> '
                         prevCtActive += dta.numContract.actives.perct+' % </span> from '+dta.lastYYYYmm
                         $('#boxCtActive .prevCtActive').html("").append(prevCtActive)
+                        if(dta.numContract.actives.curr == "0" && dta.numContract.actives.prev == "0") $('#boxCtActive').attr('style','opacity:0.2')
+                        else $('#boxCtActive').removeAttr('style')
 
                         // box HUYDV Contract
                         $('#boxCtHuydv .currCtHuydv').text(dta.numContract.huydv.curr)
@@ -356,6 +358,8 @@
                         prevCthuydv += (Number(dta.numContract.huydv.prev.replace(",","")) > Number(dta.numContract.huydv.curr.replace(",",""))) ? '<span class="down"><i class="fa fa-arrow-down fadeInDown animated" aria-hidden="true"></i> ' : '<span class="up"><i class="fa fa-arrow-up fadeInUp animated" aria-hidden="true"></i> '
                         prevCthuydv += dta.numContract.huydv.perct+' % </span> from '+dta.lastYYYY
                         $('#boxCtHuydv .prevCtHuydv').html("").append(prevCthuydv)
+                        if(dta.numContract.huydv.curr == "0" && dta.numContract.huydv.prev == "0") $('#boxCtHuydv').attr('style','opacity:0.2')
+                        else $('#boxCtHuydv').removeAttr('style')
 
                         // box CTBDV Contract
                         $('#boxCtCtbdv .currCtCtbdv').text(dta.numContract.ctbdv.curr)
@@ -363,19 +367,27 @@
                         prevCtCtbdv += (Number(dta.numContract.ctbdv.prev.replace(",","")) > Number(dta.numContract.ctbdv.curr.replace(",","")))? '<span class="down"><i class="fa fa-arrow-down fadeInDown animated" aria-hidden="true"></i> ' : '<span class="up"><i class="fa fa-arrow-up fadeInUp animated" aria-hidden="true"></i> '
                         prevCtCtbdv += dta.numContract.ctbdv.perct+' % </span> from '+dta.lastYYYY
                         $('#boxCtCtbdv .prevCtCtbdv').html("").append(prevCtCtbdv)
+                        if(dta.numContract.ctbdv.curr == "0" && dta.numContract.ctbdv.prev == "0") $('#boxCtCtbdv').attr('style','opacity:0.2')
+                        else $('#boxCtCtbdv').removeAttr('style')
 
                         // box Total Churn Rate
                         $('.currMonth').text($('.monthGrp').val())
                         $('#boxRateTotal .avgRateTotal').text(dta.churnRate.totalRate.avg)
                         $('#boxRateTotal .currRateTotal').html(dta.churnRate.totalRate.curr+' % <i class="fa fa-info-circle iconTip" title="Tỷ lệ rời mạng, bao gồm HSSD và CTBDV, của tháng hiện tại"></i>')
+                        if(dta.churnRate.totalRate.curr == 0 && dta.churnRate.totalRate.avg == 0) $('#boxRateTotal').attr('style','opacity:0.2')
+                        else $('#boxRateTotal').removeAttr('style')
 
                         // box HUYDV Churn Rate
                         $('#boxRateHuydv .avgRateHuydv').text(dta.churnRate.huydvRate.avg)
                         $('#boxRateHuydv .currRateHuydv').html(dta.churnRate.huydvRate.curr+' % <i class="fa fa-info-circle iconTip" title="Tỷ lệ rời mạng, tính theo HSSD, của tháng hiện tại"></i>')
+                        if(dta.churnRate.huydvRate.curr == 0 && dta.churnRate.huydvRate.avg == 0) $('#boxRateHuydv').attr('style','opacity:0.2')
+                        else $('#boxRateHuydv').removeAttr('style')
 
                         // box CTBDV Churn Rate
                         $('#boxRateCtbdv .avgRateCtbdv').text(dta.churnRate.ctbdvRate.avg)
                         $('#boxRateCtbdv .currRateCtbdv').html(dta.churnRate.ctbdvRate.curr+ ' % <i class="fa fa-info-circle iconTip" title="Tỷ lệ rời mạng, tính theo CTBDV, của tháng hiện tại"></i>')
+                        if(dta.churnRate.ctbdvRate.curr == 0 && dta.churnRate.ctbdvRate.avg == 0) $('#boxRateCtbdv').attr('style','opacity:0.2')
+                        else $('#boxRateCtbdv').removeAttr('style')
 
                         $('.counter').counterUp({
                             delay: 10,

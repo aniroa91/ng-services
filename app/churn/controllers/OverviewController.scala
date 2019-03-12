@@ -93,26 +93,29 @@ class OverviewController @Inject() (cc: ControllerComponents) extends AbstractCo
         "ctbdv"     -> rs.numofMonth.filter(x=> x._2.toInt == 3).sorted.map(x=> x._3)
       )
       // trend churn rate by status
+      val maxPertAll = if(rs.trendRatePert._1.length >0) rs.trendRatePert._1.map(x=> x._3).max else 0
       val totalTrend = Json.obj(
         "cates"       -> rs.trendRatePert._1.map(x=> x._1).distinct.sorted,
         "rate"        -> rs.trendRatePert._1.map(x=> x._2),
         "perct"       -> rs.trendRatePert._1.map(x=> x._3),
         "f1"          -> rs.trendRatePert._1.map(x=> x._4),
-        "maxPercent"  -> rs.trendRatePert._1.map(x=> x._3).max
+        "maxPercent"  -> maxPertAll
       )
+      val maxPertHuydv = if(rs.trendRatePert._2.length >0) rs.trendRatePert._2.map(x=> x._3).max else 0
       val huydvTrend = Json.obj(
         "cates"       -> rs.trendRatePert._2.map(x=> x._1).distinct.sorted,
         "rate"        -> rs.trendRatePert._2.map(x=> x._2),
         "perct"       -> rs.trendRatePert._2.map(x=> x._3),
         "f1"          -> rs.trendRatePert._2.map(x=> x._4),
-        "maxPercent"  -> rs.trendRatePert._2.map(x=> x._3).max
+        "maxPercent"  -> maxPertHuydv
       )
+      val maxPertCtbdv = if(rs.trendRatePert._3.length >0) rs.trendRatePert._3.map(x=> x._3).max else 0
       val ctbdvTrend = Json.obj(
         "cates"       -> rs.trendRatePert._3.map(x=> x._1).distinct.sorted,
         "rate"        -> rs.trendRatePert._3.map(x=> x._2),
         "perct"       -> rs.trendRatePert._3.map(x=> x._3),
         "f1"          -> rs.trendRatePert._3.map(x=> x._4),
-        "maxPercent"  -> rs.trendRatePert._3.map(x=> x._3).max
+        "maxPercent"  -> maxPertCtbdv
       )
       val trendRatePert = Json.obj(
         "totalTrend"       -> totalTrend,

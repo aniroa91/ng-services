@@ -35,7 +35,7 @@ object OverviewService{
   }
 
   private def getListPackage(month: String) = {
-    val request = search(s"churn-contract-info-${month}" / "docs") aggregations (
+    val request = search(s"churn-contract-info-${month}" / "docs") query(CommonUtil.filterCommon("package_name")) aggregations (
       termsAggregation("package_name")
         .field("package_name") size 1000
       ) size 0
@@ -95,10 +95,10 @@ object OverviewService{
   }
 
   private def calChurnRatebyMonth(array: Array[(String, String, Long)], status: Int) = {
-    val allStatus = array.groupBy(x=> x._1).map(x=> x._1 -> x._2.map(y=> y._3).sum).toMap
-    val rs = if(status != 13) array.filter(x=> x._2.toInt == status).map(x=> x._1 -> x._3)
-    else array.filter(x=> x._2.toInt == 1 || x._2.toInt == 3).groupBy(x=> x._1).map(x=> x._1 -> x._2.map(y=> y._3).sum).toArray
-    rs.map(x=> x._1 -> CommonService.format3Decimal(x._2 * 100.0 / allStatus.get(x._1).get))
+    val allStatus = array.groupBy(x => x._1).map(x => x._1 -> x._2.map(y => y._3).sum).toMap
+    val rs = if (status != 13) array.filter(x => x._2.toInt == status).map(x => x._1 -> x._3)
+    else array.filter(x => x._2.toInt == 1 || x._2.toInt == 3).groupBy(x => x._1).map(x => x._1 -> x._2.map(y => y._3).sum).toArray
+    rs.map(x => x._1 -> CommonService.format3Decimal(x._2 * 100.0 / allStatus.get(x._1).get))
   }
 
   private def getFilterGroup(age:String, region:String, province:String, packages:String, combo:String, lstProvince: Array[(String, String)]): String = {
@@ -166,12 +166,15 @@ object OverviewService{
 
     // calculate churn rate for Status HUYDV + CTBDV(1 vs 3)
     val ctMonthStatus = getContractChurnRate(month, "rate", queries)
-    val avgRateHuydv  = CommonService.format3Decimal(calChurnRatebyMonth(ctMonthStatus, 1).map(x=> x._2).sum / calChurnRatebyMonth(ctMonthStatus, 1).length)
-    val currRateHuydv = calChurnRatebyMonth(ctMonthStatus, 1).filter(x=> x._1 == month).toMap.get(month).get
-    val avgRateCTBDV  = CommonService.format3Decimal(calChurnRatebyMonth(ctMonthStatus, 3).map(x=> x._2).sum / calChurnRatebyMonth(ctMonthStatus, 3).length)
-    val currRateCTBDV = calChurnRatebyMonth(ctMonthStatus, 3).filter(x=> x._1 == month).toMap.get(month).get
-    val avgRateAll    = CommonService.format3Decimal(calChurnRatebyMonth(ctMonthStatus, 13).map(x=> x._2).sum / calChurnRatebyMonth(ctMonthStatus, 13).length)
-    val currRateAll   = calChurnRatebyMonth(ctMonthStatus, 13).filter(x=> x._1 == month).toMap.get(month).get
+    val avgRateHuydv  = if(calChurnRatebyMonth(ctMonthStatus, 1).length > 0) CommonService.format3Decimal(calChurnRatebyMonth(ctMonthStatus, 1).map(x=> x._2).sum / calChurnRatebyMonth(ctMonthStatus, 1).length)
+                        else 0
+    val currRateHuydv = calChurnRatebyMonth(ctMonthStatus, 1).filter(x=> x._1 == month).toMap.get(month).getOrElse(0.0)
+    val avgRateCTBDV  = if(calChurnRatebyMonth(ctMonthStatus, 3).length > 0) CommonService.format3Decimal(calChurnRatebyMonth(ctMonthStatus, 3).map(x=> x._2).sum / calChurnRatebyMonth(ctMonthStatus, 3).length)
+                        else 0
+    val currRateCTBDV = calChurnRatebyMonth(ctMonthStatus, 3).filter(x=> x._1 == month).toMap.get(month).getOrElse(0.0)
+    val avgRateAll    = if(calChurnRatebyMonth(ctMonthStatus, 13).length > 0) CommonService.format3Decimal(calChurnRatebyMonth(ctMonthStatus, 13).map(x=> x._2).sum / calChurnRatebyMonth(ctMonthStatus, 13).length)
+                        else 0
+    val currRateAll   = calChurnRatebyMonth(ctMonthStatus, 13).filter(x=> x._1 == month).toMap.get(month).getOrElse(0.0)
     logger.info("t2: "+(System.currentTimeMillis() - t2))
     val t3 = System.currentTimeMillis()
 
