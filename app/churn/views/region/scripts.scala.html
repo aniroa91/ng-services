@@ -549,10 +549,14 @@
                     var month = dataRegionHuyDv.getValue(row, 1)
                     $(".monthPicker").datepicker("update", keyByValue(catesMonthRegion, month));
                     $('#region').val(region)
+                    $('.txtRegion').text("Vung "+region)
+                    $('.regionDiv').show()
                 }
                 else{
                     $(".monthPicker").datepicker("update", $('#month').val());
                     $('#region').val("*")
+                    $('.txtRegion').text("")
+                    $('.regionDiv').hide()
                 }
                 // highlight region when click
                 Array.prototype.forEach.call(document.getElementById('churn3').getElementsByTagName('text'), function(text) {
@@ -1204,10 +1208,14 @@
                                         var month = dataRegionMonth.getValue(row, 1)
                                         $(".monthPicker").datepicker("update", keyByValue(dta.churn3.cates, month));
                                         $('#region').val(region)
+                                        $('.txtRegion').text("Vung "+region)
+                                        $('.regionDiv').show()
                                     }
                                     else{
                                         $(".monthPicker").datepicker("update", $('#month').val());
                                         $('#region').val("*")
+                                        $('.txtRegion').text("")
+                                        $('.regionDiv').hide()
                                     }
                                     // highlight region when click
                                     Array.prototype.forEach.call(document.getElementById('churn3').getElementsByTagName('text'), function(text) {
