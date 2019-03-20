@@ -180,6 +180,8 @@ object OverviewService{
 
     // Chart trend Number Contract by month
     val numOfMonth    = getContractChurnRate(month, "month", queries).filter(x=> x._2.toInt == 1 || x._2.toInt == 3).sorted
+    numOfMonth.foreach(println)
+    println("===")
     logger.info("t4: "+(System.currentTimeMillis() - t3))
     val t4 = System.currentTimeMillis()
 

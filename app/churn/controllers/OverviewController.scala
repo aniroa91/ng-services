@@ -85,12 +85,15 @@ class OverviewController @Inject() (cc: ControllerComponents) extends AbstractCo
         "ctbdvRate"       -> ctbdvRate
       )
       // number of contract by month
+      val ctHuyDV = rs.numofMonth.filter(x=> x._2.toInt == 1).map(x=> x._1 -> x._3).sorted.toMap
+      val ctCTBDV = rs.numofMonth.filter(x=> x._2.toInt == 3).map(x=> x._1 -> x._3).sorted.toMap
+      val cates   = rs.numofMonth.map(x=> x._1).distinct.map(x=> (x, ctHuyDV.get(x).getOrElse(0.toLong), ctCTBDV.get(x).getOrElse(0.toLong)))
       val numofMonth = Json.obj(
-        "cates"     -> rs.numofMonth.map(x=> x._1).distinct.sorted,
-        "huydv"     -> rs.numofMonth.filter(x=> x._2.toInt == 1).sorted.map(x=> x._3),
+        "cates"      -> cates.map(x=> x._1).distinct.sorted,
+        "huydv"      -> cates.map(x=> x._2),
         "titSeries1" -> "HSSD",
         "titSeries2" -> "CTBDV",
-        "ctbdv"     -> rs.numofMonth.filter(x=> x._2.toInt == 3).sorted.map(x=> x._3)
+        "ctbdv"      -> cates.map(x=> x._3)
       )
       // trend churn rate by status
       val maxPertAll = if(rs.trendRatePert._1.length >0) rs.trendRatePert._1.map(x=> x._3).max else 0
