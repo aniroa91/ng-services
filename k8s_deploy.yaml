@@ -16,6 +16,11 @@ spec:
       containers:
       - name: ${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
         image: bigdata-registry.local:5043/${BRANCH_NAME}/${DOCKER_IMAGE_NAME}:${BUILD_ID}
+        env:
+        - name: SVC_HOST1
+          value: STAGING_SVC_USER_MANAGEMENT_SERVICE_HOST
+        - name: SVC_PORT1
+          value: STAGING_SVC_USER_MANAGEMENT_SERVICE_PORT
         ports:
         - containerPort: 9000
 
