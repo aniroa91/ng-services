@@ -17,10 +17,9 @@ spec:
       - name: ${BRANCH_NAME}-${DOCKER_IMAGE_NAME}
         image: bigdata-registry.local:5043/${BRANCH_NAME}/${DOCKER_IMAGE_NAME}:${BUILD_ID}
         env:
-#env variable to access web user management
-        - name: SVC_HOST1
+        - name: SVC_HOST_USER_MANAGEMENT
           value: STAGING_SVC_USER_MANAGEMENT_SERVICE_HOST
-        - name: SVC_PORT1
+        - name: SVC_PORT_USER_MANAGEMENT
           value: STAGING_SVC_USER_MANAGEMENT_SERVICE_PORT
         ports:
         - containerPort: 9000
