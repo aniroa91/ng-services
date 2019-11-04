@@ -5,11 +5,10 @@ import play.api.data.Forms.mapping
 import play.api.data.Forms.text
 import javax.inject.Inject
 import javax.inject.Singleton
-
 import play.api.mvc._
 import play.api.mvc.AbstractController
 import play.api.mvc.ControllerComponents
-import churn.utils.AgeGroupUtil
+import churn.utils.{AgeGroupUtil, CommonUtil}
 import services.domain.CommonService
 import controllers.Secured
 import com.sksamuel.elastic4s.http.HttpClient
@@ -27,21 +26,19 @@ import service.OverviewService
 
 @Singleton
 class OverviewController @Inject() (cc: ControllerComponents) extends AbstractController(cc) with Secured{
-
   def index() = withAuth { username => implicit request: Request[AnyContent] =>
-    val month = CommonService.getPrevMonth()
-    try {
-      val rs = OverviewService.getInternet(null)
-      Ok(churn.views.html.overview.index(rs, month, username, churn.controllers.routes.OverviewController.index()))
-    }
+    //try {
+      val rs = OverviewService.getInternet(username, null)
+      Ok(churn.views.html.overview.index(rs, rs.month, username, rs.trendRegionMonth._2.map(x=> x._1).toArray.sorted, churn.controllers.routes.OverviewController.index()))
+    /*}
     catch {
-      case e: Exception => Ok(churn.views.html.overview.index(null, month, username, churn.controllers.routes.OverviewController.index()))
-    }
+      case e: Exception => Ok(churn.views.html.overview.index(null, CommonService.getPrevMonth(), username, rangeMonth, churn.controllers.routes.OverviewController.index()))
+    }*/
   }
 
   def getJsonChurn() = withAuth {username => implicit request: Request[AnyContent] =>
-    try{
-      val rs = OverviewService.getInternet(request)
+    //try{
+      val rs = OverviewService.getInternet(username, request)
       // num contract
       var perct = if(rs.numContract._1.prev.toLong == 0) "NaN" else CommonService.percent(rs.numContract._1.curr.toLong, rs.numContract._1.prev.toLong).toString
       val activeCt = Json.obj(
@@ -96,50 +93,62 @@ class OverviewController @Inject() (cc: ControllerComponents) extends AbstractCo
         "ctbdv"      -> cates.map(x=> x._3)
       )
       // trend churn rate by status
-      val maxPertAll = if(rs.trendRatePert._1.length >0) rs.trendRatePert._1.map(x=> x._3).max else 0
+      val maxPertAll = if(rs.trendRatePert.length >0) rs.trendRatePert.map(x=> x._3).max else 0
       val totalTrend = Json.obj(
-        "cates"       -> rs.trendRatePert._1.map(x=> x._1).distinct.sorted,
-        "rate"        -> rs.trendRatePert._1.map(x=> x._2),
-        "perct"       -> rs.trendRatePert._1.map(x=> x._3),
-        "f1"          -> rs.trendRatePert._1.map(x=> x._4),
+        "cates"       -> rs.trendRatePert.map(x=> x._1).distinct.sorted,
+        "rate"        -> rs.trendRatePert.map(x=> x._2),
+        "perct"       -> rs.trendRatePert.map(x=> x._3),
+        "f1"          -> rs.trendRatePert.map(x=> x._4),
         "maxPercent"  -> maxPertAll
       )
-      val maxPertHuydv = if(rs.trendRatePert._2.length >0) rs.trendRatePert._2.map(x=> x._3).max else 0
-      val huydvTrend = Json.obj(
-        "cates"       -> rs.trendRatePert._2.map(x=> x._1).distinct.sorted,
-        "rate"        -> rs.trendRatePert._2.map(x=> x._2),
-        "perct"       -> rs.trendRatePert._2.map(x=> x._3),
-        "f1"          -> rs.trendRatePert._2.map(x=> x._4),
-        "maxPercent"  -> maxPertHuydv
-      )
-      val maxPertCtbdv = if(rs.trendRatePert._3.length >0) rs.trendRatePert._3.map(x=> x._3).max else 0
-      val ctbdvTrend = Json.obj(
-        "cates"       -> rs.trendRatePert._3.map(x=> x._1).distinct.sorted,
-        "rate"        -> rs.trendRatePert._3.map(x=> x._2),
-        "perct"       -> rs.trendRatePert._3.map(x=> x._3),
-        "f1"          -> rs.trendRatePert._3.map(x=> x._4),
-        "maxPercent"  -> maxPertCtbdv
-      )
       val trendRatePert = Json.obj(
-        "totalTrend"       -> totalTrend,
-        "huydvTrend"       -> huydvTrend,
-        "ctbdvTrend"       -> ctbdvTrend
+        "totalTrend"       -> totalTrend
+      )
+      // sparkline table
+      val tbChurn = Json.obj(
+        "location" -> rs.tbChurn._1,
+        "data" -> rs.tbChurn._2,
+        "arrMonth" -> rs.trendRegionMonth._2.map(x=> x._1).toArray.sorted
+      )
+      // bubble charts
+      val minPercBubble = if(rs.trendRegionMonth._3.length > 0) CommonService.format2Decimal(rs.trendRegionMonth._3.map(x=>x._4).min) else 0
+      val maxPercBubble = if(rs.trendRegionMonth._3.length > 0) CommonService.format2Decimal(rs.trendRegionMonth._3.map(x=>x._4).max) else 0
+      val isNullBubble  = if(rs.trendRegionMonth._3.length > 0 && rs.trendRegionMonth._3.map(x=>x._4).min == 0 && rs.trendRegionMonth._3.map(x=>x._3).min == 0) 1 else 0
+      val churnBubble = Json.obj(
+        "catesRegion" -> rs.trendRegionMonth._1,
+        "catesMonth"  -> rs.trendRegionMonth._2,
+        "data"       -> rs.trendRegionMonth._3,
+        "minPercent" -> minPercBubble,
+        "maxPercent" -> maxPercBubble,
+        "isNull"     -> isNullBubble
       )
       val json = Json.obj(
         "numContract"    -> numContract,
         "churnRate"      -> churnRate,
         "numofMonth"     -> numofMonth,
         "trendRatePert"  -> trendRatePert,
+        "churnBubble"    -> churnBubble,
+        "tbChurn"        -> tbChurn,
         "lastYYYY"       -> CommonService.getPrevYYYY(rs.month),
-        "lastYYYYmm"     -> CommonService.getPrevYYYYMM(rs.month)
+        "lastYYYYmm"     -> CommonService.getPrevYYYYMM(rs.month),
+        "location"       -> OverviewService.checkLocation(request.body.asFormUrlEncoded.get("province").head)
       )
       Ok(Json.toJson(json))
-    }
+   /* }
     catch{
       case e: Exception => Ok("Error")
-    }
+    }*/
 
   }
 
+  def pushComment() = withAuth { username => implicit request: Request[AnyContent] =>
+      try {
+        CommonService.insertComment(username, request)
+        Ok("Ok")
+      }
+      catch {
+        case e: Exception => Ok("Error")
+      }
+  }
 
 }

@@ -8,9 +8,12 @@ case class OverviewResponse(
                            numContract   : (ContractNumber, ContractNumber, ContractNumber),
                            churnRate     : (RateNumber, RateNumber, RateNumber),
                            numofMonth    : Array[(String, String, Long)],
-                           trendRatePert : (Array[(String, Double, Double, Double)], Array[(String, Double, Double, Double)], Array[(String, Double, Double, Double)]),
+                           trendRatePert : Array[(String, Double, Double, Double)],
                            province      : Array[(String, String)],
                            packages      : Array[(String)],
+                           trendRegionMonth : (Map[String, Int], Map[String, Int], Array[(Int, Int, Double, Double, Int)]),
+                           tbChurn       : (Array[(String)], Array[(String, String, Double, Double, Int)]),
+                           comments      : (String, String),
                            month         : String
                          )
 

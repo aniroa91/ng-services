@@ -30,6 +30,9 @@ GET     /churn/search                    churn.controllers.ChurnDetectController
 GET     /internet/overview               churn.controllers.OverviewController.index
 POST    /internet/overview/getJsonChurn  churn.controllers.OverviewController.getJsonChurn
 
+## COMMENT LOG
+POST    /internet/pushComment            churn.controllers.OverviewController.pushComment
+
 ### PAGE AGE
 GET     /internet/age                    churn.controllers.ChurnAgeController.index
 POST    /internet/age/getJsonChurn       churn.controllers.ChurnAgeController.getJsonChurn

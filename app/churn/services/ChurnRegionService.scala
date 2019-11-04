@@ -24,7 +24,7 @@ object  ChurnRegionService{
 
   val logger = Logger(this.getClass())
 
-  val rangeDate = CommonService.getRangeDateByLimit(CommonService.getPrevMonth(), 12, "month")
+  val rangeDate = CommonService.getRangeDateByLimit(CommonService.getPrevMonth(), 15, "month")
 
   def getChurnGroupMonth(queryString: String) ={
     val request = search(s"churn-contract-info-*" / "docs") query(queryString +" AND "+CommonUtil.filterCommon("package_name")) aggregations (

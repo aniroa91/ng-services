@@ -3,9 +3,13 @@ package services.domain
 import java.text.DecimalFormat
 import java.time.format.DateTimeFormatter
 
+import churn.utils.CommonUtil
 import com.ftel.bigdata.utils.DateTimeUtil
+import org.elasticsearch.action.support.WriteRequest.RefreshPolicy
 import org.elasticsearch.search.sort.SortOrder
-import org.joda.time.{DateTime, Days}
+import org.joda.time.{DateTime, Days, Months}
+import play.api.mvc.{AnyContent, Request}
+import service.OverviewService.client
 
 import scala.collection.mutable
 import scala.util.control.Breaks.{break, breakable}
@@ -210,6 +214,24 @@ object CommonService extends AbstractService {
       .toArray
   }
 
+  def insertComment(username: String, request: Request[AnyContent]) ={
+    val log     = request.body.asFormUrlEncoded.get("comment").head
+    val chartId = CommonUtil.PAGE_ID.get(0).get +request.body.asFormUrlEncoded.get("chartId").head
+    val date = new DateTime()
+    val curDate = date.toString(DateTimeFormat.forPattern("yyyy-MM-dd hh:mm:ss"))
+    client.execute {
+      bulk(
+        indexInto("log-comment" / "docs").fields("user" -> username,"chartId"-> chartId, "log" -> log, "date" -> curDate)
+      ).refresh(RefreshPolicy.IMMEDIATE)
+    }.await
+  }
+
+  def getCommentByUser(username: String, chartId: String) ={
+    val request = search(s"log-comment" / "docs") query(s"user:$username AND chartId:$chartId*")
+    val response = client.execute(request).await
+    response.hits.hits.map(x=> x.sourceAsMap).map(x=> (getValueAsString(x, "chartId"), getValueAsString(x, "date"), getValueAsString(x, "log")))
+  }
+
   def getSecondAggregations(aggr: Option[AnyRef],secondField: String):  Array[(String, Array[(String, Long)])] = {
     aggr.getOrElse("buckets", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
       .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
@@ -273,6 +295,15 @@ object CommonService extends AbstractService {
     return from
   }
 
+  def getTopMonth(day: String, numMonths: Int): ArrayBuffer[String] = {
+    var arrMonth = ArrayBuffer[String]()
+    val prev = DateTimeUtil.create(day, "yyyy-MM").minusMonths(numMonths)
+    for (f<- 1 to numMonths) {
+      arrMonth += prev.plusMonths(f).toString("yyyy-MM")
+    }
+    arrMonth
+  }
+
   def isDayValid(day: String): Boolean = {
     Try(DateTimeUtil.create(day, DateTimeUtil.YMD)).isSuccess
   }
@@ -314,6 +345,19 @@ object CommonService extends AbstractService {
   def divided(number: Int, prev: Int): Int = {
     val value = number / prev
     value
+  }
+
+  def toTitleCase(str: String): String = {
+    val words = str.split(" ") // split each words of above string
+    var capitalizedWord = "" // create an empty string
+
+    for (w <- words) {
+      val first = w.substring(0, 1) // get first character of each word
+      val f_after = w.substring(1) // get remaining character of corresponding word
+      capitalizedWord += first.toUpperCase + f_after.toLowerCase + " " // capitalize first character and add the remaining to the empty string and continue
+
+    }
+    capitalizedWord
   }
   
   def percent(number: Long, prev: Long): Double = {

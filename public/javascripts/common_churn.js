@@ -1,5 +1,51 @@
 /* Author hoangnh44 */
 
+/*comment Id by Page and id:
+    [Overview*, Age*, Package*, ...]
+*/
+
+function insertComment(fields) {
+    $.ajax({
+        url: "/internet/pushComment",
+        cache: false,
+        data:  fields,
+        type:"POST",
+        success: function (dta) {
+            if(dta == "Ok"){
+                alert("Success")
+            }
+            else{
+                alert("Error when insert comment")
+            }
+        }
+    })
+}
+
+function parseTbChurnRate(data) {
+    var location = data.location
+    var dataChurn = data.data
+    var tBody = ""
+    for(var i=0; i< location.length; i++){
+        var totalRate = 0, totalContract = 0, f1 = []
+        tBody += "<tr>"
+        tBody += "<td>"+location[i]+"</td>"
+        for(var j=0; j< dataChurn.length; j++){
+            if(dataChurn[j][0] == location[i]){
+                if(dataChurn[j][1] == $('#monthCurr').val()){
+                    totalRate += dataChurn[j][2]
+                    totalContract += dataChurn[j][4]
+                }
+                f1.push(dataChurn[j][3])
+            }
+        }
+        tBody += "<td style='text-align: center'>"+totalContract.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')+"</td>"
+        tBody += "<td style='text-align: center'>"+totalRate+"</td>"
+        tBody += "<td style='text-align: center'><span class='inlinesparkline'>"+f1.join(",")+"</span></td>"
+        tBody += "</tr>"
+    }
+    return tBody
+}
+
 function showMoreLess(event){
     if ($(event).parent().find('.dots').is(':visible')) {
         $(event).parent().find('.more').show()

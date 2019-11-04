@@ -1,6 +1,16 @@
 package churn.utils
 
+import com.sksamuel.elastic4s.http.search.SearchResponse
+
+import scala.collection.immutable.Map
+
 object CommonUtil {
+
+  val PAGE_ID = Map(
+    0 -> "Overview",
+    1 -> "Age",
+    2 -> "Package"
+  )
 
   val STATUS_MAP = Map(
     "BINH THUONG" -> 0,
@@ -368,4 +378,33 @@ object CommonUtil {
     full_queries
   }
 
+  def getChurnRateAndPercentage(response: SearchResponse, term1: String, term2: String, term3: String): Array[(String, String, String, Int, Int, Int)] = {
+    if (response.aggregations != null) {
+      response.aggregations
+        .getOrElse(term1, Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+        .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+        .map(x => x.asInstanceOf[Map[String, AnyRef]])
+        .flatMap(x => {
+          val term1Key = x.getOrElse("key", "key").toString()
+          val term1Count = x.getOrElse("doc_count", "0").toString().toInt
+          x.getOrElse(term2, Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+            .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+            .map(y => y.asInstanceOf[Map[String, AnyRef]])
+            .flatMap(y => {
+              val term2Key = y.getOrElse("key", "key").toString()
+              val term2Count = y.getOrElse("doc_count", "0").toString().toInt
+              y.getOrElse(term3, Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+                .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+                .map(z => z.asInstanceOf[Map[String, AnyRef]])
+                .map(z => {
+                  val term3Key = z.getOrElse("key", "key").toString()
+                  val term3Count = z.getOrElse("doc_count", "0").toString().toInt
+                  (term1Key, term2Key, term3Key, term1Count, term2Count, term3Count)
+                })
+            })
+        }).toArray
+    } else {
+      Array[(String, String, String, Int, Int, Int)]()
+    }
+  }
 }
