@@ -4,6 +4,14 @@ case class ContractNumber(curr: Int, prev: Int)
 
 case class RateNumber(avg: Double, curr: Double)
 
+case class AgeResponse(
+                        trendAgeMonth : (Map[String, Int], Map[String, Int], Array[(Int, Int, Double, Double, Int)]),
+                        tbAge         : (Array[(String)], Array[(String, String, Double, Double, Int)]),
+                        trendAgeLocation : (Map[String, Int], Map[String, Int], Array[(Int, Int, Double, Double, Int)]),
+                        comments      : String,
+                        month         : String
+                      )
+
 case class OverviewResponse(
                            numContract   : (ContractNumber, ContractNumber, ContractNumber),
                            churnRate     : (RateNumber, RateNumber, RateNumber),
@@ -13,7 +21,7 @@ case class OverviewResponse(
                            packages      : Array[(String)],
                            trendRegionMonth : (Map[String, Int], Map[String, Int], Array[(Int, Int, Double, Double, Int)]),
                            tbChurn       : (Array[(String)], Array[(String, String, Double, Double, Int)]),
-                           comments      : (String, String),
+                           comments      : String,
                            month         : String
                          )
 

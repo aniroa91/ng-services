@@ -11,13 +11,13 @@ class ErrorHandler extends HttpErrorHandler {
 
   def onClientError(request: RequestHeader, statusCode: Int, message: String) = {
     Future.successful(
-      Redirect(churn.controllers.routes.ChurnAgeController.index)
+      Redirect(churn.controllers.routes.OverviewController.index)
     )
   }
 
   def onServerError(request: RequestHeader, exception: Throwable) = {
     Future.successful(
-      Redirect(churn.controllers.routes.ChurnAgeController.index)
+      Redirect(churn.controllers.routes.OverviewController.index)
     )
   }
 }

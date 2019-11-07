@@ -17,7 +17,7 @@ import services.Configure
 import play.api.libs.json.Json
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.ftel.bigdata.utils.StringUtil
-import service.OverviewService
+import service.{ChurnAgeService, OverviewService}
 
 /**
   * This controller creates an `Action` to handle HTTP requests to the
@@ -27,17 +27,17 @@ import service.OverviewService
 @Singleton
 class OverviewController @Inject() (cc: ControllerComponents) extends AbstractController(cc) with Secured{
   def index() = withAuth { username => implicit request: Request[AnyContent] =>
-    //try {
+    try {
       val rs = OverviewService.getInternet(username, null)
       Ok(churn.views.html.overview.index(rs, rs.month, username, rs.trendRegionMonth._2.map(x=> x._1).toArray.sorted, churn.controllers.routes.OverviewController.index()))
-    /*}
+    }
     catch {
-      case e: Exception => Ok(churn.views.html.overview.index(null, CommonService.getPrevMonth(), username, rangeMonth, churn.controllers.routes.OverviewController.index()))
-    }*/
+      case e: Exception => Ok(churn.views.html.overview.index(null, CommonService.getPrevMonth(), username, null, churn.controllers.routes.OverviewController.index()))
+    }
   }
 
-  def getJsonChurn() = withAuth {username => implicit request: Request[AnyContent] =>
-    //try{
+  def getJsonOverview() = withAuth {username => implicit request: Request[AnyContent] =>
+    try{
       val rs = OverviewService.getInternet(username, request)
       // num contract
       var perct = if(rs.numContract._1.prev.toLong == 0) "NaN" else CommonService.percent(rs.numContract._1.curr.toLong, rs.numContract._1.prev.toLong).toString
@@ -106,7 +106,7 @@ class OverviewController @Inject() (cc: ControllerComponents) extends AbstractCo
       )
       // sparkline table
       val tbChurn = Json.obj(
-        "location" -> rs.tbChurn._1,
+        "name" -> rs.tbChurn._1,
         "data" -> rs.tbChurn._2,
         "arrMonth" -> rs.trendRegionMonth._2.map(x=> x._1).toArray.sorted
       )
@@ -134,10 +134,62 @@ class OverviewController @Inject() (cc: ControllerComponents) extends AbstractCo
         "location"       -> OverviewService.checkLocation(request.body.asFormUrlEncoded.get("province").head)
       )
       Ok(Json.toJson(json))
-   /* }
+    }
     catch{
       case e: Exception => Ok("Error")
-    }*/
+    }
+  }
+
+  def getJsonByTab() = withAuth {username => implicit request: Request[AnyContent] =>
+    try{
+      val tabName = request.body.asFormUrlEncoded.get("tabName").head
+      tabName match {
+        // tab Age trending
+        case "tabAge" => {
+          val rs = ChurnAgeService.getInternet(username, request)
+          // bubble charts Age & Month
+          val minPercAge = if(rs.trendAgeMonth._3.length > 0) CommonService.format2Decimal(rs.trendAgeMonth._3.map(x=>x._4).min) else 0
+          val maxPercAge = if(rs.trendAgeMonth._3.length > 0) CommonService.format2Decimal(rs.trendAgeMonth._3.map(x=>x._4).max) else 0
+          val isNullAge  = if(rs.trendAgeMonth._3.length > 0 && rs.trendAgeMonth._3.map(x=>x._4).min == 0 && rs.trendAgeMonth._3.map(x=>x._3).min == 0) 1 else 0
+          val churnAge = Json.obj(
+            "catesRegion" -> rs.trendAgeMonth._1,
+            "catesMonth"  -> rs.trendAgeMonth._2,
+            "data"       -> rs.trendAgeMonth._3,
+            "minPercent" -> minPercAge,
+            "maxPercent" -> maxPercAge,
+            "isNull"     -> isNullAge
+          )
+          // bubble charts Age & Location
+          val minPercLocation = if(rs.trendAgeLocation._3.length > 0) CommonService.format2Decimal(rs.trendAgeLocation._3.map(x=>x._4).min) else 0
+          val maxPercLocation = if(rs.trendAgeLocation._3.length > 0) CommonService.format2Decimal(rs.trendAgeLocation._3.map(x=>x._4).max) else 0
+          val isNullLocation  = if(rs.trendAgeLocation._3.length > 0 && rs.trendAgeLocation._3.map(x=>x._4).min == 0 && rs.trendAgeLocation._3.map(x=>x._3).min == 0) 1 else 0
+          val churnLocation = Json.obj(
+            "catesRegion" -> rs.trendAgeLocation._1,
+            "catesMonth"  -> rs.trendAgeLocation._2,
+            "data"       -> rs.trendAgeLocation._3,
+            "minPercent" -> minPercLocation,
+            "maxPercent" -> maxPercLocation,
+            "isNull"     -> isNullLocation
+          )
+          // sparkline table
+          val tbAge = Json.obj(
+            "name" -> rs.tbAge._1,
+            "data" -> rs.tbAge._2,
+            "arrMonth" -> rs.trendAgeMonth._2.map(x=> x._1).toArray.sorted
+          )
+          val json = Json.obj(
+            "churnAgeLocation"    -> churnLocation,
+            "churnAgeMonth"   -> churnAge,
+            "tbAge"     -> tbAge,
+            "cmtChart"  -> rs.comments
+          )
+          Ok(Json.toJson(json))
+        }
+      }
+    }
+    catch{
+      case e: Exception => Ok("Error")
+    }
 
   }
 
@@ -149,6 +201,16 @@ class OverviewController @Inject() (cc: ControllerComponents) extends AbstractCo
       catch {
         case e: Exception => Ok("Error")
       }
+  }
+
+  def getComment(tab: String) = withAuth { username => implicit request: Request[AnyContent] =>
+    try {
+      val comments = OverviewService.getCommentChart(username, tab)
+      Ok(comments)
+    }
+    catch {
+      case e: Exception => Ok("Error")
+    }
   }
 
 }

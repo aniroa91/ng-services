@@ -27,15 +27,15 @@ GET      /logout                       controllers.LoginController.logout
 GET     /churn/search                    churn.controllers.ChurnDetectController.getFormContract(contract: String)
 
 ### PAGE OVERVIEW
-GET     /internet/overview               churn.controllers.OverviewController.index
-POST    /internet/overview/getJsonChurn  churn.controllers.OverviewController.getJsonChurn
+# Tab Overview
+GET     /overview                        churn.controllers.OverviewController.index
+POST    /overview/getJsonOverview        churn.controllers.OverviewController.getJsonOverview
+# Tab Age
+POST    /overview/getJsonByTab           churn.controllers.OverviewController.getJsonByTab
 
 ## COMMENT LOG
 POST    /internet/pushComment            churn.controllers.OverviewController.pushComment
-
-### PAGE AGE
-GET     /internet/age                    churn.controllers.ChurnAgeController.index
-POST    /internet/age/getJsonChurn       churn.controllers.ChurnAgeController.getJsonChurn
+GET     /internet/getCommentByTab        churn.controllers.OverviewController.getComment(tab: String)
 
 ### PAGE REGION
 GET     /internet/region                 churn.controllers.ChurnRegionController.index

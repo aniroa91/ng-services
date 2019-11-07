@@ -216,9 +216,9 @@ object CommonService extends AbstractService {
 
   def insertComment(username: String, request: Request[AnyContent]) ={
     val log     = request.body.asFormUrlEncoded.get("comment").head
-    val chartId = CommonUtil.PAGE_ID.get(0).get +request.body.asFormUrlEncoded.get("chartId").head
+    val chartId = CommonUtil.PAGE_ID.get(0).get +"_"+request.body.asFormUrlEncoded.get("tabName").head
     val date = new DateTime()
-    val curDate = date.toString(DateTimeFormat.forPattern("yyyy-MM-dd hh:mm:ss"))
+    val curDate = date.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
     client.execute {
       bulk(
         indexInto("log-comment" / "docs").fields("user" -> username,"chartId"-> chartId, "log" -> log, "date" -> curDate)
@@ -229,7 +229,7 @@ object CommonService extends AbstractService {
   def getCommentByUser(username: String, chartId: String) ={
     val request = search(s"log-comment" / "docs") query(s"user:$username AND chartId:$chartId*")
     val response = client.execute(request).await
-    response.hits.hits.map(x=> x.sourceAsMap).map(x=> (getValueAsString(x, "chartId"), getValueAsString(x, "date"), getValueAsString(x, "log")))
+    response.hits.hits.map(x=> x.sourceAsMap).map(x=> (getValueAsString(x, "date"), getValueAsString(x, "log")))
   }
 
   def getSecondAggregations(aggr: Option[AnyRef],secondField: String):  Array[(String, Array[(String, Long)])] = {

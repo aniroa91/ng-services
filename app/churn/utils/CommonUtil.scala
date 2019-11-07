@@ -8,8 +8,8 @@ object CommonUtil {
 
   val PAGE_ID = Map(
     0 -> "Overview",
-    1 -> "Age",
-    2 -> "Package"
+    1 -> "Checklist",
+    2 -> "Callog"
   )
 
   val STATUS_MAP = Map(

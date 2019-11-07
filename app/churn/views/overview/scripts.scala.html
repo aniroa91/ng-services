@@ -3,6 +3,64 @@
 @import services.domain.CommonService
 
 <script type="text/javascript">
+        var width = '50%'
+        var left = 'auto'
+        var right = 'auto'
+        if($(window).width() <= 600) {
+            left = 110
+            right = 0
+            width = '70%'
+        }
+        else if($(window).width() > 600 && $(window).width() <= 800) {
+            left = 'auto'
+            right = 10
+            width = '70%'
+        }
+        else if($(window).width() > 800 && $(window).width() <= 1024) {
+            left = 'auto'
+            right = 10
+            width = '70%'
+        }
+        var options = {
+            title: 'Churn Rate (%)',
+            hAxis: {
+                title: 'Contract Age',
+                gridlines: {
+                    count: 13,
+                    color: 'transparent'
+                },
+                maxAlternation: 2, // use a maximum of 1 line of labels
+                showTextEvery: 1, // show every label if possible
+                minTextSpacing: 40 // minimum spacing between adjacent labels, in pixels
+            },
+            vAxis: {
+                title: '',
+                gridlines: {
+                    count: 9,
+                    color: '#f0f0f0'
+                }
+            },
+            chartArea: {
+                height: "70%",
+                width: width,
+                left: left,
+                right: right
+            },
+            sizeAxis: {
+                maxSize: 25
+            },
+            colorAxis: {colors: ['#F5F6CE', 'green']},
+            bubble: {
+                textStyle: {
+                    auraColor: 'none',
+                },
+                cursor: 'pointer',
+                opacity: 1
+            },
+            tooltip: {
+                trigger: 'none'
+            }
+        };
         var optionsRegion = {
             title: 'Churn Rate (%)',
             hAxis: {
@@ -55,7 +113,39 @@
         google.setOnLoadCallback(drawChart);
 
         function drawChart() {
-            $('.inlinesparkline').sparkline('html',{
+            // click tab
+            $('.nav-tabs li').click(function () {
+                var tabCurr = $('.nav-tabs li.active').find('a').attr('class')
+                var tab = $(this).find('a').attr('class')
+                if(tabCurr != tab){
+                    $('#tabName').val(tab)
+                    $('.nav-tabs li').removeClass('in').removeClass('active')
+                    $('.panel-body .tab-pane').removeClass('in').removeClass('active')
+                    $('#'+tab).addClass('in').addClass('active')
+                    $(this).addClass('in').addClass('active')
+                    if(Number($(this).attr('name')) > 0){
+                        $(this).attr('name', Number($(this).attr('name'))+1)
+                        $.ajax({
+                            url: "/internet/getCommentByTab?tab="+tab,
+                            cache: false,
+                            type:"GET",
+                            success: function (dta) {
+                                if(dta != "Error"){
+                                    $('.comment').val(dta)
+                                }
+                                else{
+                                    alert("Error when execute query. Please check again your system!")
+                                }
+                            }
+                        });
+                    }
+                    else{
+                        $(this).attr('name', Number($(this).attr('name'))+1)
+                        getChurnByTab(tab)
+                    }
+                }
+            })
+            $('.sparkline1').sparkline('html',{
                 type: 'line',
                 width: '320px',
                 height: '15px',
@@ -327,22 +417,10 @@
                 }
             });
 
-            // click refresh fitler
-            $('.btnRefresh').click(function () {
-                $('.slAge').val('').trigger('change')
-                $('.slPackage').val('').trigger('change')
-                $('.radio').removeAttr('checked').iCheck('update')
-                $('.checkbox').removeAttr('checked').iCheck('update')
-                $(".monthPicker").datepicker("update", $('#monthCurr').val())
-                $(".region").jstree("deselect_all")
-                $('#combo').val("")
-                getAjaxChurn()
-            })
-
             function getAjaxChurn() {
                 var fields = getParamFields(document.querySelector('input[name=csrfToken]').value)
                 $.ajax({
-                    url: "/internet/overview/getJsonChurn",
+                    url: "/overview/getJsonOverview",
                     cache: false,
                     data:  fields,
                     type:"POST",
@@ -405,9 +483,9 @@
                             else $('#boxRateCtbdv').removeAttr('style')
 
                             // sparkline table
-                            var tBody = parseTbChurnRate(dta.tbChurn)
-                            $('#tbChurn tbody').html("").append(tBody)
-                            $('.inlinesparkline').sparkline('html',{
+                            var tBody = parseTbChurnRate(dta.tbChurn, 1)
+                            $('#tbChurn1').html("").append(tBody)
+                            $('.sparkline1').sparkline('html',{
                                 type: 'line',
                                 width: '320px',
                                 height: '15px',
@@ -424,7 +502,7 @@
                                     names: dta.tbChurn.arrMonth
                                 }
                             });
-                            $('.thFirst').text(dta.location)
+                            $('#tbChurnFirst .thFirst').text(dta.location)
                             // bubble charts
                             if(dta.churnBubble.data.length <= 0){
                                 $('#buble_overlay').hide()
@@ -434,10 +512,10 @@
                                 $('#buble_overlay').show()
                                 $('#bubleChurn').show()
                             }
-                            $('#churn3_txtMin').text(dta.churnBubble.minPercent)
-                            $('#churn3_txtMax').text(dta.churnBubble.maxPercent)
-                            $('#churn3_circle2').text(Number(dta.churnBubble.minPercent + (dta.churnBubble.maxPercent-dta.churnBubble.minPercent)/5*2).toFixed(2))
-                            $('#churn3_circle3').text(Number(dta.churnBubble.minPercent + (dta.churnBubble.maxPercent-dta.churnBubble.minPercent)/5*3).toFixed(2))
+                            $('#churn1_txtMin').text(dta.churnBubble.minPercent)
+                            $('#churn1_txtMax').text(dta.churnBubble.maxPercent)
+                            $('#churn1_circle2').text(Number(dta.churnBubble.minPercent + (dta.churnBubble.maxPercent-dta.churnBubble.minPercent)/5*2).toFixed(2))
+                            $('#churn1_circle3').text(Number(dta.churnBubble.minPercent + (dta.churnBubble.maxPercent-dta.churnBubble.minPercent)/5*3).toFixed(2))
                             Object.keys(dta.churnBubble.catesRegion).length >8 ? $('#bubleChurn').attr('style','height: 420px'): $('#bubleChurn').attr('style','height: 320px')
                             var chartRegionMonth = new google.visualization.BubbleChart(document.getElementById('bubleChurn'))
                             google.visualization.events.addListener(chartRegionMonth, 'ready', function () {
@@ -539,10 +617,260 @@
                 });
             }
 
+            // click tab and get json data
+            function getChurnByTab(tab_name) {
+                var fields = getParamFields(document.querySelector('input[name=csrfToken]').value)
+                $.ajax({
+                    url: "/overview/getJsonByTab",
+                    cache: false,
+                    data:  fields,
+                    type:"POST",
+                    beforeSend: function () {
+                        $('#'+tab_name).waitMe({
+                            effect: 'facebook',
+                            text: '',
+                            bg: 'rgba(255,255,255,0.7)',
+                            color: '#2A3F54',
+                            textPos: 'vertical'
+                        });
+                    },
+                    success: function (dta) {
+                        if(dta != "Error"){
+                            if(tab_name == "tabAge"){
+                                // bubble charts Age & Location
+                                if(dta.churnAgeLocation.data.length <= 0){
+                                    $('#bubleLocation_overlay').hide()
+                                    $('#bubleLocation').hide()
+                                }
+                                else{
+                                    $('#bubleLocation_overlay').show()
+                                    $('#bubleLocation').show()
+                                }
+                                $('#churn3_txtMin').text(dta.churnAgeLocation.minPercent)
+                                $('#churn3_txtMax').text(dta.churnAgeLocation.maxPercent)
+                                $('#churn3_circle2').text(Number(dta.churnAgeLocation.minPercent + (dta.churnAgeLocation.maxPercent-dta.churnAgeLocation.minPercent)/5*2).toFixed(2))
+                                $('#churn3_circle3').text(Number(dta.churnAgeLocation.minPercent + (dta.churnAgeLocation.maxPercent-dta.churnAgeLocation.minPercent)/5*3).toFixed(2))
+                                var chartRegionAge = new google.visualization.BubbleChart(document.getElementById('bubleLocation'))
+                                Object.keys(dta.churnAgeLocation.catesRegion).length >8 ? $('#bubleLocation').attr('style','height: 550px'): $('#bubleLocation').attr('style','height: 450px')
+                                google.visualization.events.addListener(chartRegionAge, 'ready', function () {
+                                    Array.prototype.forEach.call(document.getElementById('bubleLocation').getElementsByTagName('text'), function(text) {
+                                        if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444')) {
+                                            if(text.innerHTML == 0 || text.innerHTML == undefined || text.innerHTML == Object.keys(dta.churnAgeLocation.catesRegion).length+1)
+                                                text.setAttribute('fill-opacity',0)
+                                            else{
+                                                text.innerHTML = keyByValue(dta.churnAgeLocation.catesRegion, Number(text.innerHTML))
+                                            }
+                                        }
+                                        // change label month
+                                        if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#444444')) {
+                                            if(Object.keys(dta.churnAgeLocation.catesMonth).length == 1){
+                                                if (text.innerHTML == 0.5 || text.innerHTML == 0.0 || text.innerHTML == 1.5)
+                                                    text.setAttribute('fill-opacity', 0)
+                                                else {
+                                                    if(text.innerHTML == 1.0){
+                                                        text.innerHTML = keyByValue(dta.churnAgeLocation.catesMonth, 1)
+                                                    }
+                                                }
+                                            }
+                                            else{
+                                                if(text.innerHTML == 0 || text.innerHTML >= Object.keys(dta.churnAgeLocation.catesMonth).length+1)
+                                                    text.setAttribute('fill-opacity',0)
+                                                else{
+                                                    text.innerHTML = keyByValue(dta.churnAgeLocation.catesMonth, Number(text.innerHTML))
+                                                }
+                                            }
+                                        }
+                                    });
+                                    // remove circle value =0
+                                    Array.prototype.forEach.call(document.getElementById('bubleLocation').getElementsByTagName('circle'), function(circle) {
+                                        if(circle.getAttribute('r') == 5 && Number(dta.churnAgeLocation.isNull) == 1)
+                                            circle.setAttribute('r', 1)
+                                    })
+                                })
+                                var dataRegionAge = google.visualization.arrayToDataTable(getDataChurn(dta.churnAgeLocation.data,  "Location", "Age"))
+                                if(Object.keys(dta.churnAgeLocation.catesMonth).length == 1)
+                                    options.hAxis.gridlines.count = 4
+                                else
+                                    options.hAxis.gridlines.count = Object.keys(dta.churnAgeLocation.catesMonth).length+2
+                                options.vAxis.gridlines.count = Object.keys(dta.churnAgeLocation.catesRegion).length+2
+                                //options.chartArea.left =170;
+                                chartRegionAge.draw(dataRegionAge, options)
+                                google.visualization.events.addListener(chartRegionAge, 'onmouseover', function (event) {
+                                    var rate = dataRegionAge.getValue(event.row, 3);
+                                    var xAxis = dataRegionAge.getValue(event.row, 1);
+                                    var yAxis = dataRegionAge.getValue(event.row, 2);
+                                    var percent = dataRegionAge.getValue(event.row, 4);
+                                    var contracts = dataRegionAge.getValue(event.row, 5);
+                                    var x = 255;
+                                    if($(window).width() < 992){
+                                        mouseY = mouseY - 970
+                                    }
+                                    else{
+                                        mouseY = mouseY -740
+                                    }
+                                    var y = mouseY
+                                    if(!(Number(percent == 0) && Number(rate) == 0)){
+                                        $('#bubleLocation_tooltip').html('<div><p><b>Age:</b> ' + keyByValue(dta.churnAgeLocation.catesMonth, xAxis) +'</p><p><b>Location:</b> '+ keyByValue( dta.churnAgeLocation.catesRegion, yAxis) +
+                                                '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
+                                            'top': y,
+                                            'left': x
+                                        }).fadeIn('slow');
+                                    }
+                                    // remove circle value =0
+                                    Array.prototype.forEach.call(document.getElementById('bubleLocation').getElementsByTagName('circle'), function(circle) {
+                                        if(Number(dta.churnAgeLocation.isNull) == 1 && (circle.getAttribute('fill') == 'none' || circle.getAttribute('r') == 5)){
+                                            circle.setAttribute('r', 1)
+                                        }
+                                    })
+                                })
+                                google.visualization.events.addListener(chartRegionAge, 'onmouseout', handlerOut)
+
+                                // bubble charts Age & Month
+                                if(dta.churnAgeMonth.data.length <= 0){
+                                    $('#bubleAge_overlay').hide()
+                                    $('#bubleAge').hide()
+                                }
+                                else{
+                                    $('#bubleAge_overlay').show()
+                                    $('#bubleAge').show()
+                                }
+                                $('#churn2_txtMin').text(dta.churnAgeMonth.minPercent)
+                                $('#churn2_txtMax').text(dta.churnAgeMonth.maxPercent)
+                                $('#churn2_circle2').text(Number(dta.churnAgeMonth.minPercent + (dta.churnAgeMonth.maxPercent-dta.churnAgeMonth.minPercent)/5*2).toFixed(2))
+                                $('#churn2_circle3').text(Number(dta.churnAgeMonth.minPercent + (dta.churnAgeMonth.maxPercent-dta.churnAgeMonth.minPercent)/5*3).toFixed(2))
+                                var chartRegionMonth = new google.visualization.BubbleChart(document.getElementById('bubleAge'))
+                                google.visualization.events.addListener(chartRegionMonth, 'ready', function () {
+                                    Array.prototype.forEach.call(document.getElementById('bubleAge').getElementsByTagName('text'), function(text) {
+                                        if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444')) {
+                                            if(text.innerHTML == 0 || text.innerHTML == undefined || text.innerHTML == Object.keys(dta.churnAgeMonth.catesRegion).length+1)
+                                                text.setAttribute('fill-opacity',0)
+                                            else{
+                                                text.innerHTML = keyByValue(dta.churnAgeMonth.catesRegion, Number(text.innerHTML))
+                                            }
+                                        }
+                                        // change label month
+                                        if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#1c2752')) {
+                                            if(Object.keys(dta.churnAgeMonth.catesMonth).length == 1){
+                                                if (text.innerHTML == 0.5 || text.innerHTML == 0.0 || text.innerHTML == 1.5)
+                                                    text.setAttribute('fill-opacity', 0)
+                                                else {
+                                                    if(text.innerHTML == 1.0){
+                                                        text.innerHTML = keyByValue(dta.churnAgeMonth.catesMonth, 1)
+                                                    }
+                                                }
+                                            }
+                                            else{
+                                                if(text.innerHTML == 0 || text.innerHTML >= Object.keys(dta.churnAgeMonth.catesMonth).length+1)
+                                                    text.setAttribute('fill-opacity',0)
+                                                else{
+                                                    text.innerHTML = keyByValue(dta.churnAgeMonth.catesMonth, Number(text.innerHTML))
+                                                }
+                                            }
+                                        }
+                                    });
+                                    // remove circle value =0
+                                    Array.prototype.forEach.call(document.getElementById('bubleAge').getElementsByTagName('circle'), function(circle) {
+                                        if(circle.getAttribute('r') == 5 && Number(dta.churnAgeMonth.isNull) == 1)
+                                            circle.setAttribute('r', 1)
+                                    })
+                                })
+                                var dataRegionMonth = google.visualization.arrayToDataTable(getDataChurn(dta.churnAgeMonth.data,  "Month", "Age"))
+                                if(Object.keys(dta.churnAgeMonth.catesMonth).length == 1)
+                                    optionsRegion.hAxis.gridlines.count = 4
+                                else
+                                    optionsRegion.hAxis.gridlines.count = Object.keys(dta.churnAgeMonth.catesMonth).length+2
+                                optionsRegion.vAxis.gridlines.count = Object.keys(dta.churnAgeMonth.catesRegion).length+2
+                                optionsRegion.chartArea.left =170;
+                                chartRegionMonth.draw(dataRegionMonth, optionsRegion)
+                                google.visualization.events.addListener(chartRegionMonth, 'onmouseover', function (event) {
+                                    var rate = dataRegionMonth.getValue(event.row, 3);
+                                    var xAxis = dataRegionMonth.getValue(event.row, 1);
+                                    var yAxis = dataRegionMonth.getValue(event.row, 2);
+                                    var percent = dataRegionMonth.getValue(event.row, 4);
+                                    var contracts = dataRegionMonth.getValue(event.row, 5);
+                                    var x = mouseX - 225;
+                                    if($(window).width() < 992){
+                                        mouseY = mouseY - 870
+                                    }
+                                    else{
+                                        mouseY = mouseY -200
+                                    }
+                                    var y = mouseY
+                                    if(!(Number(percent == 0) && Number(rate) == 0)){
+                                        $('#bubleAge_tooltip').html('<div><p><b>Month:</b> ' + keyByValue(dta.churnAgeMonth.catesMonth, xAxis) +'</p><p><b>Age:</b> '+ keyByValue( dta.churnAgeMonth.catesRegion, yAxis) +
+                                                '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
+                                            'top': y,
+                                            'left': x
+                                        }).fadeIn('slow');
+                                    }
+                                    // remove circle value =0
+                                    Array.prototype.forEach.call(document.getElementById('bubleAge').getElementsByTagName('circle'), function(circle) {
+                                        if(Number(dta.churnAgeMonth.isNull) == 1 && (circle.getAttribute('fill') == 'none' || circle.getAttribute('r') == 5)){
+                                            circle.setAttribute('r', 1)
+                                        }
+                                    })
+                                })
+                                google.visualization.events.addListener(chartRegionMonth, 'onmouseout', handlerOut)
+
+                                // comment Chart
+                                $('.comment').text(dta.cmtChart)
+
+                                // sparkline table
+                                var tBodyAge = parseTbChurnRate(dta.tbAge, 2)
+                                $('#tbChurn2').html("").append(tBodyAge)
+                                $('.sparkline2').sparkline('html',{
+                                    type: 'line',
+                                    width: '320px',
+                                    height: '15px',
+                                    lineColor: '#16a085',
+                                    fillColor: '#ffffff',
+                                    lineWidth: 1,
+                                    spotColor: '#e21212',
+                                    minSpotColor: '#132186',
+                                    maxSpotColor: '#132186',
+                                    highlightLineColor: '#ffffff',
+                                    valueSpots:{'0:':'#e21212'},
+                                    tooltipFormat: '{{offset:names}}: <b>{{y:value}}</b>',
+                                    tooltipValueLookups: {
+                                        names: dta.tbAge.arrMonth
+                                    }
+                                });
+                            }
+                        }
+                        else{
+                            alert("Error when execute query. Please check again your system!")
+                        }
+                    },
+                    complete: function () {
+                        $('#'+tab_name).waitMe("hide");
+                    }
+                });
+            }
+
+            function filterCallAjax(){
+                if($('#tabName').val() == "tabOverview"){
+                    getAjaxChurn()
+                }
+                else if($('#tabName').val() == "tabAge"){
+                    getChurnByTab("tabAge")
+                }
+            }
+
             // click apply fitler
             $('.apply').click(function () {
-                getAjaxChurn()
+                filterCallAjax()
             });
+            // click refresh fitler
+            $('.btnRefresh').click(function () {
+                $('.slAge').val('').trigger('change')
+                $('.slPackage').val('').trigger('change')
+                $('.radio').removeAttr('checked').iCheck('update')
+                $('.checkbox').removeAttr('checked').iCheck('update')
+                $(".monthPicker").datepicker("update", $('#monthCurr').val())
+                $(".region").jstree("deselect_all")
+                $('#combo').val("")
+                filterCallAjax()
+            })
             $('.radio').on('ifChecked', function(){
                 $('#combo').val($(this).val())
             });
@@ -551,7 +879,7 @@
                 var fields = {
                     "csrfToken": document.querySelector('input[name=csrfToken]').value,
                     "comment"  : $(this).parent().parent().find('.comment').val(),
-                    "chartId"  : $(this).attr("name")
+                    "tabName"  : $('#tabName').val()
                 }
                 insertComment(fields)
             });
@@ -634,7 +962,8 @@
             "age"    : $('.ageDiv .select2-selection__choice').text().substring(1,$('.ageDiv .select2-selection__choice').text().length).split('x').join(','),
             "package": $('.packageDiv .select2-selection__choice').text().substring(1,$('.packageDiv .select2-selection__choice').text().length).split('x').join(','),
             "month"  : $('.monthGrp').val(),
-            "status" : status
+            "status" : status,
+            "tabName" : $('#tabName').val()
         }
         //console.log(obj)
         return obj

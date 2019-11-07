@@ -21,8 +21,8 @@ function insertComment(fields) {
     })
 }
 
-function parseTbChurnRate(data) {
-    var location = data.location
+function parseTbChurnRate(data, id) {
+    var location = data.name
     var dataChurn = data.data
     var tBody = ""
     for(var i=0; i< location.length; i++){
@@ -40,7 +40,7 @@ function parseTbChurnRate(data) {
         }
         tBody += "<td style='text-align: center'>"+totalContract.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')+"</td>"
         tBody += "<td style='text-align: center'>"+totalRate+"</td>"
-        tBody += "<td style='text-align: center'><span class='inlinesparkline'>"+f1.join(",")+"</span></td>"
+        tBody += "<td style='text-align: center'><span class='sparkline"+id+"'>"+f1.join(",")+"</span></td>"
         tBody += "</tr>"
     }
     return tBody
