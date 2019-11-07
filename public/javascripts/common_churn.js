@@ -21,11 +21,18 @@ function insertComment(fields) {
     })
 }
 
-function parseTbChurnRate(data, id) {
+function parseTbChurnRate(data, arrMonth, id) {
     var location = data.name
     var dataChurn = data.data
+    var mapMonth = arrMonth.reduce(function(map, obj) {
+        map[obj] = "";
+        return map;
+    }, {});
     var tBody = ""
     for(var i=0; i< location.length; i++){
+        Object.keys(mapMonth).forEach(function(key, value) {
+            return mapMonth[key] = "";
+        })
         var totalRate = 0, totalContract = 0, f1 = []
         tBody += "<tr>"
         tBody += "<td>"+location[i]+"</td>"
@@ -35,12 +42,15 @@ function parseTbChurnRate(data, id) {
                     totalRate += dataChurn[j][2]
                     totalContract += dataChurn[j][4]
                 }
+                if (mapMonth.hasOwnProperty(dataChurn[j][1])) {
+                    mapMonth[dataChurn[j][1]] = dataChurn[j][3]
+                }
                 f1.push(dataChurn[j][3])
             }
         }
         tBody += "<td style='text-align: center'>"+totalContract.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')+"</td>"
         tBody += "<td style='text-align: center'>"+totalRate+"</td>"
-        tBody += "<td style='text-align: center'><span class='sparkline"+id+"'>"+f1.join(",")+"</span></td>"
+        tBody += "<td style='text-align: center'><span class='sparkline"+id+"'>"+Object.values(mapMonth).join(",")+"</span></td>"
         tBody += "</tr>"
     }
     return tBody

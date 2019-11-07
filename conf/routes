@@ -35,7 +35,6 @@ POST    /overview/getJsonByTab           churn.controllers.OverviewController.ge
 
 ## COMMENT LOG
 POST    /internet/pushComment            churn.controllers.OverviewController.pushComment
-GET     /internet/getCommentByTab        churn.controllers.OverviewController.getComment(tab: String)
 
 ### PAGE REGION
 GET     /internet/region                 churn.controllers.ChurnRegionController.index

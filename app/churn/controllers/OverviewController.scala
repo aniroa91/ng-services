@@ -17,7 +17,7 @@ import services.Configure
 import play.api.libs.json.Json
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.ftel.bigdata.utils.StringUtil
-import service.{ChurnAgeService, OverviewService}
+import service.{ChurnAgeService, ChurnPackageService, OverviewService}
 
 /**
   * This controller creates an `Action` to handle HTTP requests to the
@@ -131,7 +131,8 @@ class OverviewController @Inject() (cc: ControllerComponents) extends AbstractCo
         "tbChurn"        -> tbChurn,
         "lastYYYY"       -> CommonService.getPrevYYYY(rs.month),
         "lastYYYYmm"     -> CommonService.getPrevYYYYMM(rs.month),
-        "location"       -> OverviewService.checkLocation(request.body.asFormUrlEncoded.get("province").head)
+        "location"       -> OverviewService.checkLocation(request.body.asFormUrlEncoded.get("province").head),
+        "cmtChart"       -> rs.comments
       )
       Ok(Json.toJson(json))
     }
@@ -185,6 +186,46 @@ class OverviewController @Inject() (cc: ControllerComponents) extends AbstractCo
           )
           Ok(Json.toJson(json))
         }
+        case "tabPackage" => {
+          val rs = ChurnPackageService.getInternet(username, request)
+          // bubble charts Package & Month
+          val minPercPkg = if(rs.trendPkgMonth._3.length > 0) CommonService.format2Decimal(rs.trendPkgMonth._3.map(x=>x._4).min) else 0
+          val maxPercPkg = if(rs.trendPkgMonth._3.length > 0) CommonService.format2Decimal(rs.trendPkgMonth._3.map(x=>x._4).max) else 0
+          val isNullPkg  = if(rs.trendPkgMonth._3.length > 0 && rs.trendPkgMonth._3.map(x=>x._4).min == 0 && rs.trendPkgMonth._3.map(x=>x._3).min == 0) 1 else 0
+          val churnPkg = Json.obj(
+            "catesRegion" -> rs.trendPkgMonth._1,
+            "catesMonth"  -> rs.trendPkgMonth._2,
+            "data"       -> rs.trendPkgMonth._3,
+            "minPercent" -> minPercPkg,
+            "maxPercent" -> maxPercPkg,
+            "isNull"     -> isNullPkg
+          )
+          // bubble charts Package & Location
+          val minPercLocation = if(rs.trendPkgLocation._3.length > 0) CommonService.format2Decimal(rs.trendPkgLocation._3.map(x=>x._4).min) else 0
+          val maxPercLocation = if(rs.trendPkgLocation._3.length > 0) CommonService.format2Decimal(rs.trendPkgLocation._3.map(x=>x._4).max) else 0
+          val isNullLocation  = if(rs.trendPkgLocation._3.length > 0 && rs.trendPkgLocation._3.map(x=>x._4).min == 0 && rs.trendPkgLocation._3.map(x=>x._3).min == 0) 1 else 0
+          val churnLocation = Json.obj(
+            "catesRegion" -> rs.trendPkgLocation._1,
+            "catesMonth"  -> rs.trendPkgLocation._2,
+            "data"       -> rs.trendPkgLocation._3,
+            "minPercent" -> minPercLocation,
+            "maxPercent" -> maxPercLocation,
+            "isNull"     -> isNullLocation
+          )
+          // sparkline table
+          val tbPkg = Json.obj(
+            "name" -> rs.tbPkg._1,
+            "data" -> rs.tbPkg._2,
+            "arrMonth" -> rs.trendPkgMonth._2.map(x=> x._1).toArray.sorted
+          )
+          val json = Json.obj(
+            "churnPkgLocation"    -> churnLocation,
+            "churnPkgMonth"   -> churnPkg,
+            "tbPkg"     -> tbPkg,
+            "cmtChart"  -> rs.comments
+          )
+          Ok(Json.toJson(json))
+        }
       }
     }
     catch{
@@ -201,16 +242,6 @@ class OverviewController @Inject() (cc: ControllerComponents) extends AbstractCo
       catch {
         case e: Exception => Ok("Error")
       }
-  }
-
-  def getComment(tab: String) = withAuth { username => implicit request: Request[AnyContent] =>
-    try {
-      val comments = OverviewService.getCommentChart(username, tab)
-      Ok(comments)
-    }
-    catch {
-      case e: Exception => Ok("Error")
-    }
   }
 
 }

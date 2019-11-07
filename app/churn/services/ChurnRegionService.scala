@@ -357,6 +357,7 @@ object  ChurnRegionService{
 
         /* get top profile*/
     val top8Profile = getTop8ProfileByMonth(rsProMonth, status, month)
+    top8Profile.foreach(println)
     val sizeTopProfile = if(top8Profile.length >= 8 ) 9 else top8Profile.length +1
     val mapProfileMonth = (1 until sizeTopProfile).map(x=> top8Profile(sizeTopProfile-x-1) -> x).toMap
         /* get top month*/

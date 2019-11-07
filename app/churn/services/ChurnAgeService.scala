@@ -1,19 +1,15 @@
 package service
 
 import churn.models.AgeResponse
-
-import scala.collection.immutable.Map
 import com.sksamuel.elastic4s.http.ElasticDsl.{RichFuture, RichString, SearchHttpExecutable, SearchShow, percentilesAggregation, query, rangeAggregation, search, termsAgg, termsAggregation, _}
-import com.sksamuel.elastic4s.http.search.SearchResponse
 import churn.utils.{AgeGroupUtil, CommonUtil, ProvinceUtil}
 import play.api.Logger
 import play.api.mvc.{AnyContent, Request}
-import service.ChurnRegionService.rangeDate
 import service.OverviewService.{checkLocation, getCommentChart}
 import services.Configure
 import services.domain.CommonService
 
-object  ChurnAgeService{
+object ChurnAgeService{
 
   val client = Configure.client
 
@@ -95,7 +91,7 @@ object  ChurnAgeService{
   }
 
   def getInternet(user: String, request: Request[AnyContent]) = {
-    logger.info("========START OVERVIEW SERVICE=========")
+    logger.info("========START AGE SERVICE=========")
     val t0 = System.currentTimeMillis()
     val age = ""
     val province = request.body.asFormUrlEncoded.get("province").head
@@ -103,7 +99,6 @@ object  ChurnAgeService{
     val combo = request.body.asFormUrlEncoded.get("combo").head
     val month = request.body.asFormUrlEncoded.get("month").head
     val status = request.body.asFormUrlEncoded.get("status").head
-    val tabName = request.body.asFormUrlEncoded.get("tabName").head
     // get list province of region for filter
     val lstProvince = OverviewService.getRegionProvince(month)
     val queries = OverviewService.getFilterGroup(age, province, packages, combo, lstProvince)
@@ -111,7 +106,7 @@ object  ChurnAgeService{
     logger.info("t0: "+(System.currentTimeMillis() - t0))
     val t1 = System.currentTimeMillis()
 
-    // Trend age and location
+    // Trend Age and location
     val arrAgeLoc = getTrendAgeMonth(month, queries, province)
     val trendRegionAge = calChurnRateAndPercentForAgeMonth(arrAgeLoc, status, province).filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
     /* get top location */
@@ -125,8 +120,10 @@ object  ChurnAgeService{
 
     val rsLocationAge = trendRegionAge.filter(x=> topAgeLocByPert.indexOf(x._1) >=0).filter(x=> topLocationByPert.indexOf(x._2) >=0)
       .map(x=> (mapLocation.get(x._2).get, mapAge.get(x._1).get, x._3, x._4, x._5))
+    logger.info("t1: "+(System.currentTimeMillis() - t1))
+    val t2 = System.currentTimeMillis()
 
-    // Trend age and month
+    // Trend Age and month
     val arrMonth = getTrendAgeMonth(month, queries, "No")
     val trendAgeMonth = calChurnRateAndPercentForAgeMonth(arrMonth, status, "No").filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
     /* get top Age */
@@ -139,6 +136,8 @@ object  ChurnAgeService{
     val mapMonth   = (1 until topMonthAge).map(x=> topLast12month(x-1) -> x).toMap
     val rsAgeMonth = trendAgeMonth.filter(x=> topLast12month.indexOf(x._2) >=0).filter(x=> topAgeByPert.indexOf(x._1) >=0)
       .map(x=> (mapAgeMonth.get(x._1).get, mapMonth.get(x._2).get, x._3, x._4, x._5))
+    logger.info("t2: "+(System.currentTimeMillis() - t2))
+    val t3 = System.currentTimeMillis()
 
     // sparkline table
     val topAgeByF1 = getTopAgeByMonth(arrMonth, status, month, "f1")
@@ -147,11 +146,10 @@ object  ChurnAgeService{
 
     // comments content
     val cmtChart = getCommentChart(user, "tabAge")
+    logger.info("t3: "+(System.currentTimeMillis() - t3))
 
-    logger.info("t1: "+(System.currentTimeMillis() - t1))
-
-    logger.info("Time: "+(System.currentTimeMillis() - t1))
-    logger.info("========END OVERVIEW SERVICE=========")
+    logger.info("Time: "+(System.currentTimeMillis() - t0))
+    logger.info("========END AGE SERVICE=========")
     AgeResponse((mapAgeMonth, mapMonth,rsAgeMonth), (topAgeByF1, tbAge), (mapLocation, mapAge, rsLocationAge), cmtChart, month)
   }
 }
