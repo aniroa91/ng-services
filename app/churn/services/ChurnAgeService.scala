@@ -66,8 +66,7 @@ object ChurnAgeService{
     CommonUtil.getChurnRateAndPercentage(rs,s"$field","status" , "age").map(x=> (x._1, x._2, AgeGroupUtil.AGE.find(_._2 == x._3.toInt).get._1, x._5, x._6))
   }
 
-  def getTopAgeByMonth(array: Array[(String, String, String, Int, Int)], status: String, month: String, sortBy: String) = {
-    val limit = array.map(x=> x._3).distinct.length
+  def getTopAgeByMonth(array: Array[(String, String, String, Int, Int)], status: String, month: String, sortBy: String, limit: Int) = {
     val rs = if(status == "" || status == "13") array.filter(x=> x._2.toInt == 1 || x._2.toInt == 3).groupBy(x=> x._1 -> x._3).map(x=> (x._1._1, 111, x._1._2, x._2.map(y=> y._4).sum, x._2.map(y=> y._5).sum)).toArray.sorted
              else array.filter(x => x._2.toInt == status.toInt).sorted
     val sumByOltMonth       = rs.map(x=> (x._1, x._3, x._5, CommonService.format2Decimal(x._5 * 100.0 / x._4)))
@@ -127,7 +126,7 @@ object ChurnAgeService{
     val arrMonth = getTrendAgeMonth(month, queries, "No")
     val trendAgeMonth = calChurnRateAndPercentForAgeMonth(arrMonth, status, "No").filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
     /* get top Age */
-    val topAgeByPert = getTopAgeByMonth(arrMonth, status, month, "percent")
+    val topAgeByPert = getTopAgeByMonth(arrMonth, status, month, "percent", arrMonth.map(x=> x._3).distinct.length)
     val sizeTopAge = topAgeByPert.length +1
     val mapAgeMonth = (1 until sizeTopAge).map(x=> topAgeByPert(sizeTopAge-x-1) -> x).toMap
     /* get top month */
@@ -140,7 +139,7 @@ object ChurnAgeService{
     val t3 = System.currentTimeMillis()
 
     // sparkline table
-    val topAgeByF1 = getTopAgeByMonth(arrMonth, status, month, "f1")
+    val topAgeByF1 = getTopAgeByMonth(arrMonth, status, month, "f1", arrMonth.map(x=> x._3).distinct.length)
     val tbAge = trendAgeMonth.filter(x=> topLast12month.indexOf(x._2) >=0).filter(x=> topAgeByF1.indexOf(x._1) >=0).map(x=> (x._1, x._2, x._3,
       CommonService.format2Decimal(2*x._3*x._4/(x._3+x._4)), x._5))
 

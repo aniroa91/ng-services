@@ -8,6 +8,7 @@ case class PackageResponse(
                         trendPkgMonth : (Map[String, Int], Map[String, Int], Array[(Int, Int, Double, Double, Int)]),
                         tbPkg         : (Array[(String)], Array[(String, String, Double, Double, Int)]),
                         trendPkgLocation : (Map[String, Int], Map[String, Int], Array[(Int, Int, Double, Double, Int)]),
+                        trendPkgAge : (Map[String, Int], Map[String, Int], Array[(Int, Int, Double, Double, Int)]),
                         comments      : String,
                         month         : String
                       )

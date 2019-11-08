@@ -16,8 +16,8 @@ object ChurnPackageService{
 
   val logger = Logger(this.getClass())
 
-  def getTrendPkgMonth(month: String, queries: String, province: String) ={
-    val field = if(province == "No") "month" else checkLocation(province)
+  def getTrendPkgMonth(month: String, queries: String, province: String, colName: String) ={
+    val field = if(province == "No") s"$colName" else checkLocation(province)
     val request = search(s"churn-contract-info-*" / "docs") query(OverviewService.rangeMonth(month) +" AND "+ queries) aggregations (
       termsAggregation(s"$field")
         .field(s"$field")
@@ -26,7 +26,7 @@ object ChurnPackageService{
             .field("status")
             .subaggs(
               termsAggregation("package_name")
-                .field("package_name")
+                .field("package_name") size 1000
             ) size 1000
         ) size 15
       ) size 0
@@ -51,26 +51,26 @@ object ChurnPackageService{
     val t1 = System.currentTimeMillis()
 
     // Trend Package and location
-    val arrPkgLoc = getTrendPkgMonth(month, queries, province)
-    val trendRegionAge = calChurnRateAndPercentForAgeMonth(arrPkgLoc, status, province).filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
+    val arrPkgLoc = getTrendPkgMonth(month, queries, province, "")
+    val trendRegionPkg = calChurnRateAndPercentForAgeMonth(arrPkgLoc, status, province).filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
     /* get top location */
-    val topLocationByPert = if(checkLocation(province) == "olt_name") getTopOltByAge(trendRegionAge) else trendRegionAge.map(x=> x._2).distinct
+    val topLocationByPert = if(checkLocation(province) == "olt_name") getTopOltByAge(trendRegionPkg) else trendRegionPkg.map(x=> x._2).distinct
     val sizeTopLocation = topLocationByPert.length +1
     val mapLocation = (1 until sizeTopLocation).map(x=> topLocationByPert(sizeTopLocation-x-1) -> x).toMap
     /* get top Package Location */
-    val topPkgLocByPert = trendRegionAge.map(x=> x._1).distinct
+    val topPkgLocByPert = getTopOltByAge(trendRegionPkg.map(x=> (x._2, x._1, x._3, x._4, x._5)))
     val sizeTopPkgLoc = topPkgLocByPert.length +1
     val mapPkg = (1 until sizeTopPkgLoc).map(x=> topPkgLocByPert(sizeTopPkgLoc-x-1) -> x).toMap
-    val rsLocationPkg = trendRegionAge.filter(x=> topPkgLocByPert.indexOf(x._1) >=0).filter(x=> topLocationByPert.indexOf(x._2) >=0)
+    val rsLocationPkg = trendRegionPkg.filter(x=> topPkgLocByPert.indexOf(x._1) >=0).filter(x=> topLocationByPert.indexOf(x._2) >=0)
       .map(x=> (mapLocation.get(x._2).get, mapPkg.get(x._1).get, x._3, x._4, x._5))
     logger.info("t1: "+(System.currentTimeMillis() - t1))
     val t2 = System.currentTimeMillis()
 
     // Trend Package and month
-    val arrMonth = getTrendPkgMonth(month, queries, "No")
+    val arrMonth = getTrendPkgMonth(month, queries, "No", "month")
     val trendPkgMonth = calChurnRateAndPercentForAgeMonth(arrMonth, status, "No").filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
     /* get top Package */
-    val topPkgByPert = getTopAgeByMonth(arrMonth, status, month, "percent")
+    val topPkgByPert = getTopAgeByMonth(arrMonth, status, month, "percent", 10)
     val sizeTopPkg = topPkgByPert.length +1
     val mapPkgMonth = (1 until sizeTopPkg).map(x=> topPkgByPert(sizeTopPkg-x-1) -> x).toMap
     /* get top month */
@@ -79,21 +79,37 @@ object ChurnPackageService{
     val mapMonth   = (1 until topMonthPkg).map(x=> topLast12month(x-1) -> x).toMap
     val rsPkgMonth = trendPkgMonth.filter(x=> topLast12month.indexOf(x._2) >=0).filter(x=> topPkgByPert.indexOf(x._1) >=0)
       .map(x=> (mapPkgMonth.get(x._1).get, mapMonth.get(x._2).get, x._3, x._4, x._5))
+
     logger.info("t2: "+(System.currentTimeMillis() - t2))
     val t3 = System.currentTimeMillis()
 
     // sparkline table
-    val topPkgByF1 = getTopAgeByMonth(arrMonth, status, month, "f1")
+    val topPkgByF1 = getTopAgeByMonth(arrMonth, status, month, "f1", 10)
     val tbPkg = trendPkgMonth.filter(x=> topLast12month.indexOf(x._2) >=0).filter(x=> topPkgByF1.indexOf(x._1) >=0).map(x=> (x._1, x._2, x._3,
       CommonService.format2Decimal(2*x._3*x._4/(x._3+x._4)), x._5))
-    tbPkg.filter(x=> topLast12month.indexOf(x._2) >=0).filter(x=> topPkgByF1.indexOf(x._1) >=0).foreach(println)
 
     // comments content
     val cmtChart = getCommentChart(user, "tabPackage")
     logger.info("t3: "+(System.currentTimeMillis() - t3))
+    val t4 = System.currentTimeMillis()
+
+    // Trend Package and Age
+    val arrPkgAge = getTrendPkgMonth(month, queries, "No", "lifeGroup")
+    val trendPkgAge = calChurnRateAndPercentForAgeMonth(arrPkgAge, status, "No").filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
+    /* get top age */
+    val topAgeByPert = trendPkgAge.map(x=> x._2).distinct
+    val sizeTopAge = topAgeByPert.length +1
+    val mapPkgAge = (1 until sizeTopAge).map(x=> topAgeByPert(sizeTopAge-x-1) -> x).toMap
+    /* get top Package Age */
+    val topPkgAgeByPert = getTopOltByAge(trendPkgAge.map(x=> (x._2, x._1, x._3, x._4, x._5)))
+    val sizeTopPkgAge = topPkgAgeByPert.length +1
+    val mapPackage = (1 until sizeTopPkgAge).map(x=> topPkgAgeByPert(sizeTopPkgAge-x-1) -> x).toMap
+    val rsPkgAge = trendPkgAge.filter(x=> topPkgAgeByPert.indexOf(x._1) >=0).filter(x=> topAgeByPert.indexOf(x._2) >=0)
+      .map(x=> (mapPkgAge.get(x._2).get, mapPackage.get(x._1).get, x._3, x._4, x._5))
+    logger.info("t4: "+(System.currentTimeMillis() - t4))
 
     logger.info("Time: "+(System.currentTimeMillis() - t0))
     logger.info("========END PACKAGE SERVICE=========")
-    PackageResponse((mapPkgMonth, mapMonth,rsPkgMonth), (topPkgByF1, tbPkg), (mapLocation, mapPkg, rsLocationPkg), cmtChart, month)
+    PackageResponse((mapPkgMonth, mapMonth,rsPkgMonth), (topPkgByF1, tbPkg), (mapLocation, mapPkg, rsLocationPkg), (mapPkgAge, mapPackage, rsPkgAge), cmtChart, month)
   }
 }

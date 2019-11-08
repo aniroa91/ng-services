@@ -212,6 +212,18 @@ class OverviewController @Inject() (cc: ControllerComponents) extends AbstractCo
             "maxPercent" -> maxPercLocation,
             "isNull"     -> isNullLocation
           )
+          // bubble charts Package & Age
+          val minPercPkgAge = if(rs.trendPkgAge._3.length > 0) CommonService.format2Decimal(rs.trendPkgAge._3.map(x=>x._4).min) else 0
+          val maxPercPkgAge = if(rs.trendPkgAge._3.length > 0) CommonService.format2Decimal(rs.trendPkgAge._3.map(x=>x._4).max) else 0
+          val isNullPkgAge  = if(rs.trendPkgAge._3.length > 0 && rs.trendPkgAge._3.map(x=>x._4).min == 0 && rs.trendPkgAge._3.map(x=>x._3).min == 0) 1 else 0
+          val churnPkgAge = Json.obj(
+            "catesRegion" -> rs.trendPkgAge._1,
+            "catesMonth"  -> rs.trendPkgAge._2,
+            "data"       -> rs.trendPkgAge._3,
+            "minPercent" -> minPercPkgAge,
+            "maxPercent" -> maxPercPkgAge,
+            "isNull"     -> isNullPkgAge
+          )
           // sparkline table
           val tbPkg = Json.obj(
             "name" -> rs.tbPkg._1,
@@ -222,7 +234,8 @@ class OverviewController @Inject() (cc: ControllerComponents) extends AbstractCo
             "churnPkgLocation"    -> churnLocation,
             "churnPkgMonth"   -> churnPkg,
             "tbPkg"     -> tbPkg,
-            "cmtChart"  -> rs.comments
+            "cmtChart"  -> rs.comments,
+            "churnPkgAge"  -> churnPkgAge
           )
           Ok(Json.toJson(json))
         }
