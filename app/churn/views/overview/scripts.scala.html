@@ -76,9 +76,11 @@
                     color:'#1c2752',
                     fontSize: 11
                 },
+                slantedText:true
+                /*
                 maxAlternation: 2, // use a maximum of 1 line of labels
                 showTextEvery: 1, // show every label if possible
-                minTextSpacing: 20 // minimum spacing between adjacent labels, in pixels
+                minTextSpacing: 20 // minimum spacing between adjacent labels, in pixels*/
             },
             vAxis: {
                 title: '',
@@ -280,7 +282,7 @@
                         }
                     }
                     // change label month
-                    if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#1c2752')) {
+                    if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#1c2752')) {
                         if(text.innerHTML == 0 || text.innerHTML == Object.keys(catesMonth).length + 1)
                             text.setAttribute('fill-opacity',0)
                         else{
@@ -578,7 +580,7 @@
                                         }
                                     }
                                     // change label month
-                                    if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#1c2752')) {
+                                    if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#1c2752')) {
                                         if(Object.keys(dta.churnBubble.catesMonth).length == 1){
                                             if (text.innerHTML == 0.5 || text.innerHTML == 0.0 || text.innerHTML == 1.5)
                                                 text.setAttribute('fill-opacity', 0)
@@ -799,7 +801,7 @@
                                             }
                                         }
                                         // change label month
-                                        if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#1c2752')) {
+                                        if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#1c2752')) {
                                             if(Object.keys(dta.churnAgeMonth.catesMonth).length == 1){
                                                 if (text.innerHTML == 0.5 || text.innerHTML == 0.0 || text.innerHTML == 1.5)
                                                     text.setAttribute('fill-opacity', 0)
@@ -1087,7 +1089,7 @@
                                             }
                                         }
                                         // change label month
-                                        if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#1c2752')) {
+                                        if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#1c2752')) {
                                             if(Object.keys(dta.churnPkgMonth.catesMonth).length == 1){
                                                 if (text.innerHTML == 0.5 || text.innerHTML == 0.0 || text.innerHTML == 1.5)
                                                     text.setAttribute('fill-opacity', 0)
