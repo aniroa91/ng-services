@@ -16,8 +16,7 @@ import org.elasticsearch.search.sort.SortOrder
 import play.api.mvc.{AnyContent, Request}
 import churn.models.CallogResponse
 import play.api.Logger
-import service.ChurnAgeService.checkExistsIndex
-import service.ChurnRegionService.rangeDate
+import service.OverviewService.checkExistsIndex
 
 import scalaj.http.Http
 import services.Configure
@@ -26,11 +25,11 @@ import services.domain.CommonService
 object  ChurnCallogService{
 
   val client = Configure.client
-
+  val rangeMonth = CommonService.getRangeDateByLimit(CommonService.getPrevMonth(), 24, "month")
   val logger = Logger(this.getClass())
 
   def getNumberOfContractCallIn(region:String, age: String, category: String) ={
-    val queries = rangeDate+" AND " + "region:"+region+" AND lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
+    val queries = rangeMonth+" AND " + "region:"+region+" AND lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
     val queryNested = parseCategories(category)
     val queryAggsNested = parseOtherCatesQuery(category)
     val query = s"""
@@ -102,7 +101,7 @@ object  ChurnCallogService{
   }
 
   def getNumberOfContractCallIn1(region:String, age: String, category: String) ={
-    val queries = rangeDate+" AND " + "region:"+region+" AND lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
+    val queries = rangeMonth+" AND " + "region:"+region+" AND lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
     val queryNested = if(category == "*") "calllog.cate:*" else "calllog.cate:\""+category+"\""
     val query = s"""
         {
@@ -185,14 +184,13 @@ object  ChurnCallogService{
   }*/
 
   def getNumberOfContractAll(queryString: String, tb: String) ={
-    val queries = rangeDate+" AND " + queryString + " AND "+ CommonUtil.filterCommon(if(tb == "churn-contract-info-*") "package_name" else "tenGoi")
+    val queries = rangeMonth+" AND " + queryString + " AND "+ CommonUtil.filterCommon(if(tb == "churn-contract-info-*") "package_name" else "tenGoi")
     val request = search(s"$tb" / "docs") query(queries) aggregations (
       termsAggregation("month")
         .field("month") size 24
       )  size 0 sortBy( fieldSort("month") order SortOrder.DESC)
     val rs = client.execute(request).await
-    CommonService.getAggregationsSiglog(rs.aggregations.get("month")).filter(x=> x._1 != CommonService.getCurrentMonth()).sortWith((x, y) => x._1 > y._1).slice(0,12).sorted
-
+    CommonService.getAggregationsSiglog(rs.aggregations.get("month")).filter(x=> x._1 != CommonService.getCurrentMonth()).sortWith((x, y) => x._1 > y._1)
   }
 
   def getCateOthers(queryString: String, cateOthers: Array[String]) = {
@@ -314,7 +312,7 @@ object  ChurnCallogService{
   }
 
   def getTrendCallIn(region: String, age: String, cate: String) ={
-    val queries = rangeDate+" AND " + "region:"+region+" AND lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
+    val queries = rangeMonth+" AND " + "region:"+region+" AND lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
     val queryNested = parseCategories(cate)
     val query = s"""
         {
@@ -378,21 +376,6 @@ object  ChurnCallogService{
     array.flatMap(x=> x._3.map(y=> (x._1, x._2) -> y)).map(x=> (x._1._1, x._2._1, x._2._2, x._1._2))
   }
 
-  /*def getTrendCallIn(queryString: String) ={
-    val request = search(s"churn-calllog-*" / "docs") query(queryString + " AND !(region:0) AND !(tenGoi: \"FTTH - TV ONLY\") AND !(tenGoi: \"ADSL - TV ONLY\") AND !(tenGoi: \"ADSL - TV GOLD\") AND !(tenGoi: \"FTTH - TV GOLD\") ") aggregations (
-      termsAggregation("month")
-        .field("month")
-        .subaggs(
-          termsAggregation("status")
-            .field("status") size 1000
-        ) size 24
-      ) sortBy( fieldSort("month") order SortOrder.DESC)
-    val rs = client.execute(request).await
-    ChurnRegionService.getSecondAggregations(rs.aggregations.get("month"), "status")
-      .flatMap(x=> x._3.map(y=> (x._1,x._2) -> y))
-      .map(x=> (x._1._1, x._2._1, x._2._2, x._1._2))
-  }*/
-
   def getChurnCallInbyRegionAll(queryString: String) ={
     val request = search("churn-contract-info-*" / "docs") query(queryString + " AND "+CommonUtil.filterCommon("package_name")) aggregations (
       termsAggregation("month")
@@ -409,7 +392,7 @@ object  ChurnCallogService{
   }
 
   def getChurnCallInbyRegionCallIn(age: String, cate: String) ={
-    val queries = rangeDate+" AND " + "lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
+    val queries = rangeMonth+" AND " + "lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
     val queryNested = parseCategories(cate)
     val query = s"""
         {
@@ -657,7 +640,7 @@ object  ChurnCallogService{
   }*/
 
   def getCallInRegionMonth(age: String, cate: String) = {
-    val queries = rangeDate+" AND " + "lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
+    val queries = rangeMonth+" AND " + "lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
     val queryNested = parseCategories(cate)
     val query = s"""
         {
@@ -862,7 +845,7 @@ object  ChurnCallogService{
   }
 
   def calChurnCallinRateAndPercentagebyRegion(callInRegion: Array[(String, String, Long)], allRegion: Array[(String, String, Long)]) = {
-    val catesMonth  = allRegion.map(x=> x._1).distinct.sortWith((x, y) => x > y).slice(0,12)
+    val catesMonth  = allRegion.map(x=> x._1).distinct.sortWith((x, y) => x > y).slice(0,15)
     val rs = callInRegion.filter(x=> catesMonth.indexOf(x._1) >= 0).map(x=> (x._1, x._2, x._3, allRegion.filter(y=> y._1 == x._1).filter(y=> y._2 == x._2).map(y=> y._3).sum))
         .map(x=> (x._1, x._2, CommonService.format2Decimal(x._3 * 100.00 / x._4), x._3)).sorted
 

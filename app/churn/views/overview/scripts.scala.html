@@ -24,7 +24,7 @@
         var options = {
             title: 'Churn Rate (%)',
             hAxis: {
-                title: 'Contract Age',
+                title: '',
                 gridlines: {
                     count: 13,
                     color: 'transparent'
@@ -1219,7 +1219,7 @@
                 var fields = {
                     "csrfToken": document.querySelector('input[name=csrfToken]').value,
                     "comment"  : $(this).parent().parent().find('.comment').val(),
-                    "tabName"  : $('#tabName').val()
+                    "tabName"  : "Overview_"+$('#tabName').val()
                 }
                 insertComment(fields)
             });
@@ -1307,57 +1307,5 @@
         }
         //console.log(obj)
         return obj
-    }
-
-    function getJsonTreeListRegion(dta, arrKey){
-        /*[
-               { "id" : "ajson1", "parent" : "#", "text" : "Simple root node" },
-               { "id" : "ajson2", "parent" : "#", "text" : "Root node 2" },
-               { "id" : "ajson3", "parent" : "ajson2", "text" : "Child 1" },
-               { "id" : "ajson4", "parent" : "ajson2", "text" : "Child 2" },
-                ]*/
-        var jsArray = []
-        jsArray.push({
-            "text": "Choose Region",
-            "id": "All",
-            "parent": "#",
-            'state' : {
-                'opened' : false,
-                'selected' : true
-            }
-        })
-        for(var key=0;key<arrKey.length;key++){
-            jsArray.push({
-                "text": "Region "+arrKey[key],
-                "id": arrKey[key],
-                "parent": "All"
-            })
-            for(var i=0;i<dta.length;i++){
-                if(arrKey[key] == dta[i][0]){
-                    jsArray.push({
-                        "text": dta[i][1],
-                        "id": dta[i][1],
-                        "parent": arrKey[key]
-                    })
-                }
-            }
-        }
-        return jsArray
-    }
-
-    function getDataChurn(dta, cateX, cateY){
-        var rs = []
-        rs.push(['ID', cateX, cateY,'Rate', 'Percent', 'Contract'])
-        for(var i=0;i<dta.length;i++){
-            var arr = []
-            arr[0]=''
-            arr[1]=dta[i][1]
-            arr[2]=dta[i][0]
-            arr[3]=dta[i][2]
-            arr[4]=dta[i][3]
-            arr[5]=dta[i][4]
-            rs.push(arr)
-        }
-        return rs
     }
 </script>

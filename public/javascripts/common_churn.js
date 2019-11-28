@@ -4,6 +4,78 @@
     [Overview*, Age*, Package*, ...]
 */
 
+function getJsonTreeListRegion(dta, arrKey){
+    /*[
+           { "id" : "ajson1", "parent" : "#", "text" : "Simple root node" },
+           { "id" : "ajson2", "parent" : "#", "text" : "Root node 2" },
+           { "id" : "ajson3", "parent" : "ajson2", "text" : "Child 1" },
+           { "id" : "ajson4", "parent" : "ajson2", "text" : "Child 2" },
+            ]*/
+    var jsArray = []
+    jsArray.push({
+        "text": "Choose Region",
+        "id": "All",
+        "parent": "#",
+        'state' : {
+            'opened' : false,
+            'selected' : true
+        }
+    })
+    for(var key=0;key<arrKey.length;key++){
+        jsArray.push({
+            "text": "Region "+arrKey[key],
+            "id": arrKey[key],
+            "parent": "All"
+        })
+        for(var i=0;i<dta.length;i++){
+            if(arrKey[key] == dta[i][0]){
+                jsArray.push({
+                    "text": dta[i][1],
+                    "id": dta[i][1],
+                    "parent": arrKey[key]
+                })
+            }
+        }
+    }
+    return jsArray
+}
+
+function getdataHeatMapRegionMonth(dta, arrMonth, arrRegion){
+    var rs = []
+    for(var month =0; month< arrMonth.length; month++){
+        for(var region =0; region< arrRegion.length; region++){
+            for(var i=0; i< dta.length ;i++){
+                if(dta[i][0] == arrMonth[month] && dta[i][1] == arrRegion[region]){
+                    rs.push({
+                        x: month,
+                        y: region,
+                        value: dta[i][2],
+                        name: dta[i][3]
+                    })
+                }
+            }
+        }
+    }
+    //console.log(rs)
+    return rs
+}
+
+function getDataChurn(dta, cateX, cateY){
+    var rs = []
+    rs.push(['ID', cateX, cateY,'Rate', 'Percent','Contract'])
+    for(var i=0;i<dta.length;i++){
+        var arr = []
+        arr[0]=''
+        arr[1]=dta[i][1]
+        arr[2]=dta[i][0]
+        arr[3]=dta[i][2]
+        arr[4]=dta[i][3]
+        arr[5]=dta[i][4]
+        rs.push(arr)
+    }
+    return rs
+}
+
 function insertComment(fields) {
     $.ajax({
         url: "/internet/pushComment",

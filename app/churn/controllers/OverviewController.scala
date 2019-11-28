@@ -1,23 +1,14 @@
 package churn.controllers
 
-import play.api.data.Form
-import play.api.data.Forms.mapping
-import play.api.data.Forms.text
 import javax.inject.Inject
 import javax.inject.Singleton
 import play.api.mvc._
 import play.api.mvc.AbstractController
 import play.api.mvc.ControllerComponents
-import churn.utils.{AgeGroupUtil, CommonUtil}
 import services.domain.CommonService
 import controllers.Secured
-import com.sksamuel.elastic4s.http.HttpClient
-import com.sksamuel.elastic4s.ElasticsearchClientUri
-import services.Configure
 import play.api.libs.json.Json
-import com.sksamuel.elastic4s.http.ElasticDsl._
-import com.ftel.bigdata.utils.StringUtil
-import service.{ChurnAgeService, ChurnPackageService, OverviewService}
+import service.{OverviewAgeService, OverviewPackageService, OverviewService}
 
 /**
   * This controller creates an `Action` to handle HTTP requests to the
@@ -147,7 +138,7 @@ class OverviewController @Inject() (cc: ControllerComponents) extends AbstractCo
       tabName match {
         // tab Age trending
         case "tabAge" => {
-          val rs = ChurnAgeService.getInternet(username, request)
+          val rs = OverviewAgeService.getInternet(username, request)
           // bubble charts Age & Month
           val minPercAge = if(rs.trendAgeMonth._3.length > 0) CommonService.format2Decimal(rs.trendAgeMonth._3.map(x=>x._4).min) else 0
           val maxPercAge = if(rs.trendAgeMonth._3.length > 0) CommonService.format2Decimal(rs.trendAgeMonth._3.map(x=>x._4).max) else 0
@@ -187,7 +178,7 @@ class OverviewController @Inject() (cc: ControllerComponents) extends AbstractCo
           Ok(Json.toJson(json))
         }
         case "tabPackage" => {
-          val rs = ChurnPackageService.getInternet(username, request)
+          val rs = OverviewPackageService.getInternet(username, request)
           // bubble charts Package & Month
           val minPercPkg = if(rs.trendPkgMonth._3.length > 0) CommonService.format2Decimal(rs.trendPkgMonth._3.map(x=>x._4).min) else 0
           val maxPercPkg = if(rs.trendPkgMonth._3.length > 0) CommonService.format2Decimal(rs.trendPkgMonth._3.map(x=>x._4).max) else 0

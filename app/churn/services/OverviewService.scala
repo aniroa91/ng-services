@@ -35,12 +35,12 @@ object OverviewService{
       termsAggregation("region")
         .field("region")
         .subaggs(
-          termsAgg("province", "province")) size 1000) size 0
+          termsAgg("province", "province") size 100) size 1000) size 0
     val response = client.execute(request).await
     CommonService.getTerm1(response, "region", "province").map(x=> (x._1, ProvinceUtil.getProvince(x._2.toInt).toLowerCase)).sorted
   }
 
-  private def getListPackage(month: String) = {
+  def getListPackage(month: String) = {
     val request = search(s"churn-contract-info-${month}" / "docs") query(CommonUtil.filterCommon("package_name")) aggregations (
       termsAggregation("package_name")
         .field("package_name") size 1000
@@ -109,7 +109,6 @@ object OverviewService{
         arrPercent  = arrayAll.filter(x=> x._2.toInt == 1 ||  x._2.toInt == 3)
       }
     }
-    val sumAll = fitlerArray.map(x=> x._3).sum
     val sumByStatus    = fitlerArray.groupBy(x=> x._1).map(x=> x._1 -> x._2.map(y=> y._3).sum)
     val sumByStatusAll = array.groupBy(x=> x._1).map(x=>x._1 -> x._2.map(y=> y._3).sum)
     // month, rate, percentage
@@ -140,7 +139,8 @@ object OverviewService{
     }
   }
 
-  def getFilterGroup(age:String, province:String, packages:String, combo:String, lstProvince: Array[(String, String)]): String = {
+
+  def getFilterGroup(age:String, province:String, packages:String, combo:String): String = {
     val ageFilter = if(age == "") "*" else age.split(",").map(x=> if(x == "06-12") "6-12" else x).map(x=> "lifeGroup:"+x.trim()).mkString(" OR ")
     val packageFilter = if(packages == "") "*" else packages.split(",").map(x=> "package_name:\""+x.trim()+"\"").mkString(" OR ")
     // filter combo group
@@ -187,8 +187,7 @@ object OverviewService{
     filterCN
   }
 
-  def getCommentChart(user: String, tab: String) = {
-    val pageId = CommonUtil.PAGE_ID.get(0).get+"_"+tab
+  def getCommentChart(user: String, pageId: String) = {
     val comments = CommonService.getCommentByUser(user, pageId)
     val cmtChart = if(comments.length >0) comments.sortWith((x, y) => x._1 > y._1)(0)._2 else ""
     cmtChart
@@ -207,7 +206,7 @@ object OverviewService{
     if(!checkExistsIndex(s"churn-contract-info-$month")) month = CommonService.getPrevMonth(2)
 
     // get list province of region for filter
-    val lstProvince = getRegionProvince(month)
+    val lstProvince = getRegionProvince(CommonService.getPrevMonth(2))
     // get list package for filter
     val lstPackage = getListPackage(month).sortWith((x, y) => x._2 > y._2).map(x=> x._1)
 
@@ -218,7 +217,7 @@ object OverviewService{
       combo = request.body.asFormUrlEncoded.get("combo").head
       month = request.body.asFormUrlEncoded.get("month").head
       status = request.body.asFormUrlEncoded.get("status").head
-      queries = getFilterGroup(age, province, packages, combo, lstProvince)
+      queries = getFilterGroup(age, province, packages, combo)
       println(queries)
     }
     logger.info("t0: "+(System.currentTimeMillis() - t0))
@@ -278,7 +277,6 @@ object OverviewService{
 
     logger.info("t5: "+(System.currentTimeMillis() - t5))
     val t6 = System.currentTimeMillis()
-
     // sparkline table
     val topLocationByF1 = getTop10OltByMonth(arrMonth, status, month, province, "f1")
     val tbChurn = trendRegionMonth.filter(x=> topLast12month.indexOf(x._2) >=0).filter(x=> topLocationByF1.indexOf(x._1) >=0).map(x=> (x._1, x._2, x._3,
@@ -286,7 +284,7 @@ object OverviewService{
     logger.info("t6: "+(System.currentTimeMillis() - t6))
 
     // comments content
-    val cmtChart = getCommentChart(user, "tabOverview")
+    val cmtChart = getCommentChart(user, CommonUtil.PAGE_ID.get(0).get+"_tabOverview")
 
     logger.info("Time: "+(System.currentTimeMillis() - t0))
     logger.info("========END OVERVIEW SERVICE=========")

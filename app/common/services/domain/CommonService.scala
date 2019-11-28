@@ -110,6 +110,11 @@ object CommonService extends AbstractService {
     prev.plusDays(1).toString(DateTimeUtil.YMD)
   }
 
+  def getCurrentYear(): String = {
+    val date = new DateTime()
+    date.toString(DateTimeFormat.forPattern("yyyy"))
+  }
+
   def getCurrentDay(): String = {
     val date = new DateTime()
     date.toString(DateTimeFormat.forPattern("yyyy-MM-dd"))
@@ -216,7 +221,7 @@ object CommonService extends AbstractService {
 
   def insertComment(username: String, request: Request[AnyContent]) ={
     val log     = request.body.asFormUrlEncoded.get("comment").head
-    val chartId = CommonUtil.PAGE_ID.get(0).get +"_"+request.body.asFormUrlEncoded.get("tabName").head
+    val chartId = request.body.asFormUrlEncoded.get("tabName").head
     val date = new DateTime()
     val curDate = date.toString(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
     client.execute {
@@ -279,8 +284,14 @@ object CommonService extends AbstractService {
   def getRangeDateByLimit(day: String, limit: Int, field: String): String = {
     val endDate = DateTimeUtil.create(day, "yyyy-MM").toString("yyyy-MM")
     val fromDate = DateTimeUtil.create(day, "yyyy-MM").minusMonths(limit-1).toString("yyyy-MM")
-    return s"$field:>=$fromDate AND $field:<=$endDate"
+     s"$field:>=$fromDate AND $field:<=$endDate"
+  }
 
+  def getRangeMonthInYearByLimit(month: String, limit: Int): String = {
+    val endMonth = DateTimeUtil.create(month, "yyyy-MM").toString("yyyy-MM")
+    val fromMonth = if(limit == 24) month.substring(0, month.indexOf("-"))+"-01"
+                   else DateTimeUtil.create(month, "yyyy-MM").minusMonths(limit-1).toString("yyyy-MM")
+    s"month:>=$fromMonth AND month:<=$endMonth"
   }
 
   def getRangeDay(day: String): String = {
@@ -359,7 +370,12 @@ object CommonService extends AbstractService {
     }
     capitalizedWord
   }
-  
+
+  def percentDouble(number: Double, prev: Double): Double = {
+    val value = ((number - prev) / (prev * 1.0)) * 100.0
+    BigDecimal(value).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
+  }
+
   def percent(number: Long, prev: Long): Double = {
     val value = ((number - prev) / (prev * 1.0)) * 100.0
     BigDecimal(value).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble

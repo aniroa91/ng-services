@@ -6,11 +6,11 @@ import churn.utils.{AgeGroupUtil, CommonUtil, ProvinceUtil}
 import play.api.Logger
 import play.api.mvc.{AnyContent, Request}
 import service.OverviewService.{checkLocation, getCommentChart}
-import service.ChurnAgeService.{calChurnRateAndPercentForAgeMonth, client, getTopAgeByMonth, getTopOltByAge}
+import service.OverviewAgeService.{calChurnRateAndPercentForAgeMonth, getTopAgeByMonth, getTopOltByAge}
 import services.Configure
 import services.domain.CommonService
 
-object ChurnPackageService{
+object OverviewPackageService{
 
   val client = Configure.client
 
@@ -45,7 +45,7 @@ object ChurnPackageService{
     val status = request.body.asFormUrlEncoded.get("status").head
     // get list province of region for filter
     val lstProvince = OverviewService.getRegionProvince(month)
-    val queries = OverviewService.getFilterGroup(age, province, packages, combo, lstProvince)
+    val queries = OverviewService.getFilterGroup(age, province, packages, combo)
     println(queries)
     logger.info("t0: "+(System.currentTimeMillis() - t0))
     val t1 = System.currentTimeMillis()
@@ -54,11 +54,11 @@ object ChurnPackageService{
     val arrPkgLoc = getTrendPkgMonth(month, queries, province, "")
     val trendRegionPkg = calChurnRateAndPercentForAgeMonth(arrPkgLoc, status, province).filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
     /* get top location */
-    val topLocationByPert = if(checkLocation(province) == "olt_name") getTopOltByAge(trendRegionPkg) else trendRegionPkg.map(x=> x._2).distinct
+    val topLocationByPert = if(checkLocation(province) == "olt_name") getTopOltByAge(trendRegionPkg.map(x=> (x._1, x._2, x._4))) else trendRegionPkg.map(x=> x._2).distinct
     val sizeTopLocation = topLocationByPert.length +1
     val mapLocation = (1 until sizeTopLocation).map(x=> topLocationByPert(sizeTopLocation-x-1) -> x).toMap
     /* get top Package Location */
-    val topPkgLocByPert = getTopOltByAge(trendRegionPkg.map(x=> (x._2, x._1, x._3, x._4, x._5)))
+    val topPkgLocByPert = getTopOltByAge(trendRegionPkg.map(x=> (x._2, x._1, x._4)))
     val sizeTopPkgLoc = topPkgLocByPert.length +1
     val mapPkg = (1 until sizeTopPkgLoc).map(x=> topPkgLocByPert(sizeTopPkgLoc-x-1) -> x).toMap
     val rsLocationPkg = trendRegionPkg.filter(x=> topPkgLocByPert.indexOf(x._1) >=0).filter(x=> topLocationByPert.indexOf(x._2) >=0)
@@ -89,7 +89,7 @@ object ChurnPackageService{
       CommonService.format2Decimal(2*x._3*x._4/(x._3+x._4)), x._5))
 
     // comments content
-    val cmtChart = getCommentChart(user, "tabPackage")
+    val cmtChart = getCommentChart(user, CommonUtil.PAGE_ID.get(0).get+"_tabPackage")
     logger.info("t3: "+(System.currentTimeMillis() - t3))
     val t4 = System.currentTimeMillis()
 
@@ -101,7 +101,7 @@ object ChurnPackageService{
     val sizeTopAge = topAgeByPert.length +1
     val mapPkgAge = (1 until sizeTopAge).map(x=> topAgeByPert(sizeTopAge-x-1) -> x).toMap
     /* get top Package Age */
-    val topPkgAgeByPert = getTopOltByAge(trendPkgAge.map(x=> (x._2, x._1, x._3, x._4, x._5)))
+    val topPkgAgeByPert = getTopOltByAge(trendPkgAge.map(x=> (x._2, x._1, x._4)))
     val sizeTopPkgAge = topPkgAgeByPert.length +1
     val mapPackage = (1 until sizeTopPkgAge).map(x=> topPkgAgeByPert(sizeTopPkgAge-x-1) -> x).toMap
     val rsPkgAge = trendPkgAge.filter(x=> topPkgAgeByPert.indexOf(x._1) >=0).filter(x=> topAgeByPert.indexOf(x._2) >=0)

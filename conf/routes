@@ -23,34 +23,24 @@ GET      /logout                       controllers.LoginController.logout
 
 #######################################################################
 
-### SEARCH CONTRACT
-GET     /churn/search                    churn.controllers.ChurnDetectController.getFormContract(contract: String)
-
 ### PAGE OVERVIEW
 # Tab Overview
 GET     /overview                        churn.controllers.OverviewController.index
 POST    /overview/getJsonOverview        churn.controllers.OverviewController.getJsonOverview
-# Tab Age
+# Tab Age & Package
 POST    /overview/getJsonByTab           churn.controllers.OverviewController.getJsonByTab
 
 ## COMMENT LOG
 POST    /internet/pushComment            churn.controllers.OverviewController.pushComment
 
-### PAGE REGION
-GET     /internet/region                 churn.controllers.ChurnRegionController.index
-POST    /internet/region/getJsonChurn    churn.controllers.ChurnRegionController.getJsonChurn
+### PAGE CHECKLIST
+GET     /checklist                       churn.controllers.ChecklistController.index
+POST    /checklist/getJsonChurn          churn.controllers.ChecklistController.getJsonChurn
+# Tab Region, Age, ProcessTime & Reason
+POST    /checklist/getJsonByTab          churn.controllers.ChecklistController.getJsonByTab
 
 ### PAGE CALLLOG
 GET     /internet/calllog                churn.controllers.ChurnCallogController.index
 POST    /internet/calllog/getJsonChurn   churn.controllers.ChurnCallogController.getJsonChurn
-
-### PAGE CHECKLIST
-GET     /internet/checklist              churn.controllers.ChurnChecklistController.index
-POST    /internet/checklist/getJsonChurn churn.controllers.ChurnChecklistController.getJsonChurn
-
-### PAGE DETECT PROBLEM
-GET     /internet/detect                 churn.controllers.ChurnDetectController.index
-POST    /internet/detect/exportCSV       churn.controllers.ChurnDetectController.exportCSV
-POST    /internet/detect/getJsonChurn    churn.controllers.ChurnDetectController.getJsonChurn
 
 #######################################################################

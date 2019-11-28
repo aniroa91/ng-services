@@ -1,82 +1,54 @@
-@(rs: churn.models.ChecklistResponse)
+@(rs: churn.models.ChecklistResponse, arrayMonth: Array[String])
 @import play.api.libs.json.Json
 @import services.domain.CommonService
-@import churn.utils.AgeGroupUtil
 
-<script type="text/javascript">
-
-        var heightChart_type   = $(window).height() * 0.80
-        var widthChart  = $(window).width() * 0.8
-        var heightChart_region = $(window).height() * 0.41
-        var textSpace = 40
-        // small desktop
-        if($(window).width() >= 991 && $(window).width()<= 1169){
-            widthChart = $(window).width() * 0.6
-            heightChart_region = $(window).height() * 0.52
+    <script type="text/javascript">
+        var width = '60%'
+        var left = 'auto'
+        var right = 'auto'
+        if($(window).width() <= 600) {
+            left = 110
+            right = 0
+            width = '70%'
         }
-        // large desktop
-        if($(window).width() > 1169){
-            widthChart = $(window).width() * 0.4
-            textSpace = 20
+        else if($(window).width() > 600 && $(window).width() <= 800) {
+            left = 'auto'
+            right = 10
+            width = '70%'
         }
-
+        else if($(window).width() > 800 && $(window).width() <= 1024) {
+            left = 'auto'
+            right = 10
+            width = '80%'
+        }
         var options = {
             title: 'Churn Rate (%)',
-            hAxis: {title: '',gridlines: {count: 13, color: 'transparent'}},
-            vAxis: {title: '',gridlines: {count: 9, color: '#f0f0f0'}},
+            hAxis: {
+                title: '',
+                gridlines: {
+                    count: 13,
+                    color: 'transparent'
+                }
+            },
+            vAxis: {
+                title: '',
+                gridlines: {
+                    count: 9,
+                    color: '#f0f0f0'
+                }
+            },
             chartArea: {
-                height: "70%",
+                height: "74%",
                 width: "73%",
                 left: 150,
-                right: 35
+                right: 20
             },
-            width: widthChart,
-            height: heightChart_region,
+            width: '100%',
+            height: '100%',
             sizeAxis: {
                 maxSize: 25
             },
             colorAxis: {colors: ['#F5F6CE', 'green']},
-            bubble: {
-                textStyle: {
-                    auraColor: 'none',
-                },
-                cursor: 'pointer',
-                opacity: 1
-            },
-            tooltip: {
-                trigger: 'none'
-            }
-        };
-        var optionsType = {
-            title: 'Churn Rate (%)',
-            hAxis: {
-                title: '',
-                gridlines: {count: 15, color: 'transparent'},
-                viewWindow: {
-                  min:0
-                },
-                textStyle : {
-                    color:'#1c2752'
-                }/*
-                direction:-1,
-                slantedText:true,
-                slantedTextAngle:90, // viewmode vertical*/
-
-            },
-            width: widthChart,
-            height: heightChart_type,
-            vAxis: {title: '',gridlines: {count: 9, color: '#f0f0f0'}},
-            chartArea: {
-                height: "54%",
-                width: "73%",
-                left: 150,
-                top: 50,
-                right: 30
-            },
-            sizeAxis: {
-                maxSize: 20
-            },
-            colorAxis: {colors: ['#f7fbff', '#08519c']},
             bubble: {
                 textStyle: {
                     auraColor: 'none',
@@ -97,33 +69,82 @@
                     color: 'transparent'
                 },
                 viewWindow: {
-                   min:0
+                    min:0
                 },
                 textStyle : {
                     color:'#1c2752',
                     fontSize: 11
                 },
-                maxAlternation: 2, // use a maximum of 1 line of labels
-                showTextEvery: 1, // show every label if possible
-                minTextSpacing: textSpace // minimum spacing between adjacent labels, in pixels
+                slantedText:true
             },
             vAxis: {
                 title: '',
                 gridlines: {
-                    count: 9,
+                    count: 10,
                     color: '#f0f0f0'
                 }
             },
             chartArea: {
-                height: "70%",
+                height: "74%",
                 width: "73%",
                 left: 150,
                 right: 20
             },
-            width: widthChart,
-            height: heightChart_region,
+            width: '100%',
+            height: '100%',
             sizeAxis: {
-                maxSize: 25
+                maxSize: 20
+            },
+            colorAxis: {colors: ['#F6CECE', '#B40404']},
+            bubble: {
+                textStyle: {
+                    auraColor: 'none',
+                },
+                cursor: 'pointer',
+                opacity: 1
+            },
+            tooltip: {
+                trigger: 'none'
+            }
+        };
+        var optionsCause = {
+            title: 'Churn Rate (%)',
+            hAxis: {
+                title: '',
+                gridlines: {
+                    count: 14,
+                    color: 'transparent'
+                },
+                viewWindow: {
+                    min:0
+                },
+                textStyle : {
+                    color:'#1c2752',
+                    fontSize: 11
+                },
+                slantedText:true,
+                slantedTextAngle: 17
+            },
+            vAxis: {
+                title: '',
+                gridlines: {
+                    count: 10,
+                    color: '#f0f0f0'
+                },
+                slantedText:true,
+                slantedTextAngle: 90
+            },
+            chartArea: {
+                height: "74%",
+                width: "73%",
+                left: 150,
+                right: 20,
+                bottom: 90
+            },
+            width: '100%',
+            height: '100%',
+            sizeAxis: {
+                maxSize: 20
             },
             colorAxis: {colors: ['#F6CECE', '#B40404']},
             bubble: {
@@ -143,10 +164,39 @@
         google.setOnLoadCallback(drawChart);
 
         function drawChart() {
+            // click tab
+            $('.nav-tabs li').click(function () {
+                var tabCurr = $('.nav-tabs li.active').find('a').attr('class')
+                var tab = $(this).find('a').attr('class')
+                if(tabCurr != tab){
+                    $('#tabName').val(tab)
+                    $('.nav-tabs li').removeClass('in').removeClass('active')
+                    $('.panel-body .tab-pane').removeClass('in').removeClass('active')
+                    $('#'+tab).addClass('in').addClass('active')
+                    $(this).addClass('in').addClass('active')
+                    getChurnByTab(tab)
+                }
+            })
+            $(".slAge").select2({
+                placeholder: "Choose age group ..."
+            });
+            $(".slPackage").select2({
+                placeholder: "Choose package ..."
+            });
+            $(".slPosition").select2();
+            $(".slCause").select2();
+            $(".slGrpChl").select2();
+            $(".slTime").select2();
+            $(".slProcess").select2();
+            $('.radio').iCheck({
+                radioClass: 'iradio_square-purple'
+            });
+            $('.checkbox').iCheck({
+                checkboxClass: 'icheckbox_square-purple'
+            });
             $('.monthPicker').datepicker({
                 autoclose: true,
                 minViewMode: 1,
-                startDate: '-12m',
                 endDate: '-1m',
                 format: 'yyyy-mm'
             }).on('changeDate', function (selected) {
@@ -158,22 +208,44 @@
                 // change highlight filters
                 $('.monthGrp').removeAttr('style')
             });
+            // jsTree Region and province
+            $('.region').jstree({
+                "plugins" : ["checkbox"],
+                'checkbox': {
+                    deselect_all: true,
+                    three_state: false
+                },
+                'core' : {
+                    multiple: false,
+                    expand_selected_onload : false,
+                    "themes":{
+                        "icons":false
+                    },
+                    'data' : getJsonTreeListRegion(@Html(Json.stringify(Json.toJson(rs.province))),@Html(Json.stringify(Json.toJson( rs.province.map(x => x._1).distinct.sorted ))))
+                }
+            }).on('changed.jstree', function (e, data) {
+                var i, j, nodes = [], provinces = [];
+                for (i = 0, j = data.selected.length; i < j; i++) {
+                    nodes.push(data.instance.get_node(data.selected[i]).id);
+                }
+                var regionArr = nodes.join(', ').split(',')
+                for (var i = 0; i < regionArr.length; i++) {
+                    provinces.push(regionArr[i])
+                }
+                $('#province').val(provinces)
+            })
 
             var churn1 = Highcharts.chart('churn1', {
                 chart: {
                     zoomType: 'xy'
                 },
-
                 title: {
                     text: ''
                 },
-
                 colors : ['#f1b53d','#3498DB', '#dc5a78'],
-
                 xAxis: {
                     categories: @Html(Json.stringify(Json.toJson(rs.ctCheckList.map(x=> x._1))))
                 },
-
                 yAxis: [{
                     labels: {
                         format: '{value}',
@@ -202,43 +274,22 @@
                     },
                     opposite: true
                 }],
-
                 tooltip: {
                     shared: true
                 },
-                // tam remove qua v2
-                /*plotOptions: {
-                    series: {
-                        cursor: 'pointer',
-                        point: {
-                            events: {
-                                contextmenu: function () {
-                                    window.location.href = "/churn/search?contract=Month:"+this.category
-                                }
-                            }
-                        }
-                    }
-                },*/
-
                 series: getJson2Column1Line(@Html(Json.stringify(Json.toJson(rs.ctCheckList.map(x=> x._2)))),@Html(Json.stringify(Json.toJson(rs.ctCheckList.map(x=> x._3)))), @Html(Json.stringify(Json.toJson(rs.ctCheckList.map(x=> x._4)))),"Count Checklist")
-
             });
-
             var churn2 = Highcharts.chart('churn2', {
                 chart: {
                     zoomType: 'xy'
                 },
-
                 title: {
                     text: ''
                 },
-
                 colors : ['#1ABB9C','#dc5a78'],
-
                 xAxis: {
                     categories: @Html(Json.stringify(Json.toJson(rs.trendChecklist.map(x=> x._1))))
                 },
-
                 yAxis: [{
                     labels: {
                         format: '{value} %',
@@ -267,7 +318,6 @@
                     },
                     opposite: true
                 }],
-
                 tooltip: {
                     formatter: function() {
                         var s = [];
@@ -289,935 +339,8 @@
                     },
                     shared: true
                 },
-                // tam remove qua v2
-                /*plotOptions: {
-                    series: {
-                        cursor: 'pointer',
-                        point: {
-                            events: {
-                                contextmenu: function () {
-                                    window.location.href = "/churn/search?contract=Month:"+this.category
-                                }
-                            }
-                        }
-                    }
-                },*/
-
                 series: getJsonChurnMonth(@Html(Json.stringify(Json.toJson(rs.trendChecklist.map(x=> x._2)))),@Html(Json.stringify(Json.toJson(rs.trendChecklist.map(x=> x._3->x._4)))))
-
             });
-
-            var churn3 = Highcharts.chart('churn3', {
-                chart: {
-                    type: 'heatmap',
-                    marginTop: 40,
-                    marginBottom: 70,
-                    plotBorderWidth: 1
-                },
-
-                title: {
-                    text: ''
-                },
-
-                xAxis: {
-                    categories: @Html(Json.stringify(Json.toJson(rs.checklistRegion._1)))
-                },
-
-                yAxis: {
-                    categories: @Html(Json.stringify(Json.toJson(rs.checklistRegion._2.map(x=>x._2).distinct.sorted.map(x=> "Vung " + x)))),
-                    title: null
-                },
-
-                colorAxis: {
-                    minColor: '#CEF6D8',
-                    maxColor: '#088A29'
-                },
-
-                legend: {
-                    align: 'right',
-                    layout: 'vertical',
-                    margin: 0,
-                    verticalAlign: 'top',
-                    y: 25,
-                    symbolHeight: 280
-                },
-
-                plotOptions: {
-                    series: {
-                        // tam remove qua v2
-                        /*point: {
-                            events: {
-                                contextmenu: function (event) {
-                                    var month = event.point.series.xAxis.categories[event.point.x]
-                                    var region = event.point.series.yAxis.categories[event.point.y].split(" ")[1]
-                                    window.location.href = "/churn/search?contract=Month:"+month +"_Region:"+region
-                                }
-                            }
-                        },
-                        cursor: 'pointer',*/
-                        dataLabels:{
-                            formatter:function(){
-                                var nf = new Intl.NumberFormat();
-                                return nf.format(this.point.value)+" %";
-                            }
-                        }
-                    }
-                },
-
-                tooltip: {
-                    formatter: function () {
-                        return 'Month: <b>' + this.series.xAxis.categories[this.point.x] +'</b><br/>Region: <b>'+ this.series.yAxis.categories[this.point.y] + '</b><br/>Number of contracts: <b>' +
-                                this.point.name +'</b>';
-                    }
-                },
-
-                series: [{
-                    name: 'total contracts',
-                    borderWidth: 0.1,
-                    borderColor: '#78c679',
-                    data: getdataHeatMapRegionMonth(@Html(Json.stringify(Json.toJson(rs.checklistRegion._2))), @Html(Json.stringify(Json.toJson(rs.checklistRegion._2.map(x=>x._1).distinct.sorted))),@Html(Json.stringify(Json.toJson(rs.checklistRegion._2.map(x=>x._2).distinct.sorted)))),
-                    dataLabels: {
-                        enabled: true,
-                        color: '#000000',
-                        style: {
-                            "fontSize": "10px"
-                        }
-                    }
-                }]
-
-            });
-
-            var mouseX;
-            var mouseY;
-            $(document).mousemove(function(e) {
-                if($(window).width() < 992){
-                    mouseX = e.pageX +115
-                    mouseY = 800
-                }
-                else if($(window).width() >= 992 && $(window).width() < 1024){
-                    mouseX = e.pageX -125
-                    mouseY = 380
-                }
-                else{
-                    mouseY = e.pageY -290
-                }
-            });
-
-            function handlerOut() {
-                $('.custom_tooltip').hide()
-            }
-
-            // draw chart Bubble 4-6-9
-            initChartBubble()
-
-            // Chart 5
-            var churn5 = Highcharts.chart('churn5', {
-                chart: {
-                    type: 'heatmap',
-                    marginTop: 40,
-                    marginBottom: 70,
-                    plotBorderWidth: 1
-                },
-
-                title: {
-                    text: ''
-                },
-
-                xAxis: {
-                    categories: @Html(Json.stringify(Json.toJson(rs.numRegionAge.map(x=> x._1.toInt).distinct.sorted.map(x=> AgeGroupUtil.getAgeById(x)))))
-                },
-
-                yAxis: {
-                    categories: @Html(Json.stringify(Json.toJson(rs.numRegionAge.map(x=>x._2).distinct.sorted.map(x=> "Vung " + x)))),
-                    title: null
-                },
-
-                colorAxis: {
-                    minColor: '#FFFFFF',
-                    maxColor: '#f1b53d'
-                },
-
-                plotOptions: {
-                    series: {
-                        point: {
-                            events: {
-                                click: function (event) {
-                                    var age = getIdBynameAge(event.point.series.xAxis.categories[event.point.x])
-                                    var region = event.point.series.yAxis.categories[event.point.y].split(" ")[1]
-                                    $('.txtTime').text("")
-                                    $('.timeDiv').hide()
-                                    $('.txtType').text("")
-                                    $('.typeDiv').hide()
-                                    if(age == $('#age').val() && region == $('#region').val()){
-                                        $(event.point.series.xAxis.labelGroup.element.childNodes).css('fill', '#666666')
-                                        $(event.point.series.xAxis.labelGroup.element.childNodes).attr('opacity', '1')
-                                        $(event.point.series.xAxis.labelGroup.element.childNodes).css('font-weight', '100')
-                                        $(event.point.series.xAxis.labelGroup.element.childNodes).css('font-size', '11px')
-                                        $(event.point.series.yAxis.labelGroup.element.childNodes).css('fill', '#666666')
-                                        $(event.point.series.yAxis.labelGroup.element.childNodes).attr('opacity', '1')
-                                        $(event.point.series.yAxis.labelGroup.element.childNodes).css('font-weight', '100')
-                                        $(event.point.series.yAxis.labelGroup.element.childNodes).css('font-size', '11px')
-                                        $('#region').val("")
-                                        $('#age').val("")
-                                        $('.txtRegion').text("")
-                                        $('.regionDiv').hide()
-                                        $('.txtAge').text("")
-                                        $('.ageDiv').hide()
-                                    }
-                                    else{
-                                        $(event.point.series.xAxis.labelGroup.element.childNodes).css('fill', '#666666')
-                                        $(event.point.series.xAxis.labelGroup.element.childNodes).attr('opacity', '0.5')
-                                        $(event.point.series.xAxis.labelGroup.element.childNodes).css('font-weight', '100')
-                                        $(event.point.series.xAxis.labelGroup.element.childNodes).css('font-size', '11px')
-                                        $(event.point.series.yAxis.labelGroup.element.childNodes).css('fill', '#666666')
-                                        $(event.point.series.yAxis.labelGroup.element.childNodes).attr('opacity', '0.5')
-                                        $(event.point.series.yAxis.labelGroup.element.childNodes).css('font-weight', '100')
-                                        $(event.point.series.yAxis.labelGroup.element.childNodes).css('font-size', '11px')
-                                        // highlight xaxis and yaxis
-                                        $(event.point.series.xAxis.labelGroup.element.childNodes[event.point.x]).css('fill', '#f3822b')
-                                        $(event.point.series.xAxis.labelGroup.element.childNodes[event.point.x]).css('font-weight', '700')
-                                        $(event.point.series.xAxis.labelGroup.element.childNodes[event.point.x]).css('font-size', '13px')
-                                        $(event.point.series.xAxis.labelGroup.element.childNodes[event.point.x]).attr('opacity', '1')
-                                        $(event.point.series.yAxis.labelGroup.element.childNodes[event.point.y]).css('fill', '#f3822b')
-                                        $(event.point.series.yAxis.labelGroup.element.childNodes[event.point.y]).css('font-weight', '700')
-                                        $(event.point.series.yAxis.labelGroup.element.childNodes[event.point.y]).css('font-size', '13px')
-                                        $(event.point.series.yAxis.labelGroup.element.childNodes[event.point.y]).attr('opacity', '1')
-                                        $('#region').val(region)
-                                        $('#age').val(age)
-                                        $('.txtRegion').text("Vung "+region)
-                                        $('.regionDiv').show()
-                                        $('.txtAge').text(getNameByIdAge(age))
-                                        $('.ageDiv').show()
-                                    }
-                                    $('#typeCurr').val("")
-                                    $('#time').val("")
-                                    ajaxGetChurnChecklist("churn5")
-                                }
-                                // tam remove qua v2
-                                /*,
-                                contextmenu: function (event) {
-                                    var age = event.point.series.xAxis.categories[event.point.x]
-                                    if(age == "06-12") age = "6-12"
-                                    var region = event.point.series.yAxis.categories[event.point.y].split(" ")[1]
-                                    window.location.href = "/churn/search?contract=Age:"+age +"_Region:"+region
-                                }*/
-                            }
-                        },
-                        dataLabels:{
-                            formatter:function(){
-                                var nf = new Intl.NumberFormat();
-                                return nf.format(this.point.value)+" %";
-                            }
-                        },
-                        cursor: 'pointer'
-                    }
-                },
-
-                legend: {
-                    align: 'right',
-                    layout: 'vertical',
-                    margin: 0,
-                    verticalAlign: 'top',
-                    y: 25,
-                    symbolHeight: 280
-                },
-
-                tooltip: {
-                    formatter: function () {
-                        return 'LifeGroup: <b>' + this.series.xAxis.categories[this.point.x] +'</b><br/>Region: <b>'+ this.series.yAxis.categories[this.point.y] + '</b><br/>Number of contracts: <b>' +
-                                this.point.name +'</b>';
-                    }
-                },
-
-                series: [{
-                    name: 'total contracts',
-                    borderWidth: 0.05,
-                    borderColor:'#f1b53d',
-                    data: getdataHeatMapRegionMonth(@Html(Json.stringify(Json.toJson(rs.numRegionAge))), @Html(Json.stringify(Json.toJson(rs.numRegionAge.map(x=>x._1.toInt).distinct.sorted))),@Html(Json.stringify(Json.toJson(rs.numRegionAge.map(x=>x._2).distinct.sorted)))),
-                    dataLabels: {
-                        enabled: true,
-                        color: '#000000',
-                        style: {
-                            "fontSize": "10px"
-                        }
-                    }
-                }]
-
-            });
-
-            // Chart 7
-            var churn7 = Highcharts.chart('churn7', {
-                chart: {
-                    type: 'heatmap',
-                    marginTop: 40,
-                    marginBottom: 70,
-                    plotBorderWidth: 1
-                },
-
-                title: {
-                    text: ''
-                },
-
-                xAxis: {
-                    categories: @Html(Json.stringify(Json.toJson(rs.processTime._1)))
-                },
-
-                yAxis: {
-                    categories: @Html(Json.stringify(Json.toJson(rs.processTime._2.map(x=> "Vung "+x)))),
-                    title: null
-                },
-
-                colorAxis: {
-                    minColor: '#ffffe5',
-                    maxColor: '#006837',
-                    type: 'logarithmic',
-                    stops: [
-                        [0, '#ffffe5'],
-                        [0.67, '#78c679'],
-                        [1, '#006837']
-                    ]
-                },
-
-                plotOptions: {
-                    series: {
-                        events: {
-                            click: function (event) {
-                                var time = event.point.series.xAxis.categories[event.point.x].split(" ")[0]
-                                var region = event.point.series.yAxis.categories[event.point.y].split(" ")[1]
-                                $('.txtAge').text("")
-                                $('.ageDiv').hide()
-                                $('.txtType').text("")
-                                $('.typeDiv').hide()
-                                if(time == $('#time').val() && region == $('#region').val()){
-                                    $(event.point.series.xAxis.labelGroup.element.childNodes).css('fill', '#666666')
-                                    $(event.point.series.xAxis.labelGroup.element.childNodes).attr('opacity', '1')
-                                    $(event.point.series.xAxis.labelGroup.element.childNodes).css('font-weight', '100')
-                                    $(event.point.series.xAxis.labelGroup.element.childNodes).css('font-size', '11px')
-                                    $(event.point.series.yAxis.labelGroup.element.childNodes).css('fill', '#666666')
-                                    $(event.point.series.yAxis.labelGroup.element.childNodes).attr('opacity', '1')
-                                    $(event.point.series.yAxis.labelGroup.element.childNodes).css('font-weight', '100')
-                                    $(event.point.series.yAxis.labelGroup.element.childNodes).css('font-size', '11px')
-                                    $('#region').val("")
-                                    $('#time').val("")
-                                    $('.txtTime').text("")
-                                    $('.timeDiv').hide()
-                                    $('.txtRegion').text("")
-                                    $('.regionDiv').hide()
-                                }
-                                else{
-                                    $(event.point.series.xAxis.labelGroup.element.childNodes).css('fill', '#666666')
-                                    $(event.point.series.xAxis.labelGroup.element.childNodes).attr('opacity', '0.5')
-                                    $(event.point.series.xAxis.labelGroup.element.childNodes).css('font-weight', '100')
-                                    $(event.point.series.xAxis.labelGroup.element.childNodes).css('font-size', '11px')
-                                    $(event.point.series.yAxis.labelGroup.element.childNodes).css('fill', '#666666')
-                                    $(event.point.series.yAxis.labelGroup.element.childNodes).attr('opacity', '0.5')
-                                    $(event.point.series.yAxis.labelGroup.element.childNodes).css('font-weight', '100')
-                                    $(event.point.series.yAxis.labelGroup.element.childNodes).css('font-size', '11px')
-                                    // highlight xaxis and yaxis
-                                    $(event.point.series.xAxis.labelGroup.element.childNodes[event.point.x]).css('fill', '#006837')
-                                    $(event.point.series.xAxis.labelGroup.element.childNodes[event.point.x]).css('font-weight', '700')
-                                    $(event.point.series.xAxis.labelGroup.element.childNodes[event.point.x]).css('font-size', '13px')
-                                    $(event.point.series.xAxis.labelGroup.element.childNodes[event.point.x]).attr('opacity', '1')
-                                    $(event.point.series.yAxis.labelGroup.element.childNodes[event.point.y]).css('fill', '#006837')
-                                    $(event.point.series.yAxis.labelGroup.element.childNodes[event.point.y]).css('font-weight', '700')
-                                    $(event.point.series.yAxis.labelGroup.element.childNodes[event.point.y]).css('font-size', '13px')
-                                    $(event.point.series.yAxis.labelGroup.element.childNodes[event.point.y]).attr('opacity', '1')
-                                    $('#region').val(region)
-                                    $('#time').val(time)
-                                    $('.txtTime').text(time+" hours")
-                                    $('.timeDiv').show()
-                                    $('.txtRegion').text("Vung "+region)
-                                    $('.regionDiv').show()
-                                }
-                                $('#typeCurr').val("")
-                                $('#age').val("")
-                                ajaxGetChurnChecklist("churn7")
-                            }
-                        },
-                        dataLabels:{
-                            formatter:function(){
-                                var nf = new Intl.NumberFormat();
-                                return nf.format(this.point.value);
-                            }
-                        },
-                        cursor: 'pointer'
-                    }
-                },
-
-                legend: {
-                    align: 'right',
-                    layout: 'vertical',
-                    margin: 0,
-                    verticalAlign: 'top',
-                    y: 25,
-                    symbolHeight: 280
-                },
-
-                tooltip: {
-                    formatter: function () {
-                        return 'ProcessTime: <b>' + this.series.xAxis.categories[this.point.x] +'</b><br/>Region: <b>'+ this.series.yAxis.categories[this.point.y] + '</b><br/>Number of contracts: <b>' +
-                                this.point.value +'</b>';
-                    }
-                },
-
-                series: [{
-                    name: 'total contracts',
-                    borderWidth: 0.05,
-                    borderColor:'#78c679',
-                    data: @Html(Json.stringify(Json.toJson(rs.processTime._3))),
-                    dataLabels: {
-                        enabled: true,
-                        style: {
-                            "fontSize": "10px"
-                        },
-                        color: '#000000'
-                    }
-                }]
-
-            });
-
-            // Chart 8
-            var churn8 = Highcharts.chart('churn8', {
-                chart: {
-                    type: 'heatmap',
-                    marginTop: 50,
-                    marginBottom: 125,
-                    marginRight:0,
-                    plotBorderWidth: 1
-                },
-
-                title: {
-                    text: ''
-                },
-
-                xAxis: {
-                    categories: @Html(Json.stringify(Json.toJson(rs.typeRegion._1.map(x=> x._2)))),
-                    labels: {
-                        useHTML:true,//set to true
-                        style:{
-                            width:'50px',
-                            whiteSpace:'normal'//set to normal
-                        },
-                        step: 1,
-                        formatter: function () {//use formatter
-                            return '<div align="center" style="white-space:normal;width:50px">' + this.value + '</div>';
-                        }
-                    },
-                },
-
-                yAxis: {
-                    categories: @Html(Json.stringify(Json.toJson(rs.typeRegion._2.map(x=> "Vung "+x)))),
-                    title: null
-                },
-
-                colorAxis: {
-                    minColor: '#FFFFFF',
-                    maxColor: '#b30000'
-                },
-
-                legend: {
-                    align: 'center',
-                    verticalAlign: 'top',
-                    y: -30,
-                    x: 0
-                },
-
-                plotOptions: {
-                    series: {
-                        events: {
-                            click: function (event) {
-                                var _type = event.point.series.xAxis.categories[event.point.x]
-                                var region = event.point.series.yAxis.categories[event.point.y].split(" ")[1]
-                                $('.txtAge').text("")
-                                $('.ageDiv').hide()
-                                $('.txtTime').text("")
-                                $('.timeDiv').hide()
-                                if(_type == $('#typeCurr').val() && region == $('#region').val()){
-                                    $(event.point.series.xAxis.labelGroup.div.childNodes).css('color', '#666666')
-                                    $(event.point.series.xAxis.labelGroup.div.childNodes).attr('opacity', '1')
-                                    $(event.point.series.xAxis.labelGroup.div.childNodes).css('font-weight', '100')
-                                    $(event.point.series.yAxis.labelGroup.element.childNodes).css('fill', '#666666')
-                                    $(event.point.series.yAxis.labelGroup.element.childNodes).attr('opacity', '1')
-                                    $(event.point.series.yAxis.labelGroup.element.childNodes).css('font-weight', '100')
-                                    $(event.point.series.yAxis.labelGroup.element.childNodes).css('font-size', '11px')
-                                    $('#region').val("")
-                                    $('#typeCurr').val("")
-                                    $('.txtRegion').text("")
-                                    $('.regionDiv').hide()
-                                    $('.txtType').text("")
-                                    $('.typeDiv').hide()
-                                }
-                                else{
-                                    $(event.point.series.xAxis.labelGroup.div.childNodes).css('color', '#666666')
-                                    $(event.point.series.xAxis.labelGroup.div.childNodes).attr('opacity', '0.5')
-                                    $(event.point.series.xAxis.labelGroup.div.childNodes).css('font-weight', '100')
-                                    $(event.point.series.yAxis.labelGroup.element.childNodes).css('fill', '#666666')
-                                    $(event.point.series.yAxis.labelGroup.element.childNodes).attr('opacity', '0.5')
-                                    $(event.point.series.yAxis.labelGroup.element.childNodes).css('font-weight', '100')
-                                    $(event.point.series.yAxis.labelGroup.element.childNodes).css('font-size', '11px')
-                                    // highlight xaxis and yaxis
-                                    $(event.point.series.xAxis.labelGroup.div.childNodes[event.point.x]).css('color', '#b30000')
-                                    $(event.point.series.xAxis.labelGroup.div.childNodes[event.point.x]).css('font-weight', '700')
-                                    $(event.point.series.xAxis.labelGroup.div.childNodes[event.point.x]).attr('opacity', '1')
-                                    $(event.point.series.yAxis.labelGroup.element.childNodes[event.point.y]).css('fill', '#b30000')
-                                    $(event.point.series.yAxis.labelGroup.element.childNodes[event.point.y]).css('font-weight', '700')
-                                    $(event.point.series.yAxis.labelGroup.element.childNodes[event.point.y]).css('font-size', '13px')
-                                    $(event.point.series.yAxis.labelGroup.element.childNodes[event.point.y]).attr('opacity', '1')
-                                    $('#region').val(region)
-                                    $('#typeCurr').val(_type)
-                                    $('.txtRegion').text("Vung "+region)
-                                    $('.regionDiv').show()
-                                    $('.txtType').text(_type)
-                                    $('.typeDiv').show()
-                                }
-                                $('#time').val("")
-                                $('#age').val("")
-                                ajaxGetChurnChecklist("churn8")
-                            }
-                        },
-                        dataLabels:{
-                            formatter:function(){
-                                var nf = new Intl.NumberFormat();
-                                return nf.format(this.point.value);
-                            }
-                        },
-                        cursor: 'pointer'
-                    }
-                },
-
-                tooltip: {
-                    formatter: function () {
-                        return 'Type: <b>' + this.series.xAxis.categories[this.point.x] +'</b><br/>Region: <b>'+ this.series.yAxis.categories[this.point.y] + '</b><br/>Number of contracts: <b>' +
-                                this.point.value +'</b>';
-                    }
-                },
-
-                series: [{
-                    name: 'total contracts',
-                    borderWidth: '0.03px',
-                    borderColor:'#ef6548',
-                    data: @Html(Json.stringify(Json.toJson(rs.typeRegion._3))),
-                    dataLabels: {
-                        enabled: true,
-                        style: {
-                            "fontSize": "10px"
-                        }
-                    }
-                }]
-
-            });
-
-            $('.nav-tabs li').click(function () {
-                var tabCurr = $('.nav-tabs li.active').find('a').attr('class')
-                var tab = $(this).find('a').attr('class')
-                if(tabCurr != tab){
-                    $('.nav-tabs li').removeClass('in').removeClass('active')
-                    $('.panel-body .tab-pane').removeClass('in').removeClass('active')
-                    $('#'+tab).addClass('in').addClass('active')
-                    $(this).addClass('in').addClass('active')
-                }
-            })
-
-            var catesAge = @Html(Json.stringify(Json.toJson(AgeGroupUtil.AGE)))
-
-            function initChartBubble(){
-                // Chart 4: trend region and month charts bubble
-                var container4    = document.getElementById('churn4')
-                var catesMonthRegion   = @Html(Json.stringify(Json.toJson(rs.trendRegionMonth._1)))
-                var trendRegionHuyDv = getDataChurn(@Html(Json.stringify(Json.toJson(rs.trendRegionMonth._2))), "Month", "Region")
-                var dataRegionHuyDv = google.visualization.arrayToDataTable(trendRegionHuyDv)
-                var chartRegionHuyDv = new google.visualization.BubbleChart(container4)
-                google.visualization.events.addListener(chartRegionHuyDv, 'ready', function () {
-                    Array.prototype.forEach.call(container4.getElementsByTagName('text'), function(text) {
-                        if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444')) {
-                            if(text.innerHTML == 0 || text.innerHTML == 8)
-                                text.setAttribute('fill-opacity',0)
-                            text.innerHTML = "Vung "+text.innerHTML
-                        }
-                        // change label month
-                        if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#1c2752')) {
-                            if(Object.keys(catesMonthRegion).length == 1){
-                                if (text.innerHTML == 0.5 || text.innerHTML == 0.0 || text.innerHTML == 1.5)
-                                    text.setAttribute('fill-opacity', 0)
-                                else {
-                                    if(text.innerHTML == 1.0){
-                                        text.innerHTML = keyByValue(catesMonthRegion, 1)
-                                    }
-                                }
-                            }
-                            else {
-                                if (text.innerHTML == 0 || text.innerHTML == 13)
-                                    text.setAttribute('fill-opacity', 0)
-                                else {
-                                    text.innerHTML = keyByValue(catesMonthRegion, Number(text.innerHTML))
-                                }
-                            }
-                        }
-                    });
-                    // remove circle value =0
-                    Array.prototype.forEach.call(document.getElementById('churn4').getElementsByTagName('circle'), function(circle) {
-                        if(circle.getAttribute('r') == 5 && $('#minRateregionMonth').val() == 0 && $('#minPertregionMonth').val() == 0)
-                            circle.setAttribute('r', 1)
-                    })
-                });
-                if(Object.keys(catesMonthRegion).length == 1)
-                    optionsRegion.hAxis.gridlines.count = 4
-                else
-                    optionsRegion.hAxis.gridlines.count = Object.keys(catesMonthRegion).length+2
-                chartRegionHuyDv.draw(dataRegionHuyDv, optionsRegion);
-                // tam remove qua v2
-                /*google.visualization.events.addListener(chartRegionHuyDv, 'onmousedown', function (event) {
-                    document.oncontextmenu = function() {
-                        var month = dataRegionHuyDv.getValue(Number(event.targetID.split('#')[2]), 1)
-                        var region = dataRegionHuyDv.getValue(Number(event.targetID.split('#')[2]), 2)
-                        window.location.href = "/churn/search?contract=Month:"+keyByValue(catesMonthRegion, month)+"_Region:"+region
-                    };
-                });*/
-                google.visualization.events.addListener(chartRegionHuyDv, 'onmouseover', function (event) {
-                    var rate = dataRegionHuyDv.getValue(event.row, 3);
-                    var xAxis = dataRegionHuyDv.getValue(event.row, 1);
-                    var yAxis = dataRegionHuyDv.getValue(event.row, 2);
-                    var percent = dataRegionHuyDv.getValue(event.row, 4);
-                    var contracts = dataRegionHuyDv.getValue(event.row, 5);
-                    var x = mouseX - 225;
-                    if($(window).width() < 992){
-                        mouseY = mouseY - 870
-                    }
-                    else{
-                        mouseY = mouseY -450
-                    }
-                    var y = mouseY
-                    if(!(Number(percent == 0) && Number(rate) == 0)){
-                        $('#churn4_tooltip').html('<div><p><b>Month:</b> ' + keyByValue(catesMonthRegion, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
-                                '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contract:</b> '+contracts+'</p></div>').css({
-                            'top': y,
-                            'left': x
-                        }).fadeIn('slow');
-                    }
-                    // remove circle value =0
-                    Array.prototype.forEach.call(document.getElementById('churn4').getElementsByTagName('circle'), function(circle) {
-                        if($('#minRateregionMonth').val() == 0 && $('#minPertregionMonth').val() == 0 && (circle.getAttribute('fill') == 'none' || circle.getAttribute('r') == 5)){
-                            circle.setAttribute('r', 1)
-                        }
-                    })
-                });
-                google.visualization.events.addListener(chartRegionHuyDv, 'onmouseout', handlerOut);
-
-                // Chart 6
-                var container = document.getElementById('churn6')
-                var checklistHuyDv = getDataChurn(@Html(Json.stringify(Json.toJson(rs.checklistRegionAge))), "Month", "Age")
-                var dataHuyDv = google.visualization.arrayToDataTable(checklistHuyDv)
-                var chartHuyDv = new google.visualization.BubbleChart(container);
-                google.visualization.events.addListener(chartHuyDv, 'ready', function () {
-                    Array.prototype.forEach.call(container.getElementsByTagName('text'), function(text) {
-                        if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444')) {
-                            if(text.innerHTML == 0 || text.innerHTML == 8)
-                                text.setAttribute('fill-opacity',0)
-                            text.innerHTML = "Vung "+text.innerHTML
-                        }
-                        // change label age
-                        if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#444444')) {
-                            if(text.innerHTML == 0 || text.innerHTML == 72)
-                                text.setAttribute('fill-opacity',0)
-                            else{
-                                switch ( text.innerHTML){
-                                    case "6" :
-                                        text.innerHTML = "0-6";break;
-                                    case "12" :
-                                        text.innerHTML = "06-12";break;
-                                    case "18" :
-                                        text.innerHTML = "12-18";break;
-                                    case "24" :
-                                        text.innerHTML = "18-24";break;
-                                    case "30" :
-                                        text.innerHTML = "24-30";break;
-                                    case "36" :
-                                        text.innerHTML = "30-36";break;
-                                    case "42" :
-                                        text.innerHTML = "36-42";break;
-                                    case "48" :
-                                        text.innerHTML = "42-48";break;
-                                    case "54" :
-                                        text.innerHTML = "48-54";break;
-                                    case "60" :
-                                        text.innerHTML = "54-60";break;
-                                    case "66" :
-                                        text.innerHTML = ">60";break;
-                                }
-                            }
-                        }
-                    });
-                    // remove circle value =0
-                    Array.prototype.forEach.call(document.getElementById('churn6').getElementsByTagName('circle'), function(circle) {
-                        if(circle.getAttribute('r') == 5 && $('#minRateregionAge').val() == 0 && $('#minPertregionAge').val() == 0)
-                            circle.setAttribute('r', 1)
-                    })
-                });
-                chartHuyDv.draw(dataHuyDv, options);
-                google.visualization.events.addListener(chartHuyDv, 'select', function () {
-                    var selection = chartHuyDv.getSelection()
-                    $('.txtType').text("")
-                    $('.typeDiv').hide()
-                    $('.txtTime').text("")
-                    $('.timeDiv').hide()
-                    if(selection.length >0) {
-                        var row = selection[0].row;
-                        var region = dataHuyDv.getValue(row, 2)
-                        var age = dataHuyDv.getValue(row, 1)
-                        Array.prototype.forEach.call(container.getElementsByTagName('text'), function(text) {
-                            if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === 'green') && (text.innerHTML != "Vung 0") && (text.innerHTML != "Vung 8")) {
-                                if (text.innerHTML == "Vung "+region){
-                                    text.setAttribute('fill-opacity', 1)
-                                    text.setAttribute('fill', "green")
-                                    text.setAttribute('font-weight', "bold")
-                                    text.setAttribute('font-size', "14px")
-                                }
-                                else {
-                                    text.setAttribute('fill', "#444444")
-                                    text.setAttribute('fill-opacity', 0.5)
-                                    text.removeAttribute('font-weight')
-                                    text.setAttribute('font-size', "13px")
-                                }
-                            }
-                            // change label age
-                            if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === 'green')) {
-                                if (text.innerHTML != 0 && text.innerHTML != 72)
-                                    if(getNameByIdAge(Number(age)) == text.textContent){
-                                        text.setAttribute('fill-opacity', 1)
-                                        text.setAttribute('fill', "green")
-                                        text.setAttribute('font-weight', "bold")
-                                        text.setAttribute('font-size', "14px")
-                                    }
-                                    else {
-                                        text.setAttribute('fill', "#444444")
-                                        text.setAttribute('fill-opacity', 0.5)
-                                        text.removeAttribute('font-weight')
-                                        text.setAttribute('font-size', "13px")
-                                    }
-                            }
-                        })
-                        $('#age').val(age)
-                        $('#region').val(region)
-                        $('.txtAge').text(getNameByIdAge(age))
-                        $('.ageDiv').show()
-                        $('.txtRegion').text("Vung "+region)
-                        $('.regionDiv').show()
-                    }
-                    else{
-                        Array.prototype.forEach.call(container.getElementsByTagName('text'), function(text) {
-                            if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === 'green') && (text.innerHTML != "Vung 0") && (text.innerHTML != "Vung 8")) {
-                                text.setAttribute('fill-opacity', 1)
-                                text.setAttribute('fill', "#444444")
-                                text.removeAttribute('font-weight')
-                                text.setAttribute('font-size', "13px")
-                            }
-                            if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === 'green')) {
-                                if (text.innerHTML != 0 && text.innerHTML != 72){
-                                    text.setAttribute('fill-opacity', 1)
-                                    text.setAttribute('fill', "#444444")
-                                    text.removeAttribute('font-weight')
-                                    text.setAttribute('font-size', "13px")
-                                }
-                            }
-                        })
-                        $('#age').val("")
-                        $('#region').val("")
-                        $('.txtAge').text("")
-                        $('.ageDiv').hide()
-                        $('.txtRegion').text("")
-                        $('.regionDiv').hide()
-                    }
-                    $('#time').val("")
-                    $('#typeCurr').val("")
-                    ajaxGetChurnChecklist("churn6")
-                });
-                // tam remove qua v2
-                /*google.visualization.events.addListener(chartHuyDv, 'onmousedown', function (event) {
-                    document.oncontextmenu = function() {
-                        var age = dataHuyDv.getValue(Number(event.targetID.split('#')[2]), 1)
-                        var ageGroup = keyByValue(catesAge, age)
-                        if(ageGroup == "06-12") ageGroup = "6-12"
-                        var region = dataHuyDv.getValue(Number(event.targetID.split('#')[2]), 2)
-                        window.location.href = "/churn/search?contract=Age:"+ageGroup+"_Region:"+region
-                    };
-                });*/
-                google.visualization.events.addListener(chartHuyDv, 'onmouseover', function (event) {
-                    var rate = dataHuyDv.getValue(event.row, 3);
-                    var xAxis = dataHuyDv.getValue(event.row, 1);
-                    var yAxis = dataHuyDv.getValue(event.row, 2);
-                    var percent = dataHuyDv.getValue(event.row, 4);
-                    var contracts = dataHuyDv.getValue(event.row, 5);
-                    var x = mouseX - 225;
-                    if($(window).width() < 992){
-                        mouseY = mouseY - 870
-                    }
-                    else{
-                        mouseY = mouseY -450
-                    }
-                    var y = mouseY
-                    if(!(Number(percent == 0) && Number(rate) == 0)){
-                        $('#churn6_tooltip').html('<div><p><b>Age:</b> ' + keyByValue( catesAge, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
-                                '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contract:</b> '+contracts+'</p></div>').css({
-                            'top': y,
-                            'left': x
-                        }).fadeIn('slow');
-                    }
-                    // remove circle value =0
-                    Array.prototype.forEach.call(document.getElementById('churn6').getElementsByTagName('circle'), function(circle) {
-                        if($('#minRateregionAge').val() == 0 && $('#minPertregionAge').val() == 0 && (circle.getAttribute('fill') == 'none' || circle.getAttribute('r') == 5)){
-                            circle.setAttribute('r', 1)
-                        }
-                    })
-                });
-                google.visualization.events.addListener(chartHuyDv, 'onmouseout', handlerOut);
-
-                // Chart 9
-                var container9    = document.getElementById('churn9')
-                var catesType     = @Html(Json.stringify(Json.toJson(rs.trendTypeBubble._1)))
-                var trendTypeHuyDv = getDataChurn(@Html(Json.stringify(Json.toJson(rs.trendTypeBubble._2))), "Type", "Region")
-                var dataTypeHuyDv = google.visualization.arrayToDataTable(trendTypeHuyDv)
-
-                var chartTypeHuyDv = new google.visualization.BubbleChart(container9)
-                google.visualization.events.addListener(chartTypeHuyDv, 'ready', function () {
-                    Array.prototype.forEach.call(container9.getElementsByTagName('text'), function(text) {
-                        if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444')) {
-                            if(text.innerHTML == 0 || text.innerHTML == 8)
-                                text.setAttribute('fill-opacity',0)
-                            text.innerHTML = "Vung "+text.innerHTML
-                        }
-                        // change label type
-                        if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#1c2752')) {
-                            if(Object.keys(catesType).length == 1){
-                                if (text.innerHTML == 0.5 || text.innerHTML == 0.0 || text.innerHTML == 1.5)
-                                    text.setAttribute('fill-opacity', 0)
-                                else {
-                                    if(text.innerHTML == 1.0){
-                                        text.innerHTML = keyByValue(catesType, 1)
-                                    }
-                                }
-                            }
-                            else {
-                                if (text.innerHTML == 0 || text.innerHTML == 14)
-                                    text.setAttribute('fill-opacity', 0)
-                                else {
-                                    replaceSvgToHtml(text, catesType)
-                                    text.setAttribute('fill-opacity',0)
-                                }
-                            }
-                        }
-                    });
-                    // remove circle value =0
-                    Array.prototype.forEach.call(document.getElementById('churn9').getElementsByTagName('circle'), function(circle) {
-                        if(circle.getAttribute('r') == 5 && $('#minRateregionType').val() == 0 && $('#minPertregionType').val() == 0)
-                            circle.setAttribute('r', 1)
-                    })
-                });
-                if(Object.keys(catesType).length == 1)
-                    optionsType.hAxis.gridlines.count = 4
-                else
-                    optionsType.hAxis.gridlines.count = Object.keys(catesType).length+2
-                chartTypeHuyDv.draw(dataTypeHuyDv, optionsType);
-                google.visualization.events.addListener(chartTypeHuyDv, 'select', function () {
-                    var selection = chartTypeHuyDv.getSelection()
-                    $('.txtAge').text("")
-                    $('.ageDiv').hide()
-                    $('.txtTime').text("")
-                    $('.timeDiv').hide()
-                    if(selection.length >0) {
-                        var row = selection[0].row;
-                        var region = dataTypeHuyDv.getValue(row, 2)
-                        var _type = keyByValue(catesType, dataTypeHuyDv.getValue(row, 1))
-                        // change label region
-                        Array.prototype.forEach.call(container9.getElementsByTagName('text'), function(text) {
-                            if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === '#1c2752') && (text.innerHTML != "Vung 0") && (text.innerHTML != "Vung 8")) {
-                                if (text.innerHTML == "Vung "+region){
-                                    text.setAttribute('fill-opacity', 1)
-                                    text.setAttribute('fill', "#1c2752")
-                                    text.setAttribute('font-weight', "bold")
-                                    text.setAttribute('font-size', "14px")
-                                }
-                                else {
-                                    text.setAttribute('fill', "#444444")
-                                    text.setAttribute('fill-opacity', 0.5)
-                                    text.removeAttribute('font-weight')
-                                    text.setAttribute('font-size', "13px")
-                                }
-                            }
-                        })
-                        // change label type
-                        Array.prototype.forEach.call(container9.getElementsByTagName('foreignObject'), function(text) {
-                            if(_type == text.textContent){
-                                text.setAttribute('font-weight', "bold")
-                                text.setAttribute('font-size', "14px")
-                            }
-                            else {
-                                text.removeAttribute('font-weight')
-                                text.setAttribute('font-size', "13px")
-                            }
-                        })
-                        $('#typeCurr').val(_type)
-                        $('#region').val(region)
-                        $('.txtType').text(_type)
-                        $('.typeDiv').show()
-                        $('.txtRegion').text("Vung "+region)
-                        $('.regionDiv').show()
-                    }
-                    else{
-                        // change label region
-                        Array.prototype.forEach.call(container9.getElementsByTagName('text'), function(text) {
-                            if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === '#1c2752') && (text.innerHTML != "Vung 0") && (text.innerHTML != "Vung 8")) {
-                                text.setAttribute('fill-opacity', 1)
-                                text.setAttribute('fill', "#444444")
-                                text.removeAttribute('font-weight')
-                                text.setAttribute('font-size', "13px")
-                            }
-                        })
-                        // change label type
-                        Array.prototype.forEach.call(container9.getElementsByTagName('foreignObject'), function(text) {
-                            text.removeAttribute('font-weight')
-                            text.setAttribute('font-size', "13px")
-                        })
-                        $('#typeCurr').val("")
-                        $('#region').val("")
-                        $('.txtType').text("")
-                        $('.typeDiv').hide()
-                        $('.txtRegion').text("")
-                        $('.regionDiv').hide()
-                    }
-                    $('#time').val("")
-                    $('#age').val("")
-                    ajaxGetChurnChecklist("churn9")
-                });
-                google.visualization.events.addListener(chartTypeHuyDv, 'onmouseover', function (event) {
-                    var rate = dataTypeHuyDv.getValue(event.row, 3);
-                    var xAxis = dataTypeHuyDv.getValue(event.row, 1);
-                    var yAxis = dataTypeHuyDv.getValue(event.row, 2);
-                    var percent = dataTypeHuyDv.getValue(event.row, 4);
-                    var contracts = dataTypeHuyDv.getValue(event.row, 5);
-                    var x = mouseX - 225;
-                    if($(window).width() < 992){
-                        mouseY = mouseY - 870
-                    }
-                    else{
-                        mouseY = mouseY -450
-                    }
-                    var y = mouseY
-                    if(!(Number(percent == 0) && Number(rate) == 0)){
-                        $('#churn9_tooltip').html('<div><p><b>Type:</b> ' + keyByValue(catesType, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
-                                '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contract:</b> '+contracts+'</p></div>').css({
-                            'top': y,
-                            'left': x
-                        }).fadeIn('slow');
-                    }
-                    // remove circle value =0
-                    Array.prototype.forEach.call(document.getElementById('churn9').getElementsByTagName('circle'), function(circle) {
-                        if($('#minRateregionType').val() == 0 && $('#minPertregionType').val() == 0 && (circle.getAttribute('fill') == 'none' || circle.getAttribute('r') == 5)){
-                            circle.setAttribute('r', 1)
-                        }
-                    })
-                });
-                google.visualization.events.addListener(chartTypeHuyDv, 'onmouseout', handlerOut);
-            }
 
             // click tooltip title
             var specifiedElement = document.getElementsByClassName('aMore');
@@ -1231,56 +354,12 @@
                 }
             });
 
-            /*$(window).resize(function(){
-                drawChart()
-            });*/
-
-            // click filter Status
-            $('.slStatus').on('change',function () {
-                // remove highlight filters
-                $('.slStatus').removeAttr('style')
-            })
-
-            // click apply fitler
-            $('.apply').click(function () {
-                /*$('#region').val("")
-                $('#age').val("")
-                $('#typeCurr').val("")
-                $('.txtType').text("")
-                $('.typeDiv').hide()
-                $('.txtRegion').text("")
-                $('.regionDiv').hide()
-                $('.txtAge').text("")
-                $('.ageDiv').hide()
-                $('.txtTime').text("")
-                $('.timeDiv').hide()*/
-                ajaxGetChurnChecklist("*")
-            })
-
-            // click refresh fitler
-            $('.refresh').click(function () {
-                $('#region').val("")
-                $('#age').val("")
-                $('#typeCurr').val("")
-                $(".monthPicker").datepicker("update", $('#monthCurr').val())
-                $('#month').val($('#monthCurr').val())
-                $('#time').val("")
-                $('.slStatus').val("1")
-                $('.txtType').text("")
-                $('.typeDiv').hide()
-                $('.txtRegion').text("")
-                $('.regionDiv').hide()
-                $('.txtAge').text("")
-                $('.ageDiv').hide()
-                $('.txtTime').text("")
-                $('.timeDiv').hide()
-                ajaxGetChurnChecklist("*")
-            })
-
             function ajaxGetChurnChecklist(_type){
+                $('.nav-tabs li').removeClass('in').removeClass('active')
+                $('.panel-body .tab-pane').removeClass('in').removeClass('active')
                 var fields = getParamFields(document.querySelector('input[name=csrfToken]').value)
                 $.ajax({
-                    url: "/internet/checklist/getJsonChurn",
+                    url: "/checklist/getJsonChurn",
                     cache: false,
                     data:  fields,
                     type:"POST",
@@ -1295,472 +374,46 @@
                     },
                     success: function (dta) {
                         if(dta != "Error"){
-                            // change highlight filters
-                            $('.slStatus').attr('style','border:1px solid #16a085!important')
-                            $('.monthGrp').attr('style','background-color: #16a085!important;color: #fff')
+                            /* update box number */
+                            // box Contract have Checklist
+                            $('#boxNumCtChl .currNumCtChl').text(dta.contractCL.curr)
+                            var prevCtCL = '<h4>'+dta.contractCL.prev+' <i class="fa fa-info-circle iconTip" title="Tổng số hợp đồng có checklist cùng kỳ năm ngoái"></i></h4>';
+                            prevCtCL += (Number(dta.contractCL.prev.replace(",","")) > Number(dta.contractCL.curr.replace(",","")))? '<span class="down"><i class="fa fa-arrow-down fadeInDown animated" aria-hidden="true"></i> ' : '<span class="up"><i class="fa fa-arrow-up fadeInUp animated" aria-hidden="true"></i> '
+                            prevCtCL += dta.contractCL.perct+' % </span> from '+dta.lastYYYY
+                            $('#boxNumCtChl .prevNumCtChl').html("").append(prevCtCL)
+                            if(dta.contractCL.curr == "0" && dta.contractCL.prev == "0") $('#boxNumCtChl').attr('style','opacity:0.2')
+                            else $('#boxNumCtChl').removeAttr('style')
+                            // box num of Checklist
+                            $('#boxNumCl .currNumCl').text(dta.numCL.curr)
+                            var prevCL = '<h4>'+dta.numCL.prev+' <i class="fa fa-info-circle iconTip" title="Tổng số checklist cùng kỳ năm ngoái"></i></h4>';
+                            prevCL += (Number(dta.numCL.prev.replace(",","")) > Number(dta.numCL.curr.replace(",","")))? '<span class="down"><i class="fa fa-arrow-down fadeInDown animated" aria-hidden="true"></i> ' : '<span class="up"><i class="fa fa-arrow-up fadeInUp animated" aria-hidden="true"></i> '
+                            prevCL += dta.numCL.perct+' % </span> from '+dta.lastYYYY
+                            $('#boxNumCl .prevNumCl').html("").append(prevCL)
+                            if(dta.numCL.curr == "0" && dta.numCL.prev == "0") $('#boxNumCl').attr('style','opacity:0.2')
+                            else $('#boxNumCl').removeAttr('style')
+                            // box Process time checklist 75%
+                            $('#boxTimeCl .currTimeCl').text(dta.timeCL.curr)
+                            var prevTimeCL = '<h4>'+dta.timeCL.prev+' hours <i class="fa fa-info-circle iconTip" title="Thời gian xử lý checklist 75% cùng kỳ năm ngoái"></i></h4>';
+                            prevTimeCL += (Number(dta.timeCL.prev.replace(",","")) > Number(dta.timeCL.curr.replace(",","")))? '<span class="down"><i class="fa fa-arrow-down fadeInDown animated" aria-hidden="true"></i> ' : '<span class="up"><i class="fa fa-arrow-up fadeInUp animated" aria-hidden="true"></i> '
+                            prevTimeCL += dta.timeCL.perct+' % </span> from '+dta.lastYYYY
+                            $('#boxTimeCl .prevTimeCl').html("").append(prevTimeCL)
+                            if(dta.timeCL.curr == "0" && dta.timeCL.prev == "0") $('#boxTimeCl').attr('style','opacity:0.2')
+                            else $('#boxTimeCl').removeAttr('style')
+                            // box Churn rate have checklist
+                            $('#boxRmCl .currRmCl').text(dta.churnRateCL.curr)
+                            var prevChurnCL = '<h4>'+dta.churnRateCL.prev+' <i class="fa fa-info-circle iconTip" title="Tỷ lệ rời mạng khách hàng có checklist, bao gồm HSSD và CTBDV, trung bình cùng kỳ năm ngoái"></i></h4>';
+                            prevChurnCL += (Number(dta.churnRateCL.prev.replace(",","")) > Number(dta.churnRateCL.curr.replace(",","")))? '<span class="down"><i class="fa fa-arrow-down fadeInDown animated" aria-hidden="true"></i> ' : '<span class="up"><i class="fa fa-arrow-up fadeInUp animated" aria-hidden="true"></i> '
+                            prevChurnCL += dta.churnRateCL.perct+' % </span> from '+dta.lastYYYY
+                            $('#boxRmCl .prevRmCl').html("").append(prevChurnCL)
+                            if(dta.churnRateCL.curr == "0" && dta.churnRateCL.prev == "0") $('#boxRmCl').attr('style','opacity:0.2')
+                            else $('#boxRmCl').removeAttr('style')
+
                             // update chart 1
                             churn1.xAxis[0].update({categories: dta.churn1.cates})
                             updateCharts(churn1, getJson2Column1Line(dta.churn1.count_ct, dta.churn1.churnPercent, dta.churn1.count_all, "Count Checklist"))
-
                             // update chart 2
                             churn2.xAxis[0].update({categories: dta.churn2.cates});
                             updateCharts(churn2, getJsonChurnMonth(dta.churn2.churnRate, dta.churn2.churnPercent))
-
-                            // update chart Heatmap 3
-                            churn3.xAxis[0].update({categories: dta.churn3.xAxis})
-                            churn3.yAxis[0].update({categories: dta.churn3.yAxis})
-                            churn3.series[0].setData(getdataHeatMapRegionMonth(dta.churn3.data, dta.churn3.arrMonth, dta.churn3.arrRegion ), true,true,false)
-
-                            // update chart Heatmap 5
-                            if(_type != "churn5") {
-                                churn5.xAxis[0].update({categories: dta.churn5.xAxis})
-                                churn5.yAxis[0].update({categories: dta.churn5.yAxis})
-                                churn5.series[0].setData(getdataHeatMapRegionMonth(dta.churn5.data, dta.churn5.arrAge, dta.churn5.arrRegion), true, true, false)
-                            }
-
-                            // update chart 7
-                            if(_type != "churn7") {
-                                churn7.xAxis[0].update({categories: dta.churn7.xAxis})
-                                churn7.yAxis[0].update({categories: dta.churn7.yAxis})
-                                churn7.series[0].setData(dta.churn7.data, true, true, false)
-                            }
-
-                            // update chart 8
-                            if(_type != "churn8") {
-                                churn8.xAxis[0].update({categories: dta.churn8.xAxis})
-                                churn8.yAxis[0].update({categories: dta.churn8.yAxis})
-                                churn8.series[0].setData(dta.churn8.data, true, true, false)
-                            }
-
-                            // update chart 4
-                            if(dta.churn4.data.length <= 0){
-                                $('#churn4_overlay').hide()
-                                $('#churn4').hide()
-                            }
-                            else{
-                                $('#churn4_overlay').show()
-                                $('#churn4').show()
-                            }
-                            $('#churn4_txtMin').text(dta.churn4.minPercent)
-                            $('#churn4_txtMax').text(dta.churn4.maxPercent)
-                            $('#churn4_circle2').text(Number(dta.churn4.minPercent + (dta.churn4.maxPercent-dta.churn4.minPercent)/5*2).toFixed(2))
-                            $('#churn4_circle3').text(Number(dta.churn4.minPercent + (dta.churn4.maxPercent-dta.churn4.minPercent)/5*3).toFixed(2))
-                            var chartRegionMonth  = new google.visualization.BubbleChart(document.getElementById('churn4'))
-                            var dataRegionMonth = google.visualization.arrayToDataTable(getDataChurn(dta.churn4.data, "Month", "Region"))
-                            google.visualization.events.addListener(chartRegionMonth, 'ready', function () {
-                                Array.prototype.forEach.call(document.getElementById('churn4').getElementsByTagName('text'), function(text) {
-                                    if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444')) {
-                                        if(text.innerHTML == 0 || text.innerHTML == 8)
-                                            text.setAttribute('fill-opacity',0)
-                                        text.innerHTML = "Vung "+text.innerHTML
-                                    }
-                                    // change label month
-                                    if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#1c2752')) {
-                                        if(Object.keys(dta.churn4.catesMonth).length == 1){
-                                            if (text.innerHTML == 0.5 || text.innerHTML == 0.0 || text.innerHTML == 1.5)
-                                                text.setAttribute('fill-opacity', 0)
-                                            else {
-                                                if(text.innerHTML == 1.0){
-                                                    text.innerHTML = keyByValue(dta.churn4.catesMonth, 1)
-                                                }
-                                            }
-                                        }
-                                        else {
-                                            if (text.innerHTML == 0 || text.innerHTML == 13)
-                                                text.setAttribute('fill-opacity', 0)
-                                            else {
-                                                text.innerHTML = keyByValue(dta.churn4.catesMonth, Number(text.innerHTML))
-                                            }
-                                            if(text.innerHTML == "undefined") text.setAttribute('fill-opacity', 0)
-                                        }
-                                    }
-                                });
-                                // remove circle value =0
-                                Array.prototype.forEach.call(document.getElementById('churn4').getElementsByTagName('circle'), function(circle) {
-                                    if(circle.getAttribute('r') == 5 && Number(dta.churn4.isNull) == 1)
-                                        circle.setAttribute('r', 1)
-                                })
-                            });
-                            if(Object.keys(dta.churn4.catesMonth).length == 1)
-                                optionsRegion.hAxis.gridlines.count = 4
-                            else
-                                optionsRegion.hAxis.gridlines.count = Object.keys(dta.churn4.catesMonth).length+2
-                            chartRegionMonth.draw(dataRegionMonth, optionsRegion);
-                            // tam remove qua v2
-                            /*google.visualization.events.addListener(chartRegionMonth, 'onmousedown', function (event) {
-                                document.oncontextmenu = function() {
-                                    var month = dataRegionMonth.getValue(Number(event.targetID.split('#')[2]), 1)
-                                    var region = dataRegionMonth.getValue(Number(event.targetID.split('#')[2]), 2)
-                                    window.location.href = "/churn/search?contract=Month:"+month+"_Region:"+region
-                                };
-                            });*/
-                            google.visualization.events.addListener(chartRegionMonth, 'onmouseover', function (event) {
-                                var rate = dataRegionMonth.getValue(event.row, 3);
-                                var xAxis = dataRegionMonth.getValue(event.row, 1);
-                                var yAxis = dataRegionMonth.getValue(event.row, 2);
-                                var percent = dataRegionMonth.getValue(event.row, 4);
-                                var contracts = dataRegionMonth.getValue(event.row, 5);
-                                var x = mouseX - 225;
-                                if($(window).width() < 992){
-                                    mouseY = mouseY - 870
-                                }
-                                else{
-                                    mouseY = mouseY -450
-                                }
-                                var y = mouseY
-                                if(!(Number(percent == 0) && Number(rate) == 0)){
-                                    $('#churn4_tooltip').html('<div><p><b>Month:</b> ' + keyByValue(dta.churn4.catesMonth, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
-                                            '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contract:</b> '+contracts+'</p></div>').css({
-                                        'top': y,
-                                        'left': x
-                                    }).fadeIn('slow');
-                                }
-                                // remove circle value =0
-                                Array.prototype.forEach.call(document.getElementById('churn4').getElementsByTagName('circle'), function(circle) {
-                                    if(Number(dta.churn4.isNull) == 1 && (circle.getAttribute('fill') == 'none' || circle.getAttribute('r') == 5)){
-                                        circle.setAttribute('r', 1)
-                                    }
-                                })
-                            });
-                            google.visualization.events.addListener(chartRegionMonth, 'onmouseout', handlerOut);
-
-                            // update chart 6
-                            if(_type != "churn6") {
-                                if (dta.churn6.data.length <= 0) {
-                                    $('#churn6_overlay').hide()
-                                    $('#churn6').hide()
-                                }
-                                else {
-                                    $('#churn6_overlay').show()
-                                    $('#churn6').show()
-                                }
-                                $('#churn6_txtMin').text(dta.churn6.minPercent)
-                                $('#churn6_txtMax').text(dta.churn6.maxPercent)
-                                $('#churn6_circle2').text(Number(dta.churn6.minPercent + (dta.churn6.maxPercent - dta.churn6.minPercent) / 5 * 2).toFixed(2))
-                                $('#churn6_circle3').text(Number(dta.churn6.minPercent + (dta.churn6.maxPercent - dta.churn6.minPercent) / 5 * 3).toFixed(2))
-                                var chartRegionAge = new google.visualization.BubbleChart(document.getElementById('churn6'))
-                                var dataRegionAge = google.visualization.arrayToDataTable(getDataChurn(dta.churn6.data, "Month", "Age"))
-                                google.visualization.events.addListener(chartRegionAge, 'ready', function () {
-                                    Array.prototype.forEach.call(document.getElementById('churn6').getElementsByTagName('text'), function(text) {
-                                        if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444')) {
-                                            if(text.innerHTML == 0 || text.innerHTML == 8)
-                                                text.setAttribute('fill-opacity',0)
-                                            text.innerHTML = "Vung "+text.innerHTML
-                                        }
-                                        // change label age
-                                        if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#444444')) {
-                                            if(text.innerHTML == 0 || text.innerHTML == 72)
-                                                text.setAttribute('fill-opacity',0)
-                                            else{
-                                                switch ( text.innerHTML){
-                                                    case "6" :
-                                                        text.innerHTML = "0-6";break;
-                                                    case "12" :
-                                                        text.innerHTML = "06-12";break;
-                                                    case "18" :
-                                                        text.innerHTML = "12-18";break;
-                                                    case "24" :
-                                                        text.innerHTML = "18-24";break;
-                                                    case "30" :
-                                                        text.innerHTML = "24-30";break;
-                                                    case "36" :
-                                                        text.innerHTML = "30-36";break;
-                                                    case "42" :
-                                                        text.innerHTML = "36-42";break;
-                                                    case "48" :
-                                                        text.innerHTML = "42-48";break;
-                                                    case "54" :
-                                                        text.innerHTML = "48-54";break;
-                                                    case "60" :
-                                                        text.innerHTML = "54-60";break;
-                                                    case "66" :
-                                                        text.innerHTML = ">60";break;
-                                                }
-                                            }
-                                        }
-                                    });
-                                    // remove circle value =0
-                                    Array.prototype.forEach.call(document.getElementById('churn6').getElementsByTagName('circle'), function(circle) {
-                                        if((circle.getAttribute('r') == 5 && Number(dta.churn6.isNull) == 1) || dta.churn6.emptyAll == "all")
-                                            circle.setAttribute('r', 1)
-                                    })
-                                });
-                                chartRegionAge.draw(dataRegionAge, options);
-                                google.visualization.events.addListener(chartRegionAge, 'select', function () {
-                                    var selection = chartRegionAge.getSelection()
-                                    $('.txtType').text("")
-                                    $('.txtTime').text("")
-                                    $('.timeDiv').hide()
-                                    $('.typeDiv').hide()
-                                    if(selection.length >0) {
-                                        var row = selection[0].row;
-                                        var region = dataRegionAge.getValue(row, 2)
-                                        var age = dataRegionAge.getValue(row, 1)
-                                        Array.prototype.forEach.call(document.getElementById('churn6').getElementsByTagName('text'), function(text) {
-                                            if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === 'green') && (text.innerHTML != "Vung 0") && (text.innerHTML != "Vung 8")) {
-                                                if (text.innerHTML == "Vung "+region){
-                                                    text.setAttribute('fill-opacity', 1)
-                                                    text.setAttribute('fill', "green")
-                                                    text.setAttribute('font-weight', "bold")
-                                                    text.setAttribute('font-size', "14px")
-                                                }
-                                                else {
-                                                    text.setAttribute('fill', "#444444")
-                                                    text.setAttribute('fill-opacity', 0.5)
-                                                    text.removeAttribute('font-weight')
-                                                    text.setAttribute('font-size', "13px")
-                                                }
-                                            }
-                                            // change label age
-                                            if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === 'green')) {
-                                                if (text.innerHTML != 0 && text.innerHTML != 72)
-                                                    if(getNameByIdAge(Number(age)) == text.textContent){
-                                                        text.setAttribute('fill-opacity', 1)
-                                                        text.setAttribute('fill', "green")
-                                                        text.setAttribute('font-weight', "bold")
-                                                        text.setAttribute('font-size', "14px")
-                                                    }
-                                                    else {
-                                                        text.setAttribute('fill', "#444444")
-                                                        text.setAttribute('fill-opacity', 0.5)
-                                                        text.removeAttribute('font-weight')
-                                                        text.setAttribute('font-size', "13px")
-                                                    }
-                                            }
-                                        })
-                                        $('#age').val(age)
-                                        $('#region').val(region)
-                                        $('.txtAge').text(getNameByIdAge(age))
-                                        $('.ageDiv').show()
-                                        $('.txtRegion').text("Vung "+region)
-                                        $('.regionDiv').show()
-                                    }
-                                    else {
-                                        Array.prototype.forEach.call(document.getElementById('churn6').getElementsByTagName('text'), function(text) {
-                                            if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === 'green') && (text.innerHTML != "Vung 0") && (text.innerHTML != "Vung 8")) {
-                                                text.setAttribute('fill-opacity', 1)
-                                                text.setAttribute('fill', "#444444")
-                                                text.removeAttribute('font-weight')
-                                                text.setAttribute('font-size', "13px")
-                                            }
-                                            if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === 'green')) {
-                                                if (text.innerHTML != 0 && text.innerHTML != 72){
-                                                    text.setAttribute('fill-opacity', 1)
-                                                    text.setAttribute('fill', "#444444")
-                                                    text.removeAttribute('font-weight')
-                                                    text.setAttribute('font-size', "13px")
-                                                }
-                                            }
-                                        })
-                                        $('#age').val("")
-                                        $('#region').val("")
-                                        $('.txtAge').text("")
-                                        $('.ageDiv').hide()
-                                        $('.txtRegion').text("")
-                                        $('.regionDiv').hide()
-                                    }
-                                    $('#time').val("")
-                                    $('#typeCurr').val("")
-                                    ajaxGetChurnChecklist("churn6")
-                                });
-                                // tam remove qua v2
-                               /* google.visualization.events.addListener(chartRegionAge, 'onmousedown', function (event) {
-                                    document.oncontextmenu = function() {
-                                        var age = dataRegionAge.getValue(Number(event.targetID.split('#')[2]), 1)
-                                        var ageGroup = keyByValue(catesAge, age)
-                                        if(ageGroup == "06-12") ageGroup = "6-12"
-                                        var region = dataRegionAge.getValue(Number(event.targetID.split('#')[2]), 2)
-                                        window.location.href = "/churn/search?contract=Age:"+ageGroup+"_Region:"+region
-                                    };
-                                });*/
-                                google.visualization.events.addListener(chartRegionAge, 'onmouseover', function (event) {
-                                    var rate = dataRegionAge.getValue(event.row, 3);
-                                    var xAxis = dataRegionAge.getValue(event.row, 1);
-                                    var yAxis = dataRegionAge.getValue(event.row, 2);
-                                    var percent = dataRegionAge.getValue(event.row, 4);
-                                    var contracts = dataRegionAge.getValue(event.row, 5);
-                                    var x = mouseX - 225;
-                                    if($(window).width() < 992){
-                                        mouseY = mouseY - 870
-                                    }
-                                    else{
-                                        mouseY = mouseY -450
-                                    }
-                                    var y = mouseY
-                                    if(!(Number(percent == 0) && Number(rate) == 0)){
-                                        $('#churn6_tooltip').html('<div><p><b>Age:</b> ' + keyByValue( catesAge, xAxis) +'</p><p><b>Region:</b> '+ yAxis +
-                                                '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contract:</b> '+contracts+'</p></div>').css({
-                                            'top': y,
-                                            'left': x
-                                        }).fadeIn('slow');
-                                    }
-                                    // remove circle value =0
-                                    Array.prototype.forEach.call(document.getElementById('churn6').getElementsByTagName('circle'), function(circle) {
-                                        if(Number(dta.churn6.isNull) == 1 && (circle.getAttribute('fill') == 'none' || circle.getAttribute('r') == 5) || dta.churn6.emptyAll == "all"){
-                                            circle.setAttribute('r', 1)
-                                        }
-                                    })
-                                });
-                                google.visualization.events.addListener(chartRegionAge, 'onmouseout', handlerOut);
-                            }
-
-                            // update chart 9
-                            if(_type != "churn9") {
-                                if (dta.churn9.data.length <= 0) {
-                                    $('#churn9_overlay').hide()
-                                    $('#churn9').hide()
-                                }
-                                else {
-                                    $('#churn9_overlay').show()
-                                    $('#churn9').show()
-                                }
-                                $('#churn9_txtMin').text(dta.churn9.minPercent)
-                                $('#churn9_txtMax').text(dta.churn9.maxPercent)
-                                $('#churn9_circle2').text(Number(dta.churn9.minPercent + (dta.churn9.maxPercent - dta.churn9.minPercent) / 5 * 2).toFixed(2))
-                                $('#churn9_circle3').text(Number(dta.churn9.minPercent + (dta.churn9.maxPercent - dta.churn9.minPercent) / 5 * 3).toFixed(2))
-                                var chartRegionType = new google.visualization.BubbleChart(document.getElementById('churn9'))
-                                var dataRegionType = google.visualization.arrayToDataTable(getDataChurn(dta.churn9.data, "Type", "Region"))
-                                if (Object.keys(dta.churn9.catesType).length == 1)
-                                    optionsType.hAxis.gridlines.count = 4
-                                else
-                                    optionsType.hAxis.gridlines.count = Object.keys(dta.churn9.catesType).length + 2
-                                google.visualization.events.addListener(chartRegionType, 'ready', function () {
-                                    Array.prototype.forEach.call(document.getElementById('churn9').getElementsByTagName('text'), function (text) {
-                                        if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444')) {
-                                            if (text.innerHTML == 0 || text.innerHTML == 8)
-                                                text.setAttribute('fill-opacity', 0)
-                                            text.innerHTML = "Vung "+text.innerHTML
-                                        }
-                                        // change label type
-                                        if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#1c2752')) {
-                                            if (Object.keys(dta.churn9.catesType).length == 1) {
-                                                if (text.innerHTML == 0.5 || text.innerHTML == 0.0 || text.innerHTML == 1.5)
-                                                    text.setAttribute('fill-opacity', 0)
-                                                else {
-                                                    if (text.innerHTML == 1.0) {
-                                                        text.innerHTML = keyByValue(dta.churn9.catesType, 1)
-                                                    }
-                                                }
-                                            }
-                                            else {
-                                                if (text.innerHTML == 0 || text.innerHTML == 14)
-                                                    text.setAttribute('fill-opacity', 0)
-                                                else {
-                                                    if(text.innerHTML <= Object.keys(dta.churn9.catesType).length)
-                                                       replaceSvgToHtml(text, dta.churn9.catesType)
-                                                    text.setAttribute('fill-opacity', 0)
-                                                }
-                                            }
-                                        }
-                                    });
-                                    // remove circle value =0
-                                    Array.prototype.forEach.call(document.getElementById('churn9').getElementsByTagName('circle'), function(circle) {
-                                        if(circle.getAttribute('r') == 5 && Number(dta.churn9.isNull) == 1)
-                                            circle.setAttribute('r', 1)
-                                    })
-                                });
-                                chartRegionType.draw(dataRegionType, optionsType);
-                                google.visualization.events.addListener(chartRegionType, 'select', function () {
-                                    var selection = chartRegionType.getSelection()
-                                    $('.txtAge').text("")
-                                    $('.ageDiv').hide()
-                                    $('.txtTime').text("")
-                                    $('.timeDiv').hide()
-                                    if (selection.length > 0) {
-                                        var row = selection[0].row;
-                                        var region = dataRegionType.getValue(row, 2)
-                                        var _type = keyByValue(dta.churn9.catesType, dataRegionType.getValue(row, 1))
-                                        // change label region
-                                        Array.prototype.forEach.call(document.getElementById('churn9').getElementsByTagName('text'), function(text) {
-                                            if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === '#1c2752') && (text.innerHTML != "Vung 0") && (text.innerHTML != "Vung 8")) {
-                                                if (text.innerHTML == "Vung "+region){
-                                                    text.setAttribute('fill-opacity', 1)
-                                                    text.setAttribute('fill', "#1c2752")
-                                                    text.setAttribute('font-weight', "bold")
-                                                    text.setAttribute('font-size', "14px")
-                                                }
-                                                else {
-                                                    text.setAttribute('fill', "#444444")
-                                                    text.setAttribute('fill-opacity', 0.5)
-                                                    text.removeAttribute('font-weight')
-                                                    text.setAttribute('font-size', "13px")
-                                                }
-                                            }
-                                        })
-                                        // change label type
-                                        Array.prototype.forEach.call(document.getElementById('churn9').getElementsByTagName('foreignObject'), function(text) {
-                                            if(_type == text.textContent){
-                                                text.setAttribute('font-weight', "bold")
-                                                text.setAttribute('font-size', "14px")
-                                            }
-                                            else {
-                                                text.removeAttribute('font-weight')
-                                                text.setAttribute('font-size', "13px")
-                                            }
-                                        })
-                                        $('#typeCurr').val(_type)
-                                        $('#region').val(region)
-                                        $('.txtType').text(_type)
-                                        $('.typeDiv').show()
-                                        $('.txtRegion').text("Vung "+region)
-                                        $('.regionDiv').show()
-                                    }
-                                    else {
-                                        // change label region
-                                        Array.prototype.forEach.call(document.getElementById('churn9').getElementsByTagName('text'), function(text) {
-                                            if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444' || text.getAttribute('fill') === '#1c2752') && (text.innerHTML != "Vung 0") && (text.innerHTML != "Vung 8")) {
-                                                text.setAttribute('fill-opacity', 1)
-                                                text.setAttribute('fill', "#444444")
-                                                text.removeAttribute('font-weight')
-                                                text.setAttribute('font-size', "13px")
-                                            }
-                                        })
-                                        // change label type
-                                        Array.prototype.forEach.call(document.getElementById('churn9').getElementsByTagName('foreignObject'), function(text) {
-                                            text.removeAttribute('font-weight')
-                                            text.setAttribute('font-size', "13px")
-                                        })
-                                        $('#typeCurr').val("")
-                                        $('#region').val("")
-                                        $('.txtType').text("")
-                                        $('.typeDiv').hide()
-                                        $('.txtRegion').text("")
-                                        $('.regionDiv').hide()
-                                    }
-                                    $('#time').val("")
-                                    $('#age').val("")
-                                    ajaxGetChurnChecklist("churn9")
-                                });
-                                google.visualization.events.addListener(chartRegionType, 'onmouseover', function (event) {
-                                    var rate = dataRegionType.getValue(event.row, 3);
-                                    var xAxis = dataRegionType.getValue(event.row, 1);
-                                    var yAxis = dataRegionType.getValue(event.row, 2);
-                                    var percent = dataRegionType.getValue(event.row, 4);
-                                    var contracts = dataRegionType.getValue(event.row, 5);
-                                    var x = mouseX - 225;
-                                    if($(window).width() < 992){
-                                        mouseY = mouseY - 870
-                                    }
-                                    else{
-                                        mouseY = mouseY -450
-                                    }
-                                    var y = mouseY
-                                    if(!(Number(percent == 0) && Number(rate) == 0)){
-                                        $('#churn9_tooltip').html('<div><p><b>Type:</b> ' + keyByValue(dta.churn9.catesType, xAxis) + '</p><p><b>Region:</b> ' + yAxis +
-                                                '</p><p><b>Rate:</b> ' + rate + ' %</p><p><b>Percent:</b> ' + percent + ' %</p><p><b>Number of contract:</b> ' + contracts + '</p></div>').css({
-                                            'top': y,
-                                            'left': x
-                                        }).fadeIn('slow');
-                                    }
-                                    // remove circle value =0
-                                    Array.prototype.forEach.call(document.getElementById('churn9').getElementsByTagName('circle'), function(circle) {
-                                        if(Number(dta.churn9.isNull) == 1 && (circle.getAttribute('fill') == 'none' || circle.getAttribute('r') == 5)){
-                                            circle.setAttribute('r', 1)
-                                        }
-                                    })
-                                });
-                                google.visualization.events.addListener(chartRegionType, 'onmouseout', handlerOut);
-                            }
                         }
                         else{
                             alert("Error when execute query. Please check again your system!")
@@ -1772,85 +425,987 @@
                     }
                 });
             }
+
+            // click tab and get json data
+            function getChurnByTab(tab_name) {
+                var fields = getParamFields(document.querySelector('input[name=csrfToken]').value)
+                $.ajax({
+                    url: "/checklist/getJsonByTab",
+                    cache: false,
+                    data:  fields,
+                    type:"POST",
+                    beforeSend: function () {
+                        $('#'+tab_name).waitMe({
+                            effect: 'facebook',
+                            text: '',
+                            bg: 'rgba(255,255,255,0.7)',
+                            color: '#2A3F54',
+                            textPos: 'vertical'
+                        });
+                    },
+                    success: function (dta) {
+                        if(dta != "Error"){
+                            function handlerOut() {
+                                $('.custom_tooltip').hide()
+                            }
+                            // comment Chart
+                            $('.comment').text(dta.cmtChart)
+                            if(tab_name == "tabRegion"){
+                                // bubble charts Region and Month
+                                var mouseX;
+                                var mouseY;
+                                $(document).mousemove(function(e) {
+                                    if($(window).width() < 992){
+                                        mouseY = e.pageY - 790
+                                    }
+                                    else{
+                                        mouseY = e.pageY -490;
+                                    }
+                                });
+                                if(dta.churnRegionMonth.data.length <= 0){
+                                    $('#churn4_overlay').hide()
+                                    $('#churn4').hide()
+                                }
+                                else{
+                                    $('#churn4_overlay').show()
+                                    $('#churn4').show()
+                                }
+                                $('#churn4_txtMin').text(dta.churnRegionMonth.minPercent)
+                                $('#churn4_txtMax').text(dta.churnRegionMonth.maxPercent)
+                                $('#churn4_circle2').text(Number(dta.churnRegionMonth.minPercent + (dta.churnRegionMonth.maxPercent-dta.churnRegionMonth.minPercent)/5*2).toFixed(2))
+                                $('#churn4_circle3').text(Number(dta.churnRegionMonth.minPercent + (dta.churnRegionMonth.maxPercent-dta.churnRegionMonth.minPercent)/5*3).toFixed(2))
+                                Object.keys(dta.churnRegionMonth.catesRegion).length >8 ? $('#churn4').attr('style','height: 420px'): $('#churn4').attr('style','height: 360px')
+                                var chartRegionMonth = new google.visualization.BubbleChart(document.getElementById('churn4'))
+                                google.visualization.events.addListener(chartRegionMonth, 'ready', function () {
+                                    Array.prototype.forEach.call(document.getElementById('churn4').getElementsByTagName('text'), function(text) {
+                                        if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444')) {
+                                            if(text.innerHTML == 0 || text.innerHTML == undefined || text.innerHTML == Object.keys(dta.churnRegionMonth.catesRegion).length+1)
+                                                text.setAttribute('fill-opacity',0)
+                                            else{
+                                                text.innerHTML = keyByValue(dta.churnRegionMonth.catesRegion, Number(text.innerHTML))
+                                            }
+                                        }
+                                        // change label month
+                                        if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#1c2752')) {
+                                            if(Object.keys(dta.churnRegionMonth.catesMonth).length == 1){
+                                                if (text.innerHTML == 0.5 || text.innerHTML == 0.0 || text.innerHTML == 1.5)
+                                                    text.setAttribute('fill-opacity', 0)
+                                                else {
+                                                    if(text.innerHTML == 1.0){
+                                                        text.innerHTML = keyByValue(dta.churnRegionMonth.catesMonth, 1)
+                                                    }
+                                                }
+                                            }
+                                            else{
+                                                if(text.innerHTML == 0 || text.innerHTML >= Object.keys(dta.churnRegionMonth.catesMonth).length+1)
+                                                    text.setAttribute('fill-opacity',0)
+                                                else{
+                                                    text.innerHTML = keyByValue(dta.churnRegionMonth.catesMonth, Number(text.innerHTML))
+                                                }
+                                            }
+                                        }
+                                    });
+                                    // remove circle value =0
+                                    Array.prototype.forEach.call(document.getElementById('churn4').getElementsByTagName('circle'), function(circle) {
+                                        if(circle.getAttribute('r') == 5 && Number(dta.churnRegionMonth.isNull) == 1)
+                                            circle.setAttribute('r', 1)
+                                    })
+                                })
+                                var dataRegionMonth = google.visualization.arrayToDataTable(getDataChurn(dta.churnRegionMonth.data,  "Month", "Location"))
+                                if(Object.keys(dta.churnRegionMonth.catesMonth).length == 1)
+                                    optionsRegion.hAxis.gridlines.count = 4
+                                else
+                                    optionsRegion.hAxis.gridlines.count = Object.keys(dta.churnRegionMonth.catesMonth).length+2
+                                optionsRegion.vAxis.gridlines.count = Object.keys(dta.churnRegionMonth.catesRegion).length+2
+                                optionsRegion.chartArea.left =170;
+                                optionsRegion.colorAxis.colors = ['#F6CECE', '#B40404'];
+                                chartRegionMonth.draw(dataRegionMonth, optionsRegion)
+                                google.visualization.events.addListener(chartRegionMonth, 'onmouseover', function (event) {
+                                    var rate = dataRegionMonth.getValue(event.row, 3);
+                                    var xAxis = dataRegionMonth.getValue(event.row, 1);
+                                    var yAxis = dataRegionMonth.getValue(event.row, 2);
+                                    var percent = dataRegionMonth.getValue(event.row, 4);
+                                    var contracts = dataRegionMonth.getValue(event.row, 5);
+                                    var x = mouseX - 225;
+                                    if($(window).width() < 992){
+                                        mouseY = mouseY - 870
+                                    }
+                                    else{
+                                        mouseY = mouseY -600
+                                    }
+                                    var y = mouseY
+                                    if(!(Number(percent == 0) && Number(rate) == 0)){
+                                        $('#churn4_tooltip').html('<div><p><b>Month:</b> ' + keyByValue(dta.churnRegionMonth.catesMonth, xAxis) +'</p><p><b>Location:</b> '+ keyByValue( dta.churnRegionMonth.catesRegion, yAxis) +
+                                                '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
+                                            'top': y,
+                                            'left': x
+                                        }).fadeIn('slow');
+                                    }
+                                    // remove circle value =0
+                                    Array.prototype.forEach.call(document.getElementById('churn4').getElementsByTagName('circle'), function(circle) {
+                                        if(Number(dta.churnRegionMonth.isNull) == 1 && (circle.getAttribute('fill') == 'none' || circle.getAttribute('r') == 5)){
+                                            circle.setAttribute('r', 1)
+                                        }
+                                    })
+                                })
+                                google.visualization.events.addListener(chartRegionMonth, 'onmouseout', handlerOut)
+                                // Number of Contracts That Have Checklist(s) by Region (%) 2-3 sai
+                                Highcharts.chart('churn3', {
+                                    chart: {
+                                        type: 'heatmap',
+                                        marginTop: 40,
+                                        marginBottom: 70,
+                                        plotBorderWidth: 1
+                                    },
+                                    title: {
+                                        text: ''
+                                    },
+                                    xAxis: {
+                                        categories: dta.heatmapCL.cateX
+                                    },
+                                    yAxis: {
+                                        categories: dta.heatmapCL.cateY,
+                                        title: null
+                                    },
+                                    colorAxis: {
+                                        minColor: '#FFFFFF',
+                                        maxColor: '#3498DB',
+                                        type: 'logarithmic',
+                                        stops: [
+                                            [0, '#FFFFFF'],
+                                            [0.41, '#e3ecef'],
+                                            [1, '#3498DB']
+                                        ]
+                                    },
+                                    legend: {
+                                        align: 'right',
+                                        layout: 'vertical',
+                                        margin: 0,
+                                        verticalAlign: 'top',
+                                        y: 25,
+                                        symbolHeight: 280
+                                    },
+                                    plotOptions: {
+                                        series: {
+                                            dataLabels:{
+                                                formatter:function(){
+                                                    var nf = new Intl.NumberFormat();
+                                                    return nf.format(this.point.value)+" %";
+                                                }
+                                            }
+                                        }
+                                    },
+                                    tooltip: {
+                                        formatter: function () {
+                                            return 'Month: <b>' + this.series.xAxis.categories[this.point.x] +'</b><br/>Location: <b>'+ this.series.yAxis.categories[this.point.y] + '</b><br/>Number of contracts: <b>' +
+                                                    this.point.name +'</b>';
+                                        }
+                                    },
+                                    series: [{
+                                        name: 'total contracts',
+                                        borderWidth: 0.1,
+                                        borderColor: '#78c679',
+                                        data: getdataHeatMapRegionMonth( dta.heatmapCL.data, dta.heatmapCL.dataX, dta.heatmapCL.dataY),
+                                        dataLabels: {
+                                            enabled: true,
+                                            color: '#000000',
+                                            style: {
+                                                "fontSize": "10px"
+                                            }
+                                        }
+                                    }]
+
+                                });
+                                // bubble charts To Bao Tri & Month
+                                if(dta.churnTBTMonth.data.length <= 0){
+                                    $('#bubleTBT_overlay').hide()
+                                    $('#bubleTBT').hide()
+                                }
+                                else{
+                                    $('#bubleTBT_overlay').show()
+                                    $('#bubleTBT').show()
+                                }
+                                $('#churn5_txtMin').text(dta.churnTBTMonth.minPercent)
+                                $('#churn5_txtMax').text(dta.churnTBTMonth.maxPercent)
+                                $('#churn5_circle2').text(Number(dta.churnTBTMonth.minPercent + (dta.churnTBTMonth.maxPercent-dta.churnTBTMonth.minPercent)/5*2).toFixed(2))
+                                $('#churn5_circle3').text(Number(dta.churnTBTMonth.minPercent + (dta.churnTBTMonth.maxPercent-dta.churnTBTMonth.minPercent)/5*3).toFixed(2))
+                                var chartTBTMonth = new google.visualization.BubbleChart(document.getElementById('bubleTBT'))
+                                google.visualization.events.addListener(chartTBTMonth, 'ready', function () {
+                                    Array.prototype.forEach.call(document.getElementById('bubleTBT').getElementsByTagName('text'), function(text) {
+                                        if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444')) {
+                                            if(text.innerHTML == 0 || text.innerHTML == undefined || text.innerHTML == Object.keys(dta.churnTBTMonth.catesTBT).length+1)
+                                                text.setAttribute('fill-opacity',0)
+                                            else{
+                                                text.innerHTML = keyByValue(dta.churnTBTMonth.catesTBT, Number(text.innerHTML))
+                                            }
+                                        }
+                                        // change label month
+                                        if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#1c2752')) {
+                                            if(Object.keys(dta.churnTBTMonth.catesMonth).length == 1){
+                                                if (text.innerHTML == 0.5 || text.innerHTML == 0.0 || text.innerHTML == 1.5)
+                                                    text.setAttribute('fill-opacity', 0)
+                                                else {
+                                                    if(text.innerHTML == 1.0){
+                                                        text.innerHTML = keyByValue(dta.churnTBTMonth.catesMonth, 1)
+                                                    }
+                                                }
+                                            }
+                                            else{
+                                                if(text.innerHTML == 0 || text.innerHTML >= Object.keys(dta.churnTBTMonth.catesMonth).length+1)
+                                                    text.setAttribute('fill-opacity',0)
+                                                else{
+                                                    text.innerHTML = keyByValue(dta.churnTBTMonth.catesMonth, Number(text.innerHTML))
+                                                }
+                                            }
+                                        }
+                                    });
+                                    // remove circle value =0
+                                    Array.prototype.forEach.call(document.getElementById('bubleTBT').getElementsByTagName('circle'), function(circle) {
+                                        if(circle.getAttribute('r') == 5 && Number(dta.churnTBTMonth.isNull) == 1)
+                                            circle.setAttribute('r', 1)
+                                    })
+                                })
+                                var dataTBTMonth = google.visualization.arrayToDataTable(getDataChurn(dta.churnTBTMonth.data,  "Month", "TBT"))
+                                if(Object.keys(dta.churnTBTMonth.catesMonth).length == 1)
+                                    optionsRegion.hAxis.gridlines.count = 4
+                                else
+                                    optionsRegion.hAxis.gridlines.count = Object.keys(dta.churnTBTMonth.catesMonth).length+2
+                                optionsRegion.vAxis.gridlines.count = Object.keys(dta.churnTBTMonth.catesTBT).length+2
+                                optionsRegion.chartArea.left =170;
+                                optionsRegion.colorAxis.colors = ['#F5F6CE', 'green'];
+                                chartTBTMonth.draw(dataTBTMonth, optionsRegion)
+                                google.visualization.events.addListener(chartTBTMonth, 'onmouseover', function (event) {
+                                    var rate = dataTBTMonth.getValue(event.row, 3);
+                                    var xAxis = dataTBTMonth.getValue(event.row, 1);
+                                    var yAxis = dataTBTMonth.getValue(event.row, 2);
+                                    var percent = dataTBTMonth.getValue(event.row, 4);
+                                    var contracts = dataTBTMonth.getValue(event.row, 5);
+                                    var x = mouseX - 225;
+                                    if($(window).width() < 992){
+                                        mouseY = mouseY - 870
+                                    }
+                                    else{
+                                        mouseY = mouseY -1020
+                                    }
+                                    var y = mouseY
+                                    if(!(Number(percent == 0) && Number(rate) == 0)){
+                                        $('#bubleTBT_tooltip').html('<div><p><b>Month:</b> ' + keyByValue(dta.churnTBTMonth.catesMonth, xAxis) +'</p><p><b>Doi Tac:</b> '+ keyByValue( dta.churnTBTMonth.catesTBT, yAxis) +
+                                                '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
+                                            'top': y,
+                                            'left': x
+                                        }).fadeIn('slow');
+                                    }
+                                    // remove circle value =0
+                                    Array.prototype.forEach.call(document.getElementById('bubleTBT').getElementsByTagName('circle'), function(circle) {
+                                        if(Number(dta.churnTBTMonth.isNull) == 1 && (circle.getAttribute('fill') == 'none' || circle.getAttribute('r') == 5)){
+                                            circle.setAttribute('r', 1)
+                                        }
+                                    })
+                                })
+                                google.visualization.events.addListener(chartTBTMonth, 'onmouseout', handlerOut)
+                                // sparkline table
+                                var tBodyTBT = parseTbChurnRate(dta.tbTBT, dta.tbTBT.arrMonth, 1)
+                                $('#tbChurn1').html("").append(tBodyTBT)
+                                $('.sparkline1').sparkline('html',{
+                                    type: 'line',
+                                    width: '320px',
+                                    height: '15px',
+                                    lineColor: '#16a085',
+                                    fillColor: '#ffffff',
+                                    lineWidth: 1,
+                                    spotColor: '#e21212',
+                                    minSpotColor: '#132186',
+                                    maxSpotColor: '#132186',
+                                    highlightLineColor: '#ffffff',
+                                    valueSpots:{'0:':'#e21212'},
+                                    tooltipFormat: '{{offset:names}}: <b>{{y:value}}</b>',
+                                    tooltipValueLookups: {
+                                        names: dta.tbTBT.arrMonth
+                                    }
+                                });
+                            }
+                            else if(tab_name == "tabAge"){
+                                Highcharts.chart('churn5', {
+                                    chart: {
+                                        type: 'heatmap',
+                                        marginTop: 40,
+                                        marginBottom: 70,
+                                        plotBorderWidth: 1
+                                    },
+                                    title: {
+                                        text: ''
+                                    },
+                                    xAxis: {
+                                        categories: dta.cLRegionAge.cateX
+                                    },
+                                    yAxis: {
+                                        categories: dta.cLRegionAge.cateY,
+                                        title: null
+                                    },
+                                    colorAxis: {
+                                        minColor: '#FFFFFF',
+                                        maxColor: '#f1b53d'
+                                    },
+                                    legend: {
+                                        align: 'right',
+                                        layout: 'vertical',
+                                        margin: 0,
+                                        verticalAlign: 'top',
+                                        y: 25,
+                                        symbolHeight: 280
+                                    },
+                                    plotOptions: {
+                                        series: {
+                                            dataLabels:{
+                                                formatter:function(){
+                                                    var nf = new Intl.NumberFormat();
+                                                    return nf.format(this.point.value)+" %";
+                                                }
+                                            }
+                                        }
+                                    },
+                                    tooltip: {
+                                        formatter: function () {
+                                            return 'Month: <b>' + this.series.xAxis.categories[this.point.x] +'</b><br/>Location: <b>'+ this.series.yAxis.categories[this.point.y] + '</b><br/>Number of contracts: <b>' +
+                                                    this.point.name +'</b>';
+                                        }
+                                    },
+                                    series: [{
+                                        name: 'total contracts',
+                                        borderWidth: 0.1,
+                                        borderColor: '#78c679',
+                                        data: getdataHeatMapRegionMonth( dta.cLRegionAge.data, dta.cLRegionAge.dataX, dta.cLRegionAge.dataY),
+                                        dataLabels: {
+                                            enabled: true,
+                                            color: '#000000',
+                                            style: {
+                                                "fontSize": "10px"
+                                            }
+                                        }
+                                    }]
+
+                                });
+                                // bubble charts Age & Location
+                                if(dta.trendAgeLocation.data.length <= 0){
+                                    $('#churn6_overlay').hide()
+                                    $('#churn6').hide()
+                                }
+                                else{
+                                    $('#churn6_overlay').show()
+                                    $('#churn6').show()
+                                }
+                                $('#churn6_txtMin').text(dta.trendAgeLocation.minPercent)
+                                $('#churn6_txtMax').text(dta.trendAgeLocation.maxPercent)
+                                $('#churn6_circle2').text(Number(dta.trendAgeLocation.minPercent + (dta.trendAgeLocation.maxPercent-dta.trendAgeLocation.minPercent)/5*2).toFixed(2))
+                                $('#churn6_circle3').text(Number(dta.trendAgeLocation.minPercent + (dta.trendAgeLocation.maxPercent-dta.trendAgeLocation.minPercent)/5*3).toFixed(2))
+                                var chartRegionAge = new google.visualization.BubbleChart(document.getElementById('churn6'))
+                                Object.keys(dta.trendAgeLocation.catesRegion).length >8 ? $('#churn6').attr('style','height: 550px'): $('#churn6').attr('style','height: 420px')
+                                google.visualization.events.addListener(chartRegionAge, 'ready', function () {
+                                    Array.prototype.forEach.call(document.getElementById('churn6').getElementsByTagName('text'), function(text) {
+                                        if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444')) {
+                                            if(text.innerHTML == 0 || text.innerHTML == undefined || text.innerHTML == Object.keys(dta.trendAgeLocation.catesRegion).length+1)
+                                                text.setAttribute('fill-opacity',0)
+                                            else{
+                                                text.innerHTML = keyByValue(dta.trendAgeLocation.catesRegion, Number(text.innerHTML))
+                                            }
+                                        }
+                                        // change label month
+                                        if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#444444')) {
+                                            if(Object.keys(dta.trendAgeLocation.catesMonth).length == 1){
+                                                if (text.innerHTML == 0.5 || text.innerHTML == 0.0 || text.innerHTML == 1.5)
+                                                    text.setAttribute('fill-opacity', 0)
+                                                else {
+                                                    if(text.innerHTML == 1.0){
+                                                        text.innerHTML = keyByValue(dta.trendAgeLocation.catesMonth, 1)
+                                                    }
+                                                }
+                                            }
+                                            else{
+                                                if(text.innerHTML == 0 || text.innerHTML >= Object.keys(dta.trendAgeLocation.catesMonth).length+1)
+                                                    text.setAttribute('fill-opacity',0)
+                                                else{
+                                                    text.innerHTML = keyByValue(dta.trendAgeLocation.catesMonth, Number(text.innerHTML))
+                                                }
+                                            }
+                                        }
+                                    });
+                                    // remove circle value =0
+                                    Array.prototype.forEach.call(document.getElementById('churn6').getElementsByTagName('circle'), function(circle) {
+                                        if(circle.getAttribute('r') == 5 && Number(dta.trendAgeLocation.isNull) == 1)
+                                            circle.setAttribute('r', 1)
+                                    })
+                                })
+                                var dataRegionAge = google.visualization.arrayToDataTable(getDataChurn(dta.trendAgeLocation.data,  "Location", "Age"))
+                                if(Object.keys(dta.trendAgeLocation.catesMonth).length == 1)
+                                    options.hAxis.gridlines.count = 4
+                                else
+                                    options.hAxis.gridlines.count = Object.keys(dta.trendAgeLocation.catesMonth).length+2
+                                options.vAxis.gridlines.count = Object.keys(dta.trendAgeLocation.catesRegion).length+2
+                                //options.chartArea.left =170;
+                                chartRegionAge.draw(dataRegionAge, options)
+                                google.visualization.events.addListener(chartRegionAge, 'onmouseover', function (event) {
+                                    var rate = dataRegionAge.getValue(event.row, 3);
+                                    var xAxis = dataRegionAge.getValue(event.row, 1);
+                                    var yAxis = dataRegionAge.getValue(event.row, 2);
+                                    var percent = dataRegionAge.getValue(event.row, 4);
+                                    var contracts = dataRegionAge.getValue(event.row, 5);
+                                    var x = mouseX - 6625;
+                                    if($(window).width() < 992){
+                                        mouseY = mouseY - 870
+                                    }
+                                    else{
+                                        mouseY = mouseY -600
+                                    }
+                                    var y = mouseY
+                                    if(!(Number(percent == 0) && Number(rate) == 0)){
+                                        $('#churn6_tooltip').html('<div><p><b>Age:</b> ' + keyByValue(dta.trendAgeLocation.catesMonth, xAxis) +'</p><p><b>Location:</b> '+ keyByValue( dta.trendAgeLocation.catesRegion, yAxis) +
+                                                '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
+                                            'top': y,
+                                            'left': x
+                                        }).fadeIn('slow');
+                                    }
+                                    // remove circle value =0
+                                    Array.prototype.forEach.call(document.getElementById('churn6').getElementsByTagName('circle'), function(circle) {
+                                        if(Number(dta.trendAgeLocation.isNull) == 1 && (circle.getAttribute('fill') == 'none' || circle.getAttribute('r') == 5)){
+                                            circle.setAttribute('r', 1)
+                                        }
+                                    })
+                                })
+                                google.visualization.events.addListener(chartRegionAge, 'onmouseout', handlerOut)
+                            }
+                            else if(tab_name == "tabTime"){
+                                Highcharts.chart('churn7', {
+                                    chart: {
+                                        type: 'heatmap',
+                                        marginTop: 40,
+                                        marginBottom: 70,
+                                        plotBorderWidth: 1
+                                    },
+                                    title: {
+                                        text: ''
+                                    },
+                                    xAxis: {
+                                        categories: dta.cLRegionTime.cateX
+                                    },
+                                    yAxis: {
+                                        categories: dta.cLRegionTime.cateY,
+                                        title: null
+                                    },
+                                    colorAxis: {
+                                        minColor: '#ffffe5',
+                                        maxColor: '#006837',
+                                        type: 'logarithmic',
+                                        stops: [
+                                            [0, '#ffffe5'],
+                                            [0.67, '#78c679'],
+                                            [1, '#006837']
+                                        ]
+                                    },
+                                    legend: {
+                                        align: 'right',
+                                        layout: 'vertical',
+                                        margin: 0,
+                                        verticalAlign: 'top',
+                                        y: 25,
+                                        symbolHeight: 280
+                                    },
+                                    plotOptions: {
+                                        series: {
+                                            dataLabels:{
+                                                formatter:function(){
+                                                    var nf = new Intl.NumberFormat();
+                                                    return nf.format(this.point.value);
+                                                }
+                                            }
+                                        }
+                                    },
+                                    tooltip: {
+                                        formatter: function () {
+                                            return 'ProcessTime: <b>' + this.series.xAxis.categories[this.point.x] +'</b><br/>Location: <b>'+ this.series.yAxis.categories[this.point.y] + '</b><br/>Number of contracts: <b>' +
+                                                    this.point.value +'</b>';
+                                        }
+                                    },
+                                    series: [{
+                                        name: 'total contracts',
+                                        borderWidth: 0.1,
+                                        borderColor: '#78c679',
+                                        data: dta.cLRegionTime.data,
+                                        dataLabels: {
+                                            enabled: true,
+                                            color: '#000000',
+                                            style: {
+                                                "fontSize": "10px"
+                                            }
+                                        }
+                                    }]
+
+                                });
+                                // bubble charts Processing Time & Location
+                                if(dta.trendTimeLocation.data.length <= 0){
+                                    $('#churn8_overlay').hide()
+                                    $('#churn8').hide()
+                                }
+                                else{
+                                    $('#churn8_overlay').show()
+                                    $('#churn8').show()
+                                }
+                                $('#churn8_txtMin').text(dta.trendTimeLocation.minPercent)
+                                $('#churn8_txtMax').text(dta.trendTimeLocation.maxPercent)
+                                $('#churn8_circle2').text(Number(dta.trendTimeLocation.minPercent + (dta.trendTimeLocation.maxPercent-dta.trendTimeLocation.minPercent)/5*2).toFixed(2))
+                                $('#churn8_circle3').text(Number(dta.trendTimeLocation.minPercent + (dta.trendTimeLocation.maxPercent-dta.trendTimeLocation.minPercent)/5*3).toFixed(2))
+                                var chartRegionTime = new google.visualization.BubbleChart(document.getElementById('churn8'))
+                                Object.keys(dta.trendTimeLocation.catesRegion).length >8 ? $('#churn8').attr('style','height: 550px'): $('#churn8').attr('style','height: 420px')
+                                google.visualization.events.addListener(chartRegionTime, 'ready', function () {
+                                    Array.prototype.forEach.call(document.getElementById('churn8').getElementsByTagName('text'), function(text) {
+                                        if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444')) {
+                                            if(text.innerHTML == 0 || text.innerHTML == undefined || text.innerHTML == Object.keys(dta.trendTimeLocation.catesRegion).length+1)
+                                                text.setAttribute('fill-opacity',0)
+                                            else{
+                                                text.innerHTML = keyByValue(dta.trendTimeLocation.catesRegion, Number(text.innerHTML))
+                                            }
+                                        }
+                                        // change label month
+                                        if ((text.getAttribute('text-anchor') === 'middle') && (text.getAttribute('fill') === '#444444')) {
+                                            if(Object.keys(dta.trendTimeLocation.catesMonth).length == 1){
+                                                if (text.innerHTML == 0.5 || text.innerHTML == 0.0 || text.innerHTML == 1.5)
+                                                    text.setAttribute('fill-opacity', 0)
+                                                else {
+                                                    if(text.innerHTML == 1.0){
+                                                        text.innerHTML = keyByValue(dta.trendTimeLocation.catesMonth, 1)
+                                                    }
+                                                }
+                                            }
+                                            else{
+                                                if(text.innerHTML == 0 || text.innerHTML >= Object.keys(dta.trendTimeLocation.catesMonth).length+1)
+                                                    text.setAttribute('fill-opacity',0)
+                                                else{
+                                                    text.innerHTML = keyByValue(dta.trendTimeLocation.catesMonth, Number(text.innerHTML))
+                                                }
+                                            }
+                                        }
+                                    });
+                                    // remove circle value =0
+                                    Array.prototype.forEach.call(document.getElementById('churn8').getElementsByTagName('circle'), function(circle) {
+                                        if(circle.getAttribute('r') == 5 && Number(dta.trendTimeLocation.isNull) == 1)
+                                            circle.setAttribute('r', 1)
+                                    })
+                                })
+                                var dataRegionTime = google.visualization.arrayToDataTable(getDataChurn(dta.trendTimeLocation.data,  "Location", "Time"))
+                                if(Object.keys(dta.trendTimeLocation.catesMonth).length == 1)
+                                    options.hAxis.gridlines.count = 4
+                                else
+                                    options.hAxis.gridlines.count = Object.keys(dta.trendTimeLocation.catesMonth).length+2
+                                options.vAxis.gridlines.count = Object.keys(dta.trendTimeLocation.catesRegion).length+2
+                                chartRegionTime.draw(dataRegionTime, options)
+                                google.visualization.events.addListener(chartRegionTime, 'onmouseover', function (event) {
+                                    var rate = dataRegionTime.getValue(event.row, 3);
+                                    var xAxis = dataRegionTime.getValue(event.row, 1);
+                                    var yAxis = dataRegionTime.getValue(event.row, 2);
+                                    var percent = dataRegionTime.getValue(event.row, 4);
+                                    var contracts = dataRegionTime.getValue(event.row, 5);
+                                    var x = mouseX - 6625;
+                                    if($(window).width() < 992){
+                                        mouseY = mouseY - 870
+                                    }
+                                    else{
+                                        mouseY = mouseY -600
+                                    }
+                                    var y = mouseY
+                                    if(!(Number(percent == 0) && Number(rate) == 0)){
+                                        $('#churn8_tooltip').html('<div><p><b>Processing Time:</b> ' + keyByValue(dta.trendTimeLocation.catesMonth, xAxis) +'</p><p><b>Location:</b> '+ keyByValue( dta.trendTimeLocation.catesRegion, yAxis) +
+                                                '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
+                                            'top': y,
+                                            'left': x
+                                        }).fadeIn('slow');
+                                    }
+                                    // remove circle value =0
+                                    Array.prototype.forEach.call(document.getElementById('churn8').getElementsByTagName('circle'), function(circle) {
+                                        if(Number(dta.trendTimeLocation.isNull) == 1 && (circle.getAttribute('fill') == 'none' || circle.getAttribute('r') == 5)){
+                                            circle.setAttribute('r', 1)
+                                        }
+                                    })
+                                })
+                                google.visualization.events.addListener(chartRegionTime, 'onmouseout', handlerOut)
+                            }
+                            else{
+                                /* NGUYEN NHAN XAY RA LOI */
+                                Highcharts.chart('churn9', {
+                                    chart: {
+                                        type: 'heatmap',
+                                        marginTop: 20,
+                                        marginBottom: 100,
+                                        plotBorderWidth: 1
+                                    },
+                                    title: {
+                                        text: ''
+                                    },
+                                    xAxis: {
+                                        categories: dta.cLRegionCause.cateX
+                                    },
+                                    yAxis: {
+                                        categories: dta.cLRegionCause.cateY,
+                                        title: null
+                                    },
+                                    colorAxis: {
+                                        minColor: '#ffffe5',
+                                        maxColor: '#006837',
+                                        type: 'logarithmic',
+                                        stops: [
+                                            [0, '#ffffe5'],
+                                            [0.67, '#78c679'],
+                                            [1, '#006837']
+                                        ]
+                                    },
+                                    legend: {
+                                        align: 'right',
+                                        layout: 'vertical',
+                                        margin: 0,
+                                        verticalAlign: 'top',
+                                        y: 25,
+                                        symbolHeight: 280
+                                    },
+                                    plotOptions: {
+                                        series: {
+                                            dataLabels:{
+                                                formatter:function(){
+                                                    var nf = new Intl.NumberFormat();
+                                                    return nf.format(this.point.value);
+                                                }
+                                            }
+                                        }
+                                    },
+                                    tooltip: {
+                                        formatter: function () {
+                                            return 'Cause: <b>' + this.series.xAxis.categories[this.point.x] +'</b><br/>Location: <b>'+ this.series.yAxis.categories[this.point.y] + '</b><br/>Number of contracts: <b>' +
+                                                    this.point.value +'</b>';
+                                        }
+                                    },
+                                    series: [{
+                                        name: 'total contracts',
+                                        borderWidth: 0.1,
+                                        borderColor: '#78c679',
+                                        data: dta.cLRegionCause.data,
+                                        dataLabels: {
+                                            enabled: true,
+                                            color: '#000000',
+                                            style: {
+                                                "fontSize": "10px"
+                                            }
+                                        }
+                                    }]
+
+                                });
+                                // bubble charts Cause & Location
+                                if(dta.trendCauseLocation.data.length <= 0){
+                                    $('#churn10_overlay').hide()
+                                    $('#churn10').hide()
+                                }
+                                else{
+                                    $('#churn10_overlay').show()
+                                    $('#churn10').show()
+                                }
+                                $('#churn10_txtMin').text(dta.trendCauseLocation.minPercent)
+                                $('#churn10_txtMax').text(dta.trendCauseLocation.maxPercent)
+                                $('#churn10_circle2').text(Number(dta.trendCauseLocation.minPercent + (dta.trendCauseLocation.maxPercent-dta.trendCauseLocation.minPercent)/5*2).toFixed(2))
+                                $('#churn10_circle3').text(Number(dta.trendCauseLocation.minPercent + (dta.trendCauseLocation.maxPercent-dta.trendCauseLocation.minPercent)/5*3).toFixed(2))
+                                var chartRegionCause = new google.visualization.BubbleChart(document.getElementById('churn10'))
+                                Object.keys(dta.trendCauseLocation.catesRegion).length >8 ? $('#churn10').attr('style','height: 570px'): $('#churn8').attr('style','height: 540px')
+                                google.visualization.events.addListener(chartRegionCause, 'ready', function () {
+                                    Array.prototype.forEach.call(document.getElementById('churn10').getElementsByTagName('text'), function(text) {
+                                        if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444')) {
+                                            if(text.innerHTML == 0 || text.innerHTML == undefined || text.innerHTML == Object.keys(dta.trendCauseLocation.catesRegion).length+1)
+                                                text.setAttribute('fill-opacity',0)
+                                            else{
+                                                text.innerHTML = keyByValue(dta.trendCauseLocation.catesRegion, Number(text.innerHTML))
+                                            }
+                                        }
+                                        // change label month
+                                        if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#1c2752')) {
+                                            if(Object.keys(dta.trendCauseLocation.catesMonth).length == 1){
+                                                if (text.innerHTML == 0.5 || text.innerHTML == 0.0 || text.innerHTML == 1.5)
+                                                    text.setAttribute('fill-opacity', 0)
+                                                else {
+                                                    if(text.innerHTML == 1.0){
+                                                        text.innerHTML = keyByValue(dta.trendCauseLocation.catesMonth, 1)
+                                                    }
+                                                }
+                                            }
+                                            else{
+                                                if(text.innerHTML == 0 || text.innerHTML >= Object.keys(dta.trendCauseLocation.catesMonth).length+1)
+                                                    text.setAttribute('fill-opacity',0)
+                                                else{
+                                                    text.innerHTML = keyByValue(dta.trendCauseLocation.catesMonth, Number(text.innerHTML))
+                                                }
+                                            }
+                                        }
+                                    });
+                                    // remove circle value =0
+                                    Array.prototype.forEach.call(document.getElementById('churn10').getElementsByTagName('circle'), function(circle) {
+                                        if(circle.getAttribute('r') == 5 && Number(dta.trendCauseLocation.isNull) == 1)
+                                            circle.setAttribute('r', 1)
+                                    })
+                                })
+                                var dataRegionCause = google.visualization.arrayToDataTable(getDataChurn(dta.trendCauseLocation.data,  "Location", "Cause"))
+                                if(Object.keys(dta.trendCauseLocation.catesMonth).length == 1)
+                                    optionsCause.hAxis.gridlines.count = 4
+                                else
+                                    optionsCause.hAxis.gridlines.count = Object.keys(dta.trendCauseLocation.catesMonth).length+2
+                                optionsCause.vAxis.gridlines.count = Object.keys(dta.trendCauseLocation.catesRegion).length+2
+                                optionsCause.chartArea.bottom = 90
+                                chartRegionCause.draw(dataRegionCause, optionsCause)
+                                google.visualization.events.addListener(chartRegionCause, 'onmouseover', function (event) {
+                                    var rate = dataRegionCause.getValue(event.row, 3);
+                                    var xAxis = dataRegionCause.getValue(event.row, 1);
+                                    var yAxis = dataRegionCause.getValue(event.row, 2);
+                                    var percent = dataRegionCause.getValue(event.row, 4);
+                                    var contracts = dataRegionCause.getValue(event.row, 5);
+                                    var x = mouseX - 6625;
+                                    if($(window).width() < 992){
+                                        mouseY = mouseY - 870
+                                    }
+                                    else{
+                                        mouseY = mouseY -600
+                                    }
+                                    var y = mouseY
+                                    if(!(Number(percent == 0) && Number(rate) == 0)){
+                                        $('#churn10_tooltip').html('<div><p><b>Cause:</b> ' + keyByValue(dta.trendCauseLocation.catesMonth, xAxis) +'</p><p><b>Location:</b> '+ keyByValue( dta.trendCauseLocation.catesRegion, yAxis) +
+                                                '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
+                                            'top': y,
+                                            'left': x
+                                        }).fadeIn('slow');
+                                    }
+                                    // remove circle value =0
+                                    Array.prototype.forEach.call(document.getElementById('churn10').getElementsByTagName('circle'), function(circle) {
+                                        if(Number(dta.trendCauseLocation.isNull) == 1 && (circle.getAttribute('fill') == 'none' || circle.getAttribute('r') == 5)){
+                                            circle.setAttribute('r', 1)
+                                        }
+                                    })
+                                })
+                                google.visualization.events.addListener(chartRegionCause, 'onmouseout', handlerOut)
+
+                                /* VI TRI XAY RA LOI */
+                                Highcharts.chart('churn11', {
+                                    chart: {
+                                        type: 'heatmap',
+                                        marginTop: 20,
+                                        marginBottom: 100,
+                                        plotBorderWidth: 1
+                                    },
+                                    title: {
+                                        text: ''
+                                    },
+                                    xAxis: {
+                                        categories: dta.cLRegionPosition.cateX
+                                    },
+                                    yAxis: {
+                                        categories: dta.cLRegionPosition.cateY,
+                                        title: null
+                                    },
+                                    colorAxis: {
+                                        minColor: '#ffffe5',
+                                        maxColor: '#006837',
+                                        type: 'logarithmic',
+                                        stops: [
+                                            [0, '#ffffe5'],
+                                            [0.67, '#78c679'],
+                                            [1, '#006837']
+                                        ]
+                                    },
+                                    legend: {
+                                        align: 'right',
+                                        layout: 'vertical',
+                                        margin: 0,
+                                        verticalAlign: 'top',
+                                        y: 25,
+                                        symbolHeight: 280
+                                    },
+                                    plotOptions: {
+                                        series: {
+                                            dataLabels:{
+                                                formatter:function(){
+                                                    var nf = new Intl.NumberFormat();
+                                                    return nf.format(this.point.value);
+                                                }
+                                            }
+                                        }
+                                    },
+                                    tooltip: {
+                                        formatter: function () {
+                                            return 'Position: <b>' + this.series.xAxis.categories[this.point.x] +'</b><br/>Location: <b>'+ this.series.yAxis.categories[this.point.y] + '</b><br/>Number of contracts: <b>' +
+                                                    this.point.value +'</b>';
+                                        }
+                                    },
+                                    series: [{
+                                        name: 'total contracts',
+                                        borderWidth: 0.1,
+                                        borderColor: '#78c679',
+                                        data: dta.cLRegionPosition.data,
+                                        dataLabels: {
+                                            enabled: true,
+                                            color: '#000000',
+                                            style: {
+                                                "fontSize": "10px"
+                                            }
+                                        }
+                                    }]
+
+                                });
+                                // bubble charts Position & Location
+                                if(dta.trendPositionLocation.data.length <= 0){
+                                    $('#churn12_overlay').hide()
+                                    $('#churn12').hide()
+                                }
+                                else{
+                                    $('#churn12_overlay').show()
+                                    $('#churn12').show()
+                                }
+                                $('#churn12_txtMin').text(dta.trendPositionLocation.minPercent)
+                                $('#churn12_txtMax').text(dta.trendPositionLocation.maxPercent)
+                                $('#churn12_circle2').text(Number(dta.trendPositionLocation.minPercent + (dta.trendPositionLocation.maxPercent-dta.trendPositionLocation.minPercent)/5*2).toFixed(2))
+                                $('#churn12_circle3').text(Number(dta.trendPositionLocation.minPercent + (dta.trendPositionLocation.maxPercent-dta.trendPositionLocation.minPercent)/5*3).toFixed(2))
+                                var chartRegionPosition = new google.visualization.BubbleChart(document.getElementById('churn12'))
+                                Object.keys(dta.trendPositionLocation.catesRegion).length >8 ? $('#churn10').attr('style','height: 570px'): $('#churn8').attr('style','height: 540px')
+                                google.visualization.events.addListener(chartRegionPosition, 'ready', function () {
+                                    Array.prototype.forEach.call(document.getElementById('churn12').getElementsByTagName('text'), function(text) {
+                                        if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#444444')) {
+                                            if(text.innerHTML == 0 || text.innerHTML == undefined || text.innerHTML == Object.keys(dta.trendPositionLocation.catesRegion).length+1)
+                                                text.setAttribute('fill-opacity',0)
+                                            else{
+                                                text.innerHTML = keyByValue(dta.trendPositionLocation.catesRegion, Number(text.innerHTML))
+                                            }
+                                        }
+                                        // change label month
+                                        if ((text.getAttribute('text-anchor') === 'end') && (text.getAttribute('fill') === '#1c2752')) {
+                                            if(Object.keys(dta.trendPositionLocation.catesMonth).length == 1){
+                                                if (text.innerHTML == 0.5 || text.innerHTML == 0.0 || text.innerHTML == 1.5)
+                                                    text.setAttribute('fill-opacity', 0)
+                                                else {
+                                                    if(text.innerHTML == 1.0){
+                                                        text.innerHTML = keyByValue(dta.trendPositionLocation.catesMonth, 1)
+                                                    }
+                                                }
+                                            }
+                                            else{
+                                                if(text.innerHTML == 0 || text.innerHTML >= Object.keys(dta.trendPositionLocation.catesMonth).length+1)
+                                                    text.setAttribute('fill-opacity',0)
+                                                else{
+                                                    text.innerHTML = keyByValue(dta.trendPositionLocation.catesMonth, parseInt(Number(text.innerHTML)+0.3))
+                                                }
+                                            }
+                                        }
+                                    });
+                                    // remove circle value =0
+                                    Array.prototype.forEach.call(document.getElementById('churn12').getElementsByTagName('circle'), function(circle) {
+                                        if(circle.getAttribute('r') == 5 && Number(dta.trendPositionLocation.isNull) == 1)
+                                            circle.setAttribute('r', 1)
+                                    })
+                                })
+                                var dataRegionPosition = google.visualization.arrayToDataTable(getDataChurn(dta.trendPositionLocation.data,  "Location", "Position"))
+                                if(Object.keys(dta.trendCauseLocation.catesMonth).length == 1)
+                                    optionsCause.hAxis.gridlines.count = 4
+                                else
+                                    optionsCause.hAxis.gridlines.count = Object.keys(dta.trendPositionLocation.catesMonth).length+2
+                                optionsCause.vAxis.gridlines.count = Object.keys(dta.trendPositionLocation.catesRegion).length+2
+                                optionsCause.chartArea.bottom = 80
+                                chartRegionPosition.draw(dataRegionPosition, optionsCause)
+                                google.visualization.events.addListener(chartRegionPosition, 'onmouseover', function (event) {
+                                    var rate = dataRegionPosition.getValue(event.row, 3);
+                                    var xAxis = dataRegionPosition.getValue(event.row, 1);
+                                    var yAxis = dataRegionPosition.getValue(event.row, 2);
+                                    var percent = dataRegionPosition.getValue(event.row, 4);
+                                    var contracts = dataRegionPosition.getValue(event.row, 5);
+                                    var x = mouseX - 6625;
+                                    if($(window).width() < 992){
+                                        mouseY = mouseY - 870
+                                    }
+                                    else{
+                                        mouseY = mouseY -600
+                                    }
+                                    var y = mouseY
+                                    if(!(Number(percent == 0) && Number(rate) == 0)){
+                                        $('#churn12_tooltip').html('<div><p><b>Position:</b> ' + keyByValue(dta.trendPositionLocation.catesMonth, xAxis) +'</p><p><b>Location:</b> '+ keyByValue( dta.trendPositionLocation.catesRegion, yAxis) +
+                                                '</p><p><b>Rate:</b> '+ rate +' %</p><p><b>Percent:</b> '+ percent +' %</p><p><b>Number of contracts: </b>'+contracts+'</p></div>').css({
+                                            'top': y,
+                                            'left': x
+                                        }).fadeIn('slow');
+                                    }
+                                    // remove circle value =0
+                                    Array.prototype.forEach.call(document.getElementById('churn12').getElementsByTagName('circle'), function(circle) {
+                                        if(Number(dta.trendPositionLocation.isNull) == 1 && (circle.getAttribute('fill') == 'none' || circle.getAttribute('r') == 5)){
+                                            circle.setAttribute('r', 1)
+                                        }
+                                    })
+                                })
+                                google.visualization.events.addListener(chartRegionPosition, 'onmouseout', handlerOut)
+                            }
+                        }
+                        else{
+                            alert("Error when execute query. Please check again your system!")
+                        }
+                    },
+                    complete: function () {
+                        $("html, body").animate({ scrollTop: $("#"+tab_name).offset().top - $(window).height()/2 });
+                        $('#commentBox').show();
+                        $('#'+tab_name).waitMe("hide");
+                    }
+                });
+            }
+
+            // click apply fitler
+            $('.apply').click(function () {
+                ajaxGetChurnChecklist()
+            });
+            // click refresh fitler
+            $('.btnRefresh').click(function () {
+                $('.slAge').val('').trigger('change')
+                $('.slPackage').val('').trigger('change')
+                $('.slCause').val('*').trigger('change')
+                $('.slPosition').val('*').trigger('change')
+                $('.slProcess').val('*').trigger('change')
+                $('.slTime').val('24').trigger('change')
+                $('.slGrpChl').val('*').trigger('change')
+                $('.checkbox').removeAttr('checked').iCheck('update')
+                $(".monthPicker").datepicker("update", $('#monthCurr').val())
+                $(".region").jstree("deselect_all")
+                $('#province').val("")
+                $('#tabName').val("")
+                ajaxGetChurnChecklist()
+            })
+            // click comment insert
+            $('.btnCmt').click(function () {
+                var fields = {
+                    "csrfToken": document.querySelector('input[name=csrfToken]').value,
+                    "comment"  : $(this).parent().parent().find('.comment').val(),
+                    "tabName"  : "Checklist_"+$('#tabName').val()
+                }
+                insertComment(fields)
+            });
         }
 
         function getParamFields(token){
+            var boxes = $('.statusDiv .checkbox:checked');
+            var status = ""
+            boxes.each(function(i, chkbox) {
+                status += chkbox.value
+            });
+            $('#status').val(status)
             var obj = {
-                "csrfToken"   : token,
-                "region"      : $('#region').val(),
-                "age"         : $('#age').val(),
+                "csrfToken" : token,
+                "region"  : $('#province').val() == "All" ? "": $('#province').val(),
+                "age"    : $('.ageDiv .select2-selection__choice').text().substring(1,$('.ageDiv .select2-selection__choice').text().length).split('x').join(','),
+                "package": $('.packageDiv .select2-selection__choice').text().substring(1,$('.packageDiv .select2-selection__choice').text().length).split('x').join(','),
+                "month"  : $('.monthGrp').val(),
+                "status" : status,
+                "tabName" : $('#tabName').val(),
                 "typeCurr"    : $('#typeCurr').val(),
                 "topType"     : $('#typeArr').val(),
-                "processTime" : $('#time').val(),
-                "month"       : $('#month').val(),
-                "status"      : $('.slStatus').val()
+                "cause"      : $('.slCause').val(),
+                "position" : $('.slPosition').val(),
+                "processTime" : $('.slProcess').val(),
+                "timeCL"    : $('.slTime').val(),
+                "groupCL"   : $('.slGrpChl').val()
             }
             //console.log(obj)
             return obj
         }
-
-        function getdataHeatMapRegionMonth(dta, arrMonth, arrRegion){
-            var rs = []
-            for(var month =0; month< arrMonth.length; month++){
-                for(var region =0; region< arrRegion.length; region++){
-                    for(var i=0; i< dta.length ;i++){
-                        if(dta[i][0] == arrMonth[month] && dta[i][1] == arrRegion[region]){
-                            rs.push({
-                                x: month,
-                                y: region,
-                                value: dta[i][2],
-                                name: dta[i][3]
-                            })
-                        }
-                    }
-                }
-            }
-            //console.log(rs)
-            return rs
-        }
-
-        function getDataChurn(dta, cateX, cateY){
-            var rs = []
-            rs.push(['ID', cateX, cateY,'Rate', 'Percent','Contract'])
-            for(var i=0;i<dta.length;i++){
-                var arr = []
-                arr[0]=''
-                arr[1]=dta[i][1]
-                arr[2]=dta[i][0]
-                arr[3]=dta[i][2]
-                arr[4]=dta[i][3]
-                arr[5]=dta[i][4]
-                rs.push(arr)
-            }
-            return rs
-        }
-
-        function replaceSvgToHtml(el, arrCatesType){
-            var g = el.parentNode;
-            var x = el.getAttribute('x').replace("\"", "");
-            var y = el.getAttribute('y').replace("\"", "");
-            var width = el.getAttribute('width') || 40;
-            var height = el.getAttribute('height') || 225;
-
-            // A "ForeignObject" tag is how you can inject HTML into an SVG document.
-            var fo = document.createElementNS("http://www.w3.org/2000/svg", "foreignObject");
-            fo.setAttribute('x', x -25);
-            fo.setAttribute('y', y);
-            fo.setAttribute('height', height);
-            fo.setAttribute('width', width);
-
-            var body = document.createElementNS("http://www.w3.org/1999/xhtml", "BODY");
-            var p = document.createElement("P");
-
-            p.setAttribute("style", "font-size: 12px; max-width: 60px ;font-family:Arial;text-align:center;color:#555;");
-            p.innerHTML = keyByValue(arrCatesType, Number(el.textContent.replace('|','<br />')));
-
-            body.appendChild(p);
-            fo.appendChild(body);
-
-            // Remove the original SVG text and replace it with the HTML.
-           // g.removeChild(el);
-            g.appendChild(fo);
-        }
-
 </script>
