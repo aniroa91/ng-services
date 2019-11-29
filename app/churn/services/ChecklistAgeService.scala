@@ -1,10 +1,9 @@
 package service
 
-import com.sksamuel.elastic4s.http.ElasticDsl.{RichFuture, RichString, SearchHttpExecutable, SearchShow, percentilesAggregation, query, rangeAggregation, search, termsAgg, termsAggregation, _}
-import churn.utils.{AgeGroupUtil, CommonUtil, ProvinceUtil}
+import com.sksamuel.elastic4s.http.ElasticDsl.{RichFuture, RichString, SearchHttpExecutable, rangeAggregation, search, termsAggregation, _}
+import churn.utils.CommonUtil
 import play.api.mvc.{AnyContent, Request}
-import churn.models.{CLAgeResponse, CLRegionResponse}
-import org.elasticsearch.search.sort.SortOrder
+import churn.models.CLAgeResponse
 import play.api.Logger
 import scalaj.http.Http
 import services.Configure
@@ -14,8 +13,7 @@ import play.api.libs.json.JsNumber
 import play.api.libs.json.JsString
 import play.api.libs.json.Json
 import service.ChecklistService.{getFilterGroup, getQueryNested, getTopCause}
-import service.ChurnChecklistService.{getChurnByRegionAgeChecklist, logger}
-import service.OverviewAgeService.{calChurnRateAndPercentForAgeMonth, getTopOltByAge, getTrendAgeMonth, logger}
+import service.OverviewAgeService.{calChurnRateAndPercentForAgeMonth, getTopOltByAge}
 import service.OverviewService.{checkLocation, getCommentChart}
 
 object ChecklistAgeService{

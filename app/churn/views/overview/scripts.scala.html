@@ -1120,7 +1120,7 @@
                                 else
                                     optionsRegion.hAxis.gridlines.count = Object.keys(dta.churnPkgMonth.catesMonth).length+2
                                 optionsRegion.vAxis.gridlines.count = Object.keys(dta.churnPkgMonth.catesRegion).length+2
-                                optionsRegion.chartArea.left =170;
+                                optionsRegion.chartArea.left =180;
                                 chartRegionMonth.draw(dataRegionMonth, optionsRegion)
                                 google.visualization.events.addListener(chartRegionMonth, 'onmouseover', function (event) {
                                     var rate = dataRegionMonth.getValue(event.row, 3);
@@ -1151,6 +1151,21 @@
                                     })
                                 })
                                 google.visualization.events.addListener(chartRegionMonth, 'onmouseout', handlerOut)
+
+                                // Rotate vAxis labels.
+                                var array = $('#bublePkg g');
+                                for(var i = 0; i < array.length; i++) {
+                                    var logicalname = array[i].logicalname;
+                                    var text = $(array[i].children[0]);
+                                    if(logicalname != null &&
+                                            logicalname.indexOf("vAxis") == 0 &&
+                                            logicalname.indexOf("label") > 0) {
+
+                                        text.attr("transform",
+                                                "rotate(-30 "+$(text[0]).attr('x')+" "+$(text[0]).attr('y')+")");
+
+                                    }
+                                }
 
                                 // comment Chart
                                 $('.comment').text(dta.cmtChart)

@@ -139,7 +139,6 @@ object OverviewService{
     }
   }
 
-
   def getFilterGroup(age:String, province:String, packages:String, combo:String): String = {
     val ageFilter = if(age == "") "*" else age.split(",").map(x=> if(x == "06-12") "6-12" else x).map(x=> "lifeGroup:"+x.trim()).mkString(" OR ")
     val packageFilter = if(packages == "") "*" else packages.split(",").map(x=> "package_name:\""+x.trim()+"\"").mkString(" OR ")

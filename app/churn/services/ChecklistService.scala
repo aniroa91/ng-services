@@ -1,8 +1,8 @@
 package service
 
-import com.sksamuel.elastic4s.http.ElasticDsl.{RichFuture, RichString, SearchHttpExecutable, SearchShow, percentilesAggregation, query, rangeAggregation, search, termsAgg, termsAggregation, _}
+import com.sksamuel.elastic4s.http.ElasticDsl.{RichFuture, RichString, SearchHttpExecutable, search, termsAggregation, _}
 import play.api.libs.json.{JsArray, JsNumber, JsString, JsValue, Json}
-import churn.utils.{AgeGroupUtil, CommonUtil, ProvinceUtil}
+import churn.utils.{CommonUtil, ProvinceUtil}
 import org.elasticsearch.search.sort.SortOrder
 import play.api.mvc.{AnyContent, Request}
 import churn.models.{ChecklistResponse, ContractNumber, RateNumber}
@@ -315,7 +315,6 @@ object  ChecklistService{
       .asString.body
     val json = Json.parse(body)
     val quantile = json.\("aggregations").\("checklist").\("quantile").\("values").\("75.0").get.asInstanceOf[JsValue].toString().replaceAll("\"", "")
-    println(quantile)
     if(quantile == "NaN") 0.0 else quantile.toDouble
   }
 

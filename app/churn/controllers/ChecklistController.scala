@@ -87,7 +87,7 @@ class ChecklistController @Inject()(cc: ControllerComponents) extends AbstractCo
   }
 
   def getJsonByTab() = withAuth {username => implicit request: Request[AnyContent] =>
-    //try{
+    try{
       val tabName = request.body.asFormUrlEncoded.get("tabName").head
       tabName match {
         // tab Region trending
@@ -240,9 +240,9 @@ class ChecklistController @Inject()(cc: ControllerComponents) extends AbstractCo
           Ok(Json.toJson(json))
         }
       }
-    /*}
+    }
     catch{
       case e: Exception => Ok("Error")
-    }*/
+    }
   }
 }

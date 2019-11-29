@@ -130,9 +130,7 @@
                 gridlines: {
                     count: 10,
                     color: '#f0f0f0'
-                },
-                slantedText:true,
-                slantedTextAngle: 90
+                }
             },
             chartArea: {
                 height: "74%",
@@ -1028,6 +1026,22 @@
                                 google.visualization.events.addListener(chartRegionTime, 'onmouseout', handlerOut)
                             }
                             else{
+                                // tab Reason and position
+                                var count = 0
+                                if (count == 0) {
+                                    count = 1;
+                                    var width = 1;
+                                    var id = setInterval(frame, 10);
+                                    function frame() {
+                                        if (width >= 100) {
+                                            clearInterval(id);
+                                            count = 0;
+                                        } else {
+                                            width++;
+                                            $('.divBar').attr('style','width:'+width+'%')
+                                        }
+                                    }
+                                }
                                 /* NGUYEN NHAN XAY RA LOI */
                                 Highcharts.chart('churn9', {
                                     chart: {

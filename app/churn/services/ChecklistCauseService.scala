@@ -1,16 +1,11 @@
 package service
 
-import churn.utils.{AgeGroupUtil, CommonUtil, ProvinceUtil}
+import churn.utils.CommonUtil
 import play.api.mvc.{AnyContent, Request}
-import churn.models.{CLCauseResponse, CLTimeResponse}
+import churn.models.CLCauseResponse
 import play.api.Logger
-import scalaj.http.Http
 import services.Configure
 import services.domain.CommonService
-import play.api.libs.json.JsArray
-import play.api.libs.json.JsNumber
-import play.api.libs.json.JsString
-import play.api.libs.json.Json
 import service.ChecklistService.{getFilterGroup, getQueryNested, getTopCause}
 import service.OverviewAgeService.{calChurnRateAndPercentForAgeMonth, getTopOltByAge}
 import service.OverviewService.{checkLocation, getCommentChart}
@@ -104,9 +99,6 @@ object ChecklistCauseService{
     val trendRegionPosition = calChurnRateAndPercentForAgeMonth(arrPositionLoc, status, region).filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
     val rsLocationPosition = trendRegionPosition.filter(x=> position_X.indexOf(x._1) >=0).filter(x=> locPosition_Y.indexOf(x._2) >=0)
       .map(x=> (mapLocPosition.map(x=> x._1 -> (x._2+1)).get(x._2).get, mapPosition.map(x=> x._1 -> (x._2+1)).get(x._1).get, x._3, x._4, x._5))
-    mapPosition.foreach(println)
-    println("=-=")
-    rsLocationPosition.foreach(println)
     logger.info("t4: "+(System.currentTimeMillis() - t4))
     val t5 = System.currentTimeMillis()
     // comments content
