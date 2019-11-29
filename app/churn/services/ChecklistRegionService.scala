@@ -315,7 +315,6 @@ object  ChecklistRegionService{
     val topTBTByF1 = getTopAgeByMonth(arrMonthTBT, status, month, "f1", 10)
     val tbTBT = trendMonthTBT.filter(x=> topLast12monthTBT.indexOf(x._2) >=0).filter(x=> topTBTByF1.indexOf(x._1) >=0).map(x=> (x._1, x._2, x._3,
       CommonService.format2Decimal(2*x._3*x._4/(x._3+x._4)), x._5))
-    tbTBT.foreach(println)
     logger.info("t4: "+(System.currentTimeMillis() - t4))
 
     logger.info("Time: "+(System.currentTimeMillis() -t0))
