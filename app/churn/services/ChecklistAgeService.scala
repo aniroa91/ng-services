@@ -90,7 +90,8 @@ object ChecklistAgeService{
     rs.map(x=> (x._1, x._2,if(x._3 == "6-12") "06-12" else x._3, x._4, x._5))
   }
 
-  def getChurnByRegionAgeAll(month: String, queries: String) ={
+  def getChurnByRegionAgeAll(month: String, queries: String, region: String) ={
+    val location = checkLocation(region)
     val request = search(s"churn-contract-info-${month}" / "docs") query(queries + " AND " + CommonUtil.filterCommon("package_name")) aggregations (
       rangeAggregation("age")
         .field("age")
@@ -107,7 +108,7 @@ object ChecklistAgeService{
         .range(">60", 60.001, Double.MaxValue)
         .subaggs(
           termsAggregation("region")
-            .field("region") size 1000
+            .field(s"$location") size 1000
         )
       )
     val rs = client.execute(request).await
@@ -284,7 +285,7 @@ object ChecklistAgeService{
     val t1 = System.currentTimeMillis()
     // Number of Contracts Who Have Checklist(s) by Region by Contract Age (%)
     val numOfChecklist      = getChurnByRegionAgeChecklist(month, queries, queryNested, region)
-    val checklistRegionAge  = ChecklistRegionService.calChurnCLRateAndPercentagebyRegion(numOfChecklist, getChurnByRegionAgeAll(month, queries), region)
+    val checklistRegionAge  = ChecklistRegionService.calChurnCLRateAndPercentagebyRegion(numOfChecklist, getChurnByRegionAgeAll(month, queries, region), region)
     logger.info("t1: "+(System.currentTimeMillis() -t1))
     val t2 = System.currentTimeMillis()
     // Trend Age and location

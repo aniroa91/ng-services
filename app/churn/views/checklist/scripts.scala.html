@@ -1148,7 +1148,7 @@
                                                 if(text.innerHTML == 0 || text.innerHTML >= Object.keys(dta.trendCauseLocation.catesMonth).length+1)
                                                     text.setAttribute('fill-opacity',0)
                                                 else{
-                                                    text.innerHTML = keyByValue(dta.trendCauseLocation.catesMonth, Number(text.innerHTML))
+                                                    text.innerHTML = keyByValue(dta.trendCauseLocation.catesMonth, parseInt(Number(text.innerHTML)+0.3))
                                                 }
                                             }
                                         }
