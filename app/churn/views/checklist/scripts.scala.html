@@ -167,6 +167,7 @@
                 var tabCurr = $('.nav-tabs li.active').find('a').attr('class')
                 var tab = $(this).find('a').attr('class')
                 if(tabCurr != tab){
+                    $('#commentBox').show()
                     $('#tabName').val(tab)
                     $('.nav-tabs li').removeClass('in').removeClass('active')
                     $('.panel-body .tab-pane').removeClass('in').removeClass('active')
@@ -433,6 +434,7 @@
                     data:  fields,
                     type:"POST",
                     beforeSend: function () {
+                        $("html, body").animate({ scrollTop: $("#"+tab_name).offset().top - $(window).height()/3 });
                         $('#'+tab_name).waitMe({
                             effect: 'facebook',
                             text: '',
@@ -723,6 +725,8 @@
                                 });
                             }
                             else if(tab_name == "tabAge"){
+                                if(dta.cLRegionAge.cateY.length > 7) $('#churn5').attr('style','width: auto; height:450px')
+                                else $('#churn5').attr('style','height:350px;width: auto')
                                 Highcharts.chart('churn5', {
                                     chart: {
                                         type: 'heatmap',
@@ -872,6 +876,8 @@
                                 google.visualization.events.addListener(chartRegionAge, 'onmouseout', handlerOut)
                             }
                             else if(tab_name == "tabTime"){
+                                if(dta.cLRegionTime.cateY.length > 7) $('#churn7').attr('style','width: auto; height:450px')
+                                else $('#churn7').attr('style','height:350px;width: auto')
                                 Highcharts.chart('churn7', {
                                     chart: {
                                         type: 'heatmap',
@@ -1042,6 +1048,8 @@
                                         }
                                     }
                                 }
+                                if(dta.cLRegionCause.cateY.length > 7) $('#churn9').attr('style','width: auto; height:430px')
+                                else $('#churn9').attr('style','height:350px;width: auto')
                                 /* NGUYEN NHAN XAY RA LOI */
                                 Highcharts.chart('churn9', {
                                     chart: {
@@ -1198,6 +1206,8 @@
                                 google.visualization.events.addListener(chartRegionCause, 'onmouseout', handlerOut)
 
                                 /* VI TRI XAY RA LOI */
+                                if(dta.cLRegionPosition.cateY.length > 7) $('#churn11').attr('style','width: auto; height:430px')
+                                else $('#churn11').attr('style','height:350px;width: auto')
                                 Highcharts.chart('churn11', {
                                     chart: {
                                         type: 'heatmap',
@@ -1358,7 +1368,6 @@
                         }
                     },
                     complete: function () {
-                        $("html, body").animate({ scrollTop: $("#"+tab_name).offset().top - $(window).height()/2 });
                         $('#commentBox').show();
                         $('#'+tab_name).waitMe("hide");
                     }
@@ -1383,6 +1392,7 @@
                 $(".region").jstree("deselect_all")
                 $('#province').val("")
                 $('#tabName').val("")
+                $('#commentBox').hide()
                 ajaxGetChurnChecklist()
             })
             // click comment insert

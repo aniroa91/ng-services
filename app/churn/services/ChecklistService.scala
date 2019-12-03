@@ -424,7 +424,7 @@ object  ChecklistService{
     // get top 5 Nguyen nhan
     val topCause = getTopCause(month, "Nguyennhan").map(x=> x._1)
     // get top 5 vi Tri xay ra Checklist
-    val topPostion = getTopCause(month, "vitrixayrasuco").map(x=> x._1)
+    val topPosition = getTopCause(month, "vitrixayrasuco").map(x=> x._1)
 
     if(request != null) {
       groupCL = request.body.asFormUrlEncoded.get("groupCL").head
@@ -463,7 +463,7 @@ object  ChecklistService{
           position = "*"
         }
         case "others" => {
-          position = topPostion.map(x => "!(checklist.vitrixayrasuco:\"" + x + "\")").mkString(" AND ")
+          position = topPosition.map(x => "!(checklist.vitrixayrasuco:\"" + x + "\")").mkString(" AND ")
         }
         case _ => {
           position = "checklist.vitrixayrasuco:\"" + request.body.asFormUrlEncoded.get("position").head + "\""
@@ -511,7 +511,7 @@ object  ChecklistService{
     logger.info("Time: "+(System.currentTimeMillis() -t0))
     logger.info("========END CHECKLIST SERVICE=========")
     ChecklistResponse((ContractNumber(currCtCl, prevCtCl), ContractNumber(currCl, prevCl), RateNumber(currQuantileTime, prevQuantileTime)),RateNumber(currChurnChkl, prevChurnChkl),
-      ctCheckList.sortWith((x, y) => x._1 > y._1 ).slice(0, 15).sorted, trendChecklist, month, lstProvince, lstPackage, topCause, topPostion)
+      ctCheckList.sortWith((x, y) => x._1 > y._1 ).slice(0, 15).sorted, trendChecklist, month, lstProvince, lstPackage, topCause, topPosition)
 
   }
 }

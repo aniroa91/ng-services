@@ -1,5 +1,6 @@
 package churn.controllers
 
+import churn.services.CacheService
 import javax.inject.Inject
 import javax.inject.Singleton
 import play.api.mvc._
@@ -8,7 +9,6 @@ import play.api.mvc.ControllerComponents
 import services.domain.CommonService
 import controllers.Secured
 import play.api.libs.json.Json
-import service.{ChecklistAgeService, ChecklistCauseService, ChecklistRegionService, ChecklistService, ChecklistTimeService}
 
 /**
   * This controller creates an `Action` to handle HTTP requests to the
@@ -20,7 +20,7 @@ class ChecklistController @Inject()(cc: ControllerComponents) extends AbstractCo
 
   def getJsonChurn() =  withAuth {username => implicit request: Request[AnyContent] =>
     try{
-        val rs = ChecklistService.getInternet(request)
+        val rs = CacheService.getChecklistResponse(request)
         // num contract have checklist
         var perct = if(rs.numContract._1.prev.toLong == 0) "NaN" else CommonService.percentDouble(rs.numContract._1.curr.toDouble, rs.numContract._1.prev.toDouble).toString
         val contractCL = Json.obj(
@@ -78,7 +78,7 @@ class ChecklistController @Inject()(cc: ControllerComponents) extends AbstractCo
 
   def index() =  withAuth {username => implicit request: Request[AnyContent] =>
     try {
-      val rs = ChecklistService.getInternet(null)
+      val rs = CacheService.getChecklistResponse(null)
       Ok(churn.views.html.checklist.index(rs, rs.month, username, rs.trendChecklist.map(x=> x._1).sorted, churn.controllers.routes.ChecklistController.index()))
     }
     catch {
@@ -92,7 +92,7 @@ class ChecklistController @Inject()(cc: ControllerComponents) extends AbstractCo
       tabName match {
         // tab Region trending
         case "tabRegion" => {
-          val rs = ChecklistRegionService.getInternet(username, request)
+          val rs = CacheService.getChecklistRegionResponse(request, username)
           // Number of Contracts That Have Checklist(s) by Region (%) 2-3 sai
           val heatmapCL = Json.obj(
             "cateX" -> rs.checklistRegion._1,
@@ -141,7 +141,7 @@ class ChecklistController @Inject()(cc: ControllerComponents) extends AbstractCo
           Ok(Json.toJson(json))
         }
         case "tabAge" => {
-          val rs = ChecklistAgeService.getInternet(username, request)
+          val rs = CacheService.getChecklistAgeResponse(request, username)
           // bubble charts Age & Location
           val minPercLocation = if(rs.trendAgeLocation._3.length > 0) CommonService.format2Decimal(rs.trendAgeLocation._3.map(x=>x._4).min) else 0
           val maxPercLocation = if(rs.trendAgeLocation._3.length > 0) CommonService.format2Decimal(rs.trendAgeLocation._3.map(x=>x._4).max) else 0
@@ -169,7 +169,7 @@ class ChecklistController @Inject()(cc: ControllerComponents) extends AbstractCo
           Ok(Json.toJson(json))
         }
         case "tabTime" => {
-          val rs = ChecklistTimeService.getInternet(username, request)
+          val rs = CacheService.getChecklistTimeResponse(request, username)
           // bubble charts Time & Location
           val minPercLocation = if(rs.trendTimeLocation._3.length > 0) CommonService.format2Decimal(rs.trendTimeLocation._3.map(x=>x._4).min) else 0
           val maxPercLocation = if(rs.trendTimeLocation._3.length > 0) CommonService.format2Decimal(rs.trendTimeLocation._3.map(x=>x._4).max) else 0
@@ -195,7 +195,7 @@ class ChecklistController @Inject()(cc: ControllerComponents) extends AbstractCo
           Ok(Json.toJson(json))
         }
         case "tabCause" => {
-          val rs = ChecklistCauseService.getInternet(username, request)
+          val rs = CacheService.getChecklistCauseResponse(request, username)
           // bubble charts Cause & Location
           val minPercLocCause = if(rs.trendCauseLocation._3.length > 0) CommonService.format2Decimal(rs.trendCauseLocation._3.map(x=>x._4).min) else 0
           val maxPercLocCause = if(rs.trendCauseLocation._3.length > 0) CommonService.format2Decimal(rs.trendCauseLocation._3.map(x=>x._4).max) else 0
