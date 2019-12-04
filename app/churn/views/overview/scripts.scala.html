@@ -226,7 +226,7 @@
             $('.monthPicker').datepicker({
                 autoclose: true,
                 minViewMode: 1,
-                endDate: '-1m',
+                endDate: '0m',
                 format: 'yyyy-mm'
             }).on('changeDate', function (selected) {
                 var startDate = new Date(selected.date.valueOf());
