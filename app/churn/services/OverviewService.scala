@@ -217,7 +217,7 @@ object OverviewService{
       month = request.body.asFormUrlEncoded.get("month").head
       status = request.body.asFormUrlEncoded.get("status").head
       queries = getFilterGroup(age, province, packages, combo)
-      println(queries)
+      //println(queries)
     }
     logger.info("t0: "+(System.currentTimeMillis() - t0))
     val t1 = System.currentTimeMillis()
@@ -234,6 +234,7 @@ object OverviewService{
 
     // calculate churn rate for Status HUYDV + CTBDV(1 vs 3)
     val ctMonthStatus = getContractChurnRate(month, "rate", queries)
+    logger.info("t222: "+(System.currentTimeMillis() - t2))
     val avgRateHuydv  = if(calChurnRatebyMonth(ctMonthStatus, 1).length > 0) CommonService.format3Decimal(calChurnRatebyMonth(ctMonthStatus, 1).map(x=> x._2).sum / calChurnRatebyMonth(ctMonthStatus, 1).length)
                         else 0
     val currRateHuydv = calChurnRatebyMonth(ctMonthStatus, 1).filter(x=> x._1 == month).toMap.get(month).getOrElse(0.0)
@@ -247,7 +248,6 @@ object OverviewService{
     val t3 = System.currentTimeMillis()
 
     val rsStatus = if(status == "" || status == "13") " AND (status:1 OR status:3)" else s" AND (status:$status)"
-
     // Chart trend Number Contract by month
     val numOfMonth    = getContractChurnRate(month, "month", queries+rsStatus).sorted
     logger.info("t3: "+(System.currentTimeMillis() - t3))
@@ -255,8 +255,6 @@ object OverviewService{
 
     // Churn Rate & Percent HUYDV and CTBDV
     val trendRatePert = calRateAndPercentByMonth(getContractChurnRate(month, "month", queries), getContractChurnRate(month, "month", CommonUtil.filterCommon("package_name")), status)
-    //val huyDvRatePert = calRateAndPercentByMonth(getContractChurnRate(month, "month", queries), getContractChurnRate(month, "month", CommonUtil.filterCommon("package_name")), 1)
-    //val ctbdvRatePert = calRateAndPercentByMonth(getContractChurnRate(month, "month", queries), getContractChurnRate(month, "month", CommonUtil.filterCommon("package_name")), 3)
     logger.info("t4: "+(System.currentTimeMillis() - t4))
     val t5 = System.currentTimeMillis()
 

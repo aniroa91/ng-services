@@ -1,8 +1,8 @@
 package churn.services
 
-import churn.models.{CLAgeResponse, CLCauseResponse, CLRegionResponse, CLTimeResponse, ChecklistResponse}
+import churn.models.{AgeResponse, CLAgeResponse, CLCauseResponse, CLRegionResponse, CLTimeResponse, ChecklistResponse, OverviewResponse, PackageResponse}
 import play.api.mvc.{AnyContent, Request}
-import service.{ChecklistAgeService, ChecklistCauseService, ChecklistRegionService, ChecklistService, ChecklistTimeService}
+import service.{ChecklistAgeService, ChecklistCauseService, ChecklistRegionService, ChecklistService, ChecklistTimeService, OverviewAgeService, OverviewPackageService, OverviewService}
 import services.domain.CommonService
 
 object CacheService {
@@ -11,6 +11,10 @@ object CacheService {
   var checklistAgeCache:(String, CLAgeResponse) = "" -> null
   var checklistTimeCache:(String, CLTimeResponse) = "" -> null
   var checklistCauseCache:(String, CLCauseResponse) = "" -> null
+
+  var overviewCache:(String, OverviewResponse) = "" -> null
+  var overviewAgeCache:(String, AgeResponse) = "" -> null
+  var overviewPackageCache:(String, PackageResponse) = "" -> null
 
   /* PAGE CHECKLIST */
   private def getFilterChecklist(request: Request[AnyContent]) = {
@@ -86,4 +90,48 @@ object CacheService {
   }
 
   /* PAGE OVERVIEW */
+  private def getFilterOverview(request: Request[AnyContent]) = {
+    if(request == null) CommonService.getCurrentDay()
+    else {
+      val currDate = CommonService.getCurrentDay()
+      val age = request.body.asFormUrlEncoded.get("age").head
+      val province = request.body.asFormUrlEncoded.get("province").head
+      val packages = request.body.asFormUrlEncoded.get("package").head
+      val combo = request.body.asFormUrlEncoded.get("combo").head
+      val month = request.body.asFormUrlEncoded.get("month").head
+      val status = request.body.asFormUrlEncoded.get("status").head
+      val queries = s"($currDate) AND ($status) AND ($month) AND ($age) AND ($packages) AND ($province) AND ($combo)"
+      queries
+    }
+  }
+  // TAB OVERVIEW
+  def getOverviewResponse(request: Request[AnyContent], username: String) = {
+    if(getFilterOverview(request) == overviewCache._1)
+      overviewCache._2
+    else {
+      val response = OverviewService.getInternet(username, request)
+      overviewCache = getFilterOverview(request)-> response
+      response
+    }
+  }
+  // TAB AGE
+  def getOverviewAgeResponse(request: Request[AnyContent], username: String) = {
+    if(getFilterOverview(request) == overviewAgeCache._1)
+      overviewAgeCache._2
+    else {
+      val response = OverviewAgeService.getInternet(username, request)
+      overviewAgeCache = getFilterOverview(request)-> response
+      response
+    }
+  }
+  // TAB PACKAGES
+  def getOverviewPackageResponse(request: Request[AnyContent], username: String) = {
+    if(getFilterOverview(request) == overviewPackageCache._1)
+      overviewPackageCache._2
+    else {
+      val response = OverviewPackageService.getInternet(username, request)
+      overviewPackageCache = getFilterOverview(request)-> response
+      response
+    }
+  }
 }

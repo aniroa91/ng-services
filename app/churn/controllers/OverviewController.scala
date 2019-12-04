@@ -1,5 +1,6 @@
 package churn.controllers
 
+import churn.services.CacheService
 import javax.inject.Inject
 import javax.inject.Singleton
 import play.api.mvc._
@@ -19,7 +20,7 @@ import service.{OverviewAgeService, OverviewPackageService, OverviewService}
 class OverviewController @Inject() (cc: ControllerComponents) extends AbstractController(cc) with Secured{
   def index() = withAuth { username => implicit request: Request[AnyContent] =>
     try {
-      val rs = OverviewService.getInternet(username, null)
+      val rs = CacheService.getOverviewResponse(null, username)
       Ok(churn.views.html.overview.index(rs, rs.month, username, rs.trendRegionMonth._2.map(x=> x._1).toArray.sorted, churn.controllers.routes.OverviewController.index()))
     }
     catch {
@@ -29,7 +30,7 @@ class OverviewController @Inject() (cc: ControllerComponents) extends AbstractCo
 
   def getJsonOverview() = withAuth {username => implicit request: Request[AnyContent] =>
     try{
-      val rs = OverviewService.getInternet(username, request)
+      val rs = CacheService.getOverviewResponse(request, username)
       // num contract
       var perct = if(rs.numContract._1.prev.toLong == 0) "NaN" else CommonService.percent(rs.numContract._1.curr.toLong, rs.numContract._1.prev.toLong).toString
       val activeCt = Json.obj(
@@ -138,7 +139,7 @@ class OverviewController @Inject() (cc: ControllerComponents) extends AbstractCo
       tabName match {
         // tab Age trending
         case "tabAge" => {
-          val rs = OverviewAgeService.getInternet(username, request)
+          val rs = CacheService.getOverviewAgeResponse(request, username)
           // bubble charts Age & Month
           val minPercAge = if(rs.trendAgeMonth._3.length > 0) CommonService.format2Decimal(rs.trendAgeMonth._3.map(x=>x._4).min) else 0
           val maxPercAge = if(rs.trendAgeMonth._3.length > 0) CommonService.format2Decimal(rs.trendAgeMonth._3.map(x=>x._4).max) else 0
@@ -178,7 +179,7 @@ class OverviewController @Inject() (cc: ControllerComponents) extends AbstractCo
           Ok(Json.toJson(json))
         }
         case "tabPackage" => {
-          val rs = OverviewPackageService.getInternet(username, request)
+          val rs = CacheService.getOverviewPackageResponse(request, username)
           // bubble charts Package & Month
           val minPercPkg = if(rs.trendPkgMonth._3.length > 0) CommonService.format2Decimal(rs.trendPkgMonth._3.map(x=>x._4).min) else 0
           val maxPercPkg = if(rs.trendPkgMonth._3.length > 0) CommonService.format2Decimal(rs.trendPkgMonth._3.map(x=>x._4).max) else 0
