@@ -24,7 +24,7 @@ class OverviewController @Inject() (cc: ControllerComponents) extends AbstractCo
       Ok(churn.views.html.overview.index(rs, rs.month, username, rs.trendRegionMonth._2.map(x=> x._1).toArray.sorted, churn.controllers.routes.OverviewController.index()))
     }
     catch {
-      case e: Exception => Ok(churn.views.html.overview.index(null, CommonService.getPrevMonth(), username, null, churn.controllers.routes.OverviewController.index()))
+      case e: Exception => Ok(churn.views.html.overview.index(null, CommonService.getCurrentMonth(), username, null, churn.controllers.routes.OverviewController.index()))
     }
   }
 

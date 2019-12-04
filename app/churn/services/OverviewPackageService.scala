@@ -1,8 +1,8 @@
 package service
 
 import churn.models.PackageResponse
-import com.sksamuel.elastic4s.http.ElasticDsl.{RichFuture, RichString, SearchHttpExecutable, SearchShow, percentilesAggregation, query, rangeAggregation, search, termsAgg, termsAggregation, _}
-import churn.utils.{AgeGroupUtil, CommonUtil, ProvinceUtil}
+import com.sksamuel.elastic4s.http.ElasticDsl.{RichFuture, RichString, SearchHttpExecutable, search, termsAggregation, _}
+import churn.utils.CommonUtil
 import play.api.Logger
 import play.api.mvc.{AnyContent, Request}
 import service.OverviewService.{checkLocation, getCommentChart}
@@ -52,7 +52,7 @@ object OverviewPackageService{
 
     // Trend Package and location
     val arrPkgLoc = getTrendPkgMonth(month, queries, province, "")
-    val trendRegionPkg = calChurnRateAndPercentForAgeMonth(arrPkgLoc, status, province).filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
+    val trendRegionPkg = calChurnRateAndPercentForAgeMonth(arrPkgLoc, status, province).sorted
     /* get top location */
     val topLocationByPert = if(checkLocation(province) == "olt_name") getTopOltByAge(trendRegionPkg.map(x=> (x._1, x._2, x._4))) else trendRegionPkg.map(x=> x._2).distinct
     val sizeTopLocation = topLocationByPert.length +1
@@ -68,13 +68,13 @@ object OverviewPackageService{
 
     // Trend Package and month
     val arrMonth = getTrendPkgMonth(month, queries, "No", "month")
-    val trendPkgMonth = calChurnRateAndPercentForAgeMonth(arrMonth, status, "No").filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
+    val trendPkgMonth = calChurnRateAndPercentForAgeMonth(arrMonth, status, "No").sorted
     /* get top Package */
     val topPkgByPert = getTopAgeByMonth(arrMonth, status, month, "percent", 10)
     val sizeTopPkg = topPkgByPert.length +1
     val mapPkgMonth = (1 until sizeTopPkg).map(x=> topPkgByPert(sizeTopPkg-x-1) -> x).toMap
     /* get top month */
-    val topLast12month = trendPkgMonth.map(x=> x._2).distinct.sortWith((x, y) => x > y).filter(x=> x != CommonService.getCurrentMonth()).slice(0,15).sorted
+    val topLast12month = trendPkgMonth.map(x=> x._2).distinct.sortWith((x, y) => x > y).slice(0,15).sorted
     val topMonthPkg = if(topLast12month.length >= 15) 16 else topLast12month.length+1
     val mapMonth   = (1 until topMonthPkg).map(x=> topLast12month(x-1) -> x).toMap
     val rsPkgMonth = trendPkgMonth.filter(x=> topLast12month.indexOf(x._2) >=0).filter(x=> topPkgByPert.indexOf(x._1) >=0)
@@ -95,7 +95,7 @@ object OverviewPackageService{
 
     // Trend Package and Age
     val arrPkgAge = getTrendPkgMonth(month, queries, "No", "lifeGroup")
-    val trendPkgAge = calChurnRateAndPercentForAgeMonth(arrPkgAge, status, "No").filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
+    val trendPkgAge = calChurnRateAndPercentForAgeMonth(arrPkgAge, status, "No").sorted
     /* get top age */
     val topAgeByPert = trendPkgAge.map(x=> x._2).distinct
     val sizeTopAge = topAgeByPert.length +1

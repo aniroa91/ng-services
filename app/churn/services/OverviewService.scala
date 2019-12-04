@@ -200,7 +200,7 @@ object OverviewService{
     var combo = "*"
     var packages = "*"
     var status = ""
-    var month = CommonService.getPrevMonth()
+    var month = CommonService.getCurrentMonth()
     var queries = CommonUtil.filterCommon("package_name")
     if(!checkExistsIndex(s"churn-contract-info-$month")) month = CommonService.getPrevMonth(2)
 
@@ -234,7 +234,6 @@ object OverviewService{
 
     // calculate churn rate for Status HUYDV + CTBDV(1 vs 3)
     val ctMonthStatus = getContractChurnRate(month, "rate", queries)
-    logger.info("t222: "+(System.currentTimeMillis() - t2))
     val avgRateHuydv  = if(calChurnRatebyMonth(ctMonthStatus, 1).length > 0) CommonService.format3Decimal(calChurnRatebyMonth(ctMonthStatus, 1).map(x=> x._2).sum / calChurnRatebyMonth(ctMonthStatus, 1).length)
                         else 0
     val currRateHuydv = calChurnRatebyMonth(ctMonthStatus, 1).filter(x=> x._1 == month).toMap.get(month).getOrElse(0.0)
@@ -260,13 +259,13 @@ object OverviewService{
 
     // Trend region and month
     val arrMonth = getTrendRegionMonth(month, queries, province)
-    val trendRegionMonth = calChurnRateAndPercentageForRegionMonth(arrMonth, status, province).filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
+    val trendRegionMonth = calChurnRateAndPercentageForRegionMonth(arrMonth, status, province).sorted
     /* get top location */
     val topLocationByPert = getTop10OltByMonth(arrMonth, status, month, province, "percent")
     val sizeTopLocation = topLocationByPert.length +1
     val mapRegionMonth = (1 until sizeTopLocation).map(x=> topLocationByPert(sizeTopLocation-x-1) -> x).toMap
     /* get top month */
-    val topLast12month = trendRegionMonth.map(x=> x._2).distinct.sortWith((x, y) => x > y).filter(x=> x != CommonService.getCurrentMonth()).slice(0,15).sorted
+    val topLast12month = trendRegionMonth.map(x=> x._2).distinct.sortWith((x, y) => x > y).slice(0,15).sorted
     val topMonthRegion = if(topLast12month.length >= 15) 16 else topLast12month.length+1
     val mapMonth   = (1 until topMonthRegion).map(x=> topLast12month(x-1) -> x).toMap
     val rsRegionMonth = trendRegionMonth.filter(x=> topLast12month.indexOf(x._2) >=0).filter(x=> topLocationByPert.indexOf(x._1) >=0)

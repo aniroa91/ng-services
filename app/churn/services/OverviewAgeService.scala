@@ -1,7 +1,7 @@
 package service
 
 import churn.models.AgeResponse
-import com.sksamuel.elastic4s.http.ElasticDsl.{RichFuture, RichString, SearchHttpExecutable, SearchShow, percentilesAggregation, query, rangeAggregation, search, termsAgg, termsAggregation, _}
+import com.sksamuel.elastic4s.http.ElasticDsl.{RichFuture, RichString, SearchHttpExecutable, rangeAggregation, search, termsAggregation, _}
 import churn.utils.{AgeGroupUtil, CommonUtil, ProvinceUtil}
 import play.api.Logger
 import play.api.mvc.{AnyContent, Request}
@@ -98,7 +98,7 @@ object OverviewAgeService{
     val t1 = System.currentTimeMillis()
     // Trend Age and location
     val arrAgeLoc = getTrendAgeMonth(month, queries, province)
-    val trendRegionAge = calChurnRateAndPercentForAgeMonth(arrAgeLoc, status, province).filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
+    val trendRegionAge = calChurnRateAndPercentForAgeMonth(arrAgeLoc, status, province).sorted
     /* get top location */
     val topLocationByPert = if(checkLocation(province) == "olt_name") getTopOltByAge(trendRegionAge.map(x=> (x._1, x._2, x._4))) else trendRegionAge.map(x=> x._2).distinct
     val sizeTopLocation = topLocationByPert.length +1
@@ -115,13 +115,13 @@ object OverviewAgeService{
 
     // Trend Age and month
     val arrMonth = getTrendAgeMonth(month, queries, "No")
-    val trendAgeMonth = calChurnRateAndPercentForAgeMonth(arrMonth, status, "No").filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
+    val trendAgeMonth = calChurnRateAndPercentForAgeMonth(arrMonth, status, "No").sorted
     /* get top Age */
     val topAgeByPert = getTopAgeByMonth(arrMonth, status, month, "percent", arrMonth.map(x=> x._3).distinct.length)
     val sizeTopAge = topAgeByPert.length +1
     val mapAgeMonth = (1 until sizeTopAge).map(x=> topAgeByPert(sizeTopAge-x-1) -> x).toMap
     /* get top month */
-    val topLast12month = trendAgeMonth.map(x=> x._2).distinct.sortWith((x, y) => x > y).filter(x=> x != CommonService.getCurrentMonth()).slice(0,15).sorted
+    val topLast12month = trendAgeMonth.map(x=> x._2).distinct.sortWith((x, y) => x > y).slice(0,15).sorted
     val topMonthAge = if(topLast12month.length >= 15) 16 else topLast12month.length+1
     val mapMonth   = (1 until topMonthAge).map(x=> topLast12month(x-1) -> x).toMap
     val rsAgeMonth = trendAgeMonth.filter(x=> topLast12month.indexOf(x._2) >=0).filter(x=> topAgeByPert.indexOf(x._1) >=0)
