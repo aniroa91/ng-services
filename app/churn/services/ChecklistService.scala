@@ -84,6 +84,49 @@ object  ChecklistService{
     CommonService.getAggregationsSiglog(rs.aggregations.get("month")).filter(x=> x._1 != CommonService.getCurrentMonth()).sortWith((x, y) => x._1 > y._1)
   }
 
+  def getUniqueContract(queryStr: String, queryNested: String, year: String) ={
+    val queries = queryStr + " AND " + CommonUtil.filterCommon("tenGoi")
+    val query = s"""
+        {
+            "query": {
+                "bool": {
+                    "filter": [
+                         {
+                           "query_string" : {
+                              "query": "${queries.replace("\"", "\\\"")}"
+                           }
+                         },
+                         {
+                           "nested": {
+                                 "path": "checklist",
+                                 "query": {
+                                     "query_string": {
+                                           "query": "${queryNested.replace("\"", "\\\"")}"
+                                     }
+                                 }
+                           }
+                         }
+                    ]
+                }
+            },
+            "aggs": {
+              "count": {
+                  "cardinality": {
+                       "field": "contract"
+                  }
+              }
+            },
+            "size": 0
+        }
+        """
+    val body = Http(s"http://172.27.11.151:9200/churn-checklist-$year-*/docs/_search")
+      .postData(query)
+      .header("content-type", "application/JSON")
+      .asString.body
+    val json = Json.parse(body)
+    json.\("aggregations").\("count").\("value").get.toString().toInt
+  }
+
   def getChurnCtHaveChecklistsByStatus(month: String, region: String, age: String, _type: String, time: String, topTypes: String, stt: String) ={
     val arrMonth = CommonService.getRangeDateByLimit(month, 1, "month")
     val queries = arrMonth+ s" AND $stt "+"region:"+region+" AND lifeGroup:"+age+" AND "+CommonUtil.filterCommon("tenGoi")
@@ -476,13 +519,13 @@ object  ChecklistService{
     val contractAll   = getNumberOfContractAll(queries)
     val ctCheckList   = getNumberOfContractChecklist(queries, queryNested).filter(x=> contractAll.map(y=> y._1).indexOf(x._1) >=0)
       .map(x=> (x._1, x._2, CommonService.format2Decimal(x._2 * 100.00 / contractAll.toMap.get(x._1).get), x._3)).sorted
-    // Box Count Contract have Checklist
-    val currCtCl = ctCheckList.filter(x=> x._1.matches(month.substring(0, month.indexOf("-")) +"-.*")).map(x=> x._2).sum.toInt
-    val mapPrevCtcl = getNumberOfContractChecklist(getFilterGroup(timeCL, age, region, packages, CommonService.getPrevYYYYMM(month), 0), queryNested)
-    val prevCtCl = mapPrevCtcl.map(x=> x._2).sum.toInt
     // Box Count Checklist
-    val currCl = ctCheckList.filter(x=> x._1.matches(month.substring(0, month.indexOf("-")) +"-.*")).map(x=> x._4).sum.toInt
-    val prevCl = mapPrevCtcl.map(x=> x._3).sum.toInt
+    val currCl = ctCheckList.filter(x=> x._1.matches(month.substring(0, month.indexOf("-")) +"-.*")).map(x=> x._2).sum.toInt
+    val mapPrevCl = getNumberOfContractChecklist(getFilterGroup(timeCL, age, region, packages, CommonService.getPrevYYYYMM(month), 0), queryNested)
+    val prevCl = mapPrevCl.map(x=> x._2).sum.toInt
+    // Box Count Contract have Checklist
+    val currCtCl = getUniqueContract(queries, queryNested, CommonService.getCurrentYear())
+    val prevCtCl = getUniqueContract(getFilterGroup(timeCL, age, region, packages, CommonService.getPrevYYYYMM(month), 0), queryNested, CommonService.getPrevYYYY(month))
 
     logger.info("t0: "+(System.currentTimeMillis() -t0))
     val t1 = System.currentTimeMillis()
