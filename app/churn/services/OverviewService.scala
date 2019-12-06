@@ -123,6 +123,7 @@ object OverviewService{
     else array.filter(x => x._2.toInt == 1 || x._2.toInt == 3).groupBy(x => x._1).map(x => x._1 -> x._2.map(y => y._3).sum).toArray
     rs.map(x => x._1 -> CommonService.format3Decimal(x._2 * 100.0 / allStatus.get(x._1).get))
   }
+  /// tesst
 
   def calChurnRateAndPercentageForRegionMonth(array: Array[(String, String, String, Int, Int)], status: String, province: String) = {
     val rsArr = if(status == "" || status == "13") array.filter(x=> x._2.toInt == 1 || x._2.toInt == 3).groupBy(x=> x._1 -> x._3).map(x=> (x._1._1, 111, x._1._2, x._2.map(y=> y._4).sum, x._2.map(y=> y._5).sum)).toArray.sorted

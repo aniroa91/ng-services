@@ -11,11 +11,10 @@ pipeline {
         EXPOSE_PORT = 9013
         CONTAINER_PORT = 9000
     }
-
-    
     stages {
         stage('Build') {
             steps {
+                sh 'printenv'
                 echo "Compiling..."
                 // sh 'printenv'
                 sh "${tool name: 'sbt', type: 'org.jvnet.hudson.plugins.SbtPluginBuilder$SbtInstallation'}/bin/sbt dist"
@@ -42,6 +41,7 @@ pipeline {
                     }
                 }
             }
+
         }
     }
 }
