@@ -17,7 +17,6 @@ import com.sksamuel.elastic4s.ElasticsearchClientUri
 import services.Configure
 import play.api.libs.json.Json
 import com.sksamuel.elastic4s.http.ElasticDsl._
-import com.ftel.bigdata.utils.StringUtil
 import service.ChurnCallogService
 
 /**

@@ -1,7 +1,5 @@
 package churn.utils
 
-import com.ftel.bigdata.utils.FileUtil
-
 object ProvinceUtil {
 
   private val MAP = FileUtil.readResource("/resources/province.csv")

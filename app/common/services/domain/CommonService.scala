@@ -1,48 +1,23 @@
 package services.domain
 
 import java.text.DecimalFormat
-import java.time.format.DateTimeFormatter
-
-import churn.utils.CommonUtil
-import com.ftel.bigdata.utils.DateTimeUtil
 import org.elasticsearch.action.support.WriteRequest.RefreshPolicy
 import org.elasticsearch.search.sort.SortOrder
-import org.joda.time.{DateTime, Days, Months}
+import org.joda.time.Days
 import play.api.mvc.{AnyContent, Request}
-import service.OverviewService.client
-
-import scala.collection.mutable
 import scala.util.control.Breaks.{break, breakable}
-
-//import com.ftel.bigdata.dns.parameters.Label
-import com.ftel.bigdata.utils.DateTimeUtil
-import com.ftel.bigdata.utils.WhoisUtil
-import com.ftel.bigdata.whois.Whois
-import com.sksamuel.elastic4s.http.ElasticDsl.IndexHttpExecutable
 import com.sksamuel.elastic4s.http.ElasticDsl._
-import com.sksamuel.elastic4s.http.search.SearchResponse
 
 import scala.util.Try
 import services.Configure
-import services.Bucket2
-import com.ftel.bigdata.utils.FileUtil
-import com.ftel.bigdata.utils.HttpUtil
-import org.elasticsearch.search.aggregations.bucket.terms.Terms
-import org.apache.http.HttpHost
-import scalaj.http.Http
-import play.api.libs.json.Json
 import scala.concurrent.duration.Duration
 import scala.concurrent.duration._
 import scala.collection.mutable.ArrayBuffer
-
-import java.util.concurrent.TimeUnit
-import org.jsoup.Jsoup
-import org.jsoup.select.Elements
-import play.api.libs.json.JsObject
-import com.ftel.bigdata.utils.StringUtil
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.DateTime
-import java.time.format.DateTimeFormatter
+import churn.utils.DateTimeUtil
+import churn.utils.FileUtil
+import churn.utils.HttpUtil
 
 object CommonService extends AbstractService {
 

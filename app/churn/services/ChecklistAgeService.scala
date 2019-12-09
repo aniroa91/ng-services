@@ -15,6 +15,10 @@ import play.api.libs.json.Json
 import service.ChecklistService.{getFilterGroup, getQueryNested, getTopCause}
 import service.OverviewAgeService.{calChurnRateAndPercentForAgeMonth, getTopOltByAge}
 import service.OverviewService.{checkLocation, getCommentChart}
+import scala.concurrent.{Await, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.async.Async.{async, await}
+import scala.concurrent.duration.Duration
 
 object ChecklistAgeService{
 
@@ -231,7 +235,25 @@ object ChecklistAgeService{
     array.flatMap(x=> x._2.map(y=> x._1 -> y)).map(x=> (x._1, x._2._1, x._2._2))
   }
 
-  def getInternet(user: String, request: Request[AnyContent]) = {
+  def getTrendAgeLoc(month:String, queries:String, queryNested:String ,region:String, status: String) = {
+    val arrAgeLoc = getChecklistRegionAge(month, queries, queryNested ,region)
+    val trendRegionAge = calChurnRateAndPercentForAgeMonth(arrAgeLoc, status, region).filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
+    /* get top location */
+    val topLocationByPert = if(checkLocation(region) == "olt_name") getTopOltByAge(trendRegionAge.map(x=> (x._1, x._2, x._4))) else trendRegionAge.map(x=> x._2).distinct
+    val sizeTopLocation = topLocationByPert.length +1
+    val mapLocation = (1 until sizeTopLocation).map(x=> topLocationByPert(x-1) -> x).toMap
+    /* get top Age Location */
+    val topAgeLocByPert = trendRegionAge.map(x=> x._1).distinct
+    val sizeTopAgeLoc = topAgeLocByPert.length +1
+    val mapAge = (1 until sizeTopAgeLoc).map(x=> topAgeLocByPert(x-1) -> x).toMap
+    val rsLocationAge = trendRegionAge.filter(x=> topAgeLocByPert.indexOf(x._1) >=0).filter(x=> topLocationByPert.indexOf(x._2) >=0)
+      .map(x=> (mapLocation.get(x._2).get, mapAge.get(x._1).get, x._3, x._4, x._5))
+    Future{
+      (mapLocation, mapAge, rsLocationAge)
+    }
+  }
+
+  def getInternet(user: String, request: Request[AnyContent]) = async{
     logger.info("========START CHECKLIST AGE TAB SERVICE=========")
     val t0 = System.currentTimeMillis()
     val groupCL = request.body.asFormUrlEncoded.get("groupCL").head
@@ -244,7 +266,7 @@ object ChecklistAgeService{
     val month = request.body.asFormUrlEncoded.get("month").head
     val packages = request.body.asFormUrlEncoded.get("package").head
     val queries = getFilterGroup(timeCL, age, region, packages, month, 1)
-    println(queries)
+    //println(queries)
     var processTime = request.body.asFormUrlEncoded.get("processTime").head
     // get top 5 Nguyen nhan
     val topCause = getTopCause(CommonService.getPrevMonth(), "Nguyennhan").map(x=> x._1)
@@ -282,32 +304,29 @@ object ChecklistAgeService{
       }
     }
     val queryNested = getQueryNested(cause, position, processTime)
+
     val t1 = System.currentTimeMillis()
     // Number of Contracts Who Have Checklist(s) by Region by Contract Age (%)
-    val numOfChecklist      = getChurnByRegionAgeChecklist(month, queries, queryNested, region)
-    val checklistRegionAge  = ChecklistRegionService.calChurnCLRateAndPercentagebyRegion(numOfChecklist, getChurnByRegionAgeAll(month, queries, region), region)
+    val checklistRegionAge  = Await.result(Future{ ChecklistRegionService.calChurnCLRateAndPercentagebyRegion(getChurnByRegionAgeChecklist(month, queries, queryNested, region),
+        getChurnByRegionAgeAll(month, queries, region), region) }, Duration.Inf)
     logger.info("t1: "+(System.currentTimeMillis() -t1))
+
     val t2 = System.currentTimeMillis()
     // Trend Age and location
-    val arrAgeLoc = getChecklistRegionAge(month, queries, queryNested ,region)
-    val trendRegionAge = calChurnRateAndPercentForAgeMonth(arrAgeLoc, status, region).filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
-    /* get top location */
-    val topLocationByPert = if(checkLocation(region) == "olt_name") getTopOltByAge(trendRegionAge.map(x=> (x._1, x._2, x._4))) else trendRegionAge.map(x=> x._2).distinct
-    val sizeTopLocation = topLocationByPert.length +1
-    val mapLocation = (1 until sizeTopLocation).map(x=> topLocationByPert(x-1) -> x).toMap
-    /* get top Age Location */
-    val topAgeLocByPert = trendRegionAge.map(x=> x._1).distinct
-    val sizeTopAgeLoc = topAgeLocByPert.length +1
-    val mapAge = (1 until sizeTopAgeLoc).map(x=> topAgeLocByPert(x-1) -> x).toMap
-    val rsLocationAge = trendRegionAge.filter(x=> topAgeLocByPert.indexOf(x._1) >=0).filter(x=> topLocationByPert.indexOf(x._2) >=0)
-      .map(x=> (mapLocation.get(x._2).get, mapAge.get(x._1).get, x._3, x._4, x._5))
+    val trendAgeLoc = Await.result(getTrendAgeLoc(month, queries, queryNested, region, status), Duration.Inf)
     logger.info("t2: "+(System.currentTimeMillis() - t2))
+
     val t3 = System.currentTimeMillis()
     // comments content
-    val cmtChart = getCommentChart(user, CommonUtil.PAGE_ID.get(1).get+"_tabAge")
+    val cmtChart = Await.result(Future{ getCommentChart(user, CommonUtil.PAGE_ID.get(1).get+"_tabAge") }, Duration.Inf)
     logger.info("t3: "+(System.currentTimeMillis() - t3))
+
     logger.info("Time: "+(System.currentTimeMillis() -t0))
     logger.info("========END CHECKLIST AGE TAB SERVICE=========")
-    CLAgeResponse(checklistRegionAge, (mapLocation, mapAge, rsLocationAge), cmtChart, month)
+    await(
+      Future{
+        CLAgeResponse(checklistRegionAge, trendAgeLoc, cmtChart, month)
+      }
+    )
   }
 }

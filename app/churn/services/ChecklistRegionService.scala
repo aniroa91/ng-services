@@ -16,6 +16,10 @@ import play.api.libs.json.Json
 import service.ChecklistService.{getFilterGroup, getQueryNested, getTopCause}
 import service.OverviewAgeService.getTopAgeByMonth
 import service.OverviewService.{checkLocation, getCommentChart}
+import scala.concurrent.{Await, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.async.Async.{async, await}
+import scala.concurrent.duration.Duration
 
 object  ChecklistRegionService{
 
@@ -221,7 +225,48 @@ object  ChecklistRegionService{
     res
   }
 
-  def getInternet(user: String, request: Request[AnyContent]) = {
+  def getTrendTbtMonth(month:String, queries:String, queryNested:String, status:String) = {
+    val arrMonthTBT = getChecklistRegionMonth(queries, queryNested, "tobaotri")
+    val trendMonthTBT = calChurnRateAndPercentageForTBTMonth(arrMonthTBT, status).filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
+    /* get top To bao tri */
+    val topTBTByPert = getTopAgeByMonth(arrMonthTBT, status, month, "percent", 10)
+    val sizeTopTBT = topTBTByPert.length +1
+    val mapTBT = (1 until sizeTopTBT).map(x=> topTBTByPert(sizeTopTBT-x-1) -> x).toMap
+    /* get top month */
+    val topLast12monthTBT = trendMonthTBT.map(x=> x._2).distinct.sortWith((x, y) => x > y).filter(x=> x != CommonService.getCurrentMonth()).slice(0,15).sorted
+    val topMonthTBT = if(topLast12monthTBT.length >= 15) 16 else topLast12monthTBT.length+1
+    val mapMonthTBT   = (1 until topMonthTBT).map(x=> topLast12monthTBT(x-1) -> x).toMap
+    val rsTBTMonth = trendMonthTBT.filter(x=> topLast12monthTBT.indexOf(x._2) >=0).filter(x=> topTBTByPert.indexOf(x._1) >=0)
+      .map(x=> (mapTBT.get(x._1).get, mapMonthTBT.get(x._2).get, x._3, x._4, x._5))
+
+    // sparkline table
+    val topTBTByF1 = getTopAgeByMonth(arrMonthTBT, status, month, "f1", 10)
+    val tbTBT = trendMonthTBT.filter(x=> topLast12monthTBT.indexOf(x._2) >=0).filter(x=> topTBTByF1.indexOf(x._1) >=0).map(x=> (x._1, x._2, x._3,
+      CommonService.format2Decimal(2*x._3*x._4/(x._3+x._4)), x._5))
+    Future{
+      (mapTBT, mapMonthTBT,rsTBTMonth, topTBTByF1, tbTBT)
+    }
+  }
+
+  def getTrendRegionMonth(month: String, queries: String, queryNested: String, region: String, status: String) = {
+    val arrMonth = getChecklistRegionMonth(queries, queryNested, region)
+    val trendRegionMonth = OverviewService.calChurnRateAndPercentageForRegionMonth(arrMonth, status, region).filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
+    /* get top location */
+    val topLocationByPert = OverviewService.getTop10OltByMonth(arrMonth, status, month, region, "percent")
+    val sizeTopLocation = topLocationByPert.length +1
+    val mapRegionMonth = (1 until sizeTopLocation).map(x=> topLocationByPert(sizeTopLocation-x-1) -> x).toMap
+    /* get top month */
+    val topLast12month = trendRegionMonth.map(x=> x._2).distinct.sortWith((x, y) => x > y).filter(x=> x != CommonService.getCurrentMonth()).slice(0,15).sorted
+    val topMonthRegion = if(topLast12month.length >= 15) 16 else topLast12month.length+1
+    val mapMonth   = (1 until topMonthRegion).map(x=> topLast12month(x-1) -> x).toMap
+    val rsRegionMonth = trendRegionMonth.filter(x=> topLast12month.indexOf(x._2) >=0).filter(x=> topLocationByPert.indexOf(x._1) >=0)
+      .map(x=> (mapRegionMonth.get(x._1).get, mapMonth.get(x._2).get, x._3, x._4, x._5))
+    Future{
+      (mapRegionMonth, mapMonth,rsRegionMonth)
+    }
+  }
+
+  def getInternet(user: String, request: Request[AnyContent]) = async{
     logger.info("========START CHECKLIST REGION TAB SERVICE=========")
     val t0 = System.currentTimeMillis()
     val groupCL = request.body.asFormUrlEncoded.get("groupCL").head
@@ -234,7 +279,7 @@ object  ChecklistRegionService{
     val month = request.body.asFormUrlEncoded.get("month").head
     val packages = request.body.asFormUrlEncoded.get("package").head
     val queries = getFilterGroup(timeCL, age, region, packages, month, 1)
-    println(queries)
+    //println(queries)
     var processTime = request.body.asFormUrlEncoded.get("processTime").head
     // get top 5 Nguyen nhan
     val topCause = getTopCause(CommonService.getPrevMonth(), "Nguyennhan").map(x=> x._1)
@@ -272,53 +317,33 @@ object  ChecklistRegionService{
       }
     }
     val queryNested = getQueryNested(cause, position, processTime)
+
     // Number of Contracts That Have Checklist(s) by Region (%)
-    val ctAllRegion     = getChurnChecklistbyRegionAll(queries, region)
-    val checklistRegion = calChurnCLRateAndPercentagebyRegion(getChurnCallInbyRegionChecklist(queries, queryNested, region), ctAllRegion, region)
+    val checklistRegion = Await.result(Future{ calChurnCLRateAndPercentagebyRegion(getChurnCallInbyRegionChecklist(queries, queryNested, region),
+        getChurnChecklistbyRegionAll(queries, region), region) }, Duration.Inf)
     logger.info("t0: "+(System.currentTimeMillis() -t0))
     val t1 = System.currentTimeMillis()
+
     // Trend region and month
-    val arrMonth = getChecklistRegionMonth(queries, queryNested, region)
-    val trendRegionMonth = OverviewService.calChurnRateAndPercentageForRegionMonth(arrMonth, status, region).filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
-    /* get top location */
-    val topLocationByPert = OverviewService.getTop10OltByMonth(arrMonth, status, month, region, "percent")
-    val sizeTopLocation = topLocationByPert.length +1
-    val mapRegionMonth = (1 until sizeTopLocation).map(x=> topLocationByPert(sizeTopLocation-x-1) -> x).toMap
-    /* get top month */
-    val topLast12month = trendRegionMonth.map(x=> x._2).distinct.sortWith((x, y) => x > y).filter(x=> x != CommonService.getCurrentMonth()).slice(0,15).sorted
-    val topMonthRegion = if(topLast12month.length >= 15) 16 else topLast12month.length+1
-    val mapMonth   = (1 until topMonthRegion).map(x=> topLast12month(x-1) -> x).toMap
-    val rsRegionMonth = trendRegionMonth.filter(x=> topLast12month.indexOf(x._2) >=0).filter(x=> topLocationByPert.indexOf(x._1) >=0)
-      .map(x=> (mapRegionMonth.get(x._1).get, mapMonth.get(x._2).get, x._3, x._4, x._5))
+    val trendRegionMonth = Await.result(getTrendRegionMonth(month, queries, queryNested, region, status), Duration.Inf)
     logger.info("t1: "+(System.currentTimeMillis() - t1))
+
     val t2 = System.currentTimeMillis()
     // comments content
-    val cmtChart = getCommentChart(user, CommonUtil.PAGE_ID.get(1).get+"_tabRegion")
+    val cmtChart = Await.result(Future{ getCommentChart(user, CommonUtil.PAGE_ID.get(1).get+"_tabRegion") }, Duration.Inf)
     logger.info("t2: "+(System.currentTimeMillis() - t2))
+
     val t3 = System.currentTimeMillis()
     // Trend To bao tri and month
-    val arrMonthTBT = getChecklistRegionMonth(queries, queryNested, "tobaotri")
-    val trendMonthTBT = calChurnRateAndPercentageForTBTMonth(arrMonthTBT, status).filter(x=> x._2 != CommonService.getCurrentMonth()).sorted
-    /* get top To bao tri */
-    val topTBTByPert = getTopAgeByMonth(arrMonthTBT, status, month, "percent", 10)
-    val sizeTopTBT = topTBTByPert.length +1
-    val mapTBT = (1 until sizeTopTBT).map(x=> topTBTByPert(sizeTopTBT-x-1) -> x).toMap
-    /* get top month */
-    val topLast12monthTBT = trendMonthTBT.map(x=> x._2).distinct.sortWith((x, y) => x > y).filter(x=> x != CommonService.getCurrentMonth()).slice(0,15).sorted
-    val topMonthTBT = if(topLast12monthTBT.length >= 15) 16 else topLast12monthTBT.length+1
-    val mapMonthTBT   = (1 until topMonthTBT).map(x=> topLast12monthTBT(x-1) -> x).toMap
-    val rsTBTMonth = trendMonthTBT.filter(x=> topLast12monthTBT.indexOf(x._2) >=0).filter(x=> topTBTByPert.indexOf(x._1) >=0)
-      .map(x=> (mapTBT.get(x._1).get, mapMonthTBT.get(x._2).get, x._3, x._4, x._5))
+    val trendTbtMonth = Await.result(getTrendTbtMonth(month, queries, queryNested, status), Duration.Inf)
     logger.info("t3: "+(System.currentTimeMillis() - t3))
-    val t4 = System.currentTimeMillis()
-    // sparkline table
-    val topTBTByF1 = getTopAgeByMonth(arrMonthTBT, status, month, "f1", 10)
-    val tbTBT = trendMonthTBT.filter(x=> topLast12monthTBT.indexOf(x._2) >=0).filter(x=> topTBTByF1.indexOf(x._1) >=0).map(x=> (x._1, x._2, x._3,
-      CommonService.format2Decimal(2*x._3*x._4/(x._3+x._4)), x._5))
-    logger.info("t4: "+(System.currentTimeMillis() - t4))
 
     logger.info("Time: "+(System.currentTimeMillis() -t0))
     logger.info("========END CHECKLIST REGION TAB SERVICE=========")
-    CLRegionResponse((mapRegionMonth, mapMonth,rsRegionMonth), checklistRegion, cmtChart, (mapTBT, mapMonthTBT,rsTBTMonth), (topTBTByF1, tbTBT), month)
+    await(
+      Future{
+        CLRegionResponse(trendRegionMonth, checklistRegion, cmtChart, (trendTbtMonth._1, trendTbtMonth._2, trendTbtMonth._3), (trendTbtMonth._4, trendTbtMonth._5), month)
+      }
+    )
   }
 }

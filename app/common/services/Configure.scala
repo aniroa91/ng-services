@@ -3,8 +3,6 @@ package services
 import com.sksamuel.elastic4s.ElasticsearchClientUri
 import com.sksamuel.elastic4s.http.HttpClient
 import com.typesafe.config.ConfigFactory
-import play.api.libs.json.Json
-import com.redis.RedisClient
 
 object Configure {
   val LOGO_PATH = ConfigFactory.load().getString("storage") + "/"
