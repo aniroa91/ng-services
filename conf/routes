@@ -27,8 +27,8 @@ GET      /logout                       controllers.LoginController.logout
 # Tab Overview
 GET     /overview                        churn.controllers.OverviewController.index
 POST    /overview/getJsonOverview        churn.controllers.OverviewController.getJsonOverview
-# Tab Age & Package
-POST    /overview/getJsonByTab           churn.controllers.OverviewController.getJsonByTab
+# Tab Age & Package & Month
+POST    /overview/getJsonByTab            churn.controllers.OverviewController.getJsonByTab
 
 ## COMMENT LOG
 POST    /internet/pushComment            churn.controllers.OverviewController.pushComment

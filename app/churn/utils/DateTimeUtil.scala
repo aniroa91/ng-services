@@ -3,6 +3,7 @@ package churn.utils
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.DateTimeZone
+import services.domain.CommonService
 
 object DateTimeUtil {
   val MONTH_PATTERN      = "yyyy-MM"
@@ -95,6 +96,20 @@ object DateTimeUtil {
     val number = getNumberDayOfMonth(month)
     (0 until number).toArray.map(x => first.plusDays(x).toString(YMD)).sorted
   }
+
+  def getDaysOfMonthByInterval(month: String, inteval: Int): Array[String] = {
+    val first  = getFirstDayOfMonth(CommonService.getLastNumMonth(month, 2))
+    val sumDays = CommonService.getTopMonth(month, 3).map(x=> getNumberDayOfMonth(x)).sum
+    val number = if(sumDays % inteval == 0) sumDays / inteval else sumDays / inteval + 1
+    (0 until (number + 1)).toArray.map(x => first.plusDays(inteval*x -1).toString(YMD)).sorted
+  }
+
+  /*def getCurrDaysOfMonthByInterval(month: String, inteval: Int): Array[String] = {
+    val first  = getFirstDayOfMonth(month)
+    // 3
+    val number = if(getNumberDayOfMonth(month) % inteval == 0) getNumberDayOfMonth(month)/ inteval else getNumberDayOfMonth(month)/ inteval + 1
+    (0 until (number + 1)).toArray.map(x => first.plusDays(inteval*x -1).toString(YMD)).sorted
+  }*/
   /**
    * Convert id of dayOfWeek to shortText
    */

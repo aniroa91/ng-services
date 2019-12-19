@@ -1,8 +1,8 @@
 package churn.services
 
-import churn.models.{AgeResponse, CLAgeResponse, CLCauseResponse, CLRegionResponse, CLTimeResponse, ChecklistResponse, OverviewResponse, PackageResponse}
+import churn.models.{AgeResponse, CLAgeResponse, CLCauseResponse, CLRegionResponse, CLTimeResponse, ChecklistResponse, MonthResponse, OverviewResponse, PackageResponse}
 import play.api.mvc.{AnyContent, Request}
-import service.{ChecklistAgeService, ChecklistCauseService, ChecklistRegionService, ChecklistService, ChecklistTimeService, OverviewAgeService, OverviewPackageService, OverviewService}
+import service.{ChecklistAgeService, ChecklistCauseService, ChecklistRegionService, ChecklistService, ChecklistTimeService, OverviewAgeService, OverviewMonthService, OverviewPackageService, OverviewService}
 import services.domain.CommonService
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -17,6 +17,7 @@ object CacheService {
   var overviewCache:(String, OverviewResponse) = "" -> null
   var overviewAgeCache:(String, AgeResponse) = "" -> null
   var overviewPackageCache:(String, PackageResponse) = "" -> null
+  var overviewMonthCache:(String, MonthResponse) = "" -> null
 
   /* PAGE CHECKLIST */
   private def getFilterChecklist(request: Request[AnyContent]) = {
@@ -102,7 +103,8 @@ object CacheService {
       val combo = request.body.asFormUrlEncoded.get("combo").head
       val month = request.body.asFormUrlEncoded.get("month").head
       val status = request.body.asFormUrlEncoded.get("status").head
-      val queries = s"($currDate) AND ($status) AND ($month) AND ($age) AND ($packages) AND ($province) AND ($combo)"
+      val dataPoint = request.body.asFormUrlEncoded.get("dataPoint").head
+      val queries = s"($currDate) AND ($status) AND ($month) AND ($age) AND ($packages) AND ($province) AND ($combo) AND ($dataPoint)"
       queries
     }
   }
@@ -133,6 +135,16 @@ object CacheService {
     else {
       val response = Await.result(OverviewPackageService.getInternet(username, request), Duration.Inf)
       overviewPackageCache = getFilterOverview(request)-> response
+      response
+    }
+  }
+  // TAB MONTH CURRENT TRENDING
+  def getOverviewMonthResponse(request: Request[AnyContent], username: String) = {
+    if(getFilterOverview(request) == overviewMonthCache._1)
+      overviewMonthCache._2
+    else {
+      val response = Await.result(OverviewMonthService.getInternet(username, request), Duration.Inf)
+      overviewMonthCache = getFilterOverview(request)-> response
       response
     }
   }

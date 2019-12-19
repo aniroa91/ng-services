@@ -28,6 +28,19 @@ abstract class AbstractService {
     getValueAsString(map, key, "0").toDouble
   }
 
+  def getAggregationsKeyString(searchResponse: SearchResponse, name: String, subName: String): Array[(String, String, Long)] = {
+    val buckets    = getBuckets(searchResponse.aggregations, name)
+    buckets.flatMap(x => {
+      val key     = x.getOrElse("key", "NA").toString()
+      val array   = getBuckets(x, subName)
+      array.map(y => {
+        val key2  = y.getOrElse("key_as_string", "NA").toString()
+        val count = y.getOrElse("doc_count", 0).toString().toLong
+        (key, key2, count)
+      })
+    }).toArray
+  }
+
   def getTerm1(searchResponse: SearchResponse, name: String, subName: String): Array[(String, String, Long)] = {
     val buckets    = getBuckets(searchResponse.aggregations, name)
     //def subBuckets = getBuckets(searchResponse, name)

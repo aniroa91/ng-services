@@ -1,6 +1,7 @@
 package churn.controllers
 
 import churn.services.CacheService
+import churn.utils.DateTimeUtil
 import javax.inject.Inject
 import javax.inject.Singleton
 import play.api.mvc._
@@ -9,7 +10,8 @@ import play.api.mvc.ControllerComponents
 import services.domain.CommonService
 import controllers.Secured
 import play.api.libs.json.Json
-import service.{OverviewAgeService, OverviewPackageService, OverviewService}
+import service.{OverviewMonthService, OverviewService}
+import scala.util.Random
 
 /**
   * This controller creates an `Action` to handle HTTP requests to the
@@ -228,6 +230,32 @@ class OverviewController @Inject() (cc: ControllerComponents) extends AbstractCo
             "tbPkg"     -> tbPkg,
             "cmtChart"  -> rs.comments,
             "churnPkgAge"  -> churnPkgAge
+          )
+          Ok(Json.toJson(json))
+        }
+        case "tabMonth" => {
+          val rs = CacheService.getOverviewMonthResponse(request, username)
+          val plan = OverviewMonthService.getDataPoint(DateTimeUtil.getDaysOfMonth(request.body.asFormUrlEncoded.get("month").head)
+            .map(x=> (x, Random.nextInt(300).toLong, Random.nextInt(300).toLong, Random.nextInt(300).toLong)).sorted,
+            request.body.asFormUrlEncoded.get("month").head, request.body.asFormUrlEncoded.get("dataPoint").head.toInt)
+
+          val arrTbTrend = Json.obj(
+            "quarter" -> rs.arrTbTrend._1,
+            "data" -> rs.arrTbTrend._2.map(x=> (x._1, CommonService.formatPattern(x._2), CommonService.formatPattern(x._3), CommonService.formatPattern(x._4),
+              CommonService.formatPattern(x._5), CommonService.formatPattern(x._6), CommonService.formatPattern(x._7))),
+            "total" -> rs.arrTbTrend._3.map(x=> (CommonService.formatPattern(x._1), CommonService.formatPattern(x._2), CommonService.formatPattern(x._3),
+              CommonService.formatPattern(x._4), CommonService.formatPattern(x._5), CommonService.formatPattern(x._6)))
+          )
+          val chartDaily = Json.obj(
+            "cateX" -> plan.map(x=> x._1).sorted,
+            "planDaily" -> plan.map(x=> x._1 -> x._2).sorted,
+            "realDaily" -> rs.rangeDaily.map(x=> x._1 -> x._2).sorted,
+            "rangeDaily" -> rs.rangeDaily.map(x=> (x._1, x._3, x._4)).sorted
+          )
+          val json = Json.obj(
+            "arrTbTrend"  -> arrTbTrend,
+            "chartDaily"     -> chartDaily,
+            "cmtChart"  -> rs.comments
           )
           Ok(Json.toJson(json))
         }

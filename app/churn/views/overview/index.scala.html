@@ -42,12 +42,35 @@
         <link rel="stylesheet" href="/assets/custom/css/icheck.css">
             <!-- bootstrap-daterangepicker -->
         <link href="/assets/datepicker/css/bootstrap-datepicker.css" rel="stylesheet">
-        <script src="/assets/otherLayout/js/vendor/modernizr-2.8.3.min.js"></script>
         <style>
                 .aHeader{
                     font-size: 24px;
                     color: #0df3cf!important;
                     font-weight: 600;
+                }
+                .thOther{
+                    text-align: center;
+                    background: #f5edb6;
+                    font-weight: 600;
+                }
+                .thHuy{
+                    text-align: center;
+                    background: #a1e2f1;
+                    font-weight: 600;
+                }
+                #tbTrend>tbody>tr>td, #tfooter>td{
+                    text-align: center;
+                    white-space: nowrap
+                }
+                #tfooter{
+                    font-weight: 600;
+                    background: #f5edb6;
+                }
+                .dataTables_filter .form-control{
+                    height: 15px;
+                }
+                .dataTables_filter, .dataTables_paginate{
+                    float: right;
                 }
                 .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
                     color: #16a085;
@@ -306,6 +329,12 @@
                      color: #fff;
                      height: 149px;
                  }
+                .inlineFlex{
+                    float: right;
+                    display: -webkit-inline-flex;
+                    display: -ms-inline-flexbox;
+                    display: inline-flex;
+                }
                 .box-area-warning{
                     background: linear-gradient(45deg, #6bbdf7 0%, #ffca28 100%);
                     color: #fff;
@@ -718,9 +747,10 @@
                         <div class="tab-area panel with-nav-tabs panel-primary">
                             <div class="panel-heading">
                                 <ul class="nav nav-tabs">
-                                    <li name="1" class="active"><a class="tabOverview" style="cursor: pointer">Overview</a></li>
-                                    <li name="0"><a class="tabAge" style="cursor: pointer">Age Trending & Comparing</a></li>
-                                    <li name="0"><a class="tabPackage" style="cursor: pointer">Package Trending & Comparing</a></li>
+                                    <li class="active"><a class="tabOverview" style="cursor: pointer">Overview</a></li>
+                                    <li><a class="tabAge" style="cursor: pointer">Age Trending & Comparing</a></li>
+                                    <li><a class="tabPackage" style="cursor: pointer">Package Trending & Comparing</a></li>
+                                    <li><a class="tabMonth" style="cursor: pointer">Month Trending</a></li>
                                 </ul>
                             </div>
                             <div class="panel-body" style="padding-top: 0px">
@@ -1180,6 +1210,86 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="tab-pane fade" id="tabMonth">
+                                        <div class="rate-percent-area mg-tb-15">
+                                            <div class="container-fluid">
+                                                <div class="row">
+                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                        <div class="product-sales-chart">
+                                                            <div class="portlet-title" style="height: 35px">
+                                                                <div class="row">
+                                                                    <input type="hidden" id="point" value="1">
+                                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                        <div class="caption pro-sl-hd">
+                                                                            <span class="caption-subject">Trending daily in this month
+                                                                                <span class="dropdown">
+                                                                                    <a name="11" class="dropdown-toggle aMore" style="cursor: pointer" onclick="toogleTooltip(this)"><i class="fa fa-info-circle" style="color: #16a085;"></i></a>
+                                                                                    <div class="dropdown-menu ddMore" style="background: #211d1d">
+                                                                                        <p class="divMore">
+                                                                                            <span></span>
+                                                                                        </p>
+                                                                                    </div>
+                                                                                </span>
+                                                                            </span>
+                                                                            <span class="inlineFlex">
+                                                                                Data point:
+                                                                                <select class="form-control selectBox slPoint" style="width: 163px;margin-top: -7px">
+                                                                                    <option value="1" selected>1 day</option>
+                                                                                    <option value="3">3 day</option>
+                                                                                    <option value="5">5 day</option>
+                                                                                    <option value="7">7 day</option>
+                                                                                </select>
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div id="dailyTrend" style="width: auto; height: 320px;"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                        <div class="product-sales-chart">
+                                                            <table id="tbTrend" class="table-bordered" style="width: 100%">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="thOther" rowspan="2" style="vertical-align:inherit; white-space: nowrap">Location</th>
+                                                                        <th class="thHuy" colspan="5">Tổng Hủy SSD</th>
+                                                                        <th class="thOther" colspan="3">Tổng CTBDV</th>
+                                                                        <th class="thOther" colspan="3">Tổng Rời Mạng</th>
+                                                                        <th class="thOther" colspan="3">Tổng Rời Mạng Quý <span class="idQuarter"></span></th>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th class="thHuy">Tổng hủy đến hiện tại</th>
+                                                                        <th class="thHuy">Số hủy data point gần nhất</th>
+                                                                        <th class="thHuy">TBC tại datapoint gần nhất 6 tháng</th>
+                                                                        <th class="thHuy">Số hủy kế hoạch</th>
+                                                                        <th class="thHuy">Chênh lệch thực tế</th>
+                                                                        <th class="thOther" >Tổng CTBDV đến hiện tại</th>
+                                                                        <th class="thOther" >Kế hoạch</th>
+                                                                        <th class="thOther" >Chênh lệch thực tế</th>
+                                                                        <th class="thOther" >Tổng RM đến hiện tại</th>
+                                                                        <th class="thOther" >Kế hoạch</th>
+                                                                        <th class="thOther" >Chênh lệch thực tế</th>
+                                                                        <th class="thOther" >Tổng RM quý <span class="idQuarter"></span> đến hiện tại</th>
+                                                                        <th class="thOther" >Kế hoạch</th>
+                                                                        <th class="thOther" >Chênh lệch thực tế</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tfoot>
+                                                                    <tr id="tfooter">
+                                                                    </tr>
+                                                                </tfoot>
+                                                                <tbody>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1225,11 +1335,17 @@
         <script src="/assets/javascripts/icheck.js"></script>
         <script src="/assets/javascripts/common_churn.js"></script>
         <script src="/assets/javascripts/jquery.sparkline.js"></script>
+        <script src="/assets/otherLayout/js/vendor/modernizr-2.8.3.min.js"></script>
             <!--  Datepicker -->
         <script src="/assets/datepicker/js/bootstrap-datepicker.js"></script>
         <script src="/assets/javascripts/jsapi.js"></script>
             <!-- High chart -->
         <script src="/assets/javascripts/highcharts.js"></script>
+        <script src="/assets/javascripts/highcharts-more.js"></script>
+        <script src="/assets/javascripts/accessibility.js"></script>
+            <!-- Datatable -->
+        <script src="/assets/datatables/datatables.net/js/jquery.dataTables.min.js"></script>
+        <script src="/assets/datatables/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
         @if(rs != null){
             @scripts(rs, arrMonth)
         }

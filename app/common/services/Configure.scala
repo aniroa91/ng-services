@@ -5,7 +5,6 @@ import com.sksamuel.elastic4s.http.HttpClient
 import com.typesafe.config.ConfigFactory
 
 object Configure {
-  val LOGO_PATH = ConfigFactory.load().getString("storage") + "/"
   
   val LOGO_API_URL = "https://logo.clearbit.com/"
   val CATEGORY_API_URL = "http://sitereview.bluecoat.com/sitereview.jsp#/?search="
