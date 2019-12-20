@@ -104,7 +104,8 @@ object CacheService {
       val month = request.body.asFormUrlEncoded.get("month").head
       val status = request.body.asFormUrlEncoded.get("status").head
       val dataPoint = request.body.asFormUrlEncoded.get("dataPoint").head
-      val queries = s"($currDate) AND ($status) AND ($month) AND ($age) AND ($packages) AND ($province) AND ($combo) AND ($dataPoint)"
+      val dataType = request.body.asFormUrlEncoded.get("dataType").head
+      val queries = s"($currDate) AND ($status) AND ($month) AND ($age) AND ($packages) AND ($province) AND ($combo) AND ($dataPoint) AND ($dataType)"
       queries
     }
   }

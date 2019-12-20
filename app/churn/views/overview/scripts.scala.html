@@ -183,6 +183,11 @@
                     }
                 }
             })
+            // radio tab Month
+            $('.radioPoint').on('ifChecked', function(){
+                $('#dataType').val($(this).val())
+                getChurnByTab($('#tabName').val())
+            });
             $('.sparkline1').sparkline('html',{
                 type: 'line',
                 width: '320px',
@@ -1256,14 +1261,14 @@
             $('.btnRefresh').click(function () {
                 $('.slAge').val('').trigger('change')
                 $('.slPackage').val('').trigger('change')
-                $('.radio').removeAttr('checked').iCheck('update')
+                $('.radioCombo').removeAttr('checked').iCheck('update')
                 $('.checkbox').removeAttr('checked').iCheck('update')
                 $(".monthPicker").datepicker("update", $('#monthCurr').val())
                 $(".region").jstree("deselect_all")
                 $('#combo').val("")
                 filterCallAjax()
             })
-            $('.radio').on('ifChecked', function(){
+            $('.radioCombo').on('ifChecked', function(){
                 $('#combo').val($(this).val())
             });
             // click comment insert
@@ -1356,7 +1361,8 @@
             "month"  : $('.monthGrp').val(),
             "status" : status,
             "tabName" : $('#tabName').val(),
-            "dataPoint" : $('#point').val()
+            "dataPoint" : $('#point').val(),
+            "dataType"  : $('#dataType').val()
         }
         //console.log(obj)
         return obj

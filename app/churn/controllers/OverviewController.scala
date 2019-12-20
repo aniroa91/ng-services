@@ -237,7 +237,7 @@ class OverviewController @Inject() (cc: ControllerComponents) extends AbstractCo
           val rs = CacheService.getOverviewMonthResponse(request, username)
           val plan = OverviewMonthService.getDataPoint(DateTimeUtil.getDaysOfMonth(request.body.asFormUrlEncoded.get("month").head)
             .map(x=> (x, Random.nextInt(300).toLong, Random.nextInt(300).toLong, Random.nextInt(300).toLong)).sorted,
-            request.body.asFormUrlEncoded.get("month").head, request.body.asFormUrlEncoded.get("dataPoint").head.toInt)
+            request.body.asFormUrlEncoded.get("month").head, request.body.asFormUrlEncoded.get("dataPoint").head.toInt, request.body.asFormUrlEncoded.get("dataType").head)
 
           val arrTbTrend = Json.obj(
             "quarter" -> rs.arrTbTrend._1,

@@ -75,18 +75,35 @@ object OverviewMonthService{
     }
   }
 
-  def getRange6LastMonth(array: Array[(String, String, Long)], arrCurr: Array[(String, Long)], month: String) = {
+  def getRange6LastMonth(array: Array[(String, String, Long)], arrCurr: Array[(String, Long)], month: String, dataType: String) = {
     val res = arrCurr.map(x => (x._1, x._2, array.filter(y => y._1 < CommonService.getLastNumMonth(month, 2))
        .filter(y => y._2.matches(".*" + x._1.substring(x._1.lastIndexOf("-"))))))
-    res.map(x => (x._1, x._2, if(x._3.map(y => y._3).length >0) x._3.map(y => y._3).min else 0, if(x._3.map(y => y._3).length >0) x._3.map(y => y._3).max else 0))
+    val all = res.map(x => (x._1, x._2, if(x._3.map(y => y._3).length >0) x._3.map(y => y._3).min else 0, if(x._3.map(y => y._3).length >0) x._3.map(y => y._3).max else 0))
+    if(dataType == "sum"){
+      all.map(x=> (x._1, all.filter(y=> y._1 <= x._1).map(k=> k._2).sum, all.filter(y=> y._1 <= x._1).map(k=> k._3).sum, all.filter(y=> y._1 <= x._1).map(k=> k._4).sum))
+    }
+    else all
   }
 
-  def getDataPoint(dataPoint: Array[(String, Long, Long, Long)], month:String, inteval: Int) = {
+  def getDataPoint(dataPoint: Array[(String, Long, Long, Long)], month:String, inteval: Int, dType: String) = {
     val lastDayofMonth = DateTimeUtil.getLastDayOfMonth(month).toString(YMD)
     val intevalDaily = DateTimeUtil.getDaysOfMonthByInterval(month, inteval).sorted
     val mapInteval = (0 until intevalDaily.length).map(x=> (x, if(x == (intevalDaily.length-1) && intevalDaily(x) != lastDayofMonth) lastDayofMonth else intevalDaily(x))).toMap
-    val res = mapInteval.toArray.sorted.slice(1, mapInteval.size).map(x=> (x._2, dataPoint.filter(y=> y._1 <= x._2 && y._1 > mapInteval.get(x._1-1).get).map(y=> y._2).sum,
-      dataPoint.filter(y=> y._1 <= x._2 && y._1 > mapInteval.get(x._1-1).get).map(y=> y._3).sum, dataPoint.filter(y=> y._1 <= x._2 && y._1 > mapInteval.get(x._1-1).get).map(y=> y._4).sum)).sorted
+    val mapInRange = mapInteval.toArray.sorted
+    val res = if(dType == "point"){
+      mapInRange.slice(1, mapInteval.size).map(x=> (x._2, dataPoint.filter(y=> y._1 <= x._2 && y._1 > mapInteval.get(x._1-1).get).map(y=> y._2).sum,
+        dataPoint.filter(y=> y._1 <= x._2 && y._1 > mapInteval.get(x._1-1).get).map(y=> y._3).sum, dataPoint.filter(y=> y._1 <= x._2 && y._1 > mapInteval.get(x._1-1).get).map(y=> y._4).sum)).sorted
+    }
+    else {
+      var sumArr = new Array[(String, Long, Long, Long)](0)
+      for (i <- 0 until mapInRange.length) {
+        val arrDate = dataPoint.filter(x=> x._1 > mapInRange(i)._2 && x._1 <= mapInRange(i+1)._2).sorted
+        val date = if(arrDate.length >0) (mapInRange(i+1)._2, arrDate(arrDate.length-1)._2, arrDate(arrDate.length-1)._3, arrDate(arrDate.length-1)._4) else (mapInRange(i)._2, 0L, 0L, 0L)
+        sumArr :+= date
+      }
+      sumArr.groupBy(x=> x._1).map(x=> (x._1, x._2.map(y=> y._2).sum, x._2.map(y=> y._3).sum, x._2.map(y=> y._4).sum)).toArray.sorted
+
+    }
     res
   }
 
@@ -115,13 +132,13 @@ object OverviewMonthService{
     var tbcHuyDataPoint = res.filter(x=> x._3 == 1).filter(x=> x._4 != CommonService.getPreviousDay())
       .filter(x => x._4.matches(".*" + CommonService.getPreviousDay().substring(CommonService.getPreviousDay().lastIndexOf("-"))))
         .groupBy(x=> x._2).map(x=> x._1 -> avg(x._2.map(y=> y._5))).toArray.sorted
-    // inteval > 1 p
+    // inteval > 1 point
     if(inteval != 1) {
       val arrHuyDv = mapInteval.toArray.sorted.slice(1, mapInteval.size).map(x => (x._2, res.filter(x => x._3 == 1).filter(y => y._4 <= x._2
         && y._4 > mapInteval.get(x._1 - 1).get).map(y => y._2 -> y._5)))
         .flatMap(x => x._2.map(y => (x._1, y._1, y._2))).groupBy(x => x._1 -> x._2).map(x => (x._1._1, x._1._2, x._2.map(y => y._3).sum)).toArray.sorted
       val arrPoints = arrHuyDv.map(x=> x._1).sorted
-      sumHuyLastPoint = arrHuyDv.filter(x=> arrPoints(arrPoints.length-1) == x._1).map(x=> x._2 -> x._3).toArray.sorted
+      sumHuyLastPoint = arrHuyDv.filter(x=> arrPoints(arrPoints.length-1) == x._1).map(x=> x._2 -> x._3).sorted
       tbcHuyDataPoint = arrHuyDv.filter(x=> arrPoints(arrPoints.length-1) != x._1).groupBy(x=> x._2).map(x=> x._1 -> avg(x._2.map(y=> y._3))).toArray.sorted
     }
 
@@ -144,6 +161,7 @@ object OverviewMonthService{
     val month = request.body.asFormUrlEncoded.get("month").head
     val status = request.body.asFormUrlEncoded.get("status").head
     val point = request.body.asFormUrlEncoded.get("dataPoint").head.toInt
+    val dataType = request.body.asFormUrlEncoded.get("dataType").head
     val queries = OverviewService.getFilterGroup(age, province, packages, combo)
     //println(queries)
     logger.info("t0: "+(System.currentTimeMillis() - t0))
@@ -152,8 +170,8 @@ object OverviewMonthService{
     val rsStatus = if(status == "" || status == "13") "(status:1 OR status:3)" else s"(status:$status)"
     val arrReal6LastMonth = Await.result(Future{ getRealChurnContract(queries, rsStatus, month)}, Duration.Inf)
     val arrReal3LastMonth = arrReal6LastMonth.filter(x=> x._1 >= CommonService.getLastNumMonth(month, 2)).map(x=> x._2 -> x._3).sorted
-    val arrRangeDaily = if(point == 1) getRange6LastMonth(arrReal6LastMonth, arrReal3LastMonth, month)
-        else getDataPoint(getRange6LastMonth(arrReal6LastMonth, arrReal3LastMonth, month), month, point)
+    val arrRangeDaily = if(point == 1) getRange6LastMonth(arrReal6LastMonth, arrReal3LastMonth, month, dataType)
+        else getDataPoint(getRange6LastMonth(arrReal6LastMonth, arrReal3LastMonth, month, dataType), month, point, dataType)
     logger.info("t1: "+(System.currentTimeMillis() - t1))
     // table trending
     val t2 = System.currentTimeMillis()
@@ -164,7 +182,7 @@ object OverviewMonthService{
     logger.info("t2: "+(System.currentTimeMillis() - t2))
     // comments content
     val t3 = System.currentTimeMillis()
-    val cmtChart = if(point == 1) Await.result(Future{ getCommentChart(user, CommonUtil.PAGE_ID.get(0).get+"_tabMonth") }, Duration.Inf) else ""
+    val cmtChart = Await.result(Future{ getCommentChart(user, CommonUtil.PAGE_ID.get(0).get+"_tabMonth") }, Duration.Inf)
     logger.info("t3: "+(System.currentTimeMillis() - t3))
 
     logger.info("Time: "+(System.currentTimeMillis() - t0))

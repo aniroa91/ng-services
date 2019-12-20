@@ -414,13 +414,13 @@
                             <ul class="listview">
                                 <li>
                                     <label class="radiobutton">
-                                        <input name="radio" class="radio" value="int" type="radio">
+                                        <input name="radio" class="radio radioCombo" value="int" type="radio">
                                         <span class="label-text"><strong>Internet Only</strong></span>
                                     </label>
                                 </li>
                                 <li>
                                     <label class="radiobutton">
-                                        <input name="radio" class="radio" value="combo" type="radio">
+                                        <input name="radio" class="radio radioCombo" value="combo" type="radio">
                                         <span class="label-text"><strong>Combo Paytv & Internet</strong></span>
                                     </label>
                                 </li>
@@ -549,13 +549,13 @@
                                                     <ul class="listview">
                                                         <li>
                                                             <label class="radiobutton">
-                                                                <input name="radio" class="radio" value="int" type="radio">
+                                                                <input name="radio" class="radio radioCombo" value="int" type="radio">
                                                                 <span class="label-text"><strong>Internet Only</strong></span>
                                                             </label>
                                                         </li>
                                                         <li>
                                                             <label class="radiobutton">
-                                                                <input name="radio" class="radio" value="combo" type="radio">
+                                                                <input name="radio" class="radio radioCombo" value="combo" type="radio">
                                                                 <span class="label-text"><strong>Combo Paytv & Internet</strong></span>
                                                             </label>
                                                         </li>
@@ -627,6 +627,7 @@
                 <input type="hidden" id="indexChart">
                 <input type="hidden" id="minRatemonthRegion" value="@rs.trendRegionMonth._3.map(x=>x._3).min">
                 <input type="hidden" id="minPertmonthRegion" value="@rs.trendRegionMonth._3.map(x=>x._4).min">
+                <input type="hidden" id="dataType" value="point">
                 <div class="rate-percent-area mg-tb-15">
                     <div class="container-fluid">
                         <div class="row">
@@ -1232,7 +1233,14 @@
                                                                                 </span>
                                                                             </span>
                                                                             <span class="inlineFlex">
-                                                                                Data point:
+                                                                                <label class="radiobutton" style="cursor: pointer">
+                                                                                    <input name="dataSum" class="radio radioPoint" value="sum" type="radio">
+                                                                                    <span class="label-text" style="font-size: 14px"><strong>Queue Sum</strong></span>
+                                                                                </label>
+                                                                                <label class="radiobutton" style="margin-left: 10px;cursor: pointer">
+                                                                                    <input name="dataSum" class="radio radioPoint" value="point" type="radio" checked>
+                                                                                    <span class="label-text" style="font-size: 14px"><strong>Data point:</strong></span>
+                                                                                </label>
                                                                                 <select class="form-control selectBox slPoint" style="width: 163px;margin-top: -7px">
                                                                                     <option value="1" selected>1 day</option>
                                                                                     <option value="3">3 day</option>
