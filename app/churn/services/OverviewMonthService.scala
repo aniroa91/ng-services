@@ -145,7 +145,7 @@ object OverviewMonthService{
     val sumCTBDV = res.filter(x=> x._3 == 3).filter(x=> x._1 == month).groupBy(x=> x._2).map(x=> x._1-> x._2.map(y=> y._5).sum).toArray.sorted
     val rmQuarter = res.filter(x=> x._1 >= firstQuarter && x._1 <= endQuarter).groupBy(x=> x._2).map(x=> x._1-> x._2.map(y=> y._5).sum).toArray.sorted
     val arrSumLoc = zipper(sumHuyDV.toMap, sumHuyLastPoint.toMap, tbcHuyDataPoint.toMap, sumCTBDV.toMap, rmQuarter.toMap).map(x=> (x._1, x._2, x._3, x._4, x._5, x._2+x._5, x._6, x._2 *1.00/x._3))
-      .toArray.sortWith((x, y) => x._8 > y._8)
+      .toArray.sortWith((x, y) => x._8 < y._8)
 
     (currQuarter, arrSumLoc)
   }
