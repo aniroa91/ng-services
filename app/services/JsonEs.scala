@@ -24,12 +24,13 @@ object JsonES{
     val merge = udf( (first: Double, second: Double) => { CommonUtil.formatDecimalByDigit(first, 4) + " => " + CommonUtil.formatDecimalByDigit(second, 4) } )
     val df = locationDF.withColumn("day", date(col("created_time")))
         .withColumn("address", merge(col("location.lat"),col("location.long"))).drop("location")
+    val dfGroup = df.groupBy("day","address").agg(count("userId")).withColumnRenamed("count(userId)", "numUser")
+    dfGroup.saveToEs("loc-date/docs")
     /*df.printSchema()
     df.createTempView("location")
     val sql = df.sparkSession.sql("select * from location limit 1")
     sql.show(1)*/
-    df.printSchema()
-    df.saveToEs("location/docs")
+    //df.saveToEs("locDate/docs")
     println("Time job: "+(System.currentTimeMillis()-t0))
   }
 }
