@@ -201,6 +201,49 @@ function getJsonChurnMonth2Col(churnRate, churnPercent){
     return rs
 }
 
+function getJsonDaily(arrReal, arrRange, arrPlan){
+    var rs = []
+    rs.push({
+        showInLegend: false,
+        name: 'Real current churn this month',
+        data: arrReal,
+        zIndex: 1,
+        color:'#36b5b0',
+        marker: {
+            fillColor: 'white',
+            lineWidth: 2,
+            lineColor: '#36b5b0'
+        }
+    })
+    rs.push({
+        name: 'Real Range churn last 6 months',
+        data: arrRange,
+        type: 'arearange',
+        lineWidth: 0,
+        linkedTo: ':previous',
+        color: "#42dee1",
+        fillOpacity: 0.6,
+        zIndex: 0,
+        marker: {
+            enabled: false
+        }
+    });
+    rs.push({
+        showInLegend: false,
+        name: 'Plan current churn this month',
+        data: arrPlan,
+        zIndex: 1,
+        color:'#f65c78',
+        marker: {
+            fillColor: 'white',
+            lineWidth: 2,
+            lineColor: '#f65c78'
+        }
+    })
+
+    return rs
+}
+
 function parseMulMetris(arrs) {
     var rs = []
     for(var i=0; i< arrs.length; i++) {

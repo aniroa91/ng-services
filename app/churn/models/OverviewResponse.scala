@@ -4,6 +4,13 @@ case class ContractNumber(curr: Int, prev: Int)
 
 case class RateNumber(avg: Double, curr: Double)
 
+case class MonthResponse(
+                          arrTbTrend    : (Int, Array[(String, Long, Long, Long, Long, Long, Long, Double)], Array[(Long, Long, Long, Long, Long, Long, Double)]),
+                          rangeDaily    : Array[(String, Long, Long, Long)],
+                          comments      : String,
+                          month         : String
+                        )
+
 case class PackageResponse(
                         trendPkgMonth : (Map[String, Int], Map[String, Int], Array[(Int, Int, Double, Double, Int)]),
                         tbPkg         : (Array[(String)], Array[(String, String, Double, Double, Int)]),

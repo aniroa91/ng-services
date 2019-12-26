@@ -8,6 +8,10 @@ import play.api.mvc.{AnyContent, Request}
 import service.OverviewService.{checkLocation, getCommentChart}
 import services.Configure
 import services.domain.CommonService
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.async.Async.{async, await}
+import scala.concurrent.{Await, Future}
+import scala.concurrent.duration.Duration
 
 object OverviewAgeService{
 
@@ -30,7 +34,7 @@ object OverviewAgeService{
     }
   }
 
-  def getTrendAgeMonth(month: String, queries: String, province: String) ={
+  def getAgeMonth(month: String, queries: String, province: String) ={
     val field = if(province == "No") "month" else checkLocation(province)
     val request = search(s"churn-contract-info-*" / "docs") query(OverviewService.rangeMonth(month) +" AND "+ queries) aggregations (
       termsAggregation(s"$field")
@@ -81,40 +85,26 @@ object OverviewAgeService{
     top10Olt.sortWith((x, y) => x._2 > y._2).map(x=> x._1).distinct.slice(0,10)
   }
 
-  def getInternet(user: String, request: Request[AnyContent]) = {
-    logger.info("========START AGE SERVICE=========")
-    val t0 = System.currentTimeMillis()
-    val age = ""
-    val province = request.body.asFormUrlEncoded.get("province").head
-    val packages = request.body.asFormUrlEncoded.get("package").head
-    val combo = request.body.asFormUrlEncoded.get("combo").head
-    val month = request.body.asFormUrlEncoded.get("month").head
-    val status = request.body.asFormUrlEncoded.get("status").head
-    // get list province of region for filter
-    val lstProvince = OverviewService.getRegionProvince(month)
-    val queries = OverviewService.getFilterGroup(age, province, packages, combo)
-   // println(queries)
-    logger.info("t0: "+(System.currentTimeMillis() - t0))
-    val t1 = System.currentTimeMillis()
-    // Trend Age and location
-    val arrAgeLoc = getTrendAgeMonth(month, queries, province)
+  def getTrendAgeLoc(month:String, queries:String, province:String, status: String) ={
+    val arrAgeLoc = getAgeMonth(month, queries, province)
     val trendRegionAge = calChurnRateAndPercentForAgeMonth(arrAgeLoc, status, province).sorted
     /* get top location */
     val topLocationByPert = if(checkLocation(province) == "olt_name") getTopOltByAge(trendRegionAge.map(x=> (x._1, x._2, x._4))) else trendRegionAge.map(x=> x._2).distinct
     val sizeTopLocation = topLocationByPert.length +1
     val mapLocation = (1 until sizeTopLocation).map(x=> topLocationByPert(sizeTopLocation-x-1) -> x).toMap
     /* get top Age Location */
-    val topAgeLocByPert = trendRegionAge.map(x=> x._1).distinct
+    val topAgeLocByPert = trendRegionAge.map(x=> x._1).distinct.sorted
     val sizeTopAgeLoc = topAgeLocByPert.length +1
-    val mapAge = (1 until sizeTopAgeLoc).map(x=> topAgeLocByPert(sizeTopAgeLoc-x-1) -> x).toMap
-
+    val mapAge = (1 until sizeTopAgeLoc).map(x=> topAgeLocByPert(x-1) -> x).toMap
     val rsLocationAge = trendRegionAge.filter(x=> topAgeLocByPert.indexOf(x._1) >=0).filter(x=> topLocationByPert.indexOf(x._2) >=0)
       .map(x=> (mapLocation.get(x._2).get, mapAge.get(x._1).get, x._3, x._4, x._5))
-    logger.info("t1: "+(System.currentTimeMillis() - t1))
-    val t2 = System.currentTimeMillis()
+    Future{
+      (mapLocation, mapAge, rsLocationAge)
+    }
+  }
 
-    // Trend Age and month
-    val arrMonth = getTrendAgeMonth(month, queries, "No")
+  def getTrendAgeMonth(month:String, queries:String, status: String) ={
+    val arrMonth = getAgeMonth(month, queries, "No")
     val trendAgeMonth = calChurnRateAndPercentForAgeMonth(arrMonth, status, "No").sorted
     /* get top Age */
     val topAgeByPert = getTopAgeByMonth(arrMonth, status, month, "percent", arrMonth.map(x=> x._3).distinct.length)
@@ -126,20 +116,49 @@ object OverviewAgeService{
     val mapMonth   = (1 until topMonthAge).map(x=> topLast12month(x-1) -> x).toMap
     val rsAgeMonth = trendAgeMonth.filter(x=> topLast12month.indexOf(x._2) >=0).filter(x=> topAgeByPert.indexOf(x._1) >=0)
       .map(x=> (mapAgeMonth.get(x._1).get, mapMonth.get(x._2).get, x._3, x._4, x._5))
-    logger.info("t2: "+(System.currentTimeMillis() - t2))
-    val t3 = System.currentTimeMillis()
 
     // sparkline table
     val topAgeByF1 = getTopAgeByMonth(arrMonth, status, month, "f1", arrMonth.map(x=> x._3).distinct.length)
     val tbAge = trendAgeMonth.filter(x=> topLast12month.indexOf(x._2) >=0).filter(x=> topAgeByF1.indexOf(x._1) >=0).map(x=> (x._1, x._2, x._3,
       CommonService.format2Decimal(2*x._3*x._4/(x._3+x._4)), x._5))
+    Future{
+      (mapAgeMonth, mapMonth, rsAgeMonth, topAgeByF1, tbAge)
+    }
+  }
+
+  def getInternet(user: String, request: Request[AnyContent]) = async{
+    logger.info("========START AGE SERVICE=========")
+    val t0 = System.currentTimeMillis()
+    val age = ""
+    val province = request.body.asFormUrlEncoded.get("province").head
+    val packages = request.body.asFormUrlEncoded.get("package").head
+    val combo = request.body.asFormUrlEncoded.get("combo").head
+    val month = request.body.asFormUrlEncoded.get("month").head
+    val status = request.body.asFormUrlEncoded.get("status").head
+    val queries = OverviewService.getFilterGroup(age, province, packages, combo)
+   // println(queries)
+    logger.info("t0: "+(System.currentTimeMillis() - t0))
+    val t1 = System.currentTimeMillis()
+
+    // Trend Age and location
+    val trendAgeLoc = Await.result(getTrendAgeLoc(month, queries, province, status), Duration.Inf)
+    logger.info("t1: "+(System.currentTimeMillis() - t1))
+    val t2 = System.currentTimeMillis()
+
+    // Trend Age and month
+    val trendAgeMonth = Await.result(getTrendAgeMonth(month, queries, status), Duration.Inf)
+    logger.info("t2: "+(System.currentTimeMillis() - t2))
+    val t3 = System.currentTimeMillis()
 
     // comments content
-    val cmtChart = getCommentChart(user, CommonUtil.PAGE_ID.get(0).get+"_tabAge")
+    val cmtChart = Await.result(Future{ getCommentChart(user, CommonUtil.PAGE_ID.get(0).get+"_tabAge") }, Duration.Inf)
     logger.info("t3: "+(System.currentTimeMillis() - t3))
 
     logger.info("Time: "+(System.currentTimeMillis() - t0))
     logger.info("========END AGE SERVICE=========")
-    AgeResponse((mapAgeMonth, mapMonth,rsAgeMonth), (topAgeByF1, tbAge), (mapLocation, mapAge, rsLocationAge), cmtChart, month)
+    await(Future {
+         AgeResponse((trendAgeMonth._1, trendAgeMonth._2, trendAgeMonth._3), (trendAgeMonth._4, trendAgeMonth._5), trendAgeLoc , cmtChart, month)
+       }
+    )
   }
 }

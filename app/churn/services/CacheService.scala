@@ -1,9 +1,11 @@
 package churn.services
 
-import churn.models.{AgeResponse, CLAgeResponse, CLCauseResponse, CLRegionResponse, CLTimeResponse, ChecklistResponse, OverviewResponse, PackageResponse}
+import churn.models.{AgeResponse, CLAgeResponse, CLCauseResponse, CLRegionResponse, CLTimeResponse, ChecklistResponse, MonthResponse, OverviewResponse, PackageResponse}
 import play.api.mvc.{AnyContent, Request}
-import service.{ChecklistAgeService, ChecklistCauseService, ChecklistRegionService, ChecklistService, ChecklistTimeService, OverviewAgeService, OverviewPackageService, OverviewService}
+import service.{ChecklistAgeService, ChecklistCauseService, ChecklistRegionService, ChecklistService, ChecklistTimeService, OverviewAgeService, OverviewMonthService, OverviewPackageService, OverviewService}
 import services.domain.CommonService
+import scala.concurrent.Await
+import scala.concurrent.duration._
 
 object CacheService {
   var checklistCache:(String, ChecklistResponse) = "" -> null
@@ -15,6 +17,7 @@ object CacheService {
   var overviewCache:(String, OverviewResponse) = "" -> null
   var overviewAgeCache:(String, AgeResponse) = "" -> null
   var overviewPackageCache:(String, PackageResponse) = "" -> null
+  var overviewMonthCache:(String, MonthResponse) = "" -> null
 
   /* PAGE CHECKLIST */
   private def getFilterChecklist(request: Request[AnyContent]) = {
@@ -43,7 +46,7 @@ object CacheService {
     if(getFilterChecklist(request) == checklistCache._1)
       checklistCache._2
     else {
-      val response = ChecklistService.getInternet(request)
+      val response = Await.result(ChecklistService.getInternet(request), Duration.Inf)
       checklistCache = getFilterChecklist(request)-> response
       response
     }
@@ -53,7 +56,7 @@ object CacheService {
     if(getFilterChecklist(request) == checklistRegionCache._1)
       checklistRegionCache._2
     else {
-      val response = ChecklistRegionService.getInternet(username,request)
+      val response = Await.result(ChecklistRegionService.getInternet(username,request), Duration.Inf)
       checklistRegionCache = getFilterChecklist(request)-> response
       response
     }
@@ -63,7 +66,7 @@ object CacheService {
     if(getFilterChecklist(request) == checklistAgeCache._1)
       checklistAgeCache._2
     else {
-      val response = ChecklistAgeService.getInternet(username,request)
+      val response = Await.result(ChecklistAgeService.getInternet(username,request), Duration.Inf)
       checklistAgeCache = getFilterChecklist(request)-> response
       response
     }
@@ -83,7 +86,7 @@ object CacheService {
     if(getFilterChecklist(request) == checklistCauseCache._1)
       checklistCauseCache._2
     else {
-      val response = ChecklistCauseService.getInternet(username,request)
+      val response = Await.result(ChecklistCauseService.getInternet(username,request), Duration.Inf)
       checklistCauseCache = getFilterChecklist(request)-> response
       response
     }
@@ -100,7 +103,9 @@ object CacheService {
       val combo = request.body.asFormUrlEncoded.get("combo").head
       val month = request.body.asFormUrlEncoded.get("month").head
       val status = request.body.asFormUrlEncoded.get("status").head
-      val queries = s"($currDate) AND ($status) AND ($month) AND ($age) AND ($packages) AND ($province) AND ($combo)"
+      val dataPoint = request.body.asFormUrlEncoded.get("dataPoint").head
+      val dataType = request.body.asFormUrlEncoded.get("dataType").head
+      val queries = s"($currDate) AND ($status) AND ($month) AND ($age) AND ($packages) AND ($province) AND ($combo) AND ($dataPoint) AND ($dataType)"
       queries
     }
   }
@@ -109,7 +114,7 @@ object CacheService {
     if(getFilterOverview(request) == overviewCache._1)
       overviewCache._2
     else {
-      val response = OverviewService.getInternet(username, request)
+      val response = Await.result(OverviewService.getInternet(username, request), Duration.Inf)
       overviewCache = getFilterOverview(request)-> response
       response
     }
@@ -119,7 +124,7 @@ object CacheService {
     if(getFilterOverview(request) == overviewAgeCache._1)
       overviewAgeCache._2
     else {
-      val response = OverviewAgeService.getInternet(username, request)
+      val response = Await.result(OverviewAgeService.getInternet(username, request), Duration.Inf)
       overviewAgeCache = getFilterOverview(request)-> response
       response
     }
@@ -129,8 +134,18 @@ object CacheService {
     if(getFilterOverview(request) == overviewPackageCache._1)
       overviewPackageCache._2
     else {
-      val response = OverviewPackageService.getInternet(username, request)
+      val response = Await.result(OverviewPackageService.getInternet(username, request), Duration.Inf)
       overviewPackageCache = getFilterOverview(request)-> response
+      response
+    }
+  }
+  // TAB MONTH CURRENT TRENDING
+  def getOverviewMonthResponse(request: Request[AnyContent], username: String) = {
+    if(getFilterOverview(request) == overviewMonthCache._1)
+      overviewMonthCache._2
+    else {
+      val response = Await.result(OverviewMonthService.getInternet(username, request), Duration.Inf)
+      overviewMonthCache = getFilterOverview(request)-> response
       response
     }
   }

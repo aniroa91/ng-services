@@ -11,6 +11,10 @@ import scalaj.http.Http
 import service.OverviewService.{checkExistsIndex, getListPackage, getRegionProvince}
 import services.Configure
 import services.domain.CommonService
+import scala.concurrent.{Await, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.async.Async.{async, await}
+import scala.concurrent.duration.Duration
 
 object  ChecklistService{
 
@@ -445,8 +449,8 @@ object  ChecklistService{
     s"($cause) AND ($position) AND ($processTime)"
   }
 
-  def getInternet(request: Request[AnyContent]) = {
-    logger.info("========START CHECKLIST SERVICE=========")
+  def getInternet(request: Request[AnyContent]) = async{
+    logger.info("========START SYNC CHECKLIST SERVICE=========")
     var status = 13
     var age = ""
     var region = ""
@@ -461,9 +465,9 @@ object  ChecklistService{
     var queryNested = "*"
     if(!checkExistsIndex(s"churn-contract-info-$month")) month = CommonService.getPrevMonth(2)
     // get list province of region for filter
-    val lstProvince = getRegionProvince(CommonService.getPrevMonth(2))
+    val lstProvince = Await.result(Future{ getRegionProvince(CommonService.getPrevMonth(2)) }, Duration.Inf)
     // get list package for filter
-    val lstPackage = getListPackage(month).sortWith((x, y) => x._2 > y._2).map(x=> x._1)
+    val lstPackage = Await.result(Future{ getListPackage(month).sortWith((x, y) => x._2 > y._2).map(x=> x._1) }, Duration.Inf)
     // get top 5 Nguyen nhan
     val topCause = getTopCause(month, "Nguyennhan").map(x=> x._1)
     // get top 5 vi Tri xay ra Checklist
@@ -480,7 +484,7 @@ object  ChecklistService{
       month = request.body.asFormUrlEncoded.get("month").head
       packages = request.body.asFormUrlEncoded.get("package").head
       queries = getFilterGroup(timeCL, age, region, packages, month, 1)
-      println(queries)
+      //println(queries)
       // nested query filter
       request.body.asFormUrlEncoded.get("processTime").head match {
         case "*" => {
@@ -515,6 +519,7 @@ object  ChecklistService{
       queryNested = getQueryNested(cause, position, processTime)
     }
     val t0 = System.currentTimeMillis()
+
     // Chart 1: Number of Contracts That Have Checklist(s)
     val contractAll   = getNumberOfContractAll(queries)
     val ctCheckList   = getNumberOfContractChecklist(queries, queryNested).filter(x=> contractAll.map(y=> y._1).indexOf(x._1) >=0)
@@ -524,11 +529,13 @@ object  ChecklistService{
     val mapPrevCl = getNumberOfContractChecklist(getFilterGroup(timeCL, age, region, packages, CommonService.getPrevYYYYMM(month), 0), queryNested)
     val prevCl = mapPrevCl.map(x=> x._2).sum.toInt
     // Box Count Contract have Checklist
-    val currCtCl = getUniqueContract(queries, queryNested, CommonService.getCurrentYear())
-    val prevCtCl = getUniqueContract(getFilterGroup(timeCL, age, region, packages, CommonService.getPrevYYYYMM(month), 0), queryNested, CommonService.getPrevYYYY(month))
+    val currCtCl = Await.result(Future{ getUniqueContract(queries, queryNested, CommonService.getCurrentYear()) }, Duration.Inf)
+    val prevCtCl = Await.result(Future{ getUniqueContract(getFilterGroup(timeCL, age, region, packages, CommonService.getPrevYYYYMM(month), 0),
+      queryNested, CommonService.getPrevYYYY(month)) }, Duration.Inf)
 
     logger.info("t0: "+(System.currentTimeMillis() -t0))
     val t1 = System.currentTimeMillis()
+
     // Chart 2: Churn Rate & Percentage For Customers Who Have Checklist
     val stt = if(status == 13) "(status:1 OR status:3)" else s"status:$status"
     val allChurn_count  = if(processTime == "*" && position == "*" && cause == "*") ChurnCallogService.getNumberOfContractAll(s"$stt AND $queries", "churn-contract-info-*")
@@ -536,25 +543,32 @@ object  ChecklistService{
     val trendChecklist  = calChecklistRatePertByMonth(getChurnContractbyStatus(queries, queryNested), allChurn_count , status)
     logger.info("t1: "+(System.currentTimeMillis() -t1))
     val t2 = System.currentTimeMillis()
+
     // Box Ty le RM KH co checklist
-    val currChurnChkl = calChurnRateByYear(getChurnContractbyStatus(queries, queryNested), status)
-    val prevChurnChkl = calChurnRateByYear(getChurnContractbyStatus(getFilterGroup(timeCL, age, region, packages, CommonService.getPrevYYYYMM(month), 0), queryNested), status)
+    val currChurnChkl = Await.result(Future{ calChurnRateByYear(getChurnContractbyStatus(queries, queryNested), status)}, Duration.Inf)
+    val prevChurnChkl = Await.result(Future{ calChurnRateByYear(getChurnContractbyStatus(getFilterGroup(timeCL, age, region, packages,
+        CommonService.getPrevYYYYMM(month), 0), queryNested) , status) }, Duration.Inf)
     logger.info("t2: "+(System.currentTimeMillis() -t2))
+
     /*val t3 = System.currentTimeMillis()
     // Box Ty le rm KH co nhieu checklist trong thang
     val currCtrmCLGt1 = getChurnCtHaveChecklistsByStatus(month, region, age, _type, processTime, topTypes, stt)
     val prevCtrmCLGt1 = getChurnCtHaveChecklistsByStatus(CommonService.getPrevYYYYMM(month), region, age, _type, processTime, topTypes, stt)
     logger.info("t3: "+(System.currentTimeMillis() -t3))*/
+
     val t4 = System.currentTimeMillis()
     // Thoi gian xu ly checklist 75%
-    val currQuantileTime = getQuantileProcessTime(getFilterGroup(timeCL, age, region, packages, month, 0), queryNested)
-    val prevQuantileTime = getQuantileProcessTime(getFilterGroup(timeCL, age, region, packages, CommonService.getPrevYYYYMM(month), 0), queryNested)
+    val currQuantileTime = Await.result(Future{ getQuantileProcessTime(getFilterGroup(timeCL, age, region, packages, month, 0), queryNested) }, Duration.Inf)
+    val prevQuantileTime = Await.result(Future{ getQuantileProcessTime(getFilterGroup(timeCL, age, region, packages, CommonService.getPrevYYYYMM(month), 0), queryNested) }, Duration.Inf)
     logger.info("t4: "+(System.currentTimeMillis() -t4))
 
     logger.info("Time: "+(System.currentTimeMillis() -t0))
-    logger.info("========END CHECKLIST SERVICE=========")
-    ChecklistResponse((ContractNumber(currCtCl, prevCtCl), ContractNumber(currCl, prevCl), RateNumber(currQuantileTime, prevQuantileTime)),RateNumber(currChurnChkl, prevChurnChkl),
-      ctCheckList.sortWith((x, y) => x._1 > y._1 ).slice(0, 15).sorted, trendChecklist, month, lstProvince, lstPackage, topCause, topPosition)
-
+    logger.info("========END SYNC CHECKLIST SERVICE=========")
+    await(
+      Future {
+        ChecklistResponse((ContractNumber(currCtCl, prevCtCl), ContractNumber(currCl, prevCl), RateNumber(currQuantileTime, prevQuantileTime)), RateNumber(currChurnChkl, prevChurnChkl),
+          ctCheckList.sortWith((x, y) => x._1 > y._1).slice(0, 15).sorted, trendChecklist, month, lstProvince, lstPackage, topCause, topPosition)
+      }
+    )
   }
 }

@@ -175,17 +175,6 @@
                     $('.panel-body .tab-pane').removeClass('in').removeClass('active')
                     $('#'+tab).addClass('in').addClass('active')
                     $(this).addClass('in').addClass('active')
-                    /*if(Number($(this).attr('name')) > 0){
-                        $(this).attr('name', Number($(this).attr('name'))+1)
-                        alert(0)
-                        var fields = getParamFields(document.querySelector('input[name=csrfToken]').value)
-                        console.log(fields)
-                        getCommentByTab(tab)
-                    }
-                    else{
-                        $(this).attr('name', Number($(this).attr('name'))+1)
-                        getChurnByTab(tab)
-                    }*/
                     if(tab == "tabOverview"){
                         getAjaxChurn()
                     }
@@ -194,6 +183,11 @@
                     }
                 }
             })
+            // radio tab Month
+            $('.radioPoint').on('ifChecked', function(){
+                $('#dataType').val($(this).val())
+                getChurnByTab($('#tabName').val())
+            });
             $('.sparkline1').sparkline('html',{
                 type: 'line',
                 width: '320px',
@@ -454,6 +448,28 @@
 
             });
 
+            var dailyTrend = Highcharts.chart('dailyTrend', {
+                chart:{
+                    zoomType: 'x'
+                },
+                title: {
+                    text: ''
+                },
+                xAxis: {
+                    categories: []
+                },
+                yAxis: {
+                    title: {
+                        text: null
+                    }
+                },
+                tooltip: {
+                    crosshairs: true,
+                    shared: true
+                },
+                series: []
+            });
+
             // click tooltip title
             var specifiedElement = document.getElementsByClassName('aMore');
             document.addEventListener('click', function(event) {
@@ -465,6 +481,11 @@
                     $('.tooltipSL').removeClass('fa-angle-double-up').addClass('fa-angle-double-down')
                 }
             });
+
+            $('.slPoint').on('change', function () {
+                $('#point').val(this.value)
+                getChurnByTab($('#tabName').val())
+            })
 
             function getAjaxChurn() {
                 var fields = getParamFields(document.querySelector('input[name=csrfToken]').value)
@@ -484,6 +505,7 @@
                     },
                     success: function (dta) {
                         if(dta != "Error"){
+                            $('.monthGrp').attr('style','background-color: #16a085!important;color: #fff')
                             /* update box number */
                             // box Active Contract
                             $('#boxCtActive .currCtActive').text(dta.numContract.actives.curr)
@@ -688,6 +710,9 @@
                     },
                     success: function (dta) {
                         if(dta != "Error"){
+                            $('.monthGrp').attr('style','background-color: #16a085!important;color: #fff')
+                            // comment Chart
+                            $('.comment').text(dta.cmtChart)
                             if(tab_name == "tabAge"){
                                 // bubble charts Age & Location
                                 if(dta.churnAgeLocation.data.length <= 0){
@@ -863,9 +888,6 @@
                                     })
                                 })
                                 google.visualization.events.addListener(chartRegionMonth, 'onmouseout', handlerOut)
-
-                                // comment Chart
-                                $('.comment').text(dta.cmtChart)
 
                                 // sparkline table
                                 var tBodyAge = parseTbChurnRate(dta.tbAge, dta.tbAge.arrMonth, 2)
@@ -1167,9 +1189,6 @@
                                     }
                                 }
 
-                                // comment Chart
-                                $('.comment').text(dta.cmtChart)
-
                                 // sparkline table
                                 var tBodyPkg = parseTbChurnRate(dta.tbPkg, dta.tbPkg.arrMonth, 3)
                                 $('#tbChurn3').html("").append(tBodyPkg)
@@ -1190,6 +1209,29 @@
                                         names: dta.tbPkg.arrMonth
                                     }
                                 });
+                            }
+                            else{
+                                // table Trend
+                                $('.idQuarter').text(dta.arrTbTrend.quarter)
+                                var tbTrend = $('#tbTrend').DataTable( {
+                                    "lengthChange": false,
+                                    "info":     false,
+                                    "sort":     false,
+                                    responsive: true,
+                                    destroy: true,
+                                    "scrollX": true
+                                });
+                                tbTrend.rows().remove().draw();
+                                for(var i=0;i< dta.arrTbTrend.data.length;i++){
+                                    tbTrend.row.add([dta.arrTbTrend.data[i][0], dta.arrTbTrend.data[i][1], dta.arrTbTrend.data[i][2], dta.arrTbTrend.data[i][3], 0, 0,
+                                        dta.arrTbTrend.data[i][4], 0, 0, dta.arrTbTrend.data[i][5], 0, 0, dta.arrTbTrend.data[i][6], 0, 0]).draw( false );
+                                }
+                                $('#tfooter').html('').append('<td>Tổng</td><td>'+dta.arrTbTrend.total[0][0]+'</td><td>'+dta.arrTbTrend.total[0][1]+'</td>'+
+                                        '<td>'+dta.arrTbTrend.total[0][2]+'</td><td>0</td><td>0</td><td>'+dta.arrTbTrend.total[0][3]+'</td><td>0</td><td>0</td><td>'+
+                                        dta.arrTbTrend.total[0][4]+'</td><td>0</td><td>0</td><td>'+dta.arrTbTrend.total[0][5]+'</td><td>0</td><td>0</td>')
+                                // update chart daily
+                                dailyTrend.xAxis[0].update({categories: dta.chartDaily.cateX})
+                                updateCharts(dailyTrend, getJsonDaily(dta.chartDaily.realDaily, dta.chartDaily.rangeDaily, dta.chartDaily.planDaily))
                             }
                         }
                         else{
@@ -1219,14 +1261,14 @@
             $('.btnRefresh').click(function () {
                 $('.slAge').val('').trigger('change')
                 $('.slPackage').val('').trigger('change')
-                $('.radio').removeAttr('checked').iCheck('update')
+                $('.radioCombo').removeAttr('checked').iCheck('update')
                 $('.checkbox').removeAttr('checked').iCheck('update')
                 $(".monthPicker").datepicker("update", $('#monthCurr').val())
                 $(".region").jstree("deselect_all")
                 $('#combo').val("")
                 filterCallAjax()
             })
-            $('.radio').on('ifChecked', function(){
+            $('.radioCombo').on('ifChecked', function(){
                 $('#combo').val($(this).val())
             });
             // click comment insert
@@ -1318,7 +1360,9 @@
             "package": $('.packageDiv .select2-selection__choice').text().substring(1,$('.packageDiv .select2-selection__choice').text().length).split('x').join(','),
             "month"  : $('.monthGrp').val(),
             "status" : status,
-            "tabName" : $('#tabName').val()
+            "tabName" : $('#tabName').val(),
+            "dataPoint" : $('#point').val(),
+            "dataType"  : $('#dataType').val()
         }
         //console.log(obj)
         return obj

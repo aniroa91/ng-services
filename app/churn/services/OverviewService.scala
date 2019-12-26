@@ -1,19 +1,16 @@
 package service
 
 import churn.models.{ContractNumber, OverviewResponse, RateNumber}
-import com.sksamuel.elastic4s.http.ElasticDsl.{RichFuture, RichString, SearchHttpExecutable, SearchShow, percentilesAggregation, query, rangeAggregation, search, termsAgg, termsAggregation, _}
-import com.sksamuel.elastic4s.http.search.SearchResponse
+import com.sksamuel.elastic4s.http.ElasticDsl.{RichFuture, RichString, SearchHttpExecutable, search, termsAgg, termsAggregation, _}
 import churn.utils.{CommonUtil, ProvinceUtil}
-import com.ftel.bigdata.utils.DateTimeUtil
-import org.elasticsearch.action.support.WriteRequest.RefreshPolicy
-import org.joda.time.DateTime
-import org.joda.time.format.DateTimeFormat
 import play.api.Logger
 import play.api.mvc.{AnyContent, Request}
 import services.Configure
 import services.domain.CommonService
-
-import scala.collection.immutable.Map
+import scala.concurrent.{Await, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.async.Async.{async, await}
+import scala.concurrent.duration.Duration
 
 object OverviewService{
 
@@ -62,7 +59,7 @@ object OverviewService{
     }
   }
 
-  def getTrendRegionMonth(month: String, queries: String, province: String) ={
+  def getRegionMonth(month: String, queries: String, province: String) ={
     val location = checkLocation(province)
     val request = search(s"churn-contract-info-*" / "docs") query(rangeMonth(month) +" AND "+ queries) aggregations (
       termsAggregation("month")
@@ -193,8 +190,31 @@ object OverviewService{
     cmtChart
   }
 
-  def getInternet(user: String, request: Request[AnyContent]) = {
-    logger.info("========START OVERVIEW SERVICE=========")
+  def getTrendRegionMonth(month:String, queries:String, province:String, status:String) ={
+    val arrMonth = getRegionMonth(month, queries, province)
+    val trendRegionMonth = calChurnRateAndPercentageForRegionMonth(arrMonth, status, province).sorted
+    /* get top location */
+    val topLocationByPert = getTop10OltByMonth(arrMonth, status, month, province, "percent")
+    val sizeTopLocation = topLocationByPert.length +1
+    val mapRegionMonth = (1 until sizeTopLocation).map(x=> topLocationByPert(sizeTopLocation-x-1) -> x).toMap
+    /* get top month */
+    val topLast12month = trendRegionMonth.map(x=> x._2).distinct.sortWith((x, y) => x > y).slice(0,15).sorted
+    val topMonthRegion = if(topLast12month.length >= 15) 16 else topLast12month.length+1
+    val mapMonth   = (1 until topMonthRegion).map(x=> topLast12month(x-1) -> x).toMap
+    val rsRegionMonth = trendRegionMonth.filter(x=> topLast12month.indexOf(x._2) >=0).filter(x=> topLocationByPert.indexOf(x._1) >=0)
+      .map(x=> (mapRegionMonth.get(x._1).get, mapMonth.get(x._2).get, x._3, x._4, x._5))
+
+    // sparkline table
+    val topLocationByF1 = getTop10OltByMonth(arrMonth, status, month, province, "f1")
+    val tbChurn = trendRegionMonth.filter(x=> topLast12month.indexOf(x._2) >=0).filter(x=> topLocationByF1.indexOf(x._1) >=0).map(x=> (x._1, x._2, x._3,
+      CommonService.format2Decimal(2*x._3*x._4/(x._3+x._4)), x._5))
+    Future{
+      (mapRegionMonth, mapMonth, rsRegionMonth, topLocationByF1, tbChurn)
+    }
+  }
+
+  def getInternet(user: String, request: Request[AnyContent]) = async{
+    logger.info("========START Async OVERVIEW SERVICE=========")
     val t0 = System.currentTimeMillis()
     var age = "*"
     var province = ""
@@ -206,9 +226,9 @@ object OverviewService{
     if(!checkExistsIndex(s"churn-contract-info-$month")) month = CommonService.getPrevMonth(2)
 
     // get list province of region for filter
-    val lstProvince = getRegionProvince(CommonService.getPrevMonth(2))
+    val lstProvince = Await.result(Future{ getRegionProvince(CommonService.getPrevMonth(2)) }, Duration.Inf)
     // get list package for filter
-    val lstPackage = getListPackage(month).sortWith((x, y) => x._2 > y._2).map(x=> x._1)
+    val lstPackage = Await.result(Future{ getListPackage(month).sortWith((x, y) => x._2 > y._2).map(x=> x._1) }, Duration.Inf)
 
     if(request != null) {
       age = request.body.asFormUrlEncoded.get("age").head
@@ -224,17 +244,17 @@ object OverviewService{
     val t1 = System.currentTimeMillis()
 
     // get contract by status
-    val currActive = getContractByStatus(month, 0, queries)
-    val currHuydv  = getContractByStatus(month, 1, queries)
-    val currCtbdv  = getContractByStatus(month, 3, queries)
-    val prevActive = getContractByStatus(CommonService.getPrevYYYYMM(month), 0, queries)
-    val prevHuydv  = getContractByStatus(CommonService.getPrevYYYYMM(month), 1, queries)
-    val prevCtbdv  = getContractByStatus(CommonService.getPrevYYYYMM(month), 3, queries)
+    val currActive = Await.result(Future{ getContractByStatus(month, 0, queries) }, Duration.Inf)
+    val currHuydv  = Await.result(Future{ getContractByStatus(month, 1, queries) }, Duration.Inf)
+    val currCtbdv  = Await.result(Future{ getContractByStatus(month, 3, queries) }, Duration.Inf)
+    val prevActive = Await.result(Future{ getContractByStatus(CommonService.getPrevYYYYMM(month), 0, queries) }, Duration.Inf)
+    val prevHuydv  = Await.result(Future{ getContractByStatus(CommonService.getPrevYYYYMM(month), 1, queries) }, Duration.Inf)
+    val prevCtbdv  = Await.result(Future{ getContractByStatus(CommonService.getPrevYYYYMM(month), 3, queries) }, Duration.Inf)
     logger.info("t1: "+(System.currentTimeMillis() - t1))
     val t2 = System.currentTimeMillis()
 
     // calculate churn rate for Status HUYDV + CTBDV(1 vs 3)
-    val ctMonthStatus = getContractChurnRate(month, "rate", queries)
+    val ctMonthStatus = Await.result(Future { getContractChurnRate(month, "rate", queries) }, Duration.Inf)
     val avgRateHuydv  = if(calChurnRatebyMonth(ctMonthStatus, 1).length > 0) CommonService.format3Decimal(calChurnRatebyMonth(ctMonthStatus, 1).map(x=> x._2).sum / calChurnRatebyMonth(ctMonthStatus, 1).length)
                         else 0
     val currRateHuydv = calChurnRatebyMonth(ctMonthStatus, 1).filter(x=> x._1 == month).toMap.get(month).getOrElse(0.0)
@@ -249,44 +269,29 @@ object OverviewService{
 
     val rsStatus = if(status == "" || status == "13") " AND (status:1 OR status:3)" else s" AND (status:$status)"
     // Chart trend Number Contract by month
-    val numOfMonth    = getContractChurnRate(month, "month", queries+rsStatus).sorted
+    val numOfMonth    = Await.result(Future{ getContractChurnRate(month, "month", queries+rsStatus).sorted }, Duration.Inf)
     logger.info("t3: "+(System.currentTimeMillis() - t3))
     val t4 = System.currentTimeMillis()
 
     // Churn Rate & Percent HUYDV and CTBDV
-    val trendRatePert = calRateAndPercentByMonth(getContractChurnRate(month, "month", queries), getContractChurnRate(month, "month", CommonUtil.filterCommon("package_name")), status)
+    val trendRatePert = Await.result(Future{ calRateAndPercentByMonth(getContractChurnRate(month, "month", queries), getContractChurnRate(month, "month", CommonUtil.filterCommon("package_name")), status) }, Duration.Inf)
     logger.info("t4: "+(System.currentTimeMillis() - t4))
     val t5 = System.currentTimeMillis()
 
     // Trend region and month
-    val arrMonth = getTrendRegionMonth(month, queries, province)
-    val trendRegionMonth = calChurnRateAndPercentageForRegionMonth(arrMonth, status, province).sorted
-    /* get top location */
-    val topLocationByPert = getTop10OltByMonth(arrMonth, status, month, province, "percent")
-    val sizeTopLocation = topLocationByPert.length +1
-    val mapRegionMonth = (1 until sizeTopLocation).map(x=> topLocationByPert(sizeTopLocation-x-1) -> x).toMap
-    /* get top month */
-    val topLast12month = trendRegionMonth.map(x=> x._2).distinct.sortWith((x, y) => x > y).slice(0,15).sorted
-    val topMonthRegion = if(topLast12month.length >= 15) 16 else topLast12month.length+1
-    val mapMonth   = (1 until topMonthRegion).map(x=> topLast12month(x-1) -> x).toMap
-    val rsRegionMonth = trendRegionMonth.filter(x=> topLast12month.indexOf(x._2) >=0).filter(x=> topLocationByPert.indexOf(x._1) >=0)
-      .map(x=> (mapRegionMonth.get(x._1).get, mapMonth.get(x._2).get, x._3, x._4, x._5))
-
+    val trendRegionMonth = Await.result(getTrendRegionMonth(month, queries, province, status), Duration.Inf)
     logger.info("t5: "+(System.currentTimeMillis() - t5))
-    val t6 = System.currentTimeMillis()
-    // sparkline table
-    val topLocationByF1 = getTop10OltByMonth(arrMonth, status, month, province, "f1")
-    val tbChurn = trendRegionMonth.filter(x=> topLast12month.indexOf(x._2) >=0).filter(x=> topLocationByF1.indexOf(x._1) >=0).map(x=> (x._1, x._2, x._3,
-      CommonService.format2Decimal(2*x._3*x._4/(x._3+x._4)), x._5))
-    logger.info("t6: "+(System.currentTimeMillis() - t6))
 
     // comments content
-    val cmtChart = getCommentChart(user, CommonUtil.PAGE_ID.get(0).get+"_tabOverview")
+    val cmtChart = Await.result(Future{ getCommentChart(user, CommonUtil.PAGE_ID.get(0).get+"_tabOverview") }, Duration.Inf)
 
     logger.info("Time: "+(System.currentTimeMillis() - t0))
     logger.info("========END OVERVIEW SERVICE=========")
-    OverviewResponse((ContractNumber(currActive, prevActive), ContractNumber(currHuydv, prevHuydv), ContractNumber(currCtbdv, prevCtbdv)),
-      (RateNumber(avgRateHuydv, currRateHuydv), RateNumber(avgRateCTBDV, currRateCTBDV), RateNumber(avgRateAll, currRateAll)), numOfMonth, trendRatePert,
-      lstProvince, lstPackage, (mapRegionMonth, mapMonth,rsRegionMonth), (topLocationByF1, tbChurn), cmtChart, month)
+    await(Future {
+      OverviewResponse((ContractNumber(currActive, prevActive), ContractNumber(currHuydv, prevHuydv), ContractNumber(currCtbdv, prevCtbdv)),
+        (RateNumber(avgRateHuydv, currRateHuydv), RateNumber(avgRateCTBDV, currRateCTBDV), RateNumber(avgRateAll, currRateAll)), numOfMonth, trendRatePert,
+        lstProvince, lstPackage, (trendRegionMonth._1, trendRegionMonth._2, trendRegionMonth._3), (trendRegionMonth._4, trendRegionMonth._5), cmtChart, month)
+      }
+    )
   }
 }

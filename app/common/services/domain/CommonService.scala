@@ -1,48 +1,23 @@
 package services.domain
 
 import java.text.DecimalFormat
-import java.time.format.DateTimeFormatter
-
-import churn.utils.CommonUtil
-import com.ftel.bigdata.utils.DateTimeUtil
 import org.elasticsearch.action.support.WriteRequest.RefreshPolicy
 import org.elasticsearch.search.sort.SortOrder
-import org.joda.time.{DateTime, Days, Months}
+import org.joda.time.Days
 import play.api.mvc.{AnyContent, Request}
-import service.OverviewService.client
-
-import scala.collection.mutable
 import scala.util.control.Breaks.{break, breakable}
-
-//import com.ftel.bigdata.dns.parameters.Label
-import com.ftel.bigdata.utils.DateTimeUtil
-import com.ftel.bigdata.utils.WhoisUtil
-import com.ftel.bigdata.whois.Whois
-import com.sksamuel.elastic4s.http.ElasticDsl.IndexHttpExecutable
 import com.sksamuel.elastic4s.http.ElasticDsl._
-import com.sksamuel.elastic4s.http.search.SearchResponse
 
 import scala.util.Try
 import services.Configure
-import services.Bucket2
-import com.ftel.bigdata.utils.FileUtil
-import com.ftel.bigdata.utils.HttpUtil
-import org.elasticsearch.search.aggregations.bucket.terms.Terms
-import org.apache.http.HttpHost
-import scalaj.http.Http
-import play.api.libs.json.Json
 import scala.concurrent.duration.Duration
 import scala.concurrent.duration._
 import scala.collection.mutable.ArrayBuffer
-
-import java.util.concurrent.TimeUnit
-import org.jsoup.Jsoup
-import org.jsoup.select.Elements
-import play.api.libs.json.JsObject
-import com.ftel.bigdata.utils.StringUtil
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.DateTime
-import java.time.format.DateTimeFormatter
+import churn.utils.DateTimeUtil
+import churn.utils.FileUtil
+import churn.utils.HttpUtil
 
 object CommonService extends AbstractService {
 
@@ -105,6 +80,11 @@ object CommonService extends AbstractService {
     prev.minusDays(1).toString(DateTimeUtil.YMD)
   }
 
+  def getPreviousDay(): String = {
+    val date = new DateTime()
+    date.minusDays(1).toString(DateTimeUtil.YMD)
+  }
+
   def getNextDay(day: String): String = {
     val prev = DateTimeUtil.create(day, DateTimeUtil.YMD)
     prev.plusDays(1).toString(DateTimeUtil.YMD)
@@ -150,6 +130,11 @@ object CommonService extends AbstractService {
     date.minusMonths(6).toString(DateTimeFormat.forPattern("yyyy-MM"))
   }
 
+  def getLastNumMonth(month: String, num: Int): String = {
+    val date = DateTimeUtil.create(month, "yyyy-MM")
+    date.minusMonths(num).toString(DateTimeFormat.forPattern("yyyy-MM"))
+  }
+
   def getPrevYYYY(month: String): String = {
     val next = DateTimeUtil.create(month, "yyyy-MM")
     next.minusYears(1).toString(DateTimeFormat.forPattern("yyyy"))
@@ -163,6 +148,13 @@ object CommonService extends AbstractService {
   def getpreviousMinutes(times: Int): String = {
     val date = new DateTime()
     date.minusMinutes(times).toString()
+  }
+
+  def getDayFromES5(date: String) = {
+    val ES_5_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZZ"
+    val formatter = DateTimeFormat.forPattern(ES_5_DATETIME_FORMAT)
+    val dateTime = DateTime.parse(date, formatter)
+    dateTime.toString(DateTimeFormat.forPattern("yyyy-MM-dd"))
   }
 
   def getAggregations(aggr: Option[AnyRef], hasContract: Boolean): Array[(String, Long, Long, Long, Long, Long)] = {
@@ -214,6 +206,39 @@ object CommonService extends AbstractService {
                                   }).toArray
                  (keyCard,map)
                }).toArray
+        (key, map)
+      })
+      .toArray
+  }
+
+  def getMultiAggregations4Level(aggr: Option[AnyRef], secondField: String, thirdField: String, fourField: String) = {
+    aggr.getOrElse("buckets", Map[String, AnyRef]()).asInstanceOf[Map[String, AnyRef]]
+      .getOrElse("buckets", List).asInstanceOf[List[AnyRef]]
+      .map(x => x.asInstanceOf[Map[String, AnyRef]])
+      .map(x => {
+        val key = x.getOrElse("key", "0L").toString
+        val map = x.getOrElse(s"$secondField",Map[String,AnyRef]()).asInstanceOf[Map[String,AnyRef]]
+          .getOrElse("buckets",List).asInstanceOf[List[AnyRef]]
+          .map(x => x.asInstanceOf[Map[String,AnyRef]])
+          .map(x => {
+            val keySecond = x.getOrElse("key","0L").toString
+            val map = x.getOrElse(s"$thirdField",Map[String,AnyRef]()).asInstanceOf[Map[String,AnyRef]]
+              .getOrElse("buckets",List).asInstanceOf[List[AnyRef]]
+              .map(x=> x.asInstanceOf[Map[String,AnyRef]])
+              .map(x=> {
+                val keyThird = x.getOrElse("key","0L").toString.toInt
+                val map = x.getOrElse(s"$fourField",Map[String,AnyRef]()).asInstanceOf[Map[String,AnyRef]]
+                  .getOrElse("buckets",List).asInstanceOf[List[AnyRef]]
+                  .map(x=> x.asInstanceOf[Map[String,AnyRef]])
+                  .map(x=> {
+                    val keyFour = x.getOrElse("key_as_string","0L").toString
+                    val count = x.getOrElse("doc_count",0L).toString.toLong
+                    (keyFour,count)
+                  }).toArray
+                (keyThird,map)
+              }).toArray
+            (keySecond,map)
+          }).toArray
         (key, map)
       })
       .toArray
@@ -348,6 +373,11 @@ object CommonService extends AbstractService {
     frnum.format(number);
   }
 
+  def formatPattern(number: Long): String ={
+    val frnum = new DecimalFormat("###,###.###");
+    frnum.format(number);
+  }
+
   def formatPatternDouble(number: Double): String ={
     val frnum = new DecimalFormat("###,###.###");
     frnum.format(number);
@@ -464,80 +494,5 @@ object CommonService extends AbstractService {
 
   def getHoursFromMiliseconds(miliseconds: Long): Int = {
     new DateTime(miliseconds).getHourOfDay()
-  }
-  
-  /**
-   * Create html tag
-   */
-  def getImageTag(domain: String): String = {
-    val logo = getLogo(domain, false)
-    //"<a href=\"/search?q=" + domain + "\"><img src=\"" + logo + "\" width=\"30\" height=\"30\"></a>"
-    //<img id="currentPhoto" src="SomeImage.jpg" onerror="this.src='Default.jpg'" width="100" height="120">
-    "<a href=\"/search?ct=" + domain + "\"><img src=\"" + logo + "\" onerror=\"this.src='/assets/images/logo/default.png'\" width=\"30\" height=\"30\"></a>"
-  }
-  
-  def getImageTag2(domain: String): String = {
-    val logo = getLogo(domain, false)
-    //"<a href=\"/search?q=" + domain + "\"><img src=\"" + logo + "\" width=\"30\" height=\"30\"></a>"
-    //<img id="currentPhoto" src="SomeImage.jpg" onerror="this.src='Default.jpg'" width="100" height="120">
-    "<a href=\"/search?ct=" + domain + "\"><img src=\"" + logo + "\" onerror=\"this.src='/assets/images/logo/default.png'\" width=\"20\" height=\"20\"></a>"
-  }
-  
-  def getLinkTag(domain: String): String = {
-    "<a href=\"/search?ct=" + domain + "\" class=\"titDomain\">" + domain + "</a>"
-  }
-
-  /**
-   * Download image
-   */
-//  def downloadLogo(secondDomain: String): String = {
-//    val logoUrl = Configure.LOGO_API_URL + secondDomain
-//    val path = Configure.LOGO_PATH + secondDomain + ".png"
-//    val logo = "../extassets/" + secondDomain + ".png"
-//    if (!FileUtil.isExist(path)) {
-//      println("Download logo to " + path)
-//      Try(HttpUtil.download(logoUrl, path, Configure.PROXY_HOST, Configure.PROXY_PORT))
-//    }
-//    if (FileUtil.isExist(path)) {
-//      logo
-//    } else Configure.LOGO_DEFAULT
-//  }
-
-  def getLogo(secondDomain: String, download: Boolean): String = {
-    val logoUrl = Configure.LOGO_API_URL + secondDomain
-    val path = Configure.LOGO_PATH + secondDomain + ".png"
-    val logo = "/extassets/" + secondDomain + ".png"
-    if (download) {
-      if (!FileUtil.isExist(path)) {
-        println("Download logo to " + path)
-        Try(HttpUtil.download(logoUrl, path, Configure.PROXY_HOST, Configure.PROXY_PORT))
-      }
-    }
-    if (FileUtil.isExist(path)) {
-      logo
-    } else {
-      Configure.LOGO_DEFAULT
-    }
-  }
-
-  /**
-   * ********************************************************************************
-   * ********************************************************************************
-   * ********************************************************************************
-   */
-
-  def backgroupJob(f: => Unit, msg: String) {
-    val thread = new Thread {
-      override def run {
-        val time0 = System.currentTimeMillis()
-        println("Start " +  msg)
-        //all.map(x => x.name).map(x => CommonService.getLogo(x, true))
-        f
-        val time1 = System.currentTimeMillis()
-        println("End " +  msg + s" [${time1 -time0}]")
-        
-      }
-    }
-    thread.start()
   }
 }
