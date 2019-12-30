@@ -11,7 +11,7 @@ import org.apache.spark.sql.functions._
 import org.elasticsearch.spark.sql._
 import utils.CommonUtil
 
-object JsonES{
+object InitData{
 
   val spark = SparkSession.builder().appName("Spark parquet").config("spark.master", "local").getOrCreate()
   val outSrcLocation = "/home/hoangnh44/Desktop/data/outbound/locations"
@@ -23,7 +23,7 @@ object JsonES{
     val date =  udf { s: String => CommonUtil.create(s.toLong).toString(CommonUtil.YMD) }
     val merge = udf( (first: Double, second: Double) => { CommonUtil.formatDecimalByDigit(first, 4) + " => " + CommonUtil.formatDecimalByDigit(second, 4) } )
     val df = locationDF.withColumn("day", date(col("created_time")))
-        .withColumn("address", merge(col("location.lat"),col("location.long"))).drop("location")
+      .withColumn("address", merge(col("location.lat"),col("location.long"))).drop("location")
     val dfGroup = df.groupBy("day","address").agg(count("userId")).withColumnRenamed("count(userId)", "numUser")
     dfGroup.saveToEs("loc-date/docs")
     /*df.printSchema()

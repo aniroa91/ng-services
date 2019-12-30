@@ -1,4 +1,4 @@
-name := """bigdata-play-churn"""
+name := """ng-services"""
 
 version := "1.0-SNAPSHOT"
 
